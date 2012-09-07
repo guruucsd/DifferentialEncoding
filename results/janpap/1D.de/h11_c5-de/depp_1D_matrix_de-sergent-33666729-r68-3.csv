@@ -1,0 +1,3 @@
+1D Network settings: o=[ 1.8 12.0 ] nConns=5 nHidden=11 trials=68
+
+run,hemisphere,global_target,local_target,nConns,nHidden
