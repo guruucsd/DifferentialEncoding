@@ -1,0 +1,24 @@
+function ffts = de_StatsFFTs(mss,dset)
+%
+  ffts = cell(size(mss));
+  
+  for i=1:length(mss)
+    models = mss{i};
+    
+    nImages = size(dset.X,2);
+    ffts{i} = zeros([length(models) nImages models(1).nInput]);
+    
+    for i=1:length(models)
+      model = de_LoadProps(models(i), 'ac', 'Weights');
+      [imgs]   = guru_nnExec(model.ac, dset.X, dset.X);
+
+      fprintf( '%d ', i);
+      
+      for j=1:nImages
+        img = reshape(imgs(:,j), model.nInput);
+        img = img - mean(mean(img));
+        cfft = fft2(img);
+        ffts(i,j,:,:) = reshape((cfft.*conj(cfft)), [1 1 model.nInput]);
+      end;
+    end;
+  end;

@@ -1,0 +1,59 @@
+Differential Encoder: 2D
+	Runs:       68  
+	Sigma:      4.0 
+	Sigma:      18.0
+	nConns:     40  
+	nHidden:    24  
+
+	Error Type: 2
+	RandState:  2
+	Data File:  /aihome/bcipolli/de/janpap/v1.43/data/2D.de/data2D.de.mat
+
+
+AutoEncoder:
+	AvgError:       0.0500
+	MaxIterations:  250  
+	Acc:            1.0500
+	Dec:            1.2500
+	EtaInit:        0.1000
+	WeightInitType: rand-normd
+
+
+Perceptron:
+	AvgError:       0.0000
+	MaxIterations:  100  
+	Acc:            1.0100
+	Dec:            1.2500
+	EtaInit:        0.0500
+	WeightInitType: rand-normd
+
+
+Analysis:
+	Rejection Width: 3.0000
+	Rejection Type:  maxerr
+	Rejection Type:  sample_std-normd
+
+
+Summary:
+	Rejections (ordered by Sigma): 1
+	Rejections (ordered by Sigma): 1
+
+	RAW L+S+ ID: 5.6459e-03	5.5671e-03	
+	RAW L+S+ N.ID: 7.0472e-03	5.4932e-03	
+	RAW L+S-: 3.0533e-02	3.9486e-02	
+	RAW L-S+: 4.3621e-02	3.8342e-02	
+	RAW L-S- ID: 1.4873e-01	1.7207e-01	
+	RAW L-S- N.ID: 1.2146e-01	1.2741e-01	
+	RAW L+S+: 6.3465e-03	5.5302e-03	
+	RAW L-S-: 1.3509e-01	1.4974e-01	
+
+	REJ L+S+ ID: 5.7018e-03	5.5781e-03	
+	REJ L+S+ N.ID: 7.1173e-03	5.5424e-03	
+	REJ L+S-: 3.0782e-02	3.9696e-02	
+	REJ L-S+: 4.3899e-02	3.8541e-02	
+	REJ L-S- ID: 1.5012e-01	1.7308e-01	
+	REJ L-S- N.ID: 1.2251e-01	1.2862e-01	
+	REJ L+S+: 6.4095e-03	5.5602e-03	
+	REJ L-S-: 1.3632e-01	1.5085e-01	
+
+

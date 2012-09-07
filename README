@@ -1,0 +1,8 @@
+pushd v1.43
+
+matlab -f scripts/paper/depp_1D_rezad
+cp 
+
+matlab -f scripts/paper/depp_2D_rezad
+matlab -f scripts/paper/depp_2D_sergent
+

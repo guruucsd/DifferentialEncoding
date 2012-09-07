@@ -1,0 +1,59 @@
+Differential Encoder: 1D
+	Runs:       68  
+	Sigma:      1.8 
+	Sigma:      12.0
+	nConns:     9   
+	nHidden:    11  
+
+	Error Type: 2
+	RandState:  1
+	Data File:  /aihome/bcipolli/de/paper/v1.43/data/1D.de/data1D.de.mat
+
+
+AutoEncoder:
+	AvgError:       0.0400
+	MaxIterations:  1000 
+	Acc:            1.0500
+	Dec:            1.2500
+	EtaInit:        0.1000
+	WeightInitType: randn
+
+
+Perceptron:
+	AvgError:       0.0000
+	MaxIterations:  250  
+	Acc:            1.0100
+	Dec:            1.2500
+	EtaInit:        0.0500
+	WeightInitType: randn
+
+
+Analysis:
+	Rejection Width: 3.0000
+	Rejection Type:  maxerr
+	Rejection Type:  sample_std-normd
+
+
+Summary:
+	Rejections (ordered by Sigma): 2
+	Rejections (ordered by Sigma): 1
+
+	RAW L+S+ ID: 2.0527e-03	2.1378e-03	
+	RAW L+S+ N.ID: 2.1354e-03	2.2477e-03	
+	RAW L+S-: 1.0013e-02	1.6385e-02	
+	RAW L-S+: 3.3490e-02	1.9310e-02	
+	RAW L-S- ID: 4.3181e-02	4.1086e-02	
+	RAW L-S- N.ID: 4.9596e-02	3.5121e-02	
+	RAW L+S+: 2.0940e-03	2.1928e-03	
+	RAW L-S-: 4.6389e-02	3.8104e-02	
+
+	REJ L+S+ ID: 1.6173e-03	2.0178e-03	
+	REJ L+S+ N.ID: 1.9377e-03	2.1712e-03	
+	REJ L+S-: 9.9540e-03	1.5749e-02	
+	REJ L-S+: 3.2311e-02	1.9425e-02	
+	REJ L-S- ID: 4.1224e-02	4.0499e-02	
+	REJ L-S- N.ID: 4.7951e-02	3.4602e-02	
+	REJ L+S+: 1.7775e-03	2.0945e-03	
+	REJ L-S-: 4.4588e-02	3.7551e-02	
+
+
