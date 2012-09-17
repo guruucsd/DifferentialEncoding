@@ -206,7 +206,7 @@ function figures = de_PlotFFTs(mSets, ffts)
   h(end+1) = plot(freqs_1D, pMean(1,:)-pMean(2,:), 'b', 'LineWidth', 2.0);
   h(end+1) = plot(freqs_1D, pMean(1,:)-pMean(2,:) + pStd, 'r--');
   plot(freqs_1D, pMean(1,:)-pMean(2,:) - pStd, 'r--')
-  legend(h, {'mean', 'std'}, 'Location', 'NorthEast');
+  %legend(h, {'mean', 's'}, 'Location', 'NorthEast');
   title('RH - LH');
   xlabel('spatial frequency (cycles/image)');
   ylabel('log(power)');
@@ -220,7 +220,7 @@ function figures = de_PlotFFTs(mSets, ffts)
   %%%%%%%%%%%%%%%%%%%%
   %keyboard
   
-  sigs = [0 0.05 0.1 0.2 0.5 1 3];
+  sigs = [1 0.5 0];
   for j=1:length(sigs)
 
   % Do the smoothing
@@ -307,6 +307,7 @@ function figures = de_PlotFFTs(mSets, ffts)
   bad_idx  = pals>0.05;
   pMean2 = [mean((fSm{1}),1); mean((fSm{end}),1)]; %average over models
   pStd2  = std((fSm{1}),0,1) + std((fSm{end}),0,1); %std of the log(diff)
+  pStd2  = pStd2/sqrt(nModels)
   pMean2Diff = pMean2(1,:)-pMean2(2,:);
   
   last_zero = 0;
@@ -355,14 +356,14 @@ function figures = de_PlotFFTs(mSets, ffts)
   h(end+1) = plot(freqs_1D, pMean2Diff + pStd2, 'r--');
   plot(freqs_1D, pMean2Diff - pStd2, 'r--')
 
-  legend(h, {'mean', 'std'}, 'Location', 'NorthEast');
+  %legend(h, {'mean', 'sem'}, 'Location', 'NorthEast');
   title(sprintf('RH - LH (\\sigma=%3.2f)', sig));
   xlabel('spatial frequency (cycles/image)');
   ylabel('log(power)');
     
   yl = [min(pMean2(1,:)-pMean2(2,:) - pStd2) max(pMean2(1,:)-pMean2(2,:) + pStd2)];
   set(gca,'xlim', freqs_1D([1 end]), 'ylim',yl);
-
+  keyboard
   %print(gcf, guru_getTmpFilename('test','png'), '-dpng'); %close all;
 
 
