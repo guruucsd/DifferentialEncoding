@@ -1,4 +1,4 @@
-function de_saveXLS(fn, stats, title)
+function de_SaveXLS(fn, stats, title)
 %
   error('NYI');
   if (exist('fn','file'))

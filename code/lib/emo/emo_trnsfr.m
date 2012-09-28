@@ -25,7 +25,11 @@ function [o, h1] = emo_trnsfr( Trn, z )
   case 5,                 % 0-mean sigmoid
       o = 1./(1+exp(-z)) - 0.5;
       h1 = o - o.^2;
-      
+    
+  case 6,                 % BIG tanh: 1.71*tanh(2*x/3)
+      o  = 1.7159*(2 ./ (1 + exp(-2 * 2*z/3)) - 1);
+      h1 = 1.7159*2/3*(1 - (o/1.7159).^2);
+  
   otherwise,
       error('Unknown transfer function type');
   end

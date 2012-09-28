@@ -23,6 +23,6 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   oact = o((end-nOutput+1):end,:);
   
   if (nargout>2)
-    nInput = size(Y,1);
+    nInput = size(X,1);
     huact = o((nInput+1):(end-nOutput),:);
   end;

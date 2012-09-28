@@ -22,7 +22,7 @@ function out = de_SavePlot(modelSettings, figs)
 
     % Loop over each plot
     for j=1:length(figs)
-      out.files{end+1} = de_getOutFile(modelSettings, 'plot', figs(j).name, ext, modelSettings.runs);
+      out.files{end+1} = de_GetOutFile(modelSettings, 'plot', figs(j).name, ext, modelSettings.runs);
       
       if (ismember(1,modelSettings.debug))
         fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], out.files{end});

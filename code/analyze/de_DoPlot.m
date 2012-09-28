@@ -23,10 +23,10 @@ function newfigs = de_DoPlot(plotKey, plotFn, mSets, varargin)
       end;
       if (isempty(newfigs(i).size))
         pos = get(newfigs(i).handle, 'Position');
-        newfigs(i).size = [pos(3)-pos(1) pos(4)-pos(2)];
+        newfigs(i).size = [pos(3) pos(4)];
       end;
       
-      set(newfigs(i).handle, 'Position', [0 -newfigs(i).size(2)/2 newfigs(i).size(1) newfigs(i).size(2)/2]);
+      set(newfigs(i).handle, 'Position', [0 0 newfigs(i).size(1) newfigs(i).size(2)]);
     end;
   end;
 
