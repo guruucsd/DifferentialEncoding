@@ -89,8 +89,8 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
   
   % With this info, create our X and TT vectors
   switch(dim)
-    case 1, [train.X, nInput, STIM, train.ST] = stim1D();
-    case 2, [train.X, nInput, STIM, train.ST] = stim2D();
+    case 1, [train.X, nInput, STIM, train.ST] = stim1D(opt);
+    case 2, [train.X, nInput, STIM, train.ST] = stim2D(opt);
     otherwise, error('Unknown dimensionality: %d', dim);
   end;
   % Normalize X: 0 mean, from -0.5 to 0.5
@@ -269,7 +269,6 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
           ST   = strrep(ST, 'T1', 'D2'); % set T1 to D2
           ST   = strrep(ST, '[TMP]', 'T1');% set D2 to T1
         
-        
         otherwise
           error('Unknown option: %s', opt{i});
       end;
@@ -347,7 +346,7 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
     
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,STIM,ST]= stim1D()
+  function [X,nInput,STIM,ST]= stim1D(opt)
 
     global LpSm LmSp LpSp LmSm LpSpID LpSpNID LmSmID LmSmNID
 
@@ -393,7 +392,7 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
 
    
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,STIM,ST] = stim2D()
+  function [X,nInput,STIM,ST] = stim2D(opt)
 
     global LpSm LmSp LpSp LmSm LpSpID LpSpNID LmSmID LmSmNID
     
@@ -404,6 +403,29 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
     %L_H, L_F, L_L, L_T
     load(fullfile(de_getBaseDir(), 'data','ILarge.mat'));  %load the input images 
     nInput = [31 13];
+
+    % Low-pass filter
+    if (guru_contains(opt,{'lowpass'})
+        num_images = size(X,2);
+        lowpass_filter = 2; % hard-coded for this branch only
+        filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'lowpass', lowpass_filter);
+        X = reshape(filt_images,[num_images prod(nInput)])';
+
+    % High-pass filter
+    else if (guru_contains(opt,{'highpass'})
+      highpass_filter = 10; % hard-coded for this branch only
+      num_images = size(X,2);
+      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'highpass', highpass_filter);
+      X = reshape(filt_images,[num_images prod(nInput)])';
+          
+    % Band-pass filter
+    else if (guru_contains(opt,{'bandpass'})
+      bandpass_filter = [2 10]; % hard-coded for this branch only
+      num_images = size(X,2);
+      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'bandpass', bandpass_filter);
+      X = reshape(filt_images,[num_images prod(nInput)])';
+    end;
+    
 
     % per Sergent, 1982
     STIM = {'H' 'L' 'T' 'F'};
@@ -426,6 +448,9 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
     % SpLm(zz,ss)=(sum(ERROR(9:12),2))/4;                     %L-S+
     % LpSp(zz,ss)=(sum(ERROR(4:6),2)+ERROR(:,1))/4;           %L+S+
     %LmSm(zz,ss)=(sum(ERROR(13:16),2))/4;                    %L-S-    
+
+
+
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function de_visualizeData(outFile)
