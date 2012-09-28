@@ -218,8 +218,7 @@ function figures = de_PlotFFTs(mSets, ffts)
   %%%%%%%%%%%%%%%%%%%%
   % Do the curve and stats again, but this time with smoothing
   %%%%%%%%%%%%%%%%%%%%
-  %keyboard
-  
+
   sigs = [1 0.5 0];
   for j=1:length(sigs)
 
@@ -363,10 +362,6 @@ function figures = de_PlotFFTs(mSets, ffts)
     
   yl = [min(pMean2(1,:)-pMean2(2,:) - pStd2) max(pMean2(1,:)-pMean2(2,:) + pStd2)];
   set(gca,'xlim', freqs_1D([1 end]), 'ylim',yl);
-  keyboard
-  %print(gcf, guru_getTmpFilename('test','png'), '-dpng'); %close all;
-
-
 
 
   % Plot images of LH-stat-sig-different freqeuncies 

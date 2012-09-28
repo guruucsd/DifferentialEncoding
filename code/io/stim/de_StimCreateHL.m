@@ -269,6 +269,10 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
           ST   = strrep(ST, 'T1', 'D2'); % set T1 to D2
           ST   = strrep(ST, '[TMP]', 'T1');% set D2 to T1
         
+        % taken care of elsewhere
+        case {'lowpass','highpass','bandpass'}
+          ;
+          
         otherwise
           error('Unknown option: %s', opt{i});
       end;
@@ -404,28 +408,7 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
     load(fullfile(de_getBaseDir(), 'data','ILarge.mat'));  %load the input images 
     nInput = [31 13];
 
-    % Low-pass filter
-    if (guru_contains(opt,{'lowpass'})
-        num_images = size(X,2);
-        lowpass_filter = 2; % hard-coded for this branch only
-        filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'lowpass', lowpass_filter);
-        X = reshape(filt_images,[num_images prod(nInput)])';
 
-    % High-pass filter
-    else if (guru_contains(opt,{'highpass'})
-      highpass_filter = 10; % hard-coded for this branch only
-      num_images = size(X,2);
-      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'highpass', highpass_filter);
-      X = reshape(filt_images,[num_images prod(nInput)])';
-          
-    % Band-pass filter
-    else if (guru_contains(opt,{'bandpass'})
-      bandpass_filter = [2 10]; % hard-coded for this branch only
-      num_images = size(X,2);
-      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'bandpass', bandpass_filter);
-      X = reshape(filt_images,[num_images prod(nInput)])';
-    end;
-    
 
     % per Sergent, 1982
     STIM = {'H' 'L' 'T' 'F'};
@@ -443,6 +426,29 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
     X=X/max(X(:));   %normalize the values to range from 0 to 1    
     X=1-X;  %invert the image so there will be more 0's than 1's
 
+    % Low-pass filter
+    if (guru_contains(opt,{'lowpass'}))
+        num_images = size(X,2);
+        lowpass_filter = 3; % hard-coded for this branch only
+        filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'lowpass', lowpass_filter);
+        X = reshape(filt_images,[num_images prod(nInput)])';
+
+    % High-pass filter
+    elseif (guru_contains(opt,{'highpass'}))
+      highpass_filter = 8; % hard-coded for this branch only
+      num_images = size(X,2);
+      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'highpass', highpass_filter);
+      X = reshape(filt_images,[num_images prod(nInput)])';
+          
+    % Band-pass filter
+    elseif (guru_contains(opt,{'bandpass'}))
+      bandpass_filter = [3 8]; % hard-coded for this branch only
+      num_images = size(X,2);
+      filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'bandpass', bandpass_filter);
+      X = reshape(filt_images,[num_images prod(nInput)])';
+    end;
+    
+        
     % visualize input
     % LpSm(zz,ss)=(sum(ERROR(2:3),2)+sum(ERROR(7:8),2))/4;    %L+S-
     % SpLm(zz,ss)=(sum(ERROR(9:12),2))/4;                     %L-S+
@@ -515,6 +521,6 @@ function de_StimCreateHL(dim, stimSet, taskType, opt)
       
       %
       print(strrep(outFile, '.mat', sprintf('-%s.%s', objName, 'png')), '-dpng');
-      close(gcf);
+      keyboard; close(gcf);
     end;
     
