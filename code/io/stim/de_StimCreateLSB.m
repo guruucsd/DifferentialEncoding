@@ -43,7 +43,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
   
   % With this info, create our X and TT vectors
   switch(dim)
-    case 2, [X, nInput, SUBJ, EMO, DS] = stim2D(stimSet, 'train');
+    case 2, [X, nInput, SUBJ, EMO, DS] = stim2D(stimSet, 'train', taskType);
     otherwise, error('Unknown dimensionality: %d', dim);
   end;
 
@@ -62,7 +62,6 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
   end;
   
   % Now split into train and test sets
-  keyboard
   unique_DS = unique(DS);
   for i=1:length(unique_DS)
     ds = unique_DS{i};
@@ -88,7 +87,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
     test.nInput = nInput;
     
     % Output everything (including images)  
-    outFile        = de_getDataFile(dim, ['lsb_' stimSet], taskType, {opt{:} ds});
+    outFile        = fullfile(de_getBaseDir(), 'data', de_getDataFile(dim, [stimSet], taskType, {opt{:} ds}));
     if (~exist(guru_fileparts(outFile,'pathstr'), 'dir'))
       mkdir(guru_fileparts(outFile,'pathstr'));
     end;
@@ -101,30 +100,50 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
   
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X_new, nInput_new] = de_applyOptions(opt, X, nInput)
+  function [X_new, nInput_new] = de_applyOptions(opts, X, nInput)
   %
   % Take a weighted stimulus training set, and apply some options to
   % shuffle inputs
 
-    if (isempty(opt))
+    if (isempty(opts))
       X_new = X;
       nInput_new = nInput;
       
-    elseif (length(opt) > 1)
-      error('too many options.');
+    %elseif (length(opts) > 1)
+    %  error('too many options.');
     
     else
       % each option must update ST; everything else
       %   comes from reindexing.
-      opt = opt{1};
-        
-      switch (opt)
-        case 'small', scale = 0.25;
-        case 'med',   scale = 0.5;
-        case 'large', scale = 1.0;
-        otherwise, error('Unknown option: %s', opt);
-      end;
       
+        for opt=opts
+        switch (opt{1})
+          case 'small', scale = 0.25;
+          case 'med',   scale = 0.5;
+          case 'large', scale = 1.0;
+          case 'lowpass'
+            num_images = size(X,2);
+            lowpass_filter = 3; % hard-coded for this branch only
+            filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'lowpass', lowpass_filter);
+            X = reshape(filt_images,[num_images prod(nInput)])';
+
+          case 'highpass'% High-pass filter
+            highpass_filter = 8; % hard-coded for this branch only
+            num_images = size(X,2);
+            filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'highpass', highpass_filter);
+            X = reshape(filt_images,[num_images prod(nInput)])';
+                
+          % Band-pass filter
+          case 'bandpass'
+            bandpass_filter = [3 8]; % hard-coded for this branch only
+            num_images = size(X,2);
+            filt_images = guru_filterImages(reshape(X', [num_images nInput]), 'bandpass', bandpass_filter);
+            X = reshape(filt_images,[num_images prod(nInput)])';
+          
+          otherwise, error('Unknown option: %s', opt);
+        end;
+      end;
+            
       nInput_new = size(imresize( reshape(X(:,1), nInput), scale ));
       X_new  = zeros(prod(nInput_new), size(X,2));
       for i=1:size(X,2)
@@ -185,7 +204,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
     
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,SUBJ,EMO,DS]= stim2D(set, tot, taskType)
+  function [X,nInput,SUBJ,EMO,dataset]= stim2D(set, tot, taskType)
   %
   %
   %
@@ -202,7 +221,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
         error('Couldn''t find raw CAFE files @ %s', rawdir);
       else
         makeChimeric(rawdir, indir, set);
-        [X,nInput,SUBJ,EMO,DS] = stim2D(set,tot);
+        [X,nInput,SUBJ,EMO,dataset] = stim2D(set,tot,taskType);
         return;
       end;
     end;
@@ -244,8 +263,8 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
           end;
       
           % Hacks
-          if (strcmp(parts{i},'040') && strcmp(parts{2}, 'n5'))
-            keyboard; % need to verify
+          if (strcmp(parts{1},'040') && strcmp(parts{2}, 'n5'))
+            %keyboard; % need to verify
             dataset{i} = '1';
           end;
           
@@ -261,7 +280,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
     
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [subjects,emotions,dataset] = lbl2SubjDS(TLBL)
+  function [subjects,emotions] = lbl2SubjDS(TLBL)
   %
   %
   %
@@ -292,24 +311,18 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
         
         otherwise, error('Unknown emotion: %s', parts{2});
       end;
-      
-      % Hacks
-      if (strcmp(subjects{i},'040') && strcmp(parts{2}, 'n5'))
-        dataset{i} = '1';
-      end;
     end;
   
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function makeChimeric(indir, outdir, side)  
-    keyboard
-      % make all files chimeric, then save out
+
+    % make all files chimeric, then save out
     fs = dir(fullfile(indir, '*.pgm'));
     fmt = 'pgm';
 
     for i=1:length(fs)
       f = fs(i);
-      %keyboard
       outfile = sprintf('%s_%s', guru_fileparts(f.name, 'name'), side);
 
       if (~strcmp(side, 'orig'))
@@ -327,8 +340,8 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
   %
 
     load(outFile);
-    nRows = 10;
-    nCols = 12;
+    nRows = 3;
+    nCols = 4;
     
     for objName = {'train' 'test'}
       objName = objName{1};
@@ -340,14 +353,15 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
       figure;
       set(findobj(gcf,'Type','text'),'FontSize',6) ;
     
-      for i=1:size(obj.X,2)
+      for i=1:(nRows*nCols)
+        imagei=ceil(i*size(obj.X,2)/(nRows*nCols));
         subplot(nRows,nCols,i); 
         colormap gray;
         
         switch(dim)
           % 2d images can be plotted
           case 2
-            imagesc(reshape(obj.X(:,i), nInput)); 
+            imagesc(reshape(obj.X(:,imagei), nInput));
             
           otherwise
             error('No visualization set for %dD', dim);
@@ -356,7 +370,7 @@ function makeLsbStim(dim, stimSet, taskType, opt, force)
         %
         set(gca, 'xtick',[],'ytick',[]);
         hold on;
-        xlabel(obj.XLAB);
+        xlabel(obj.XLAB(imagei));
       end;
     
       %

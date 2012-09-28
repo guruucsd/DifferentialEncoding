@@ -377,25 +377,27 @@ function figures = de_PlotFFTs(mSets, ffts)
   
   rhImg = zeros(size(ffts.orig));
   lhImg = zeros(size(ffts.orig));
-  for i=1:nImg
-    rhFFT = squeeze(ffts.orig(i, :, :)) .* ifftshift(guru_freq1to2(freqs_1D(rhFreqs), sz2D));
-    rhiFFT = ifft2(rhFFT);
-    rhImg(i, :, :) = real(rhiFFT);
+  for pli=1:16
+    imgi = ceil(pli*nImg/16);
     
-    lhFFT = squeeze(ffts.orig(i, :, :)) .* ifftshift(guru_freq1to2(freqs_1D(lhFreqs), sz2D));
+    rhFFT = squeeze(ffts.orig(imgi, :, :)) .* ifftshift(guru_freq1to2(freqs_1D(rhFreqs), sz2D));
+    rhiFFT = ifft2(rhFFT);
+    rhImg(imgi, :, :) = real(rhiFFT);
+    
+    lhFFT = squeeze(ffts.orig(imgi, :, :)) .* ifftshift(guru_freq1to2(freqs_1D(lhFreqs), sz2D));
     lhiFFT = ifft2(lhFFT);
-    lhImg(i, :, :) = real(lhiFFT);
+    lhImg(imgi, :, :) = real(lhiFFT);
 
     figure(figures(end-1).handle);
-    subplot(4,4,i);
+    subplot(4,4,pli);
     colormap('gray');
-    imagesc( squeeze(rhImg(i,:,:)), [min(mSets.data.train.X(:)) max(mSets.data.train.X(:))] );
+    imagesc( squeeze(rhImg(imgi,:,:)), [min(mSets.data.train.X(:)) max(mSets.data.train.X(:))] );
     set(gca, 'xtick',[],'ytick',[]);
 
     figure(figures(end).handle);
-    subplot(4,4,i);
+    subplot(4,4,pli);
     colormap('gray');
-    imagesc( squeeze(lhImg(i,:,:)), [min(mSets.data.train.X(:)) max(mSets.data.train.X(:))] );
+    imagesc( squeeze(lhImg(imgi,:,:)), [min(mSets.data.train.X(:)) max(mSets.data.train.X(:))] );
     set(gca, 'xtick',[],'ytick',[]);
   end;
    
