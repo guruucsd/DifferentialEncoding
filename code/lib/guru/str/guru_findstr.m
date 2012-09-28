@@ -11,17 +11,26 @@ function is = guru_findstr(str, tomatch, startIdx)
   end;
   
   if (~iscell(str))
-    is = findstr(str(startIdx:end), tomatch);
-    if (isempty(is))
-      is = -1;
+    tmp = findstr(str(startIdx:end), tomatch);
+    if (isempty(tmp))
+      is = 0;
     else
-      is = is(1);
+      is = tmp(1);
     end;
     
   else
     is = zeros(size(str));
-    for i=1:prod(size(is))
-      is(i) = guru_findstr(str{i}, tomatch, startIdx);
+    for i=1:numel(is)
+      if (~ischar(str{i}))
+          is(i) = 0;
+      else
+        tmp = findstr(str{i}(startIdx:end), tomatch);
+        if (isempty(tmp))
+          is(i) = 0;
+        else
+          is(i) = tmp(1);
+        end;
+      end;
     end;
   end;
   

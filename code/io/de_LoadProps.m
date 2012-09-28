@@ -19,7 +19,7 @@ function models = de_LoadProps(models, objname, propname)
     % Easy and efficient to do for a single model
     if (length(models)==1)
       if (~isfield(models.(objname), propname))
-        models.(objname).(propname) = guru_loadVars( de_getOutFile(models, [objname '.' inPropname]), inPropname );
+        models.(objname).(propname) = guru_loadVars( de_GetOutFile(models, [objname '.' inPropname]), inPropname );
       end;
 
     % Slower and harder to do an array of objects
@@ -27,7 +27,7 @@ function models = de_LoadProps(models, objname, propname)
       if (~isfield(models(1).(objname), propname))
         obj = {models.(objname)};
         for i=1:length(models)
-          obj{i}.Weights = guru_loadVars( de_getOutFile(models(i), [objname '.' inPropname]), inPropname );
+          obj{i}.Weights = guru_loadVars( de_GetOutFile(models(i), [objname '.' inPropname]), inPropname );
         end;
      
         [models.(objname)] = deal(obj{:});

@@ -1,10 +1,15 @@
-function [str] = guru_cell2str(cel, fmt)
-  if (~exist('fmt','var'))
-    fmt = '''%s''';
-  end;
-  
-  if (isempty(cel))
-    str = '{}';
-  else
-    str = sprintf('{%s}', sprintf([' ' fmt], cel{:}));
+function [out] = guru_cell2str(cel, div, fmt)
+%
+% if div is present, then concatenate cell elements into a string
+% if not, then return a cell matrix of strings
+
+
+  out = guru_csprintf([], cel);
+  if (exist('div','var'))
+      if (isempty(cel))
+          out = '{}';
+      else
+          out = sprintf('{%s}', sprintf([div '%s'], out{:})); 
+          out = out([1 (2+length(div)):end]);    
+      end;
   end;

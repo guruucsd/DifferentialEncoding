@@ -1,4 +1,4 @@
-function de_saveCSV(fn, stats, delim, title)
+function de_SaveCSV(fn, stats, delim, title)
 %
 
   if (~exist('delim','var'))

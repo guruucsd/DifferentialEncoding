@@ -1,4 +1,4 @@
-function de_saveCSV2(fn, stats, delim, title, mSets)
+function de_SaveCSV2(fn, stats, delim, title, mSets)
 %
 
   if (~exist('delim','var'))

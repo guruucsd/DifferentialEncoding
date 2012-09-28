@@ -13,7 +13,7 @@ function de_LogSettingsMap(mSets)
     str = [ hash sprintf(':\n') str ];
 
     % Make the output path    
-    fn = de_getOutFile(mSets, 'settings-map');
+    fn = de_GetOutFile(mSets, 'settings-map');
     if (~exist(guru_fileparts(fn, 'pathstr')))
       mkdir(guru_fileparts(fn, 'pathstr'));
     end;

@@ -1,4 +1,4 @@
-function [Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
+function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
 %[Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
 %
 %Compute error and gradient of feedforward network via backpropagation
@@ -31,6 +31,8 @@ function [Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
 
 % Copyright (C) Emanuel Todorov, 2004-2006
 
+  if (~exist('Ern','var')), Ern = 2; end;
+  if (~exist('Pow','var')), Pow = 1; end;
 
 
   % compute sizes
@@ -56,16 +58,29 @@ function [Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
   Out(1:nInput,:) = X;
 
   % run forward pass
-  for j = nInput+1:nTotal
-      z(j,:) = W(j,:)*Out;
-      [Out(j,:), h1(j,:)] = emo_trnsfr( Trn(j-nInput), z(j,:) );
-  end
+  hididx = (nInput+1):(nTotal-nOutput);
+  outidx = (nTotal-nOutput+1):nTotal;
+
+  % More than 1 hidden layer
+  if (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1)
+      for j = nInput+1:nTotal-nOutput % loop is slow?
+          z(j,:) = W(j,:)*Out;
+          [Out(j,:), h1(j,:)] = emo_trnsfr( Trn(j-nInput), z(j,:) );
+      end
+  else
+      z(hididx,:) = W(hididx,:)*Out;
+      [Out(hididx,:), h1(hididx,:)] = emo_trnsfr( Trn(hididx(1)-nInput), z(hididx,:) );
+  end;
+
+  z(outidx,:) = W(outidx,:)*Out;
+  [Out(outidx,:), h1(outidx,:)] = emo_trnsfr( Trn(outidx(1)-nInput), z(outidx,:) );
+
 
   % compute residuals (desired minus actual outputs)
   d_a = Y - Out(idxOutput,:);
 
   % initialize backward pass
-  d(idxOutput,:) = - d_a .* h1(idxOutput,:);
+  d(idxOutput,:) = - (d_a).^(Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
 
   % run backward pass
   for j = nTotal-nOutput:-1:nInput+1
@@ -75,6 +90,7 @@ function [Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
   % compute error and gradient
 %  Err = sum(sum(d_a.^2))/ 2;
   Err  = emo_nnError(d_a, Ern);
+
   Grad = (d*Out') .* Con;
 
 

@@ -1,4 +1,4 @@
-function [img] = makeChimeric(img, side)
+function [img] = guru_makeChimeric(img, side)
 %
 %
 
