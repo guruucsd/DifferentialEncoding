@@ -1,4 +1,4 @@
-%Dummy absolute frequency filtering
+%lsDummy absolute frequency filtering
 
 close all; clear all;
 
@@ -15,7 +15,7 @@ legend({'RH', 'LH'}, 'Location', 'South');
 ylabel('power');
 xlabel(sprintf('absolute\nfrequency bias'));
 
-subplot(2,4,5);
+subplot(2,4,5);Sam
 plot(x,ylow, 'b--', 'LineWidth', 2.0); hold on;
 plot(x,yhigh, 'r-', 'LineWidth', 2.0); hold on;
 set(gca, 'ylim', [0 1.5], 'FontSize', 14, 'ytick', [], 'xtick', [2 8.5], 'xticklabel', {'LSF', 'HSF'});
