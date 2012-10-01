@@ -1,6 +1,5 @@
+% Dummy plot of relative frequency filtering
 
-
-%%Ivry and Robertson Frequency Filtering
 close all; clear all;
 
 x=0:10;
@@ -38,7 +37,4 @@ plot(x,zlown, 'b--', 'LineWidth', 2.0); hold on;
 plot(x,zhighn, 'r-', 'LineWidth', 2.0); hold on;
 set(gca, 'ylim', [0 1.5], 'FontSize', 14, 'ytick', [], 'xtick', [2 8.5], 'xticklabel', {' ', ' '});
 xlabel(sprintf('relative\nfrequency bias\n '));
-
-
-
 
