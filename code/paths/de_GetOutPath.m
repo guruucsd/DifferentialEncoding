@@ -29,8 +29,8 @@ function outdir = de_GetOutPath(model, dirType)
 
     case {'conn'}
             origString = de_GetOutPath(model, 'ac_p_base');
-            hash       = sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
-
+            hash       = hash_path(origString);
+            
             outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', hash);
 
     % Top-level output directory for trained models and analysis stats.
@@ -69,7 +69,7 @@ function outdir = de_GetOutPath(model, dirType)
 %                     sprintf('XF=%d', model.ac.XferFn), ...
 %                     sprintf('WT=%s', model.ac.WeightInitType) ];
 %      %hash = mfe_md5(origString);
-%      hash = sprintf('%d', sum(origString.*[1:10:10*length(origString)]));
+%      hash = hash_path(origString);%sprintf('%d', sum(origString.*[1:10:10*length(origString)]));
 %      outdir = fullfile(de_GetOutPath(model, 'data'), hash); %saving under data directory
 
     % Directory containing all trained models.
@@ -83,7 +83,7 @@ function outdir = de_GetOutPath(model, dirType)
             %   That's what hashes are for!
             %hash = mfe_md5(origString);
             origString = de_GetOutPath(model, 'ac_p_base');
-            hash = sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
+            hash = hash_path(origString);%sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
 
             % That was just the directory name; now prepend the base directory!
             outdir = fullfile(de_GetOutPath(model, 'runs'), hash); %saving under data directory
@@ -96,7 +96,7 @@ function outdir = de_GetOutPath(model, dirType)
 
           % Ridiculous internal directory name needs to be unique, but shortened.
           %   That's what hashes are for!
-          hash = sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
+          hash = hash_path(origString);%sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
 
           % That was just the directory name; now prepend the base directory!
           outdir = fullfile(de_GetOutPath(model, 'runs'), hash); %saving under data directory
@@ -132,7 +132,7 @@ function outdir = de_GetOutPath(model, dirType)
                          sprintf('AE=%f', model.ac.AvgError), ...
                          sprintf('MI=%d', model.ac.MaxIterations), ...
                          sprintf('ET=%d', model.ac.errorType), ...
-                         sprintf('XF=%d', model.ac.XferFn), ...
+                         sprintf('XF=[ %s ]', sprintf('%d ',model.ac.XferFn)), ...
                          sprintf('UB=%d', model.ac.useBias), ...
                          sprintf('AC=%f', model.ac.Acc), ...
                          sprintf('DC=%f', model.ac.Dec), ...
@@ -159,3 +159,9 @@ function outdir = de_GetOutPath(model, dirType)
   if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
     outdir = fullfile(de_GetBaseDir(), outdir);
   end;
+  
+  
+function hp = hash_path(p)
+  hv = round( sum(p.*[1:5:5*length(p)]) );
+  guru_assert(hv<1E10, 'hash cannot be too big')
+  hp = sprintf('%d', hv);
