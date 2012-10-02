@@ -110,13 +110,13 @@
     [col,row] = find(mu==1);
     [mupos] = [col,row];
     
-    if (ismember(2,dbg))
+    if (ismember(12,dbg))
         %pcolor(mu);
         %mu
         nRows = ceil(sqrt((sH+1)*4/3));
         nCols = ceil((sH+1)/nRows);
         
-        figure;
+        %figure;
         subplot(nRows,nCols,1);
         imagesc(mu); title('Hidden node locations');
     end;
