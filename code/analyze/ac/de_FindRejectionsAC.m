@@ -22,6 +22,7 @@ function [rejMats] = de_FindRejectionsAC(mss, rejSets, stats, rejMats)
       if (~isempty(rejSets))
       % Total hack, I don't have time to deal with this right now.
       rejSets.width(isnan(rejSets.width) & strcmp(rejSets.props, 'err')) = mss{k}(1).ac.Error;
+      rejSets.width(isnan(rejSets.width) & strcmp(rejSets.props, 'ti'))  = mss{k}(1).ac.MaxIterations;
 
 
       rejMats{k}(:,end-2) = de_FindRejections_PerStat(mss{k}, de_GetRejSets(rejSets, 'err'), stats.ac.err{k});

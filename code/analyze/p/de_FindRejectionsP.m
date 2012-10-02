@@ -15,7 +15,7 @@ function [rejMats] = de_FindRejectionsP(mss, rejSets, stats, rejMats)
         rejMats = zeros(length(mss{k}), 0);
     end;
   end;
-  
+
   for k=1:nSigmas
       rejMats{k}(:,end+1:end+3) = zeros(length(mss{k}), 3);
   
