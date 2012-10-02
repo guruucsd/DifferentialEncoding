@@ -20,5 +20,5 @@ function [ERROR] = emo_nnError(errorType, RAW_ERROR, Y, T)
     case {3,'cent'}
         ERROR = -(T.*log(Y) + (1-T).*log(1-Y));
 %        fprintf('%f\n',sum(ERROR,1))
-        guru_assert(all(ERROR>=0), 'abc')
+        guru_assert(all(Y>=0 & Y<=1), 'Y must be between 0 and 1')
   end;
