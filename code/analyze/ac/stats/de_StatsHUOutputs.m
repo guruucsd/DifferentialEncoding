@@ -29,6 +29,7 @@ function out_images = de_StatsHUOutputs(mss, dset)
       Y_dummy = zeros(inPix,1);
 
       % Produce output images from single hidden unit activations
+      error('This function must be migrated to either use guru_nnExec, or to use its logic for setting up the transfer functions appropriately')
       for hu=1:nHUs
         X                             = zeros(1+model.nHidden, 1);
         if (model.ac.useBias), X(1,:) = dset.bias; end; % set bias input
