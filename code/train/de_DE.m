@@ -28,8 +28,10 @@ function [model] = de_DE(model)
 
     % Train
     if (model.ac.linout && length(model.ac.XferFn) ~= (model.nHidden+prod(model.nOutput)))
+      old_ac_xferfn = model.ac.XferFn;
       model.ac.XferFn = [model.ac.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
     elseif (length(model.ac.XferFn)==2)
+      old_ac_xferfn = model.ac.XferFn;
       model.ac.XferFn = [model.ac.XferFn(1)*ones(1,model.nHidden) model.ac.XferFn(2)*ones(1,prod(model.nOutput))];
     end;
 
@@ -48,10 +50,11 @@ function [model] = de_DE(model)
     mx = 0+max(max(model.ac.Weights(nPixels+[1:model.nHidden], 1:nPixels)));
     fprintf(' wts=[%5.2f %5.2f]', mn,mx)
 
-    % Undo expansion of XferFn
-%    if (model.ac.linout)
-%        model.ac.XferFn = model.ac.XferFn(1);
-%    end;
+    % Undo expansion of XferFn, for caching purposes
+    if (exist('old_ac_xferfn','var'))
+        model.ac.XferFn = old_ac_xferfn;
+        clear('old_ac_xferfn')
+    end;
   end;
 
   % Even if it's cached, we need the output characteristics
@@ -63,9 +66,11 @@ function [model] = de_DE(model)
     model.ac.Conn = (model.ac.Weights~=0);
 
     if (model.ac.linout && length(model.ac.XferFn) ~= (model.nHidden+prod(model.nOutput)))
+        old_ac_xferfn = model.ac.XferFn;
         model.ac.XferFn = [model.ac.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
     elseif (length(model.ac.XferFn)==2)
-      model.ac.XferFn = [model.ac.XferFn(1)*ones(1,model.nHidden) model.ac.XferFn(2)*ones(1,prod(model.nOutput))];
+        old_ac_xferfn = model.ac.XferFn;
+        model.ac.XferFn = [model.ac.XferFn(1)*ones(1,model.nHidden) model.ac.XferFn(2)*ones(1,prod(model.nOutput))];
     end;
 
     fprintf('| (cached)');
@@ -81,10 +86,11 @@ function [model] = de_DE(model)
     model.ac.output.test = o_test(nPixels+model.nHidden+[1:nPixels],:); % Do NOT grab bias
     clear('o_test');
 
-    % Undo
-%    if (model.ac.linout)
-%        model.ac.XferFn = model.ac.XferFn(1);
-%    end;
+    % Undo expansion of XferFn, for caching purposes
+    if (exist('old_ac_xferfn','var'))
+        model.ac.XferFn = old_ac_xferfn;
+        clear('old_ac_xferfn')
+    end;
   end;
 
 
@@ -130,8 +136,10 @@ function [model] = de_DE(model)
         end;
 
         if (length(model.p.XferFn)==1)
+            old_p_xferfn = model.p.XferFn;
             model.p.XferFn = model.p.XferFn*ones(1,pHidden+pOutputs);
         elseif (length(model.p.XferFn)==2)
+            old_p_xferfn = model.p.XferFn;
             model.p.XferFn = [model.p.XferFn(1)*ones(1,pHidden) model.p.XferFn(2)*ones(1,pOutputs)];
         end;
          
@@ -169,6 +177,12 @@ function [model] = de_DE(model)
         [~,~,o_test]=emo_backprop(X_test, model.data.test.T, model.p.Weights, model.p.Conn, model.p.XferFn, model.p.errorType );
 
         model.p.output.test = o_test(end-pOutputs+1:end,:);
+        
+        % Now restore xferfn, for caching purposes
+        if (exist('old_p_xferfn', 'var'))
+          model.p.XferFn = old_p_xferfn;
+          clear('old_p_xferfn')
+        end;
       end;
   end;
 
