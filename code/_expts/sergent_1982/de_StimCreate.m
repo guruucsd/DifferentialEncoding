@@ -84,7 +84,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
   % With this info, create our X and TT vectors
   [train.X, STIM, train.ST, train.nInput] = stim2D(idx);
-
+keyboard
   % Now index and apply options, including input weightings.
   if (~isempty(taskType))
 	  [train.TIDX, train.TT]                    = de_indexStim(TALL, train.ST, idx);
