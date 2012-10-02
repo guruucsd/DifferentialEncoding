@@ -14,6 +14,12 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
     
+  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (model.nHidden+prod(model.nOutput)))
+    model.XferFn = [model.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
+  elseif (length(model.XferFn)==2)
+    model.XferFn = [model.XferFn(1)*ones(1,model.nHidden) model.XferFn(2)*ones(1,prod(model.nOutput))];
+  end;
+
   % Determine model error
   [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
 
