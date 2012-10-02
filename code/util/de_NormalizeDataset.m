@@ -11,7 +11,7 @@ function dset = de_NormalizeDataset(dset, mSets)
           mSets.ac.minmax = [];
 
       else
-          switch (mSets.ac.XferFn)
+          switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
               case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
                                                        % in the [-1 1] range as well
               otherwise,  mSets.ac.minmax    = [0 1];
@@ -96,7 +96,7 @@ function dset = de_NormalizeDataset(dset, mSets)
   if (isfield(dset,'T') && isfield(mSets, 'p'))
 
       if (~isfield(mSets.p, 'minmax'))
-          switch (mSets.p.XferFn)
+          switch (mSets.p.XferFn(end)) % either a single number, or a vector with output nodes at the end
               case {4,6}, mSets.p.minmax    = [-1 1];
               otherwise,  mSets.p.minmax    = [0 1];
           end;

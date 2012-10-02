@@ -7,7 +7,6 @@ function [model,o_p] = guru_nnTrain_online(model,X,Y)
   nOutputs  = nInputs;
   nHidden   = nUnits - nInputs - nOutputs;
   
-  errorType = 4-mod(model.errorType,2); % get out all datak
   model.err = zeros([model.MaxIterations nDatapts]);
 
   % Only do if necessary, for memory reasons  
@@ -35,9 +34,9 @@ function [model,o_p] = guru_nnTrain_online(model,X,Y)
 
     for ep =1:size(X,2)
       if (exist('o_p', 'var'))
-        [model,indivCurrErr(ep), indivLastErr(ep),o_p(ip,:,ep)] = guru_nnTrain_inner(X(:,gg(ep)), Y(:,gg(ep)), model, errorType, ep, ip, indivCurrErr(ep));
+        [model,indivCurrErr(ep), indivLastErr(ep),o_p(ip,:,ep)] = guru_nnTrain_inner(X(:,gg(ep)), Y(:,gg(ep)), model, model.errorType, ep, ip, indivCurrErr(ep));
       else
-        [model,indivCurrErr(ep), indivLastErr(ep)] = guru_nnTrain_inner(X(:,gg(ep)), Y(:,gg(ep)), model, errorType, ep, ip, indivCurrErr(ep));
+        [model,indivCurrErr(ep), indivLastErr(ep)] = guru_nnTrain_inner(X(:,gg(ep)), Y(:,gg(ep)), model, model.errorType, ep, ip, indivCurrErr(ep));
       end;
     end;
     currErr = sum(indivCurrErr);
