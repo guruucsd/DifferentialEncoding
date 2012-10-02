@@ -16,12 +16,13 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
   if (~isfield(model, 'TrainMode')), model.TrainMode = 'batch'; end;
   try, startTime = toc; catch err, tic; startTime = toc; end;
   
-  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (model.nHidden+prod(model.nOutput)))
+  nUnits = size(model.Weights,1); nOutput = size(Y,1); nInput = size(X,1); nHidden = nUnits-nOutput-nInput;
+  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHidden+nOutput))
     old_xferfn = model.XferFn;
-    model.XferFn = [model.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
+    model.XferFn = [model.XferFn*ones(1,nHidden) ones(1,nOutput)]; %linear hidden->output
   elseif (length(model.XferFn)==2)
     old_xferfn = model.XferFn;
-    model.XferFn = [model.XferFn(1)*ones(1,model.nHidden) model.XferFn(2)*ones(1,prod(model.nOutput))];
+    model.XferFn = [model.XferFn(1)*ones(1,nHidden) model.XferFn(2)*ones(1,nOutput)];
   end;
 
   switch (model.TrainMode)
