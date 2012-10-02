@@ -110,12 +110,13 @@
     [col,row] = find(mu==1);
     [mupos] = [col,row];
     
-    if (ismember(2,dbg))
+    if (ismember(12,dbg))
         %pcolor(mu);
         %mu
         nRows = ceil(sqrt((sH+1)*4/3));
         nCols = ceil((sH+1)/nRows);
         
+        %figure;
         subplot(nRows,nCols,1);
         imagesc(mu); title('Hidden node locations');
     end;
@@ -175,7 +176,7 @@
       case 192, mu(2:2:end-1,2:2:end-1)=1;
       case 102, mu(2:4:end,2:4:end) = 1; mu(4:4:end,4:4:end) = 1;
       case 88,  mu(2:3:end-1,2:3:end-1)=1;
-
+      case 24, mu(3:6:end-1,3:6:end-1)=1;
       otherwise
         error('# Hidden Units NYI');
     end;
