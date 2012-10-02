@@ -7,7 +7,7 @@ function dset = de_NormalizeDataset(dset, mSets)
 
   if (~isfield(mSets.ac, 'minmax'))
 
-      if (isfield(mSets.ac, 'linout') && mSets.ac.linout) % anything can happen on the output
+      if ((isfield(mSets.ac, 'linout') && mSets.ac.linout) || (length(mSets.ac.XferFn)==2 && mSets.ac.XferFn(end)==1)) % anything can happen on the output
           mSets.ac.minmax = [];
 
       else
