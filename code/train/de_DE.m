@@ -108,7 +108,11 @@ function [model] = de_DE(model)
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
+<<<<<<< HEAD
         model.p.output.train = guru_nnExec(model.p, X_train, model.data.train.T );
+=======
+        model.p.output.train = guru_nnExec(model, X_train, model.data.train.T );
+>>>>>>> a7942e3922304b69fd62c86f089d6368220d0631
         
         
       
@@ -130,7 +134,11 @@ function [model] = de_DE(model)
         end;
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
+<<<<<<< HEAD
         model.p.output.test = guru_nnExec(model.p, X_test, model.data.test.T );
+=======
+        model.p.output.test = guru_nnExec(model, X_test, model.data.test.T );
+>>>>>>> a7942e3922304b69fd62c86f089d6368220d0631
       end;
   end;
 
