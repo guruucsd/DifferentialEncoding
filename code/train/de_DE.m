@@ -45,7 +45,6 @@ function [model] = de_DE(model)
 
   % Even if it's cached, we need the output characteristics
   %   of the model.
-  %elseif (~isfield(model.ac,'hu'))
   if (~isfield(model.ac,'hu'))
     % Make sure the autoencoder's connectivity is set.
     model = de_LoadProps(model, 'ac', 'Weights');
@@ -53,8 +52,8 @@ function [model] = de_DE(model)
 
     fprintf('| (cached)');
 
-    [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model, model.data.train.X, model.data.train.X(1:end-1,:))
-    [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model, model.data.test.X,  model.data.test.X(1:end-1,:))
+    [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
+    [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
   end;
 
 
@@ -109,7 +108,7 @@ function [model] = de_DE(model)
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.train = guru_nnExec(model, X_train, model.data.train.T );
+        model.p.output.train = guru_nnExec(model.p, X_train, model.data.train.T );
         
         
       
@@ -131,7 +130,7 @@ function [model] = de_DE(model)
         end;
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.test = guru_nnExec(model, X_test, model.data.test.T );
+        model.p.output.test = guru_nnExec(model.p, X_test, model.data.test.T );
       end;
   end;
 
