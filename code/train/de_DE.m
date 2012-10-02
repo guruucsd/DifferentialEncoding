@@ -27,8 +27,10 @@ function [model] = de_DE(model)
     Y = model.data.train.X(1:end-1,:);
 
     % Train
-    if (model.ac.linout)
+    if (model.ac.linout && length(model.ac.XferFn) ~= (model.nHidden+prod(model.nOutput)))
       model.ac.XferFn = [model.ac.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
+    elseif (length(model.ac.XferFn)==2)
+      model.ac.XferFn = [model.ac.XferFn(1)*ones(1,model.nHidden) model.ac.XferFn(2)*ones(1,prod(model.nOutput))];
     end;
 
     % Create connectivity
@@ -47,9 +49,9 @@ function [model] = de_DE(model)
     fprintf(' wts=[%5.2f %5.2f]', mn,mx)
 
     % Undo expansion of XferFn
-    if (model.ac.linout)
-        model.ac.XferFn = model.ac.XferFn(1);
-    end;
+%    if (model.ac.linout)
+%        model.ac.XferFn = model.ac.XferFn(1);
+%    end;
   end;
 
   % Even if it's cached, we need the output characteristics
@@ -60,8 +62,10 @@ function [model] = de_DE(model)
     model = de_LoadProps(model, 'ac', 'Weights');
     model.ac.Conn = (model.ac.Weights~=0);
 
-    if (model.ac.linout)
+    if (model.ac.linout && length(model.ac.XferFn) ~= (model.nHidden+prod(model.nOutput)))
         model.ac.XferFn = [model.ac.XferFn*ones(1,model.nHidden) ones(1,prod(model.nOutput))]; %linear hidden->output
+    elseif (length(model.ac.XferFn)==2)
+      model.ac.XferFn = [model.ac.XferFn(1)*ones(1,model.nHidden) model.ac.XferFn(2)*ones(1,prod(model.nOutput))];
     end;
 
     fprintf('| (cached)');
@@ -78,9 +82,9 @@ function [model] = de_DE(model)
     clear('o_test');
 
     % Undo
-    if (model.ac.linout)
-        model.ac.XferFn = model.ac.XferFn(1);
-    end;
+%    if (model.ac.linout)
+%        model.ac.XferFn = model.ac.XferFn(1);
+%    end;
   end;
 
 
@@ -125,7 +129,12 @@ function [model] = de_DE(model)
                                                                          model.p.WeightInitType);
         end;
 
-
+        if (length(model.p.XferFn)==1)
+            model.p.XferFn = model.p.XferFn*ones(1,pHidden+pOutputs);
+        elseif (length(model.p.XferFn)==2)
+            model.p.XferFn = [model.p.XferFn(1)*ones(1,pHidden) model.p.XferFn(2)*ones(1,pOutputs)];
+        end;
+         
         % Train
         [model.p] = guru_nnTrain(model.p,X_train,reshape(model.data.train.T(:,goodTrials),[pOutputs nTrials]));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
@@ -134,7 +143,6 @@ function [model] = de_DE(model)
             fprintf(' wts=[%5.2f %5.2f]', min(model.p.Weights(:)), max(model.p.Weights(:)))
         end;
         model.p            = rmfield(model.p, 'err');
-
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         [~,~,o_train]=emo_backprop(X_train, model.data.train.T, model.p.Weights, model.p.Conn, model.p.XferFn, model.p.errorType );

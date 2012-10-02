@@ -101,7 +101,10 @@ function [dnw_data,axes] = guru_dnw(data, varargin)
   %   * multiply by sqrt(lambda)
   %   * rotate back to original space
   %   * add back mean
-
+  
+  
+function V = normc(U)
+    V = U./repmat(sqrt(sum(U.^2,1)), [size(U,1), 1]);
 
 %%%%%%%
 function [Vf,Df] = eigsort(Vf,Df)

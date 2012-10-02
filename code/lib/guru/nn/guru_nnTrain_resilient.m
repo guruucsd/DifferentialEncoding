@@ -7,7 +7,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   nOutputs  = nInputs;
   %nHidden   = nUnits - nInputs - nOutputs;
 
-  errorType = 4-mod(model.errorType,2); % get out all datak
   model.err = zeros([model.MaxIterations nDatapts]);
 
   % Only do if necessary, for memory reasons
@@ -36,9 +35,9 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
     % Determine model error
     if (nargout>1)
-        [model.err(ip,:),grad, o_p(ip,:,:)]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, errorType, model.Pow );
+        [model.err(ip,:),grad, o_p(ip,:,:)]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType, model.Pow );
     else
-        [model.err(ip,:),grad]             =emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, errorType, model.Pow );
+        [model.err(ip,:),grad]             =emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType, model.Pow );
     end;
 
 

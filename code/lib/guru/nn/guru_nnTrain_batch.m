@@ -7,7 +7,6 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
   nOutputs  = nInputs;
   nHidden   = nUnits - nInputs - nOutputs;
 
-  errorType = 4-mod(model.errorType,2); % get out all datak
   model.err = zeros([model.MaxIterations nDatapts]);
 
   % Only do if necessary, for memory reasons
@@ -39,9 +38,9 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
     ep = 1:size(X,2);
 
     if (exist('o_p', 'var'))
-      [m, c, l, g, o] = guru_nnTrain_inner(X, Y, model, errorType, ep, ip, currErr, grad);
+      [m, c, l, g, o] = guru_nnTrain_inner(X, Y, model, model.errorType, ep, ip, currErr, grad);
     else
-      [m, c, l, g   ] = guru_nnTrain_inner(X, Y, model, errorType, ep, ip, currErr, grad);
+      [m, c, l, g   ] = guru_nnTrain_inner(X, Y, model, model.errorType, ep, ip, currErr, grad);
     end;
 
     % If it's good, update.  Otherwise, step-size will be shrunk, so preserve the same gradient, but take a smaller step!
