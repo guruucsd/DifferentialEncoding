@@ -1,4 +1,4 @@
-function [ERROR] = emo_nnError(RAW_ERROR, errorType)
+function [ERROR] = emo_nnError(errorType, RAW_ERROR, Y, T)
 %
 % Input:
 % RAW_ERROR  :
@@ -15,10 +15,10 @@ function [ERROR] = emo_nnError(RAW_ERROR, errorType)
   end;
   
   switch(errorType)
-    case 1, ERROR = abs(RAW_ERROR);
-    case 2, ERROR = (RAW_ERROR.^2)/2;
-    case 3, ERROR = sum(emo_nnError(RAW_ERROR,1),1);
-    case 4, ERROR = sum(emo_nnError(RAW_ERROR,2),1);
-    case 5, ERROR = sum(emo_nnError(RAW_ERROR,3));
-    case 6, ERROR = sum(emo_nnError(RAW_ERROR,4));
+    case {1,'abs'}, ERROR = abs(RAW_ERROR);
+    case {2,'squ'}, ERROR = (RAW_ERROR.^2)/2;
+    case {3,'cent'}
+        ERROR = -(T.*log(Y) + (1-T).*log(1-Y));
+%        fprintf('%f\n',sum(ERROR,1))
+        guru_assert(all(ERROR>=0), 'abc')
   end;

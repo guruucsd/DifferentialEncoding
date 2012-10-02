@@ -89,7 +89,7 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
 
   % compute error and gradient
 %  Err = sum(sum(d_a.^2))/ 2;
-  Err  = emo_nnError(d_a, Ern);
+  Err  = sum(emo_nnError(Ern, d_a, Out(idxOutput,:), Y), 1);
 
   Grad = (d*Out') .* Con;
 

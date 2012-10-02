@@ -13,11 +13,9 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
 %  o    : calculated output at LAST step.
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
-  
-  errorType   = 4-mod(model.errorType,2); % get out all data
-  
+    
   % Determine model error
-  [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, errorType );
+  [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
 
   nOutput = size(Y,1);
   oact = o((end-nOutput+1):end,:);
