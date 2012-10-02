@@ -64,9 +64,8 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
     LS_stde  = zeros(length(mSets.data.train.TIDX),1);
     for j=1:length(mSets.data.train.TIDX)
       x      = tmp(:,mSets.data.train.TIDX{j});
-      x      = reshape(x,[prod(size(x)) 1]);
-      LS_mean(j) = mean(x);
-      LS_stde(j) = guru_stde(x);
+      LS_mean(j) = mean(x(:));
+      LS_stde(j) = guru_stde(x(:));
     end;
 
     
