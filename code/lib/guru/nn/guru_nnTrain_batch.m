@@ -49,8 +49,7 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
        currErr = c;
        lastErr = l;
        grad = g;
-    else
-%       fprintf('c=%5.3e , f=%5.3e , diff=%5.3e\n', c/numel(Y),l/numel(Y),(l-c)/numel(Y));
+    else % bad, so just update some parameters and try again
        model.Eta    = m.Eta; % update the step-size
        model.lambda = m.lambda; % update the step-size
        if (ip>1), model.err(ip,:) = model.err(ip-1,:); end; % hack since ip=0 and ip=1 write to first row of model.err

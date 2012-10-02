@@ -35,14 +35,12 @@ function [model, currErr, lastErr, newgrad, o_p] = guru_nnTrain_inner(X, Y, m, e
     % Had a problem; probably moving too fast.
     if (any(isnan(m.err(ip,ep))))
       model.Eta = model.Eta/model.Dec;
-%      model.lambda = model.lambda/model.Dec;
       model.err = m.err;
       fprintf('*');
 
     % We're getting worse, slow things down
     elseif( currErr > lastErr && (ip/model.MaxIterations > 0.00)) % don't start decelerating until after at least 5% of iterations
       model.Eta=model.Eta/model.Dec;
-%      model.lambda = model.lambda/model.Dec;
       model.err = m.err;
       fprintf('*');
 

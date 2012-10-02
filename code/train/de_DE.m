@@ -136,10 +136,10 @@ function [model] = de_DE(model)
         end;
 
         if (length(model.p.XferFn)==1)
-            old_p_xferfn = model.p.XferFn
+            old_p_xferfn = model.p.XferFn;
             model.p.XferFn = model.p.XferFn*ones(1,pHidden+pOutputs);
         elseif (length(model.p.XferFn)==2)
-            old_p_xferfn = model.p.XferFn
+            old_p_xferfn = model.p.XferFn;
             model.p.XferFn = [model.p.XferFn(1)*ones(1,pHidden) model.p.XferFn(2)*ones(1,pOutputs)];
         end;
          
