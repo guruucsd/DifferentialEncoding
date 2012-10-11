@@ -1,4 +1,6 @@
-%Dummy absolute frequency filtering
+% Dummy relative frequency filtering
+%   (used in dissertation proposal)
+% See also absfreq
 
 close all; clear all;
 

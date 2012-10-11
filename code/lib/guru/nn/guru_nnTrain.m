@@ -37,7 +37,11 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
       case 'resilient'
         if (nargout<2), [model]     = guru_nnTrain_resilient(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_resilient(model,X,Y); end;
-        
+
+      case 'bptt'
+        if (nargout<2), [model]     = guru_nnTrain_bptt_batch(model,X,Y);
+        else,           [model,o_p] = guru_nnTrain_bptt_batch(model,X,Y); end;
+
       otherwise
         error('Unknown training type: %s', model.trainMode);
   end;

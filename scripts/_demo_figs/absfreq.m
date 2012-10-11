@@ -1,4 +1,6 @@
-% Dummy plot of relative frequency filtering
+% Dummy plot of absolute frequency filtering
+%   (used in dissertation proposal)
+% See also: relfreq
 
 close all; clear all;
 

@@ -1,13 +1,22 @@
+% Show sample distributions of wide vs narrow connections
+
 clear all; close all;
 
 
-imageSize = [31 13];      % input/output size
-nConns    = 100;              % # connections from hidden->input/output
+addpath(genpath('../../code');
+de_SetupExptPaths('young_bion_1981');
+
+
+nConns    = 25;              % # connections from hidden->input/output
+sigmas    = [3 16];
+imageSize = [34 25];      % input/output size
 gshape    = [2.5 0;0 1];      % multivariate gaussian sigma shape
-sigmas    = [3 6];
 huloc     = imageSize/2;    % position of hidden unit in center of image
 gridfreq  = 0.5;
 nSamples  = 1000;
+
+%a = de_connector2D([34 25],1,1,25,'norme',0,3,0,1); %
+%a(:,851)==input=>hidden
 
 % Sample the connections
 allcxns = zeros([nSamples length(sigmas) nConns 2]);
