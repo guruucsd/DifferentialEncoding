@@ -66,6 +66,9 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     if (isfield(model, 'wmax'))
         over_wts = abs(model.Weights)>model.wmax;
         model.Weights(over_wts) = sign(model.Weights(over_wts)) .* model.wmax;
+    elseif (isfield(model, 'wlim'))
+        model.Weights(model.Weights<model.wlim(1)) = model.wlim(1);
+        model.Weights(model.Weights>model.wlim(2)) = model.wlim(2);
     end;
 
     % We're getting better, speed things up

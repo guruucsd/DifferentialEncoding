@@ -12,8 +12,11 @@ function [model, currErr, lastErr, newgrad, o_p] = guru_nnTrain_inner(X, Y, m, e
     if (any(isnan(m.Weights(:))))
         error('model weights nan');
     end;
-    if (isfield(model, 'wmax'))
+    if (isfield(m, 'wmax'))
         m.Weights = sign(m.Weights).*min(abs(m.Weights), m.wmax);
+    elseif (isfield(m, 'wlim'))
+        m.Weights(m.Weights<m.wlim(1)) = m.wlim(1);
+        m.Weights(m.Weights>m.wlim(2)) = m.wlim(2);
     end; % max weights
 
 
