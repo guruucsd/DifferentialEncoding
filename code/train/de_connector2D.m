@@ -14,14 +14,14 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
   %  Con
   
     if (~exist('dbg','var')), dbg=0; end;
-    if (~exist('tol','var')), tol=0.01; end;
+    if (~exist('tol','var')), tol=0; end;
 
     %
     parts       = mfe_split('-',distn);
     distn_name  = parts{1}; opts = parts(2:end); clear('parts');
     inPix       = prod(sI);              %total number of nodes in the input layer
     Con         = logical(spalloc(2*inPix+sH, 2*inPix+sH, 2*numCon*sH)); %
-    halfCon     = logical(spalloc(sH,inPix, numCon*sH)); %autoencoders have summetric connections, so you
+    halfCon     = logical(spalloc(sH,inPix, numCon*sH)); %autoencoders have symmetric connections, so you
 
     [mu, mupos] = de_connector_positions(sI, sH/hpl, dbg);
     nLoc        = size(mupos,1);
@@ -224,12 +224,13 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     nNotCon = sum(~sum(halfCon,1)>0);
 
     if (nNotCon/prod(sI) > tol)
-        clear('halfCon', 'Con');
         
         x      = dbstack();
         nCalls = sum(strcmp(x(1).name, {x.name}));
         if (nCalls >= 200)
             error('Failed to connect network to ALL inputs/outputs after %d calls; quitting...', nCalls);
+        else
+            clear('halfCon', 'Con');
         end;
         
         if (dbg), fprintf('.'); end;

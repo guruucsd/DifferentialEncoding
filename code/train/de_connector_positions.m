@@ -176,7 +176,8 @@
       case 192, mu(2:2:end-1,2:2:end-1)=1;
       case 102, mu(2:4:end,2:4:end) = 1; mu(4:4:end,4:4:end) = 1;
       case 88,  mu(2:3:end-1,2:3:end-1)=1;
-      case 24, mu(3:6:end-1,3:6:end-1)=1;
+      case 24,  mu(3:6:end-1,3:6:end-1)=1;
+      case 1,   mu( round(size(mu,1)/2), round(size(mu,2)/2) ) = 1;
       otherwise
         error('# Hidden Units NYI');
     end;
