@@ -1,5 +1,7 @@
+% I believe this essentially duplicates demo_2layer
+
 clear all; %close all;
-addpath(genpath('../../de/code'))
+addpath(genpath('../../code'))
 
 sz = [20 20];
 nbatches = 10;

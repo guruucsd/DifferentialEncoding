@@ -3,23 +3,23 @@
 clear all; close all;
 
 
-addpath(genpath('../../code');
+addpath(genpath('../../code'));
 de_SetupExptPaths('young_bion_1981');
 
 
-nConns    = 25;              % # connections from hidden->input/output
+nConns    = 5;              % # connections from hidden->input/output
 sigmas    = [3 16];
 imageSize = [34 25];      % input/output size
 gshape    = [2.5 0;0 1];      % multivariate gaussian sigma shape
 huloc     = imageSize/2;    % position of hidden unit in center of image
 gridfreq  = 0.5;
-nSamples  = 1000;
+nSamples  = 1;
 
 %a = de_connector2D([34 25],1,1,25,'norme',0,3,0,1); %
 %a(:,851)==input=>hidden
 
 % Sample the connections
-allcxns = zeros([nSamples length(sigmas) nConns 2]);
+allcxns = zeros([nSamples length(sigmas) nConns+1 2]);
 allsamps = zeros([length(sigmas) imageSize]);
 
 for n=1:nSamples
@@ -41,7 +41,7 @@ for n=1:nSamples
         end;
         cxns = cxns(randperm(size(cxns,1)), :); % Gotta cut back, 
         cxns = cxns(1:nConns,:);                % but the conns were sorted
-        
+        cxns(end+1,:) = round(huloc);
         %
         allcxns(n,i,:,:) = cxns;
         
@@ -56,6 +56,7 @@ allsamps = allsamps/nSamples/nConns;
 %%%%%%%%%%%%%%%
 % 3D average plot of connectivity
 %%%%%%%%%%%%%%%
+if (false)
 zl = [0 max(allsamps(:))]*2/3;
 figure;
 set(gcf, 'Position', [78          71        1098         606])
@@ -76,7 +77,7 @@ for i=1:length(sigmas)
     surf(grd');
     plot3(huloc(1), huloc(2), grd(round(huloc(1)), round(huloc(2))), 'go','MarkerSize', 5, 'LineWidth', 5);
 end;
-
+end;
 
 
 %%%%%%%%%%%%%%%
@@ -86,7 +87,9 @@ figure;
 set(gcf, 'Position', [78          71        1098         606])
 
 for i=1:length(sigmas)
-    subplot(1,length(sigmas),i); hold on;
+    
+    % 3-layer plot
+    subplot(2, length(sigmas),i); hold on;
     daspect(gca, [1 1 1/10])
     
     cxns = squeeze(allcxns(1,i,:,:));
@@ -102,18 +105,42 @@ for i=1:length(sigmas)
     plot3(X,Y, 2*ones(size(X)), 'k.', 'MarkerSize', 0.5);
 
     %inputs
-    plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'bo','MarkerSize', 5, 'LineWidth', 5);
+    plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
 
     % outputs
-    plot3(cxns(:,1), cxns(:,2), 2*ones(size(cxns(:,2))), 'bo','MarkerSize', 5, 'LineWidth', 5);
+    plot3(cxns(:,1), cxns(:,2), 2*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
 
     % connect them
-    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1]); end;
-    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [2 1]); end;
+    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
+    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [2 1], 'k', 'LineWidth', 2); end;
 
     % hidden unit
     plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'LineWidth', 10)
     
-%    zoom(2);
+
+    % 2-layer plot
+    subplot(2, length(sigmas),length(sigmas)+i); hold on;
+    daspect(gca, [1 1 1/10])
+    
+    cxns = squeeze(allcxns(1,i,:,:));
+    
+    view(-28,43);
+    set(gca, 'xlim', [1 imageSize(1)], 'ylim', [1 imageSize(2)], 'zlim', [0 1]);
+    set(gca, 'xtick', [], 'ytick', []);
+    set(gca, 'ztick', [0 1], 'zticklabel', {'Input', 'Output'});
+
+    %Plot input/output layers
+    [X,Y] = meshgrid(1:gridfreq*2:imageSize(1), 1:gridfreq*2:imageSize(2)); % all inputs
+    plot3(X,Y, zeros(size(X)),  'k.', 'MarkerSize', 0.5);  % input layer: 
+
+    %inputs
+    plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
+    plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
+    
+    % connect them
+    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
+    
+    % hidden unit
+    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 5, 'linewidth', 5)
 end;
 

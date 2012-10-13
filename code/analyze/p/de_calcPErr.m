@@ -9,8 +9,7 @@ function err = de_calcPErr(o_p, T, errorType)
   goodTrials = ~isnan(sum(T,1));
   vecT    = reshape(T(:,goodTrials), [1 numel(T(:,goodTrials))]);
   Y       = repmat(vecT, [nModels 1]);
-  
-  err     = emo_nnError(errorType, o_p - Y, o_p, T);
+  err     = emo_nnError(errorType, o_p - Y, o_p, Y);
 
 %  if (size(T,1) ~= 1)
 %    err     = reshape(err, [nModels size(T)]);
