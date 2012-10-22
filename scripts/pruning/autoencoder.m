@@ -137,7 +137,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
 	f             = ws.fimages(:,ws.trainset);      
 	model.absmean = 1.26E-2;
 	model.minmax  = [];
-	dset          = de_NormalizeDataset(struct('X', f), struct('ac',model)); 
+	dset          = de_NormalizeDataset(struct('X', f, 'name','train'), struct('ac',model));
 	X             = dset.X;               % Input vectors;  [pixels examples]
 	Y             = dset.X(1:end-1,:);    % everything but the bias
 	clear('dset');
@@ -271,7 +271,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
 			sum(ws.iters_per), ...
 			sum(ws.iters_per));
 	f                   = ws.fimages(:,ws.trainset);        
-	dset                = de_NormalizeDataset(struct('X', f), struct('ac',model)); 
+	dset                = de_NormalizeDataset(struct('X', f, 'name','full-fidelity'), struct('ac',model));
 	X                   = dset.X;               % Input vectors;  [pixels examples]
 	X(end,:)            = dset.bias;            % Keep same bias value
 	Y                   = dset.X(1:end-1,:);    % everything but the bias
@@ -292,7 +292,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     
     
     % 1. Test set error
-	dset          = de_NormalizeDataset(struct('X', ws.fimages(:,ws.testset)), struct('ac',model));
+	dset          = de_NormalizeDataset(struct('X', ws.fimages(:,ws.testset), 'name','test'), struct('ac',model));
 	X_test        = dset.X;              % Input vectors;  [pixels examples]
 	X_test(end,:) = X(end,1);            % set bias to be the same as in the training set
 	Y_test        = dset.X(1:end-1,:);   % everything but the bias    
