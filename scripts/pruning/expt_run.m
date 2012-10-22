@@ -3,10 +3,13 @@
 tic;
 clear all variables;
 close all;
-addpath(genpath('~/de/code/lib/'));
-addpath(genpath('~/de/code/paths/'));
-addpath(genpath('~/de/code/train/'));
-addpath(genpath('~/de/code/util/'));
+addpath(genpath('../../code'));
+de_SetupExptPaths('sergent_1982');
+
+%~/de/code/lib/'));
+%addpath(genpath('~/de/code/paths/'));
+%addpath(genpath('~/de/code/train/'));
+%addpath(genpath('~/de/code/util/'));
 
 %= Sig=6, 15->10 nhidden=850*2 on a 10-10-10-10-10 sched
 %= Sig=6, 10->5 nhidden=850*2 on a 10-10-10-10-10 sched
