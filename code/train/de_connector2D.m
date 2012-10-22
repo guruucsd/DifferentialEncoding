@@ -94,20 +94,17 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                       cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
                       pdn   = mvnpdf(X, mn, cv);
 	
-                  case {'norme'}
+                  case {'norme', 'norme2'}
                       theta = 2*pi*rand; %really just need pi (half circle is enough; distn's are symmetric), but ...
                       rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
                       
                       mn    = mupos(mi,:);
                       cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
                       pdn   = mvnpdf(X, mn, cv);
-                      
-                  case {'norme2'} %some different oblong shape
-                      theta = 2*pi*rand;
-                      rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-                      pts = mvnrnd([0,0],[sig/2 0;0 sig/15 + 1/2],numCon);
-                      pts = round(rm*pts')' + repmat(mupos(mi,:),[numCon 1]);
-                     error('NYI');
+                      if strcmp(distn_name, 'norme2')
+                        [~,mp] = max(pdn);
+                        pdn(mp) = 1E10; % always connects to its own position
+                      end;
                       
                   case {'normn'} %norme, but always the same orientation
                       theta = pi/2;
@@ -178,36 +175,35 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
           cnn    = zeros(numCon,1);
 
           for ci=1:numCon
-			  
-			  val     = cdn(end)*rand; % Now select.
-			  cnn(ci) = find(cdn<val,1,'last'); % find the first instance above that value
-    		  curidx  = cnn(ci);%idx(cnn(ci));
-    		  
-    		  layer (X(curidx,1), X(curidx,2)) = true;
-    		  alllyr(X(curidx,1), X(curidx,2)) = alllyr(X(curidx,1), X(curidx,2))+1;
-    		  
-    		  % Now remove that one from the list before continuing
-     		  plost = cdn(curidx+1)-cdn(curidx);%pdn(curidx)*w(curidx);
-     		  %guru_assert(~any(0>(cdn((curidx+2):end)-plost)));
-     		  
-    		  cdn(curidx+1) = cdn(curidx);
-    		  cdn((curidx+2):end) = cdn((curidx+2):end)-plost;
+            val     = cdn(end)*rand; % Now select.
+            cnn(ci) = find(cdn<val,1,'last'); % find the first instance above that value
+            curidx  = cnn(ci);%idx(cnn(ci));
+            
+            layer (X(curidx,1), X(curidx,2)) = true;
+            alllyr(X(curidx,1), X(curidx,2)) = alllyr(X(curidx,1), X(curidx,2))+1;
+            
+            % Now remove that one from the list before continuing
+            plost = cdn(curidx+1)-cdn(curidx);%pdn(curidx)*w(curidx);
+            %guru_assert(~any(0>(cdn((curidx+2):end)-plost)));
+            
+            cdn(curidx+1) = cdn(curidx);
+            cdn((curidx+2):end) = cdn((curidx+2):end)-plost;
 
-              % Update this after the above.
-    		  w(curidx) = w(curidx)*weight_factor; % don't need to update cdn now, as we don't connect to the same node in the same layer anyway.
-    		  if (~any(w)), % unless we run out of nodes to connect to!
-    		      w=ones(size(w)); 
-                  cdn    = [0;cumsum(max(eps,pdn).*w)];
-                  cdn    = cdn(idx);
-    		  end;
-		  end;
-		  
-		  if (ismember(10,dbg))
-		  	if (mod(li,100)==0), fprintf(' %d', li); end;
-		  end;
+                % Update this after the above.
+            w(curidx) = w(curidx)*weight_factor; % don't need to update cdn now, as we don't connect to the same node in the same layer anyway.
+            if (~any(w)), % unless we run out of nodes to connect to!
+              w=ones(size(w));
+              cdn    = [0;cumsum(max(eps,pdn).*w)];
+              cdn    = cdn(idx);
+            end;
+        end;
+        
+        if (ismember(10,dbg))
+          if (mod(li,100)==0), fprintf(' %d', li); end;
+        end;
 
-          hi            = (h-1)*(sH/hpl)+mi; % unit # in sH, from 1:sH
-          halfCon(hi,:) =reshape(layer,1,inPix);
+        hi            = (h-1)*(sH/hpl)+mi; % unit # in sH, from 1:sH
+        halfCon(hi,:) =reshape(layer,1,inPix);
       end; %per loc
     end % per hidden unit
 
