@@ -30,7 +30,7 @@
     fprintf(fh, '\tGrad Power:     %-5d\n',   mSets.ac.Pow);
     fprintf(fh, '\tLambda (wt dcy):%-5d\n',   mSets.ac.lambda);
     fprintf(fh, '\tWeightInitType: %s\n',     mSets.ac.WeightInitType);
-    fprintf(fh, '\tNoise_input:    %s\n',     mSets.ac.noise_input);
+    fprintf(fh, '\tNoise_input:    %f\n',     mSets.ac.noise_input);
     fprintf(fh, '\n\n');
     
     if (isfield(mSets, 'p'))
@@ -48,7 +48,7 @@
         fprintf(fh, '\tGrad Power:     %-5d\n',   mSets.p.Pow);
         fprintf(fh, '\tLambda (wt dcy):%-5d\n',   mSets.p.lambda);
         fprintf(fh, '\tWeightInitType: %s\n',     mSets.p.WeightInitType);
-        fprintf(fh, '\tNoise_input:    %s\n',     mSets.p.noise_input);
+        fprintf(fh, '\tNoise_input:    %f\n',     mSets.p.noise_input);
         fprintf(fh, '\n\n');
     end;
 

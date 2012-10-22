@@ -3,11 +3,10 @@ function w = guru_nnInitWeights(c,type,params)
 %
 %
   sz = size(c);
-
   switch (type)
     case 'rand',        w = rand(sz);
       
-    case 'rand-normd',  if (~exist('params','var')), params=[0.5 1]; end;
+    case 'rand-normd',  if (~exist('params','var')), params=[0 1]; end;
                         w = guru_nnInitWeights(c,'rand');
                         w = (w - params(1))/(params(2));
                         

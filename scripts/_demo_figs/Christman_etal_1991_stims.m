@@ -1,4 +1,8 @@
-clear all; close all;
+% Produce freq gratings similar to Christman et al (1991)
+% see also Kitterle_etal_1992_stims
+
+clear all; %close all;
+vertical = false;
 
 %% Christman
 x = linspace(-pi, pi, 31);
@@ -20,33 +24,61 @@ y4 = mean(minmax) + (diff(minmax)/2)*sin((f4/(2*pi)) * x);
 
 figure;
 
-%subplot(2,3,1);
-subplot(3,2,1);
-imshow( repmat( (y0+y1)/2, length(x), 1) );
-xlabel('f0+f1');
+if (vertical)
+    %subplot(2,3,1);
+    subplot(3,2,1);
+    imshow( repmat( (y0+y1)/2, length(x), 1) );
+    xlabel('f0+f1');
 
-subplot(3,2,3);
-%subplot(2,3,2);
-imshow( repmat( (y0+y1+y2)/3, length(x), 1) );
-xlabel('f0+f1+f2');
+    subplot(3,2,3);
+    %subplot(2,3,2);
+    imshow( repmat( (y0+y1+y2)/3, length(x), 1) );
+    xlabel('f0+f1+f2');
 
-subplot(3,2,5);
-%subplot(2,3,3);
-imshow( repmat(y2, length(x), 1) );
-xlabel('f2 (relatively HSF)');
+    subplot(3,2,5);
+    %subplot(2,3,3);
+    imshow( repmat(y2, length(x), 1) );
+    xlabel('f2 (relatively HSF)');
 
 
-subplot(3,2,2);
-%subplot(2,3,4);
-imshow( repmat((y3+y4)/2, length(x), 1) );
-xlabel('f3+f4');
+    subplot(3,2,2);
+    %subplot(2,3,4);
+    imshow( repmat((y3+y4)/2, length(x), 1) );
+    xlabel('f3+f4');
 
-subplot(3,2,4);
-%subplot(2,3,5);
-imshow( repmat((y2+y3+y4)/3, length(x), 1) );
-xlabel('f2+f3+f4');
+    subplot(3,2,4);
+    %subplot(2,3,5);
+    imshow( repmat((y2+y3+y4)/3, length(x), 1) );
+    xlabel('f2+f3+f4');
 
-subplot(3,2,6);
-%subplot(2,3,6);
-imshow( repmat(y2, length(x), 1) );
-xlabel('f2 (relatively LSF)');
+    subplot(3,2,6);
+    %subplot(2,3,6);
+    imshow( repmat(y2, length(x), 1) );
+    xlabel('f2 (relatively LSF)');
+else
+
+    subplot(2,3,1);
+    imshow( repmat( (y0+y1)/2, length(x), 1) );
+    xlabel('f0+f1');
+
+    subplot(2,3,2);
+    imshow( repmat( (y0+y1+y2)/3, length(x), 1) );
+    xlabel('f0+f1+f2');
+
+    subplot(2,3,3);
+    imshow( repmat(y2, length(x), 1) );
+    xlabel('f2 (relatively HSF)');
+
+
+    subplot(2,3,4);
+    imshow( repmat((y2+y3+y4)/3, length(x), 1) );
+    xlabel('f3+f4');
+
+    subplot(2,3,5);
+    imshow( repmat((y3+y4)/2, length(x), 1) );
+    xlabel('f2+f3+f4');
+
+    subplot(2,3,6);
+    imshow( repmat(y2, length(x), 1) );
+    xlabel('f2 (relatively LSF)');
+end
