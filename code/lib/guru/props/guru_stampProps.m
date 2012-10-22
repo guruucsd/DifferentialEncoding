@@ -1,10 +1,37 @@
-function mSets = guru_stampProps(mSets, varargin)
-  
-  for i=1:2:length(varargin)
-    prop = varargin{i};
-    val  = varargin{i+1};
+function mSets = guru_stampProps(varargin)
+
+  % No input, can only return empty output
+  if (length(varargin)==0)
+    mSets = struct();
+    error('No input arguments')
+  end;
+
+  % Odd # of inputs; grab original object, and expect strings at every second input
+  if (1==mod(length(varargin),2))
+    if (isstruct(varargin{1}))
+      mSets = varargin{1};
+      varargin = varargin(2:end);
+    elseif (ischar(varargin{1}))
+      error('Must pass in arg/val pairs; found odd # of input args');
+    else
+      error('First arg must be an object (to stamp props on) or a string (prop name for next value)');
+    end;
+
+  % Even # of inputs; start with emtpy object
+  else
+    msets = struct();
+  end;
+
+  % expect strings at every second input
+  for pi=1:2:length(varargin)
+    prop = varargin{pi};
+    val  = varargin{pi+1};
     
     % Make sure cell-like properties are cells
+    if (~ischar(prop))
+      error('arg # %d is not a prop name', pi);
+    end;
+
     switch (prop)
       case {'plots','stats'}
         if (ischar(val))
