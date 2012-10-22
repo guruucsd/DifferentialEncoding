@@ -29,7 +29,7 @@ nConnPerHidden_Start =    1*[  10   6  15  10  15  15  60  20  15  10  10  60  1
 nConnPerHidden_End   =    1*[   5   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   1   1   1   1   2   1   1   1   1   1   1   2   1];
 nHidden              = hpl.*[ 425 425 425 425 425 425 425 425 425 425 425 102 102];
-dataset_train        =      repmat({'u'}, size(sigma));
+dataset_train        =      repmat({'n'}, size(sigma));
 lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =      true(size(sigma));
 AvgErr               =    0*ones(size(sigma));
