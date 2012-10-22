@@ -292,7 +292,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     
     
     % 1. Test set error
-	dset          = de_NormalizeDataset(struct('X', ws.fimages(:,ws.testset), 'name','train'), struct('ac',model));
+	dset          = de_NormalizeDataset(struct('X', ws.fimages(:,ws.testset), 'name','test'), struct('ac',model));
 	X_test        = dset.X;              % Input vectors;  [pixels examples]
 	X_test(end,:) = X(end,1);            % set bias to be the same as in the training set
 	Y_test        = dset.X(1:end-1,:);   % everything but the bias    
