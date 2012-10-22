@@ -38,7 +38,7 @@ dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
 iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
-tag                  = repmat( {'moretrain.out-wtwt'}, size(sigma) );
+tag                  = repmat( {'moretrain.out-wtwt5'}, size(sigma) );
 
 kernels              = repmat( {[8 1]}, size(sigma) );
 for ii=1:length(kernels)
@@ -52,7 +52,7 @@ end;
 
 mSets.debug          = 1:10;
 mSets.lrrev          = false;
-mSets.linout         = true;
+%mSets.linout         = true;
 
 % Allow multiple loops, for simplicity's sake (hi, nohup! :D)
 
@@ -100,7 +100,7 @@ for si=1:length(lambdas)
 			sprintf('%d ', ws.kernels), ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.hpl, mSets.lambda);
-	parfor mi=1:ws.nkernels*ws.N %lsf,msf,hsf
+	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
 		fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
 

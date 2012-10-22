@@ -31,7 +31,7 @@ function expt_analyze(models, ws, s)
 		end;
     end;
 
-    if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_trn_*.png')))==0)
+    if false && (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_trn_*.png')))==0)
 		[s.trn,  f.trn ] = expt_trn( models, ws );
 
 		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
