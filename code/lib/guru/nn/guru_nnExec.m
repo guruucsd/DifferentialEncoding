@@ -13,7 +13,8 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
 %  o    : calculated output at LAST step.
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
-  
+
+  % Set up transfer function for each unit
   nUnits = size(model.Weights,1); nOutput = size(Y,1); nInput = size(X,1); nHidden = nUnits-nOutput-nInput;
   if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHidden+prod(nOutput)))
     model.XferFn = [model.XferFn*ones(1,nHidden) ones(1,nOutput)]; %linear hidden->output
@@ -21,8 +22,20 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
     model.XferFn = [model.XferFn(1)*ones(1,nHidden) model.XferFn(2)*ones(1,nOutput)];
   end;
 
-  % Determine model error
-  [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+  % Execute the model and determine the errorType
+  if ~isfield(model, 'ts')
+    [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+  else
+    o = X(1:end-1,:);
+    for tsi=1:model.ts
+      if model.useBias
+        [err,grad,oz]=emo_backprop([o;X(end,:)], Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+      else
+        [err,grad,oz]=emo_backprop(o, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+      end
+      o = oz(1:(size(X,1)-model.useBias),:);
+    end
+  end;
 
   nOutput = size(Y,1);
   oact = o((end-nOutput+1):end,:);

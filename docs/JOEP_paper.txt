@@ -1,0 +1,75 @@
+Lateralization of function is a fundamental principle in the evolution of vertebrate neuroanatomy.  Vertebrates often split sensation into two segregated sides, requiring later integration to unify perception.  Lateralization has now been documented in many vertebrate species (refs), including apes and humans.  Interest in lateralization in humans remains, as it is a fact shared across functions we hold as core to our species (e.g. language, handedness, spatial processing abilities), with high consistency across the population.  
+
+While much behavioral, brain damage, and neuroimaging data clearly indicate these lateralized functions, we have little understanding of the cytoarchitectural mechanisms that produce these asymmetries.   One area where a clear, computational account of an asymmetry in function exists is in visual processing asymmetries.  Ivry and Robertson (1998) have condensed a vast literature into an explicit algorithmic model; at least two implementations of this algorithmic model have been published, showing its ability to account for all behavioral data that they've identified as core parts of the literature, and showing consistency with lesion data available at the time.
+
+These implementations, while promising, make particular assumptions to avoid complicating the implementation.  For example, while the model filters by frequency twice ("double" filtering by frequency), neither mechanism for this dynamic frequency selection is specified.  Instead, it is hard-coded into the model, with the assumption that a mechanism can be specified, if desired.  In addition, Ivry and Robertson do not provide any argument nor model evidence of the origin of these asymmetries, nor their expected laminar location, nor areal location, in cortex.
+
+We have sought to approach this problem from a different direction.  We believe that mechanisms matter, and that in specifying particular mechanisms, one is able to see whether the underlying assumptions hold.  We have approached this problem from an anatomical approach, attempting to identify an anatomical mechanism that can produce the computational asymmetries seen in the human behavioral data.  If we are able to do so, we will make stronger predictions about neural mechanisms, create a more explicit model, and ...  We believe we have done so, and we present our arguments and results in favor of this here.
+
+In this paper, we argue that excitatory long-distance horizontal connections, or "patchy" connections, are a good candidate for being involved in visual processing asymmetries.  We show that a simple asymmetry in horizontal connections, inspired by one of the few cytoarchitectural asymmetries found in human cortex, shows encoding asymmetries that lead to behavioral asymmetries in visual processing mirroring those found in the same critical studies accounted for by the DFF, as well as showing spatial frequency processing asymmetries as a result of this simple connectivity difference.  We then provide modeling evidence that the asymmetries in this model result directly from three basic well-known principles of human visual development, and that this points to a surprising, but very general, computational result.  Finally, we show that while this model and the DFF model both account for the same datasets, they are fundamentally different models, making very different predictions.  We review newer neuroimaging literature and argue that it supports our model.  We conclude by summarizing our model's advantages over the DFF model, and the predictions that it 
+
+1. Why Horizontal Connections
+* Most involved in low stimulus contrast (Nauhaus_etal_2009, Barlow science paper)
+
+
+* Horizontal connections and why 
+1. Our model
+
+* Started with Hsiao et al (2008)
+* Extended by Hsiao et al (2012)
+Current extensions:
+* Direct relationship to horizontal connections
+* Refinement of parameters
+* Moving to extended training for all?
+* More plausible sigmas
+* Show parameterization of sigma leads to parameterization fo frequencies
+
+2. Performance on tasks
+* Sergent (tell all generalizations; do cross-entropy)
+* Face recognition (all tasks; do cross-entropy)
+* Kitterle et al (do cross-entropy, to learn the task)
+* Christman et al (cross-entropy and softmax)
+
+3. Developmental model
+* Hellige / Reggia / asymmetric development
+* Callaway / hc pruning
+  Swindale_1996: development of topography (via horizontal connections)
+  Kiorpes_Bassin_2003: develop of contour integration in macaque monkeys
+  Luhmann_etal_1986: exhuberant connectivity that is pruned by visual experience, necessary for contour vision 
+* Visual acuity changes
+
+Model:
+* Basic model
+* Refinements and tweaks that don't matter
+
+Results:
+* General computational mechanism for connectivity
+
+
+4. Difference with DE / Christman model and Literature Review
+* Multiple areas vs single area
+  * Amir et al data points to more results consistent with our model
+  * Developmental model predicts multiple areas
+  * Neuroimaging model predicts multiple areas
+  
+  * Look back at TPJ data: rather than be explicitly selecting frequencies, instead select BIASED AREA.  Failure to select appropriate area would lead to slow-down (we could model this as using all vectors equally, rather than applying an attentional gain to select particular areas more than others)
+
+
+5. Discussion & Conclusions
+
+
+=================
+
+To implement:
+* Cross-entropy error & softmax units
+* Allow hidden unit encodings from multiple areas, but somehow differentially selected (perhaps inject noise? or is increasing actual vector norm enough?  I suppose this depends on how it's trained...)
+
+Procedure:
+* Train autoencoder 1
+* Train autoencoder 2
+* Load vectors & combine
+* Train perceptron
+This is OK because these connections are modulatory; assuming there's a base feed-forward hierarchy active most of the time, driving good performance.
+
+OR
+* Train autoencoder with "layers" that have different sigmas; such that one model has multiple banks.  This is weird.

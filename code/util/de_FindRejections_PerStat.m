@@ -26,7 +26,7 @@
     if (length(models) ~= size(stats,1)) 
         warning('# models(%d) and size of stats(%d) not compatible.', rons, length(stats));
     end;
-    
+
     for r=1:length(rmodes)
       switch rmodes{r}
         case 'janet',            rejectTypes(:,r) = de_FindRejectionsDE_SampleStd(stats, rc(r));
@@ -36,7 +36,7 @@
         case 'gauss',            rejectTypes(:,r) = de_FindRejectionsDE_All('gauss', stats, rc(r));
         case 'exgauss',          rejectTypes(:,r) = de_FindRejectionsDE_All('exgauss', stats, rc(r));
 
-        case 'max',              rejectTypes(:,r) = (stats>rc);
+        case 'max',              rejectTypes(:,r) = (stats>=rc);
         otherwise
           error('Unknown rejection mode: %s', rmodes{r});
       end; %switch

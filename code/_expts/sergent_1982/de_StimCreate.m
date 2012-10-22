@@ -92,7 +92,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 	  [train.ST, STIM, train.TIDX, train.TT]    = de_applyOptions(opt,    train.ST, STIM, TALL, train.TIDX, train.TT, idx);
 	  [train.X, train.ST, train.TIDX, train.TT] = de_createTrainingSets(stimSet, train.X, train.ST, TALL, train.TIDX, idx);
 
-	  % Nail down targets for each task
+	  % Nail down targets for each taskdb
 	  [train.T]         = de_createTargets(taskType, train.ST, train.TT, idx);
 
 	  train.TLAB = cell(size(train.T,2),1);
@@ -169,6 +169,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
         reindex = 1:size(X,2);
 
       case {'sergent_1982'}
+        warning('Using duplicated stimuli, to accurately reflect weighting of stimulus classes shown to each subject.')
         reindex = [TIDX{idx.LpSm}    TIDX{idx.LpSm} ...
                    TIDX{idx.LmSp}    TIDX{idx.LmSp} ...
                    TIDX{idx.LpSpID}  TIDX{idx.LpSpID}  TIDX{idx.LpSpID}  TIDX{idx.LpSpID} ...
@@ -259,6 +260,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
     % Start out with a blank set of expected results,
     % then add a row for each 'task'
     T=zeros(0,length(TT));
+
     switch (taskType)
       % 1000 for T1 "local",  0100 T2 "local",
       % 0010 for T1 "global", 0001 T2 "global"

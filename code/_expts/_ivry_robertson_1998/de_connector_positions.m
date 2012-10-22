@@ -1,4 +1,4 @@
-function [mu,hpl] = de_connector1D_positions(nHidden,dbg)
+function [mu,hpl] = de_connector_positions(nHidden,dbg)
 
     hpl = 1;
 

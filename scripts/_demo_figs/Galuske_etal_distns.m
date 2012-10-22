@@ -1,3 +1,6 @@
+% Determine (normalized) inter-patch distance and center-to-patch distance
+%   from data in Galuke et al (2000)
+
 D = [1450 1236
      1432 1099
      1463 1234

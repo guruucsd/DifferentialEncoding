@@ -1,4 +1,5 @@
 % Left-side-bias on small (34x25) images
+clear all variables
 
 [args] = face_args();
 
