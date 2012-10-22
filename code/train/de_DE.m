@@ -57,7 +57,6 @@ function [model] = de_DE(model)
   end;
 
 
-
   %--------------------------------%
   % Create and train the perceptron
   %--------------------------------%
@@ -67,7 +66,7 @@ function [model] = de_DE(model)
         goodTrials = ~isnan(sum(model.data.train.T,1));
         nTrials    = sum(goodTrials); % count the # of trials with no NaN anywhere in them
 
-        % Use hidden unit enncodings as inputs
+        % Use hidden unit encodings as inputs
         X_train    = model.ac.hu.train;
         X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
         %X_train    = X_train ./ repmat( std(X_train, 0, 2), [1 nTrials] );
