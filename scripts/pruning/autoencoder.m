@@ -1,18 +1,18 @@
 function [model,ws,s,fs] = autoencoder(model, G, ws)
-    dbstop if error;
-    
-	addpath(genpath('~/de/code/lib/'));
-	addpath(genpath('~/de/code/paths/'));
-	addpath(genpath('~/de/code/train/'));
-    
+         
     if (~exist('model','var')), model = struct(); end;
     if (~exist('ws',   'var')), ws    = struct(); end;
     
     if (~isfield(model, 'lrrev')), model.lrrev = false; end;
     if (~isfield(model, 'randSeed')), model.randSeed = rand; end;
 
-    rng(model.randSeed);    %this allows exact same randomization to prune from, for lsf,msf,hsf
-    
+    if exist('rng','file')
+      rng(model.randSeed);    %this allows exact same randomization to prune from, for lsf,msf,hsf
+    else
+      rand('seed',model.randSeed);
+      randn('seed',model.randSeed);
+    end;
+
     %%%%%%%%%%%%%%%%%
     % Create & load stimulus set into some expected schema
     %%%%%%%%%%%%%%%%%
