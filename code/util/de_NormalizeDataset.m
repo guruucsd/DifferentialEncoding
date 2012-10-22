@@ -4,7 +4,7 @@ function dset = de_NormalizeDataset(dset, mSets)
 %
 %  dset.X should come in with values in range [0 1]
 %  mSets contains the options for the dataset
-
+  %keyboard
   if (~isfield(mSets.ac, 'minmax'))
 
       if ((isfield(mSets.ac, 'linout') && mSets.ac.linout) || (length(mSets.ac.XferFn)==2 && mSets.ac.XferFn(end)==1)) % anything can happen on the output
@@ -75,6 +75,7 @@ function dset = de_NormalizeDataset(dset, mSets)
   % NOTE: only do if "useBias" field is defined
   %
   if (isfield(mSets.ac, 'useBias'))
+      %keyboard; 
       if (~isfield(dset, 'bias')), dset.bias = mean(dset.X(:)); end;
       dset.X(end+1,:) = dset.bias*mSets.ac.useBias;
   end;

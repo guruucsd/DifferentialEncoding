@@ -62,7 +62,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     % These parameters are large resources
     model.nInput               = ws.nInput;                 % # Input units (minus bias)
     model.nOutput              = ws.inPix;                  % # Output units
-    if (~isfield(model, 'distn')),                model.distn                = {'norm'}; end;
+    if (~isfield(model, 'distn')),                model.distn                = {'norme2'}; end;
     if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
     if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
     if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
@@ -70,7 +70,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     if (~isfield(model, 'nConnPerHidden_Start')), model.nConnPerHidden_Start = 30; end; % reduce this and below, tomorrow
     if (~isfield(model, 'nConnPerHidden_End')),   model.nConnPerHidden_End   = 15; end;
     if (~isfield(model, 'nConns')),               model.nConns               = model.nConnPerHidden_Start; end;
-    if (~isfield(model, 'linout')),              model.linout               = true; end;
+    %if (~isfield(model, 'linout')),              model.linout               = true; end;
     if (~isfield(model, 'debug')),                model.debug                = 1:10; end;
     if (~isfield(model, 'useBias')),              model.useBias              = 1; end;
     
@@ -114,14 +114,14 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
             model.EtaInit = 1;              % Learning rate (to start)
             model.Acc     = 1.005;          % Multiplicative increase to eta (when training good)
             model.Dec     = 1.2;            % Divisive decrease to eta (when training goes bad)
-            model.XferFn  = 6;              % 1.73 * tanh
-    
+            model.XferFn  = [6 1];              % 1.73 * tanh
+            model.useBias = 1;
         case 'resilient'
             model.Pow     = 3;              % gradient power; Err = (y-y_hat).^(Pow+1)
             model.EtaInit = 2E-2;          % Learning rate (to start)
             model.Acc     = 5E-5;          % (1+Acc) Multiplicative increase to eta (when training good)
             model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-            model.XferFn  = 6;              % 1.73 * tanh
+            model.XferFn  = [6 1];              % 1.73 * tanh
             model.useBias = 1;
     end;
     
@@ -135,8 +135,8 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     % Create training dataset from blurred images
     %
 	f             = ws.fimages(:,ws.trainset);      
-	model.absmean = 1.26E-2;
-	model.minmax  = [];
+	%model.absmean = 1.26E-2;
+	%model.minmax  = [];
 	dset          = de_NormalizeDataset(struct('X', f, 'name','train'), struct('ac',model));
 	X             = dset.X;               % Input vectors;  [pixels examples]
 	Y             = dset.X(1:end-1,:);    % everything but the bias
@@ -298,10 +298,12 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
 	Y_test        = dset.X(1:end-1,:);   % everything but the bias    
     clear('dset');
     
-    [~,~,o_p]      = emo_backprop(X_test, Y_test, model.Weights, model.Conn, model.XferFn, model.errorType);
-    s.rimgs.test  = o_p(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
-    [~,~,o_p]      = emo_backprop(X,      Y,      model.Weights, model.Conn, model.XferFn, model.errorType);
-    s.rimgs.train = o_p(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
+    [o_p]      = guru_nnExec(model, X_test, Y_test);
+    %[~,~,o_p]      = emo_backprop(X_test, Y_test, model.Weights, model.Conn, model.XferFn, model.errorType);
+    s.rimgs.test  = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
+    [o_p]      = guru_nnExec(model, X, Y);
+    %[~,~,o_p]      = emo_backprop(X,      Y,      model.Weights, model.Conn, model.XferFn, model.errorType);
+    s.rimgs.train = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
     
     % Test set error
     fprintf('Test set error: %7.3e [vs. training error %7.3e]\n', ...
