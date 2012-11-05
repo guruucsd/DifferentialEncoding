@@ -67,15 +67,12 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
 
                   case {'gam','gamma'}
                      r = gamrnd(k,theta,numCon,1); %shape, x.  As shape goes high and x goes low, interpatch distance decreases (less spread in points)
- %                     d = 2*pi*rand + (pi/2/theta)*randn(size(r));
                      d = 2*pi*rand(size(r));
-%                     d = 2*pi*rand + d/2
                      pts = repmat(mupos(mi,:), [numCon 1]) + round([r.*cos(d) r.*sin(d)]);
                      error('NYI');
                      
                   case {'game','gammae'} % Theta_max = d_max/r
                      r = gamrnd(k,theta,numCon,1); %shape, x.  As shape goes high and x goes low, interpatch distance decreases (less spread in points)
- %                     d = 2*pi*rand + (pi/2/theta)*randn(size(r));
                      d = 2*pi*rand(size(r));
                      d = 2*pi*rand + sign(d).*mod(d,pi/4);
                      pts = repmat(mupos(mi,:), [numCon 1]) + round([r.*cos(d) r.*sin(d)]);
@@ -147,9 +144,6 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                   otherwise, error('%s NYI', distn_name);
               end;
               
-              
-              %[pdn,sidx] = sort(pdn);
-              
               % Cache this item
               if (exist('prbdistn_cache','var'))
                   prbdistn_cache(mi,:) = pdn;
@@ -194,7 +188,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
             if (~any(w)), % unless we run out of nodes to connect to!
               w=ones(size(w));
               cdn    = [0;cumsum(max(eps,pdn).*w)];
-              cdn    = cdn(idx);
+              %cdn    = cdn(idx);
             end;
         end;
         
