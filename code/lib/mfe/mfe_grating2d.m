@@ -15,6 +15,7 @@ function H=grating2d(f,phi,theta,A,height,width)
   H = zeros(height,width);
   for y=1:height
       for x=1:width
-          H(y,x)=A*cos(wx*(x)+phi+wy*(y));
+          H(y,x)=A*cos(wx*(x-width/2)+phi+wy*(y-height/2));
       end
   end
+  
