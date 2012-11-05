@@ -12,9 +12,14 @@
     ny = sI(1);
     nx = sI(2);
 
-    %
+    % All positions
     if     (sH == prod(sI)),          mu = ones(sI);
     
+    % Single position
+    elseif (sH == 1), 
+        mu(round(sI(1)/2), round(sI(2)/2)) = 1;
+        
+    %
     elseif (sH == length(1:2:ny)*length(1:2:nx) ...
             + length(2:2:ny)*length(2:2:nx))
         mu = zeros(sI); 
