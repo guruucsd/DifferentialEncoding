@@ -16,7 +16,7 @@ function fig = de_PlotGenericDistributions(mSets, data, figname)
   max2 = max(data{end}(:));
 
   % Defaults
-  clim = [0 max(max1,max2)];
+  clim = max(max1,max2)*[-1 1];
   d1 = data{1};
   d2 = data{2};
 
@@ -32,7 +32,7 @@ function fig = de_PlotGenericDistributions(mSets, data, figname)
 
     max1 = max(d1(:));
     max2 = max(d2(:));
-    clim(2) = max( max1, max2);
+    clim = max(max1, max2) * [-1 1];
 
     d1(maxidx1) = max1;
     d2(maxidx2) = max2;
@@ -48,12 +48,12 @@ function fig = de_PlotGenericDistributions(mSets, data, figname)
 
   subplot(1,3,1);
   imagesc(d1(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
-  title('LSF (RH)');
+  title('LSF (RH)', 'FontSize', 16);
 
   subplot(1,3,2);
   imagesc(d2(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
-  title('Full-fidelity (LH)');
+  title('Full-fidelity (LH)', 'FontSize', 16);
 
   subplot(1,3,3);
   imagesc(dff(xidx,yidx), clim_dff); set(gca, 'xtick', [], 'ytick', []);
-  title('Difference');
+  title('RH - LH', 'FontSize', 16);
