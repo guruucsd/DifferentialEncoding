@@ -5,7 +5,17 @@ clear all; close all;
 
 addpath(genpath('../../code'));
 de_SetupExptPaths('young_bion_1981');
+load(de_GetDataFile('young_bion_1981', 'orig', [], {'small'}));
+img = reshape(train.X(end:-1:1, 16), train.nInput)';
 
+
+%figure;
+for ii=1:120
+    %subplot(12,10,ii);
+    %imshow(reshape(train.X(:,ii), train.nInput));
+    %set(gca,'xtick',[],'ytick',[]);
+    %ylabel(sprintf('%d',ii));
+end
 
 nConns    = 5;              % # connections from hidden->input/output
 sigmas    = [3 16];
@@ -52,6 +62,11 @@ for n=1:nSamples
 end;
 allsamps = allsamps/nSamples/nConns;
 
+allcxns(1,1,1,:) = [huloc(1)-6 huloc(2)];
+allcxns(1,1,2,:) = [huloc(1)-3 huloc(2)-3];
+allcxns(1,1,3,:) = [huloc(1)-3 huloc(2)+3];
+allcxns(1,1,4,:) = [huloc(1)+3 huloc(2)];
+allcxns(1,1,5,:) = [huloc(1)+6 huloc(2)-3];
 
 %%%%%%%%%%%%%%%
 % 3D average plot of connectivity
@@ -80,16 +95,16 @@ end;
 end;
 
 
-%%%%%%%%%%%%%%%
-% 3D instance plot of connectivity
-%%%%%%%%%%%%%%%
 figure;
 set(gcf, 'Position', [78          71        1098         606])
 
 for i=1:length(sigmas)
-    
-    % 3-layer plot
+
+    %%%%%%%%%%%%%%%
+    % 3-layer
+    %%%%%%%%%%%%%%%
     subplot(2, length(sigmas),i); hold on;
+    %colormap jet;
     daspect(gca, [1 1 1/10])
     
     cxns = squeeze(allcxns(1,i,:,:));
@@ -106,9 +121,11 @@ for i=1:length(sigmas)
 
     %inputs
     plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
+    plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
 
     % outputs
     plot3(cxns(:,1), cxns(:,2), 2*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
+    plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
 
     % connect them
     for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
@@ -117,8 +134,14 @@ for i=1:length(sigmas)
     % hidden unit
     plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'LineWidth', 10)
     
+    % image @ input
+    colormap gray;
+    surf(zeros(size(img)), img, 'EdgeColor','none')
 
-    % 2-layer plot
+    
+    %%%%%%%%%%%%%%%
+    % 3-layer
+    %%%%%%%%%%%%%%%
     subplot(2, length(sigmas),length(sigmas)+i); hold on;
     daspect(gca, [1 1 1/10])
     
@@ -141,6 +164,10 @@ for i=1:length(sigmas)
     for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
     
     % hidden unit
-    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 5, 'linewidth', 5)
+    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'linewidth', 10);
+    
+    % image @ input
+    colormap gray;
+    surf(zeros(size(img)), img, 'EdgeColor','none')
 end;
 
