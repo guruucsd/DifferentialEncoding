@@ -37,7 +37,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     if isfield(model,'dropout') && model.dropout>0
         wOrig = model.Weights;
         cOrig = model.Conn;
-        idxHOut = rand(nHidden,1)<model.dropout;
+        idxHOut = find(rand(nHidden,1)<model.dropout);
         model.Conn(nInputs+idxHOut, 1:nInputs) = false;
         model.Weights(nInputs+idxHOut, 1:nInputs) = 0;
         model.Conn(nInputs+nHidden+[1:nOutputs], nInputs+idxHOut) = false;

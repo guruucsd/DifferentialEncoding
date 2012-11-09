@@ -44,7 +44,7 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
     end;
 
     % If it's good, update.  Otherwise, step-size will be shrunk, so preserve the same gradient, but take a smaller step!
-    if (ip==0 || c<l)
+    if (ip==0 || c<l || (isfield(model, 'dropout' && model.dropout>0))
        model = m;
        currErr = c;
        lastErr = l;
