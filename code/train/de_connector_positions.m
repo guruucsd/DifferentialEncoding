@@ -154,6 +154,43 @@
       
        
 
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+  function [mu] = de_connector2D_positions_68x50(sH,dbg)
+  %the topological configuration of the hidden nodes is hand coded here,
+  %based on the number of Hidden nodes
+  %
+  % output:
+  %
+  % mu     - 2D bitmap with a 1 at the locations of the sH hidden nodes
+  % m       - locations of hidden nodes in 2D bitmap; 
+  %             m(:,1) = row indices
+  %             m(:,2) = column indices
+  
+    sI = [68 50];
+    mu = zeros(sI);
+    
+    switch (sH)
+      case 3400, mu(1:1:end)=1;
+      case 1700, mu(1:2:end)=1;
+      case 1134, mu(1:3:end)=1;
+      case 850,  mu(1:4:end)=1;
+
+      case 3168, mu(2:1:end-1,2:1:end-1)=1;
+      case 792,  mu(2:2:end-1,2:2:end-1)=1;
+      case 425,  mu(2:4:end,2:4:end) = 1; mu(4:4:end,4:4:end) = 1;
+      case 352,  mu(2:3:end-1,2:3:end-1)=1;
+      case 88,   mu(3:6:end-1,3:6:end-1)=1;
+      case 1,    mu( round(size(mu,1)/2), round(size(mu,2)/2) ) = 1;
+
+      case 450,         img(1:4:end,1:4:end)=1;
+                        img(3:4:end,3:4:end)=1;
+                        
+      otherwise
+        error('# hidden units NYI');
+
+    end; %switch
+    
       
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
   function [mu] = de_connector2D_positions_34x25(sH,dbg)
@@ -268,29 +305,4 @@
     
  
 
-    
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-  function [mu] = de_connector2D_positions_68x50(sH,dbg)
-  %the topological configuration of the hidden nodes is hand coded here,
-  %based on the number of Hidden nodes
-  %
-  % output:
-  %
-  % mu     - 2D bitmap with a 1 at the locations of the sH hidden nodes
-  % m       - locations of hidden nodes in 2D bitmap; 
-  %             m(:,1) = row indices
-  %             m(:,2) = column indices
-  
-    sI = [68 50];
-    mu = zeros(sI);
-    
-    switch (sH)
-      case 450,         img(1:4:end,1:4:end)=1; 
-                        img(3:4:end,3:4:end)=1;
-                        
-      otherwise
-        error('# hidden units NYI');
-
-    end; %switch
-    
- 
+     
