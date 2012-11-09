@@ -15,7 +15,8 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
   
     if (~exist('dbg','var')), dbg=0; end;
     if (~exist('tol','var')), tol=0; end;
-
+    if (~exist('weight_factor','var')), weight_factor = []; end;
+    
     %
     parts       = mfe_split('-',distn);
     distn_name  = parts{1}; opts = parts(2:end); clear('parts');
@@ -28,10 +29,11 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     if (hpl>1) 
         prbdistn_cache = zeros(nLoc,inPix);
     end;
-    if (~exist('weight_factor','var') || isempty(weight_factor))
+    if (isempty(weight_factor))
 		lg            = @(x) (2/(1+exp(-(x.^2)/8))-1); %logistic, range [-1 1], cross at 0
 		weight_factor = lg(numCon*nLoc*sqrt(hpl)/inPix - 1); %sqrt(hpl) because sparse connections per layer => spread out hus => need more "damping" of pdf for nodes we already connected to
     end;
+    guru_assert(weight_factor>0, '"weight factor" must be >0');
     
     switch (distn_name)
         case {'gam','gamma','game','gammae'}
@@ -183,8 +185,10 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
               %guru_assert(~any(0>(cdn((curidx+2):end)-plost)));
               
               cdn(curidx+1) = cdn(curidx);
+              blue = cdn;
               cdn((curidx+2):end) = cdn((curidx+2):end)-plost;
-
+              cdn(cdn<0) = -cdn(cdn<0);
+              
                   % Update this after the above.
               w(curidx) = w(curidx)*weight_factor; % don't need to update cdn now, as we don't connect to the same node in the same layer anyway.
               if (~any(w)), % unless we run out of nodes to connect to!
@@ -192,6 +196,8 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                 cdn    = [0;cumsum(max(eps,pdn).*w)];
                 %cdn    = cdn(idx);
               end;
+              guru_assert(all(cdn>=0), 'cumulative distribution must have all elements >=0');
+              guru_assert(~all(cdn==0) || ci==numCon, 'must have something to select!');
             end;
           
             if (ismember(10,dbg))
