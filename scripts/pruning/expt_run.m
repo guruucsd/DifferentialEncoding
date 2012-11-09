@@ -27,19 +27,20 @@ de_SetupExptPaths('sergent_1982');
 %nConnPerHidden_End   =    1*[   5   5   5  15   5  10   5   8   8   5  10   10   10]; % # post-pruning random connections to input (& output), per hidden unit
 %hpl                  =    1*[   2   1   2   2   2   2   1   3   3   3   1    1    1];
 %nHidden              = hpl.*[ 850 850 850 850 850 850 850 850 425 425 425 1700 1134];
-sigma                =    1*[   6   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
-nConnPerHidden_Start =    1*[  10   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[   5   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+sigma                =    1*[  20   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
+nConnPerHidden_Start =    1*[  20   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[   8   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   1   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 425 425 425 425 425 425 425 425 425 425 425 102 102];
+nHidden              = hpl.*[ 850 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
 lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
-dnw                  =      true(size(sigma));
+dnw                  =      false(size(sigma));
+zscore               = true(size(sigma));
 AvgErr               =    0*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
 dataset_test         = dataset_train;
 
-N                    = 4*ones(size(sigma));
+N                    = 12*ones(size(sigma));
 iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
 tag                  = repmat( {'moretrain.out-wtwt5'}, size(sigma) );
 
@@ -68,11 +69,13 @@ for si=1:length(lambdas)
 	mSets.hpl                  = hpl(si);
 	mSets.nHidden              = nHidden(si);
 	mSets.AvgErr               = AvgErr(si);
-	
+	mSets.zscore               = zscore(si);
+
 	switch(dataset_train{si})
 		case {'c' 'cafe'},   [~, ws.train, ws.test] = de_MakeDataset('young_bion_1981',     'orig',    '', {sz{si} 'dnw', dnw(si)});
 		case {'n' 'natimg'}, [~, ws.train, ws.test] = de_MakeDataset('vanhateren',          'orig',    '', {sz{si} 'dnw', dnw(si)});
-		case {'s' 'sf'},     [~, ws.train, ws.test] = de_MakeDataset('christman_etal_1991', 'all_freq','', {sz{si} 'dnw', dnw(si)});
+		case {'s' 'sf'},     [~, ws.train, ws.test] = de_MakeDataset('sf',                  'vertonly','', {sz{si} 'dnw', dnw(si)});
+		case {'r' 'ch'},     [~, ws.train, ws.test] = de_MakeDataset('christman_etal_1991', 'all_freq','', {sz{si} 'dnw', dnw(si)});
 		case {'u' 'uber'},   [~, ws.train, ws.test] = de_MakeDataset('uber',                'all',     '', {sz{si} 'dnw', dnw(si)});
 		otherwise,      error('dataset %s NYI', dataset_train{si});
 	end;
