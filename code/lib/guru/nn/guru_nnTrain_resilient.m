@@ -35,13 +35,13 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
     %% Determine model error based on that update
     if isfield(model,'dropout') && model.dropout>0
-        wOrig = m.Weights;
-        cOrig = m.Conn;
+        wOrig = model.Weights;
+        cOrig = model.Conn;
         idxHOut = rand(nHidden,1)<model.dropout;
-        m.Conn(nInputs+idxHOut, 1:nInputs) = false;
-        m.Weights(nInputs+idxHOut, 1:nInputs) = 0;
-        m.Conn(nInputs+nHidden+[1:nOut], nInputs+idxHOut) = false;
-        m.Weights(nInputs+nHidden+[1:nOut], nInputs+idxHOut) = 0;
+        model.Conn(nInputs+idxHOut, 1:nInputs) = false;
+        model.Weights(nInputs+idxHOut, 1:nInputs) = 0;
+        model.Conn(nInputs+nHidden+[1:nOutputs], nInputs+idxHOut) = false;
+        model.Weights(nInputs+nHidden+[1:nOutputs], nInputs+idxHOut) = 0;
     end;
 
     % Determine model error
@@ -52,8 +52,8 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     end;
 
     if (isfield(model, 'dropout') && model.dropout>0)
-      m.Conn = cOrig;
-      m.Weights = wOrig;
+      model.Conn = cOrig;
+      model.Weights = wOrig;
     end;
 
     % Change error only if there are no NaN
