@@ -4,40 +4,50 @@ function expt_analyze(models, ws, s)
     % Collect basic stats
     [s.basics] = expt_basics( models, ws, s );
 
-    % Collect stats & figures
+    % Collect histogram stats
     [s.hist, f.hist] = expt_histograms( models, ws, s );
     if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
     saveas(f.hist, fullfile(ws.pngdir, 'f_hist'), 'png');
 
+    % Collect distribution stats
+    s.distn = de_StatsDistributions(models);
+    f.distn = de_PlotDistributions(models{end}(end), s.distn);
+    if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+    for ii=1:length(f.distn)
+        saveas(f.distn(ii).handle, fullfile(ws.pngdir, ['f_distn_' f.distn(ii).name '.png']), 'png');
+    end;
+
+
+    % Collect inter-patch distance stats
     [s.ipd,  f.ipd ] = expt_ipd( models, ws );
     if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
     for ii=1:length(f.ipd)
         saveas(f.ipd(ii).handle, fullfile(ws.pngdir, ['f_ipd_' f.ipd(ii).name '.png']), 'png');
     end;
 
+    % Collect stats on shapes
     if false &&(~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_shape_*.png')))==0)
-		[s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
-
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
-		saveas(f.shp,  fullfile(ws.pngdir, 'f_shape_map'), 'png');
+      [s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
+      if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+      saveas(f.shp,  fullfile(ws.pngdir, 'f_shape_map'), 'png');
     end;
-    
+
+    % Collect spatial frequency info
     if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_sf_*.png')))==0)
-		[s.sf,  f.sf ] = expt_sf( models, ws );
-
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
-		for ii=1:length(f.sf)
-			saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
-		end;
+      [s.sf,  f.sf ] = expt_sf( models, ws );
+      if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+      for ii=1:length(f.sf)
+        saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
+      end;
     end;
 
+    % Collect
     if false && (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_trn_*.png')))==0)
-		[s.trn,  f.trn ] = expt_trn( models, ws );
-
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
-		for ii=1:length(f.trn)
-			saveas(f.trn(ii).handle, fullfile(ws.pngdir, ['f_trn_' f.sf(ii).name '.png']), 'png');
-		end;
+      [s.trn,  f.trn ] = expt_trn( models, ws );
+      if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+      for ii=1:length(f.trn)
+        saveas(f.trn(ii).handle, fullfile(ws.pngdir, ['f_trn_' f.sf(ii).name '.png']), 'png');
+      end;
     end;
 
     %[s.cxn,  f.cxn ] = expt_connections( models, ws, s.shp );
@@ -126,10 +136,13 @@ function [s,f] = expt_histograms( models, ws, s_in )
         bar(s.bins, s.d_f{fi} ); set(gca, 'ylim', yl_diff);
         title('Pruning Accentuates [dist from center]:');
     end;
+
+    % Show the difference between LH and RH differences
     subplot(ws.nkernels+1,3,3*(ws.nkernels+1) + [-1 0]); % last row of three
     bar(s.bins, s.d_f{end}-s.d_f{1});
 
-    
+
+
 %%%%%%%%%%%%%%%%%%%%%%
 function [ipd, fs] = expt_ipd( models, ws )
     mSets = models{end}(end);
@@ -440,13 +453,13 @@ function [s, f] = expt_connections( models, ws, s_in )
     inPix             = prod(mSets.nInput);
     
     
-    % 7: Histogram of # of connections
-    cc_in  = full(m.ac.Conn(inPix+1+[1:m.nHidden], 1:inPix));
-    cc_out = full(m.ac.Conn(inPix+1+m.nHidden+[1:inPix], inPix+1+[1:m.nHidden]));
-    guru_assert(~any(diff(sum(cc_in,2)' - sum(cc_out,1))));
+    % Validate that input & output connections are the same
+    cc_in  = full(m.ac.Conn(inPix+1+[1:m.nHidden], 1:inPix)); % input=> hidden
+    cc_out = full(m.ac.Conn(inPix+1+m.nHidden+[1:inPix], inPix+1+[1:m.nHidden])); %hidden=>output
+    guru_assert(~any(diff(sum(cc_in,2)' - sum(cc_out,1)))); % make sure they're the same
 
     % Find directionally selective (~=0) inter-patch networks
-    s.dsis = cell(size(s_in.dblsel));
+    s.dsis = cell(size(s_in.dblsel)); %doubly-selective: elongated and oriented
     nsp = 0;    
     for kki=1:length(s_in.dblsel)
         mns = zeros(length(s_in.chosen_idx),1);
