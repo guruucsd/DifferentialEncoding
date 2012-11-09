@@ -109,7 +109,6 @@ function [model] = de_DE(model)
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         model.p.output.train = guru_nnExec(model.p, X_train, model.data.train.T );
         
-        
       
         % TEST
         p_test     = model.p;
@@ -120,7 +119,10 @@ function [model] = de_DE(model)
         % Use hidden unit encodings as inputs
         X_test    = model.ac.hu.test;
         X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
-        %X_test   = X ./ repmat( std(X_test, 0, 2), [1 nTrials] );
+        if isfield(model.p, 'zscore') && model.p.zscore>0
+          X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
+        end;
+        
         % Add bias
         if (model.p.useBias)
             biasArray=ones(1,nTest);
