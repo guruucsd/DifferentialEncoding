@@ -13,7 +13,6 @@ function model = de_CompressAndSave(model)
 %   (files to disk if necessary)
 %
 
-%keyboard
   % Remove DUPLICATE bits
   model = de_CompressModels(model);
 
