@@ -32,8 +32,8 @@ function [pals] = de_StatsFFTs(stats)
         end;
     end;
 
-    % 2D stats are slow, so disable until we really need it
-    if (false)
+    % 2D stats are slow, so disable to speed up#until we really need it
+    if (true)
       pals.tt2D = zeros(stats.orig.fftsz);
       pwrRH     = stats.model.ffts{1}  .*conj(stats.model.ffts{1});
       pwrLH     = stats.model.ffts{end}.*conj(stats.model.ffts{end});
