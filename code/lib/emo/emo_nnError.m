@@ -19,7 +19,7 @@ function [ERROR] = emo_nnError(errorType, RAW_ERROR, Y, T)
     case {2,'squ'}, ERROR = (RAW_ERROR.^2)/2;
     case {3,'cent'}
         ERROR = -(T.*log(Y) + (1-T).*log(1-Y));
-%        fprintf('%f\n',sum(ERROR,1))
-        guru_assert(all(T>=0 & T<=1), 'T must be between 0 and 1')
-        guru_assert(all(Y>=0 & Y<=1), 'Y must be between 0 and 1')
+
+        guru_assert(all(T>=0 & T<=1), 'for cross-entropy error to work, T must be between 0 and 1')
+        guru_assert(all(Y>=0 & Y<=1), 'for cross-entropy error to work, Y must be between 0 and 1')
   end;
