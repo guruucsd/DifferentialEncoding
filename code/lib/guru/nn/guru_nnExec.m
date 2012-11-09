@@ -26,7 +26,7 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   % Special case for dropout
   %   reduce the value of the hidden->output weights by dropout %
   if (isfield(model, 'dropout'))
-    model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]) = model.dropout*model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]);
+    model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]) = (1-model.dropout)*model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]);
   end;
 
   % Execute the model and determine the errorType
