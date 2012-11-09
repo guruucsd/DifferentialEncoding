@@ -36,8 +36,8 @@ function dset = de_NormalizeDataset(dset, mSets)
       end;
 
   % Z-score: across all images and pixels at once
-  elseif (isfield(mSets.ac, 'zscore') && mSets.ac.zscore)
-    dset.X = 0.1*(dset.X - repmat(mean(dset.X), [size(dset.X,1) 1])) ./ repmat(std(dset.X), [size(dset.X,1) 1]);
+  elseif (isfield(mSets.ac, 'zscore') && mSets.ac.zscore>0)
+    dset.X = mSets.ac.zscore*(dset.X - repmat(mean(dset.X), [size(dset.X,1) 1])) ./ repmat(std(dset.X), [size(dset.X,1) 1]);
 
     if (~isempty(mSets.ac.minmax))
         dset.X = mean(mSets.ac.minmax) + dset.X;
@@ -103,14 +103,9 @@ function dset = de_NormalizeDataset(dset, mSets)
           end;
       end;
 
-      if (mSets.p.zscore)
-          error('z-scoring on the classifier output NYI');
-
-      else
-          % Normalize expected outputs based on classifier transfer function
-          dset.T = dset.T - 0.5;
+      % Normalize expected outputs based on classifier transfer function
+      dset.T = dset.T - 0.5;
 		  dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
-      end;
 
       % validate dset
 %      guru_assert(~any(isnan(dset.T(:))), 'nan T-values');
