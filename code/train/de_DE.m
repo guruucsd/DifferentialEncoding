@@ -69,7 +69,9 @@ function [model] = de_DE(model)
         % Use hidden unit encodings as inputs
         X_train    = model.ac.hu.train;
         X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
-        %X_train    = X_train ./ repmat( std(X_train, 0, 2), [1 nTrials] );
+        if isfield(model.p, 'zscore') && model.p.zscore>0
+          X_train    = model.p.zscore * X_train ./ repmat( std(X_train, 0, 1), [size(X_train,1), 1] ); %z-score the code
+        end;
 
         % Add bias
         if (model.p.useBias)
