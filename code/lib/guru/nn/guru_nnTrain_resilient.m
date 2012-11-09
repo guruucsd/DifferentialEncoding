@@ -5,7 +5,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   nDatapts  = size(Y,2);
   nUnits    = size(model.Weights,1);
   nOutputs  = nInputs;
-  %nHidden   = nUnits - nInputs - nOutputs;
+  nHidden   = nUnits - nInputs - nOutputs;
 
   model.err = zeros([model.MaxIterations nDatapts]);
 
@@ -33,6 +33,17 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 
+    %% Determine model error based on that update
+    if isfield(model,'dropout') && model.dropout>0
+        wOrig = m.Weights;
+        cOrig = m.Conn;
+        idxHOut = rand(nHidden,1)<model.dropout;
+        m.Conn(nInputs+idxHOut, 1:nInputs) = false;
+        m.Weights(nInputs+idxHOut, 1:nInputs) = 0;
+        m.Conn(nInputs+nHidden+[1:nOut], nInputs+idxHOut) = false;
+        m.Weights(nInputs+nHidden+[1:nOut], nInputs+idxHOut) = 0;
+    end;
+
     % Determine model error
     if (nargout>1)
         [model.err(ip,:),grad, o_p(ip,:,:)]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType, model.Pow );
@@ -40,6 +51,10 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         [model.err(ip,:),grad]             =emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType, model.Pow );
     end;
 
+    if (isfield(model, 'dropout') && model.dropout>0)
+      m.Conn = cOrig;
+      m.Weights = wOrig;
+    end;
 
     % Change error only if there are no NaN
     if (any(isnan(model.err(ip,:))))
