@@ -21,11 +21,27 @@ function [model, currErr, lastErr, newgrad, o_p] = guru_nnTrain_inner(X, Y, m, e
 
 
     %% Determine model error based on that update
+    if isfield(model,'dropout') && model.dropout>0
+        wOrig = m.Weights;
+        cOrig = m.Conn;
+        nIn = size(X,1); nOut = size(Y,1); nHid = size(m.Conn,1)-nIn-nOut;
+        idxHOut = rand(nHid,1)<model.dropout;
+        m.Conn(nIn+idxHOut, 1:nIn) = false;
+        m.Weights(nIn+idxHOut, 1:nIn) = 0;
+        m.Conn(nIn+nHid+[1:nOut], nIn+idxHOut) = false;
+        m.Weights(nIn+nHid+[1:nOut], nIn+idxHOut) = 0;
+    end;
+
     if (nargout==5)
         [m.err(ip,ep),newgrad,o_p]= emo_backprop(X, Y, m.Weights, m.Conn, m.XferFn, errorType, m.Pow );
     else
         [m.err(ip,ep),newgrad]    = emo_backprop(X, Y, m.Weights, m.Conn, m.XferFn, errorType, m.Pow );
     end;
+    if (isfield(model, 'dropout') && model.dropout>0)
+      m.Conn = cOrig;
+      m.Weights = wOrig;
+    end;
+
     if (~any(isnan(m.err(ip,ep))))
         currErr = sum(m.err(ip,ep));
     else
