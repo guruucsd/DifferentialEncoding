@@ -1,34 +1,39 @@
 function args = de_ArgsInit(varargin)
-args = {};
+% Remove any unwanted args
+
+  args = {};
+  if (mod(length(varargin),2)~=0)
+    error('args must have an even length');
+  end;
 
   % Remove any unwanted args
-  j=1;
-  while (j<=length(varargin))
+  jj=1;
+  while (jj<=length(varargin))
   
     % Find the arg in args, and remove it
-    i=1;
-    while (i<=length(args))
-      if (strcmp(varargin{j}, args{i}));
+    ii=1;
+    while (ii<=length(args))
+      if (strcmp(varargin{jj}, args{ii}));
         % Remove arg
-        if (isempty(varargin{j+1}))
-          args = args([1:(i-1) (i+2):end]);
-          i = i - 2; % reindex so we're not off the end
+        if (isempty(varargin{jj+1}))
+          args = args([1:(ii-1) (ii+2):end]);
+          ii = ii - 2; % reindex so we're not off the end
           
         % Use specified arg value 
         else
-          args{i+1} = varargin{j+1};
+          args{ii+1} = varargin{jj+1};
         end;
         break;
       end;
       
-      i=i+2;
+      ii=ii+2;
     end;
     
     % Not found; add it
-    if (i>length(args) && ~isempty(varargin{j+1}))
-      args{end+1} = varargin{j};
-      args{end+1} = varargin{j+1};
+    if (ii>length(args) && ~isempty(varargin{jj+1}))
+      args{end+1} = varargin{jj};
+      args{end+1} = varargin{jj+1};
     end;
     
-    j = j + 2;
+    jj = jj + 2;
   end;
