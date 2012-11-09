@@ -66,18 +66,40 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
     % Had a problem; probably moving too fast.
     if (any(isnan(model.err(ip,:))))
-      keyboard
       return;
     end;
 
+    %% Do checks before applying gradient, as error is for CURRENT weights,
+    %% not for weights after weight change!!
+
+    % Finished training
+    if (isnan(currErr))
+        warning('NaN error; probably Eta is too large`');
+
+
+    elseif (currErr <= model.Error)
+      %keyboard
+      if (ismember(3, model.debug))
+          fprintf('Error reached criterion on iteration %d; done!\n', ip);
+      end;
+      break;
+
+    % We're precisely the same; quit!
+    elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
+      warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
+      break;
+    end;
+
+    if (ismember(10, model.debug)), fprintf('[%4d]: err = %6.4e\n', ip, currErr/numel(Y)); end;
+
     % Adjust the weights
-    if (any(isnan(grad(:)))), error('nan?'); end;
+    guru_assert(~any(isnan(grad(:))));
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
         %keyboard
         model.Weights = model.Weights .* (1-model.lambda);
     end;
-    if (any(isnan(model.Weights(:)))), error('nan?'); end;
+    guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))
         over_wts = abs(model.Weights)>model.wmax;
         model.Weights(over_wts) = sign(model.Weights(over_wts)) .* model.wmax;
@@ -92,25 +114,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     model.Eta =model.Eta.*(1 - ((model.Dec).*(~samesign)));
 
     lastGrad = grad;
-
-    % Finished training
-    if (isnan(currErr))
-        warning('NaN error; probably Eta is too large`');
-
-
-    elseif (currErr <= model.Error)
-      if (ismember(3, model.debug))
-          fprintf('Error reached criterion on iteration %d; done!\n', ip);
-      end;
-      break;
-
-    % We're precisely the same; quit!
-    elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
-      warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
-      break;
-    end;
-
-    if (ismember(10, model.debug)), fprintf('[%4d]: err = %6.4e\n', ip, currErr/numel(Y)); end;
   end;
 
 %  model = rmfield(model,'Eta');
