@@ -25,7 +25,7 @@ function [model, currErr, lastErr, newgrad, o_p] = guru_nnTrain_inner(X, Y, m, e
         wOrig = m.Weights;
         cOrig = m.Conn;
         nIn = size(X,1); nOut = size(Y,1); nHid = size(m.Conn,1)-nIn-nOut;
-        idxHOut = rand(nHid,1)<model.dropout;
+        idxHOut = find(rand(nHid,1)<model.dropout); %cannot use logical indexing; need numbers
         m.Conn(nIn+idxHOut, 1:nIn) = false;
         m.Weights(nIn+idxHOut, 1:nIn) = 0;
         m.Conn(nIn+nHid+[1:nOut], nIn+idxHOut) = false;

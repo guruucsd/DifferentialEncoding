@@ -13,6 +13,7 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
 %  o    : calculated output at LAST step.
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
+  if isfield(model, 'linout'), warning('linout deprecated; use XferFn with multiple values instead.'); end;
 
   % Set up transfer function for each unit
   nUnits = size(model.Weights,1); nOutput = size(Y,1); nInput = size(X,1); nHidden = nUnits-nOutput-nInput;
@@ -20,6 +21,12 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
     model.XferFn = [model.XferFn*ones(1,nHidden) ones(1,nOutput)]; %linear hidden->output
   elseif (length(model.XferFn)==2)
     model.XferFn = [model.XferFn(1)*ones(1,nHidden) model.XferFn(2)*ones(1,nOutput)];
+  end;
+
+  % Special case for dropout
+  %   reduce the value of the hidden->output weights by dropout %
+  if (isfield(model, 'dropout'))
+    model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]) = model.dropout*model.Weights(nInput+nHidden+[1:nOutput], nInput+[1:nHidden]);
   end;
 
   % Execute the model and determine the errorType
