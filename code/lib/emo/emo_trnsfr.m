@@ -31,9 +31,10 @@ function [o, h1] = emo_trnsfr( Trn, z )
       h1 = 1.7159*2/3*(1 - (o/1.7159).^2);
 
   case 7,
-      exps = exp(z);
-      o    = exps/sum(exps);
-      h1   = inf(size(o));
+      exps  = exp(z);
+      sexps = repmat(sum(exps,1), [size(z,1),1]);
+      o     = exps./sexps;
+      h1    = (sexps+1)./(sexps.^2);
 
   otherwise,
       error('Unknown transfer function type');
