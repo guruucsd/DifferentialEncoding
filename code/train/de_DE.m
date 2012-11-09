@@ -18,8 +18,6 @@ function [model] = de_DE(model)
   % Create and train the autoencoder
   %--------------------------------%
 
-  if (~isfield(model.ac, 'linout')), model.ac.linout = false; end;
-
   if (~model.ac.cached)
 
     % Set up input/output pairs
