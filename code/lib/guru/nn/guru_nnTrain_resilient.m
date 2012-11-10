@@ -79,7 +79,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
     elseif (currErr <= model.Error)
       %keyboard
-      if (ismember(3, model.debug))
+      if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
       break;

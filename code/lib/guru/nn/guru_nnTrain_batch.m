@@ -64,7 +64,7 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
     elseif (currErr <= model.Error)
       if (ip == 0), ip=1; end; % breaks stuff if we say that no updates occurred.  Doubt this is the "right" thing.
 
-      if (ismember(3, model.debug))
+      if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
       break;
