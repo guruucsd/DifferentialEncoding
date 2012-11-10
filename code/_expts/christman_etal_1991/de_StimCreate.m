@@ -23,7 +23,7 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-  [train.phases] = guru_getopt(opt, 'phases',  [11.25:11.25:180]);
+  [train.phases] = guru_getopt(opt, 'phases',  linspace(0,15*16/pi,16));%[11.25:11.25:180]);
   [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0,pi/2, 1));
   [train.nInput] = guru_getopt(opt, 'nInput',  [135 100]);
   train.cycles    = guru_getopt(opt, 'cycles', [2 4 8 16 32]);
