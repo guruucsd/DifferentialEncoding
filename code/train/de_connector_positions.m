@@ -9,6 +9,53 @@
   %             m(:,2) = column indices
 
     if (~exist('dbg','var')), dbg = 0; end;
+
+    try
+      [mu,mupos] = de_connector_positions_new(sI,sH,dbg);
+      return;
+    catch
+      if isempty(strfind(lasterr, 'can''t fit'))
+        error(lasterr);
+      elseif ismember(5, dbg)
+        fprintf('Failed to connect with new system; trying old!');
+      end;
+    end;
+
+    [mu,mupos] = de_connector_positions_classic(sI,sH,dbg);
+    
+
+function [mu,mupos] = de_connector_positions_new(sI,sH,dbg)
+% This allows 2D size of hidden unit layer to be specified.
+% Also allows real (vs integer) hidden unit positions.sizeof
+%
+% Determine sH by dividing sI by some number, then taking the floor product:]
+%   sH = prod(floor(sI/num));
+
+  % Determine the scaling
+  scalefactor = prod(sI)/sH;
+  newgrid = round(sI/sqrt(scalefactor));
+  guru_assert(prod(newgrid)==sH, 'can''t fit');
+
+  % Set up the hidden unit positions in the smaller grid
+  [X,Y] = meshgrid(1:newgrid(2),1:newgrid(1));
+  X = X - 1 - (newgrid(2)-1)/2;
+  Y = Y - 1 - (newgrid(1)-1)/2;
+  X = X*sqrt(scalefactor);
+  Y = Y*sqrt(scalefactor);
+
+  % Expand the smaller grid back out to the larger grid
+  X = X+1 + (sI(2)-1)/2;
+  Y = Y+1 + (sI(1)-1)/2;
+
+  % Create the outputs from the grids
+  mupos = [Y(:) X(:)];
+  mu = zeros(sI);
+  mu(round(Y(:)), round(X(:))) = 1;
+  guru_assert(nnz(mu)==sH);
+
+
+
+function [mu,mupos] = de_connector_positions_classic(sI,sH,dbg)
     ny = sI(1);
     nx = sI(2);
 
