@@ -3,13 +3,49 @@ function figs = de_PlotDistributions(mSets, stats)
 
   figs        = de_NewFig('dummy');
 
-  figs(end+1) = de_PlotGenericDistributions(mSets, stats.cxns_in,  'cxns_in');
-  figs(end+1) = de_PlotGenericDistributions(mSets, stats.cxns_out, 'cxns_out');
+  % Plot 2D average weights/connections, in 2D
+  figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.cxns_in,  'cxns_in_mean2D');
+  figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.cxns_out, 'cxns_out_mean2D');
 
-  figs(end+1) = de_PlotGenericDistributions(mSets, stats.weights_in,  'weights_in');
-  figs(end+1) = de_PlotGenericDistributions(mSets, stats.weights_out, 'weights_out');
+  figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.weights_in,  'weights_in_mean2D');
+  figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.weights_out, 'weights_out_mean2D');
 
-function fig = de_PlotGenericDistributions(mSets, data, figname)
+  weight_bins = linspace(-2,2,10);
+  connection_bins = linspace(0,1,10);
+
+  % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn');
+
+  % Plot distribution of weights
+  figs(end+1) = de_PlotMeanDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_hist');
+
+
+function fig = de_PlotDistributions1D(mSets, data, bins, figname)
+% Assume center of 2D data as center; all distances computed from there
+
+  [freq1D,rho] = guru_pixeldist(size(data));
+  nBins = length(bins); nFreq = length(freq1D);
+
+  % Collect the samples & create each row of the image
+  fsamps      = cell(nFreq,1);
+  distn_surf = zeros(nFreq, nBins);
+  for fi=1:nFreq
+    fsamps{fi} = data(rho==freq1D(fi));
+    distn_surf(fi,:) = histc(fsamps{fi}, bins)/length(fsamps{fi});
+  end;
+
+  % Show the surface
+  surf(repmat(freq1D', [1 nBins]), repmat(bins, [nFreq 1]), distn_surf);
+
+
+function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
+  data_hist  = histc(data(:), bins)/numel(data);
+
+  fig = de_NewFig(figname);
+  bar(bins, data_hist);
+
+
+function fig = de_PlotMeanDistributions2D(mSets, data, figname)
 
   fig = de_NewFig(figname);
   max1 = max(data{1}(:));
