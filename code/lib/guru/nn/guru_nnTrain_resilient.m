@@ -1,10 +1,10 @@
 function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 % Train with basic backprop, in batch mode
 
-  nInputs   = size(Y,1);
-  nDatapts  = size(Y,2);
+  nInputs   = size(X,1)-1;
+  nDatapts  = size(X,2);
   nUnits    = size(model.Weights,1);
-  nOutputs  = nInputs;
+  nOutputs  = size(Y,1);
   nHidden   = nUnits - nInputs - nOutputs;
 
   model.err = zeros([model.MaxIterations nDatapts]);
