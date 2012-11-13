@@ -11,7 +11,7 @@ function figs = de_PlotDistributions(mSets, stats)
   figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.weights_out, 'weights_out_mean2D');
 
   weight_bins = linspace(-2,2,10);
-  connection_bins = linspace(0,1,10);
+  connection_bins = linspace(0,0.15,10);
 
   % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
   figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn');
@@ -25,32 +25,38 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname)
 
   fig = de_NewFig(figname);
 
-  [freq1D,rho] = guru_pixeldist(size(data{1}));
-  nBins = length(bins); nFreq = length(freq1D);
+  [dist1D,rho] = guru_pixeldist(size(data{1}));
+  nBins = length(bins); nDist = floor(length(dist1D)/10);
 
   % Collect the samples & create each row of the image
-  distn_surf = zeros(2, nFreq, nBins);
-  for di=[1 length(data)]
-    fsamps      = cell(nFreq,1);
-    for fi=1:nFreq
-      fsamps{fi} = data{di}(rho==freq1D(fi));
-      distn_surf(di, fi, :) = histc(fsamps{fi}, bins)/length(fsamps{fi});
+  distn_img = zeros(2, nDist, nBins);
+  for si=[1 length(data)]
+    dsamps      = cell(nDist,1);
+    for di=1:nDist
+      dsamps{di} = data{si}(rho==dist1D(di));
+      distn_img(si, di, :) = histc(dsamps{di}, bins)/length(dsamps{di});
     end;
 
     % Show the surface
-    subplot(1,3,di);
-    surf(repmat(freq1D', [1 nBins]), repmat(bins, [nFreq 1]), squeeze(distn_surf(di,:,:)));
+    subplot(1,3,si);
+    de_PlotDistributions1D_subplot(squeeze(distn_img(si,:,:)), dist1D, bins);
   end;
   
   subplot(1,3,3);
-  surf(repmat(freq1D', [1 nBins]), repmat(bins, [nFreq 1]), -squeeze(diff(distn_surf,1)));
-  
+  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)));
+
+function de_PlotDistributions1D_subplot(distn_img, dist1D, bins)
+
+  imagesc(distn_img);
+  xlabel('P(connection)'); ylabel('distance');
+  set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(dist1D(get(gca,'ytick')))));
+  set(gca, 'xticklabel', guru_csprintf('%4.3f', num2cell(bins(get(gca,'xtick')))));
   
 
 function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
 %
   fig = de_NewFig(figname);
-
+  keyboard
   data_hist1  = histc(data(:), bins)/numel(data{1});
   data_hist2  = histc(data(:), bins)/numel(data{end});
   data_hist_diff = data_hist1-data_hist2;
