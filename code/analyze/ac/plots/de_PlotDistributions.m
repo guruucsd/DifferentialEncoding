@@ -14,13 +14,18 @@ function figs = de_PlotDistributions(mSets, stats)
   connection_bins = linspace(0,0.15,10);
 
   % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
-  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_out, connection_bins, 'cxns_out_distn', 'cxn');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_in, weight_bins, 'weights_in_distn', 'weight');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
 
   % Plot distribution of weights
   figs(end+1) = de_PlotMeanDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_hist');
 
 
-function fig = de_PlotDistributions1D(mSets, data, bins, figname)
+function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
+% Show probability connectivity/weights as a function of distance
+%
 % Assume center of 2D data as center; all distances computed from there
 
   fig = de_NewFig(figname);
@@ -29,7 +34,7 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname)
   nBins = length(bins); nDist = floor(length(dist1D)/10);
 
   % Collect the samples & create each row of the image
-  distn_img = zeros(2, nDist, nBins);
+  distn_img = zeros(2, nBins, nDist);
   for si=[1 length(data)]
     dsamps      = cell(nDist,1);
     for di=1:nDist
@@ -38,27 +43,28 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname)
     end;
 
     % Show the surface
-    subplot(1,3,si);
-    de_PlotDistributions1D_subplot(squeeze(distn_img(si,:,:)), dist1D, bins);
+    subplot(3,1,si);
+    de_PlotDistributions1D_subplot(squeeze(distn_img(si,:,:)), dist1D, bins, datalbl);
   end;
   
-  subplot(1,3,3);
-  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)));
+  subplot(3,1,3);
+  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)), dist1D, bins, datalbl);
 
-function de_PlotDistributions1D_subplot(distn_img, dist1D, bins)
+function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
 
-  imagesc(distn_img);
-  xlabel('P(connection)'); ylabel('distance');
+  imagesc(distn_img, [-0.5 0.5]);
+  xlabel(sprintf('P(%s)', datalbl)); ylabel('distance');
   set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(dist1D(get(gca,'ytick')))));
   set(gca, 'xticklabel', guru_csprintf('%4.3f', num2cell(bins(get(gca,'xtick')))));
-  
+
+
 
 function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
-%
+% Probability of a connection or 
   fig = de_NewFig(figname);
-  keyboard
-  data_hist1  = histc(data(:), bins)/numel(data{1});
-  data_hist2  = histc(data(:), bins)/numel(data{end});
+
+  data_hist1  = histc(data{1}(:), bins)/numel(data{1});
+  data_hist2  = histc(data{end}(:), bins)/numel(data{end});
   data_hist_diff = data_hist1-data_hist2;
   
   subplot(1,3,1);bar(bins, data_hist1);
