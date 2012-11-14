@@ -37,8 +37,8 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   end;
   ws.nInput   = ws.train.nInput;                       % 2D size of images
   ws.inPix    = prod(ws.nInput);
-  ws = rmfield(ws,'train'); 
-  ws = rmfield(ws,'test');
+ % ws = rmfield(ws,'train'); 
+ % ws = rmfield(ws,'test');
   
   if (~exist('G','var'))
       G = fspecial('gaussian',[10 10],4);
@@ -134,14 +134,13 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   
   % Create training dataset from blurred images
   %
-	ws.fullfidel  = de_NormalizeDataset(ws.train, struct('ac',model)); %get the zscore info for full-fidelity images
-  model.zscore  = ws.zs; % use the zscore information for all other datasets downstream
-keyboard % looking for bias
+  ws.fullfidel  = de_NormalizeDataset(ws.train, struct('ac',model)); %get the zscore info for full-fidelity images
+  %model.zscore  = ws.fullfidel.zs; % use the zscore information for all other datasets downstream
   ws.train.X    = ws.fimages(:,ws.trainset);
-	ws.train      = de_NormalizeDataset(ws.train, struct('ac',model));
-	X             = ws.train.X;               % Input vectors;  [pixels examples]
-	Y             = ws.train.X(1:end-1,:);    % everything but the bias
-	%clear('dset');
+  ws.train      = de_NormalizeDataset(ws.train, struct('ac',model));
+  X             = ws.train.X;               % Input vectors;  [pixels examples]
+  Y             = ws.train.X(1:end-1,:);    % everything but the bias
+  %clear('dset');
 
   ws.nloops      = length(ws.iters_per)-1;
   prune_loc      = 'input';%output';
@@ -184,7 +183,7 @@ keyboard % looking for bias
         in2hu_c  = model.Conn   (ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %input->hidden connection matrix
         in2hu_w  = model.Weights(ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %input->hidden weight matrix
 
-      case otherwise, error('unknown pruning location: %s', prune_loc);
+      otherwise, error('unknown pruning location: %s', prune_loc);
     end;
   
     % Create some metric for selecting weights
@@ -278,9 +277,7 @@ keyboard % looking for bias
           sum(ws.iters_per));
 %  f                   = ws.fimages(:,ws.trainset);
 %  dset                = de_NormalizeDataset(struct('X', f, 'name','full-fidelity'), struct('ac',model));
-keyboard % looking at bias again
   X                   = ws.fullfidel.X;               % Input vectors;  [pixels examples]
-  X(end,:)            = ws.fullfidel.bias;            % Keep same bias value
   Y                   = ws.fullfidel.X(1:end-1,:);    % everything but the bias
   %clear('dset');
   model.MaxIterations = ws.iters_per(end);
@@ -299,11 +296,9 @@ keyboard % looking at bias again
   
     
   % 1. Test set error
-  ws.test.X     = ws.fimages(:, ws.testset);
+        ws.test.X     = ws.fimages(:, ws.testset);
 	ws.test       = de_NormalizeDataset(ws.test, struct('ac',model));
 	X_test        = ws.test.X;              % Input vectors;  [pixels examples]
-  keyboard % bias val
-	X_test(end,:) = ws.test.X(end,1);            % set bias to be the same as in the training set
 	Y_test        = ws.test.X(1:end-1,:);   % everything but the bias
   %clear('dset');
   
@@ -327,7 +322,7 @@ keyboard % looking at bias again
   
   rcf = figure;
   cb_orig = [min(ws.fimages(:)) max(ws.fimages(:))];
-  cb_rcon = [min(f(:))          max(f(:))];
+  cb_rcon = cb_orig; %[min(f(:))          max(f(:))];
 
   % Original train images    
   subplot(4,3,1); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(1)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 

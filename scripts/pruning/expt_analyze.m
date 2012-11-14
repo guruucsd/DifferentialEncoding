@@ -1,5 +1,6 @@
-function expt_analyze(models, ws, s)
+function expt_analyze(models, wss, s)
     addpath(genpath('~/de/code/analyze/ac/stats'));
+    ws = wss{1}(1);
 
     % Collect basic stats
     [s.basics] = expt_basics( models, ws, s );
@@ -31,10 +32,10 @@ function expt_analyze(models, ws, s)
       if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
       saveas(f.shp,  fullfile(ws.pngdir, 'f_shape_map'), 'png');
     end;
-
+    
     % Collect spatial frequency info
     if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_sf_*.png')))==0)
-      [s.sf,  f.sf ] = expt_sf( models, ws );
+      [s.sf,  f.sf ] = expt_sf( models, wss );
       if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
       for ii=1:length(f.sf)
         saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
@@ -496,29 +497,23 @@ function [s, f] = expt_connections( models, ws, s_in )
 function [s, f] = expt_images( models, ws )
 
 %%%%%%%%%%%%%%%%%%%%%%
-function [s, f] = expt_sf( models, ws, kernel )
+function [s, f] = expt_sf( models, wss, kernel )
 %
 % Analyze spatial frequency content when we run different types of images through.
 %
 % NOTE: even though the networks were trained on different kernels, 
 %   they are tested on images with the same kernel here.
 %
+    ws = wss{1}(1);
 
-    addpath(genpath('~/de/code/analyze/ac'));
-    
     if (~exist('kernel','var')), kernel = 1; end; %blurring kernel for test images
 
-    testsets = {'uber'};
+    testsets = {'natimg'};
     mSets    = models{end}(end); 
     for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
         
-    %s.orig = de_StatsFFTs( ws.train.X, mSets.nInput);  % original images
-    
-    biasVal  = getfield(de_NormalizeDataset(ws.train, struct('ac',mSets)), 'bias');
-    
     for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
-		
     % Create the testing dataset, with the same options (and same whitening)
     opt = ws.train.opt;
     if isfield(ws.train,'axes'), opt{find(guru_findstr(ws.train.opt,'dnw'))+1} = ws.train.axes; end;
@@ -538,7 +533,6 @@ function [s, f] = expt_sf( models, ws, kernel )
 		%   and the same bias val as the original images
 
 		G = fspecial('gaussian',ws.kernels([kernel kernel]),4);
-		
 		% Filter the images
 		ws.inPix = prod(test.nInput);
 		for ii=1:size(test.X,2)
@@ -546,12 +540,9 @@ function [s, f] = expt_sf( models, ws, kernel )
 			fc = imfilter(fc,G,'same');
 			test.X(:,ii) = reshape(fc, [ws.inPix 1]);
 		end;
-		test.X        = guru_dnw(test.X);
-		mSets.ac.minmax  = [];
-		mSets.ac.absmean = 1.26E-2;
 		dset          = de_NormalizeDataset(test, struct('ac',mSets)); %
-		dset.bias     = biasVal;
-		dset.X(end,:) = biasVal;
+		dset = ws.train;%dset.bias     = biasVal;
+		%dset.X(end,:) = biasVal;
 		
 
 		% Save the reconstructed images and frequency stats
@@ -559,8 +550,11 @@ function [s, f] = expt_sf( models, ws, kernel )
 		%  NOTE: the models must be reversed.  Or... should they?  lol...
 		%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
 		%
-		s.(testsets{ti}).rimgs = de_StatsOutputImages(models, dset, 1:size(dset.X,2)); 
-		s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
+		s.(testsets{ti}).rimgs = cell(size(wss));
+                for ri=1:length(wss)
+                  s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), wss{ri}(1).train, 1:size(wss{ri}(1).train.X,2)); 
+	      	end;
+                s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
 		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
 		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
 		
