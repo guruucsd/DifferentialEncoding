@@ -202,7 +202,7 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 
     % Whitening
     whiten = guru_getopt(opts, 'dnw', false);
-    if (islogical(whiten)) && whiten)
+    if (islogical(whiten) && whiten)
         if (exist('dset_to_match','var') && isfield(dset_to_match,'axes')), 
             [dset.X, dset.axes] = guru_dnw( dset.X, dset_to_match.axes );
         else,

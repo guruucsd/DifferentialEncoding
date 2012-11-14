@@ -26,7 +26,9 @@ function carr = guru_csprintf(fmt, cells, delim)
       
       for i=1:length(cells)
           if     (iscell    (cells{i})), carr{i} = guru_cell2str(cells{i}, ' ');
-          elseif (isnumeric (cells{i})), carr{i} = ['[' num2str(cells{i}) ']'];
+          elseif (isnumeric (cells{i}))
+              if length(cells{i})==numel(cells{i}), carr{i} = ['[' num2str(cells{i}) ']']; 
+              else,  carr{i}=['[' num2str(size(cells{i})) ']']; end;
           elseif (ischar    (cells{i})), carr{i} = cells{i};
           elseif (isinteger (cells{i})), carr{i} = num2str(cells{i});
           elseif (islogical (cells{i})), carr{i} = num2str(cells{i});

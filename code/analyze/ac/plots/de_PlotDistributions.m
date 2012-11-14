@@ -39,7 +39,7 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
     dsamps      = cell(nDist,1);
     for di=1:nDist
       dsamps{di} = data{si}(rho==dist1D(di));
-      distn_img(si, di, :) = histc(dsamps{di}, bins)/length(dsamps{di});
+      distn_img(si, :, di) = histc(dsamps{di}, bins)/length(dsamps{di});
     end;
 
     % Show the surface
@@ -53,9 +53,9 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
 function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
 
   imagesc(distn_img, [-0.5 0.5]);
-  xlabel(sprintf('P(%s)', datalbl)); ylabel('distance');
-  set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(dist1D(get(gca,'ytick')))));
-  set(gca, 'xticklabel', guru_csprintf('%4.3f', num2cell(bins(get(gca,'xtick')))));
+  ylabel(sprintf('P(%s)', datalbl)); xlabel('distance');
+  set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(bins(get(gca,'ytick')))));
+  set(gca, 'xticklabel', guru_csprintf('%4.3f', num2cell(dist1D(get(gca,'xtick')))));
 
 
 

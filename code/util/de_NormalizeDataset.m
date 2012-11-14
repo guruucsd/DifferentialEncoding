@@ -36,17 +36,19 @@ function dset = de_NormalizeDataset(dset, mSets)
 
   % Z-score: across all images and pixels at once
   elseif (isfield(mSets.ac, 'zscore'))
-    if (islogical(zscore)), % will produce mean 0, std 0.1 data at each pixel
-      zs.mean = mean(dset.X);
-      zs.std  = 0.1 * std(dset.X);
-    elseif isnumeric(zscore) 
-      zs.mean = mean(dset.X);
-      zs.std  = zscore * std(dset.X);
-    elseif isobject(zscore)
-      zs = zscore;
+    if (islogical(mSets.ac.zscore)), % will produce mean 0, std 0.1 data at each pixel
+      zs.delta_mean = mean(dset.X);
+      zs.delta_std  = 0.1 ./ std(dset.X);
+    elseif isnumeric(mSets.ac.zscore) 
+      zs.delta_mean = mean(dset.X);
+      zs.delta_std  = mSets.ac.zscore ./ std(dset.X);
+    elseif isstruct(mSets.ac.zscore)
+      zs = mSets.ac.zscore;
+    else
+      error('Unrecognized type for zscore property.');
     end;
 
-    dset.X =zs.std*(dset.X - repmat(zs.mean, [size(dset.X,1) 1])) ./ repmat(zs.std, [size(dset.X,1) 1]);
+    dset.X  = (dset.X - repmat(zs.delta_mean, [size(dset.X,1) 1])) .* repmat(zs.delta_std, [size(dset.X,1) 1]);
     dset.zs = zs;
 
     if (~isempty(mSets.ac.minmax))
@@ -85,7 +87,7 @@ function dset = de_NormalizeDataset(dset, mSets)
   % NOTE: only do if "useBias" field is defined
   %
   if (isfield(mSets.ac, 'useBias'))
-      if (~isfield(dset, 'bias')), dset.bias = mean(dset.X(:)); end;
+      if (~isfield(dset, 'bias')), dset.bias = mean(abs(dset.X(:))); end;
       dset.X(end+1,:) = dset.bias*mSets.ac.useBias;
   end;
 

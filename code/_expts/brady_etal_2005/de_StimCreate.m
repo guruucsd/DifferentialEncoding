@@ -100,6 +100,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     ii = 1;
     while (ii<=length(opt))
       curopt = opt{ii};
+      if (~ischar(curopt)), ii = ii + 1; continue; end;
 
       switch (curopt)
           case {'left','right','full'}

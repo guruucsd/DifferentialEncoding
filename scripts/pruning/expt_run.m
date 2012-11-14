@@ -42,7 +42,7 @@ dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
 iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
-tag                  = repmat( {'test15'}, size(sigma) );
+tag                  = repmat( {'test16'}, size(sigma) );
 
 kernels              = repmat( {[8 1]}, size(sigma) );
 for ii=1:length(kernels)
@@ -125,7 +125,7 @@ for si=1:length(lambdas)
 		curmodel.randSeed = ni;
 		
 		G                 = ws.filters{fi};  % set the appropriate filter for this run
-		[curmodel,~,s,fs] = autoencoder(curmodel, G, ws);      % run the script
+		[curmodel,ws,s,fs] = autoencoder(curmodel, G, ws);      % run the script
 		close all;        % close figures
 	
 		% Move output
@@ -142,12 +142,12 @@ for si=1:length(lambdas)
 	s.dist_orig_full = cell(ws.nkernels,ws.N);
 	s.dist_end_full  = cell(ws.nkernels,ws.N);
 	models           = cell(ws.nkernels,1);
-	
+	wss              = cell(ws.nkernels,1);
 	for fi=1:ws.nkernels
 		for ni=1:ws.N
-			ld = load(fns{ni,fi}, 'model', 's'); 
+			ld = load(fns{ni,fi}, 'model', 's', 'ws'); 
 
-            model                   = ld.model;
+            		model                   = ld.model;
 			s.dist_orig_full{fi,ni} = vertcat(ld.s.dist_orig{:});
 			s.dist_end_full {fi,ni} = vertcat(ld.s.dist_end{:});
 			
@@ -167,14 +167,15 @@ for si=1:length(lambdas)
 	
 			
 			models        {fi}    = [models{fi} model];
-		end;
+		        wss{fi} = [wss{fi} ld.ws];
+               	end;
 	end;
 	
 	% Save off results
 	if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
 	save(fullfile(ws.matdir, 'expt_sf'));
 
-    expt_analyze( models, ws, s );
+    expt_analyze( models, wss, s );
     close all;
     
     toc
