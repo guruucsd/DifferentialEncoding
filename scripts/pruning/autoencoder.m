@@ -62,7 +62,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     % These parameters are large resources
     model.nInput               = ws.nInput;                 % # Input units (minus bias)
     model.nOutput              = ws.inPix;                  % # Output units
-    if (~isfield(model, 'distn')),                model.distn                = {'norme2'}; end;
+    if (~isfield(model, 'distn')),                model.distn                = {'norme'}; end;
     if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
     if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
     if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
@@ -117,11 +117,11 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
             model.XferFn  = [6 1];              % 1.73 * tanh
             model.useBias = 1;
         case 'resilient'
-            model.Pow     = 3;              % gradient power; Err = (y-y_hat).^(Pow+1)
-            model.EtaInit = 2E-2;          % Learning rate (to start)
-            model.Acc     = 5E-5;          % (1+Acc) Multiplicative increase to eta (when training good)
+            model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
+            model.EtaInit = 5E-3;          % Learning rate (to start)
+            model.Acc     = 5E-10;          % (1+Acc) Multiplicative increase to eta (when training good)
             model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-            model.XferFn  = [6 1];              % 1.73 * tanh
+            model.XferFn  = [6 4];              % 1.73 * tanh
             model.useBias = 1;
     end;
     
@@ -143,8 +143,8 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
 	clear('dset');
 
     ws.nloops      = length(ws.iters_per)-1;
-    prune_loc      = 'output';%'input';
-    prune_strategy = 'weighted_weights';%'weights';
+    prune_loc      = 'input';%output';
+    prune_strategy = 'activity';%weighted_weights';%'weights';
     
     for ii=1:ws.nloops
         model.MaxIterations = ws.iters_per(ii);
@@ -168,7 +168,8 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
 		nConnCurr      = (nnz(model.Conn)-model.nHidden-model.nOutput);
 		nConnPerHidden = nConnCurr/model.nHidden/2;   %2 because input&output  
 		reductRate     = exp(log(model.nConnPerHidden_End/nConnPerHidden)/(ws.nloops-ii+1));
-		nout = round( (1-reductRate) * nConnPerHidden * model.nHidden * 2 );
+		
+                nout = round( (1-reductRate) * nConnPerHidden * model.nHidden * 2 );
 		nout = nout - mod(nout,2); % must be even, so as we remove hidden->input and hidden->output pairs
 		guru_assert( (nConnCurr-nout)>=model.nConnPerHidden_End*model.nHidden*2, 'Don''t remove too many connections!!');
             
@@ -321,24 +322,24 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     cb_rcon = [min(f(:))          max(f(:))];
 
     % Original train images    
-    subplot(4,3,1); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(1)), ws.nInput),   cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,2); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(round(end/2))), ws.nInput),   cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,3); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(end)), ws.nInput), cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,1); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(1)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,2); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(round(end/2))), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,3); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(end)), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
 
     % Recon train images
-    subplot(4,3,4); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,1), ws.nInput),   cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,5); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,6); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,end), ws.nInput), cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,4); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,1), ws.nInput),   cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,5); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,6); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,end), ws.nInput), cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
     
     % Original test images
-    subplot(4,3,7); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(1)), ws.nInput),   cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,8); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(round(end/2))), ws.nInput),  cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,9); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(end)), ws.nInput), cb_orig); colorbar; %set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,7); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(1)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,8); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(round(end/2))), ws.nInput),  cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,9); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(end)), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
     
     % Recon test images
-    subplot(4,3,10); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,1), ws.nInput),   cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,11); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
-    subplot(4,3,12); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,end), ws.nInput), cb_rcon); colorbar; %set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,10); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,1), ws.nInput),   cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,11); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
+    subplot(4,3,12); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,end), ws.nInput), cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
         
     
 %    clear('o_p','huacts','rimgs');

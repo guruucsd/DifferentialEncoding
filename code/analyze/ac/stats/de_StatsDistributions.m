@@ -4,6 +4,7 @@ function [stats] = de_StatsDistributions(mss)
 
   mSets = mss{end}(end);
   [~,mupos] = de_connector_positions(mSets.nInput, mSets.nHidden/mSets.hpl);
+  mupos = round(mupos);
 
   stats.weights_in  = cell(length(mss),1);
   stats.weights_out = cell(length(mss),1);
