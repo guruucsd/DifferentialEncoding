@@ -43,7 +43,7 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname)
   end;
   
   subplot(1,3,3);
-  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)));
+  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)), dist1D, bins);
 
 function de_PlotDistributions1D_subplot(distn_img, dist1D, bins)
 
@@ -56,9 +56,8 @@ function de_PlotDistributions1D_subplot(distn_img, dist1D, bins)
 function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
 %
   fig = de_NewFig(figname);
-  keyboard
-  data_hist1  = histc(data(:), bins)/numel(data{1});
-  data_hist2  = histc(data(:), bins)/numel(data{end});
+  data_hist1  = histc(data{1}(:), bins)/numel(data{1});
+  data_hist2  = histc(data{end}(:), bins)/numel(data{end});
   data_hist_diff = data_hist1-data_hist2;
   
   subplot(1,3,1);bar(bins, data_hist1);
