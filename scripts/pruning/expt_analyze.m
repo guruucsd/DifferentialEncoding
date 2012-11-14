@@ -514,12 +514,15 @@ function [s, f] = expt_sf( models, ws, kernel )
     for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
 		
+    % Create the testing dataset, with the same options (and same whitening)
+    opt = ws.train.opt;
+    if isfield(ws.train,'axes'), opt{find(guru_findstr(ws.train.opt,'dnw'))+1} = ws.train.axes; end;
 		switch(testsets{ti})
-			case 'cafe',   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '',  {'small'});
-			case 'natimg', [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '',  {'small'});
-			case 'sergent',[~, train, test] = de_MakeDataset('sergent_1982',        'de',      '',  {'small'});
-			case 'sf',     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','',  {'small'});
-			case 'uber',   [~, train, test] = de_MakeDataset('uber',                'all',     '',  {'small'});
+			case 'cafe',   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '',  opt);
+			case 'natimg', [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '',  opt);
+			case 'sergent',[~, train, test] = de_MakeDataset('sergent_1982',        'de',      '',  opt);
+			case 'sf',     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','',  opt);
+			case 'uber',   [~, train, test] = de_MakeDataset('uber',                'all',     '',  opt);
 			otherwise,      error('dataset %s NYI', testsets{ti});
 		end;
 
