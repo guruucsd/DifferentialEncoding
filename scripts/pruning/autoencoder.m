@@ -1,139 +1,139 @@
 function [model,ws,s,fs] = autoencoder(model, G, ws)
-         
-    if (~exist('model','var')), model = struct(); end;
-    if (~exist('ws',   'var')), ws    = struct(); end;
-    
-    if (~isfield(model, 'lrrev')), model.lrrev = false; end;
-    if (~isfield(model, 'randSeed')), model.randSeed = rand; end;
+       
+  if (~exist('model','var')), model = struct(); end;
+  if (~exist('ws',   'var')), ws    = struct(); end;
+  
+  if (~isfield(model, 'lrrev')), model.lrrev = false; end;
+  if (~isfield(model, 'randSeed')), model.randSeed = rand; end;
 
-    if exist('rng','file')
-      rng(model.randSeed);    %this allows exact same randomization to prune from, for lsf,msf,hsf
-    else
-      rand('seed',model.randSeed);
-      randn('seed',model.randSeed);
-    end;
+  if exist('rng','file')
+    rng(model.randSeed);    %this allows exact same randomization to prune from, for lsf,msf,hsf
+  else
+    rand('seed',model.randSeed);
+    randn('seed',model.randSeed);
+  end;
 
-    %%%%%%%%%%%%%%%%%
-    % Create & load stimulus set into some expected schema
-    %%%%%%%%%%%%%%%%%
-    
-    fprintf('\nCreating stims...');
-    if (~isfield(ws,'images'))
-        if (~isfield(ws, 'train'))
-            [~,ws.train,ws.test] = de_MakeDataset('young_bion_1981', 'orig','recog',{'small' 'dnw' true});
-        end;
-    end;
+  %%%%%%%%%%%%%%%%%
+  % Create & load stimulus set into some expected schema
+  %%%%%%%%%%%%%%%%%
+  
+  fprintf('\nCreating stims...');
+  if (~isfield(ws,'images'))
+      if (~isfield(ws, 'train'))
+          [~,ws.train,ws.test] = de_MakeDataset('young_bion_1981', 'orig','recog',{'small' 'dnw' true});
+      end;
+  end;
 
-    ws.images  = [ws.train.X ws.test.X];                            % Stim to use for expt
-    ws.trainset = 1:size(ws.train.X,2);                  % Images to be used for this training
-    ws.testset  = setdiff(1:size(ws.images,2), ws.trainset); 
-    if (model.lrrev) % mirror image across vertical axis
-        for ii=1:size(ws.images,2)
-            img = reshape(ws.images(:,ii), model.nInput);
-            
-            ws.images(:,ii) = reshape( img(:,end:-1:1), [1 numel(img)] );
-        end;
-        clear('img');
-    end;
-    ws.nInput   = ws.train.nInput;                       % 2D size of images
-    ws.inPix    = prod(ws.nInput);
-    ws = rmfield(ws,'train'); 
-    ws = rmfield(ws,'test');
-    
-    if (~exist('G','var'))
-        G = fspecial('gaussian',[10 10],4);
-    end;
-    
-    % Filter the images
-    ws.fimages = zeros(size(ws.images));
-    for ii=1:size(ws.images,2)
-        fc = reshape(ws.images(:,ii), ws.nInput);
-        fc = imfilter(fc,G,'same');
-        ws.fimages(:,ii) = reshape(fc, [ws.inPix 1]);
-    end;
-	fc = []; % parfor 'clear' trick
+  ws.images  = [ws.train.X ws.test.X];                            % Stim to use for expt
+  ws.trainset = 1:size(ws.train.X,2);                  % Images to be used for this training
+  ws.testset  = setdiff(1:size(ws.images,2), ws.trainset); 
+  if (model.lrrev) % mirror image across vertical axis
+      for ii=1:size(ws.images,2)
+          img = reshape(ws.images(:,ii), model.nInput);
+          
+          ws.images(:,ii) = reshape( img(:,end:-1:1), [1 numel(img)] );
+      end;
+      clear('img');
+  end;
+  ws.nInput   = ws.train.nInput;                       % 2D size of images
+  ws.inPix    = prod(ws.nInput);
+  ws = rmfield(ws,'train'); 
+  ws = rmfield(ws,'test');
+  
+  if (~exist('G','var'))
+      G = fspecial('gaussian',[10 10],4);
+  end;
+  
+  % Filter the images
+  ws.fimages = zeros(size(ws.images));
+  for ii=1:size(ws.images,2)
+      fc = reshape(ws.images(:,ii), ws.nInput);
+      fc = imfilter(fc,G,'same');
+      ws.fimages(:,ii) = reshape(fc, [ws.inPix 1]);
+  end;
+  fc = []; % parfor 'clear' trick
 
-    %%%%%%%%%%%%%%%%%
-    % Set up model parameters & allocate space
-    %%%%%%%%%%%%%%%%%
-    
-    fprintf('\nCreating network...');
-    
-    % These parameters are large resources
-    model.nInput               = ws.nInput;                 % # Input units (minus bias)
-    model.nOutput              = ws.inPix;                  % # Output units
-    if (~isfield(model, 'distn')),                model.distn                = {'norme'}; end;
-    if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
-    if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
-    if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
-    if (~isfield(model, 'sigma')),                model.sigma                = 20; end;
-    if (~isfield(model, 'nConnPerHidden_Start')), model.nConnPerHidden_Start = 30; end; % reduce this and below, tomorrow
-    if (~isfield(model, 'nConnPerHidden_End')),   model.nConnPerHidden_End   = 15; end;
-    if (~isfield(model, 'nConns')),               model.nConns               = model.nConnPerHidden_Start; end;
-    %if (~isfield(model, 'linout')),              model.linout               = true; end;
-    if (~isfield(model, 'debug')),                model.debug                = 1:10; end;
-    if (~isfield(model, 'useBias')),              model.useBias              = 1; end;
-    
-    
-    ws.nunits     = ws.inPix+model.nHidden+model.nOutput+1;  % Total # of units; +1 for bias
-    ws.nzmax      = 2*model.nHidden*model.nConns         ...     % Space to allocate for sparse matrix;
-                  + 1*(model.nHidden+model.nOutput);             % input->hidden, hidden->output, and bias conns
-               
-    % Create connectivity matrix.
-    %   This can be slow, so only do it if we have to.
-    if (~isfield(model, 'Conn'))
-        model.ac.tol     = 0;                % "Promote" needed props for the call into the connector
-        model.ac.debug   = model.debug;
-        model.ac.useBias = model.useBias;
-        %model.useold_connector = true;
-        model.Conn     = de_connector(model);
-        ws.Conn_init   = model.Conn; % to detect changes in connectivity
-    end;
-    
-    % Add random weights
-    %   Only do this if the weights don't exist
-    %   So, if we comment out the 'clear' above,
-    %   We can re-run the script and continue training
-    %   the previous model.
-    if (~isfield(model, 'Weights'))
-        model.Weights = (1/model.nConns/model.nHidden)*sprandn(model.Conn);
-    end;
-    
-    % Set up model training parameters
-    if (~isfield(ws, 'iters_per')), ws.iters_per     = 10*ones(5,1); end;%[15 10 8 8 5 4]; end    %floor(TotIterations/nloops);
+  %%%%%%%%%%%%%%%%%
+  % Set up model parameters & allocate space
+  %%%%%%%%%%%%%%%%%
+  
+  fprintf('\nCreating network...');
+  
+  % These parameters are large resources
+  model.nInput               = ws.nInput;                 % # Input units (minus bias)
+  model.nOutput              = ws.inPix;                  % # Output units
+  if (~isfield(model, 'distn')),                model.distn                = {'norme'}; end;
+  if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
+  if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
+  if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
+  if (~isfield(model, 'sigma')),                model.sigma                = 20; end;
+  if (~isfield(model, 'nConnPerHidden_Start')), model.nConnPerHidden_Start = 30; end; % reduce this and below, tomorrow
+  if (~isfield(model, 'nConnPerHidden_End')),   model.nConnPerHidden_End   = 15; end;
+  if (~isfield(model, 'nConns')),               model.nConns               = model.nConnPerHidden_Start; end;
+  %if (~isfield(model, 'linout')),              model.linout               = true; end;
+  if (~isfield(model, 'debug')),                model.debug                = 1:10; end;
+  if (~isfield(model, 'useBias')),              model.useBias              = 1; end;
+  
+  
+  ws.nunits     = ws.inPix+model.nHidden+model.nOutput+1;  % Total # of units; +1 for bias
+  ws.nzmax      = 2*model.nHidden*model.nConns         ...     % Space to allocate for sparse matrix;
+                + 1*(model.nHidden+model.nOutput);             % input->hidden, hidden->output, and bias conns
+             
+  % Create connectivity matrix.
+  %   This can be slow, so only do it if we have to.
+  if (~isfield(model, 'Conn'))
+      model.ac.tol     = 0;                % "Promote" needed props for the call into the connector
+      model.ac.debug   = model.debug;
+      model.ac.useBias = model.useBias;
+      %model.useold_connector = true;
+      model.Conn     = de_connector(model);
+      ws.Conn_init   = model.Conn; % to detect changes in connectivity
+  end;
+  
+  % Add random weights
+  %   Only do this if the weights don't exist
+  %   So, if we comment out the 'clear' above,
+  %   We can re-run the script and continue training
+  %   the previous model.
+  if (~isfield(model, 'Weights'))
+      model.Weights = (1/model.nConns/model.nHidden)*sprandn(model.Conn);
+  end;
+  
+  % Set up model training parameters
+  if (~isfield(ws, 'iters_per')), ws.iters_per     = 10*ones(5,1); end;%[15 10 8 8 5 4]; end    %floor(TotIterations/nloops);
 
-    if (~isfield(model, 'TrainMode')),     model.TrainMode     = 'resilient'; end;       % 'batch' or 'resilient'
-%    if (~isfield(model, 'MaxIterations')), model.MaxIterations = 50;          end;    % # iterations through the training set
-    if (~isfield(model, 'AvgError')),      model.AvgError      = 0;           end;    % Stopping criterion (0 means train to max # of iterations)
-    if (~isfield(model, 'errorType')),     model.errorType     = 2;           end;    % 1=sum(abs(err)), 2=sum(err.^2)
-    if (~isfield(model, 'debug')),         model.debug         = 1:10;        end;    % Some debug flags, for printing information during training
-    
-    switch model.TrainMode
-        case 'batch'
-            model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
-            model.EtaInit = 1;              % Learning rate (to start)
-            model.Acc     = 1.005;          % Multiplicative increase to eta (when training good)
-            model.Dec     = 1.2;            % Divisive decrease to eta (when training goes bad)
-            model.XferFn  = [6 1];              % 1.73 * tanh
-            model.useBias = 1;
-        case 'resilient'
-            model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
-            model.EtaInit = 5E-3;          % Learning rate (to start)
-            model.Acc     = 5E-10;          % (1+Acc) Multiplicative increase to eta (when training good)
-            model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-            model.XferFn  = [6 4];              % 1.73 * tanh
-            model.useBias = 1;
-    end;
-    
-    
-    %%%%%%%%%%%%%%%%%
-    % Train the model
-    %%%%%%%%%%%%%%%%%
-    
-    fprintf('\nTraining...');
-    
-    % Create training dataset from blurred images
-    %
+  if (~isfield(model, 'TrainMode')),     model.TrainMode     = 'resilient'; end;       % 'batch' or 'resilient'
+%  if (~isfield(model, 'MaxIterations')), model.MaxIterations = 50;          end;    % # iterations through the training set
+  if (~isfield(model, 'AvgError')),      model.AvgError      = 0;           end;    % Stopping criterion (0 means train to max # of iterations)
+  if (~isfield(model, 'errorType')),     model.errorType     = 2;           end;    % 1=sum(abs(err)), 2=sum(err.^2)
+  if (~isfield(model, 'debug')),         model.debug         = 1:10;        end;    % Some debug flags, for printing information during training
+  
+  switch model.TrainMode
+    case 'batch'
+      model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
+      model.EtaInit = 1;              % Learning rate (to start)
+      model.Acc     = 1.005;          % Multiplicative increase to eta (when training good)
+      model.Dec     = 1.2;            % Divisive decrease to eta (when training goes bad)
+      model.XferFn  = [6 1];              % 1.73 * tanh
+      model.useBias = 1;
+    case 'resilient'
+      model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
+      model.EtaInit = 5E-3;          % Learning rate (to start)
+      model.Acc     = 5E-10;          % (1+Acc) Multiplicative increase to eta (when training good)
+      model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
+      model.XferFn  = [6 4];              % 1.73 * tanh
+      model.useBias = 1;
+  end;
+  
+
+  %%%%%%%%%%%%%%%%%
+  % Train the model
+  %%%%%%%%%%%%%%%%%
+  
+  fprintf('\nTraining...');
+  
+  % Create training dataset from blurred images
+  %
 	f             = ws.fimages(:,ws.trainset);      
 	%model.absmean = 1.26E-2;
 	%model.minmax  = [];
