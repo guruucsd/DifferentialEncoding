@@ -43,15 +43,23 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [X,XLAB]= stim2D(stimSet, nInput, freqs, phases, thetas)
 
+    % Filter the gratings based on teh stimulus set
+    switch stimSet
+        case 'vertonly', thetas=pi/2;
+        case 'horzonly', thetas=0;
+        case {'','all'}, ;
+        otherwise, error('unknown stimSet');
+    end;
+
     X    = zeros(prod(nInput), length(freqs)*length(phases)*length(thetas));
     XLAB = cell(size(X,2),1);
 
     ii = 1;
     for fi=1:length(freqs)
-        for pi=1:length(phases)
+        for phsi=1:length(phases)
             for ti=1:length(thetas)
-                X(:,ii)  = reshape( mfe_grating2d(freqs(fi), phases(pi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
-                XLAB{ii} = sprintf('f=%f\np=%f\nt=%f', freqs(fi), phases(pi), thetas(ti));
+                X(:,ii)  = reshape( mfe_grating2d(freqs(fi), phases(phsi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
+                XLAB{ii} = sprintf('f=%f\np=%f\nt=%f', freqs(fi), phases(phsi), thetas(ti));
                 ii = ii+1;
             end;
         end;

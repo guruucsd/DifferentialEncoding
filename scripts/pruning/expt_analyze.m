@@ -180,7 +180,8 @@ function [ipd, fs] = expt_ipd( models, ws )
     
         nPos      = mSets.nHidden/mSets.hpl;
         [~,mupos] = de_connector_positions(mSets.nInput, nPos);
-        
+        mupos = round(mupos);
+
         nn_dff = diff(nn_mns,1);
         fc_dff = diff(fc_mns,1);
         
@@ -201,6 +202,7 @@ function [ipd, fs] = expt_ipd( models, ws )
         subplot(1,2,1);
         cl_nn = [-max(0.1,max(abs(nn_dff))) max(0.1,max(abs(nn_dff)))];
         imagesc(nn_img, cl_nn); axis image;
+        set(gca, 'xtick', [], 'ytick', []);
         colorbar;
         title('Diff in mean of [min patch distance]');
         xlabel(sprintf('Positive=>%s > %s', ws.klabs{2}, ws.klabs{1}));
@@ -208,6 +210,7 @@ function [ipd, fs] = expt_ipd( models, ws )
         subplot(1,2,2);
         cl_fc = [-max(0.1,max(abs(fc_dff))) max(0.1,max(abs(fc_dff)))];
         imagesc(fc_img, cl_fc); axis image;
+        set(gca, 'xtick', [], 'ytick', []);
         colorbar;
         title('Diff in mean of [distance from center]');
         xlabel(sprintf('Positive=>%s > %s', ws.klabs{2}, ws.klabs{1}));
@@ -433,7 +436,7 @@ function [s, f] = expt_shapes( models, ws, ipd )
             if (spi==1)
             else            
                 for jj=1:length(d{spi-1})
-                    hupos = s.pos{1,d{spi-1}(jj)}(1,:);
+                    hupos = round(s.pos{1,d{spi-1}(jj)}(1,:));
                     img(hupos(:,1),hupos(:,2)) = 1;
                 end;
                 guru_assert( nnz(img) == length(d{spi-1}) );
@@ -441,6 +444,7 @@ function [s, f] = expt_shapes( models, ws, ipd )
             
             colormap(gray(256));
             imagesc(img); axis image;
+            set(gca, 'xtick', [], 'ytick', []);
             if (spi==1), title(tit);
             else,        title(sprintf('[%s]: %s', ws.klabs{spi-1}, tit)); end;
         end;
@@ -481,7 +485,8 @@ function [s, f] = expt_connections( models, ws, s_in )
             img(find(cxns(s_in.huis(ci), :))) = 1;
             
             colormap(gray(256));
-             imagesc(img); axis image;
+            imagesc(img); axis image;
+            set(gca, 'xtick', [], 'ytick', []);
         end;
     end;
     
@@ -509,7 +514,7 @@ function [s, f] = expt_sf( models, ws, kernel )
         
     %s.orig = de_StatsFFTs( ws.train.X, mSets.nInput);  % original images
     
-    biasVal  = getfield(de_NormalizeDataset(ws.train, mSets), 'bias');
+    biasVal  = getfield(de_NormalizeDataset(ws.train, struct('ac',mSets)), 'bias');
     
     for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
@@ -544,7 +549,7 @@ function [s, f] = expt_sf( models, ws, kernel )
 		test.X        = guru_dnw(test.X);
 		mSets.ac.minmax  = [];
 		mSets.ac.absmean = 1.26E-2;
-		dset          = de_NormalizeDataset(test, mSets); %
+		dset          = de_NormalizeDataset(test, struct('ac',mSets)); %
 		dset.bias     = biasVal;
 		dset.X(end,:) = biasVal;
 		
@@ -618,7 +623,7 @@ function [s, f] = expt_trn( models, ws, kernel )
 	%  NOTE: the models must be reversed.  Or... should they?  lol...
 	%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
 	%
-	s.rimgs = de_StatsOutputImages(models, de_NormalizeDataset(ws.test, models{1}(1)), 1:size(ws.test.X,2)); 
+	s.rimgs = de_StatsOutputImages(models, de_NormalizeDataset(ws.test, struct('ac',models{1}(1))), 1:size(ws.test.X,2)); 
 	s.orig  = de_StatsFFTs( ws.test.X, ws.test.nInput);  % original images
 	s.model = de_StatsFFTs( s.rimgs );
 	s.pals  = de_StatsFFTs_TTest( s );
@@ -651,7 +656,8 @@ function [s, f] = expt_zoom( models, ws )
             [cy,cx] = find(img);
             img = img(min(cy):max(cy), min(cx):max(cx));
             colormap(jet);
-             imagesc(img); axis image;
+            imagesc(img); axis image;
+            set(gca, 'xtick', [], 'ytick', []);
         end;
     end;
 
@@ -677,6 +683,7 @@ function [s, f] = expt_junk( models, ws )
 %        
 %        colormap(jet);
 %        imagesc(img); axis image;
+%        set(gca, 'xtick', [], 'ytick', []);
 %    end;
 %    if (~exist(pngdir,'dir')), mkdir(pngdir); end;
 %    saveas(gcf, '~/test-rho-q','png');
