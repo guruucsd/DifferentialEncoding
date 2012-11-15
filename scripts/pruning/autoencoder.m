@@ -1,4 +1,4 @@
-function [model,ws,s,fs] = autoencoder(model, G, ws)
+function [model,ws,s,fs] = autoencoder(model, ws)
        
   if (~exist('model','var')), model = struct(); end;
   if (~exist('ws',   'var')), ws    = struct(); end;
@@ -13,55 +13,20 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     randn('seed',model.randSeed);
   end;
 
-  %%%%%%%%%%%%%%%%%
-  % Create & load stimulus set into some expected schema
-  %%%%%%%%%%%%%%%%%
-  
-  fprintf('\nCreating stims...');
-  if (~isfield(ws,'images'))
-      if (~isfield(ws, 'train'))
-          [~,ws.train,ws.test] = de_MakeDataset('young_bion_1981', 'orig','recog',{'small' 'dnw' true});
-      end;
-  end;
-
-  ws.images  = [ws.train.X ws.test.X];                            % Stim to use for expt
-  ws.trainset = 1:size(ws.train.X,2);                  % Images to be used for this training
-  ws.testset  = setdiff(1:size(ws.images,2), ws.trainset); 
-  if (model.lrrev) % mirror image across vertical axis
-      for ii=1:size(ws.images,2)
-          img = reshape(ws.images(:,ii), model.nInput);
-          
-          ws.images(:,ii) = reshape( img(:,end:-1:1), [1 numel(img)] );
-      end;
-      clear('img');
-  end;
-  ws.nInput   = ws.train.nInput;                       % 2D size of images
-  ws.inPix    = prod(ws.nInput);
- % ws = rmfield(ws,'train'); 
- % ws = rmfield(ws,'test');
-  
-  if (~exist('G','var'))
-      G = fspecial('gaussian',[10 10],4);
-  end;
-  
-  % Filter the images
-  ws.fimages = zeros(size(ws.images));
-  for ii=1:size(ws.images,2)
-      fc = reshape(ws.images(:,ii), ws.nInput);
-      fc = imfilter(fc,G,'same');
-      ws.fimages(:,ii) = reshape(fc, [ws.inPix 1]);
-  end;
-  fc = []; % parfor 'clear' trick
 
   %%%%%%%%%%%%%%%%%
   % Set up model parameters & allocate space
   %%%%%%%%%%%%%%%%%
   
   fprintf('\nCreating network...');
+
+  ws.fullfidel = create_dataset(ws);
+  ws.nInput = ws.fullfidel.nInput;
+  ws.inPix = prod(ws.fullfidel.nInput);
+  model.nInput = ws.fullfidel.nInput;
+  model.nOutput = prod(model.nInput);
   
   % These parameters are large resources
-  model.nInput               = ws.nInput;                 % # Input units (minus bias)
-  model.nOutput              = ws.inPix;                  % # Output units
   if (~isfield(model, 'distn')),                model.distn                = {'norme'}; end;
   if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
   if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
@@ -75,10 +40,6 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   if (~isfield(model, 'useBias')),              model.useBias              = 1; end;
   
   
-  ws.nunits     = ws.inPix+model.nHidden+model.nOutput+1;  % Total # of units; +1 for bias
-  ws.nzmax      = 2*model.nHidden*model.nConns         ...     % Space to allocate for sparse matrix;
-                + 1*(model.nHidden+model.nOutput);             % input->hidden, hidden->output, and bias conns
-             
   % Create connectivity matrix.
   %   This can be slow, so only do it if we have to.
   if (~isfield(model, 'Conn'))
@@ -132,49 +93,101 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   
   fprintf('\nTraining...');
   
-  % Create training dataset from blurred images
-  %
-  ws.fullfidel  = de_NormalizeDataset(ws.train, struct('ac',model)); %get the zscore info for full-fidelity images
-  %model.zscore  = ws.fullfidel.zs; % use the zscore information for all other datasets downstream
-  ws.train.X    = ws.fimages(:,ws.trainset);
-  ws.train      = de_NormalizeDataset(ws.train, struct('ac',model));
-  X             = ws.train.X;               % Input vectors;  [pixels examples]
-  Y             = ws.train.X(1:end-1,:);    % everything but the bias
-  %clear('dset');
+  ws.nloops      = length(ws.iters_per);
 
-  ws.nloops      = length(ws.iters_per)-1;
-  prune_loc      = 'input';%output';
-  prune_strategy = 'activity';%weighted_weights';%'weights';
-  
+  % last iteration is training without pruning
   for ii=1:ws.nloops
     model.MaxIterations = ws.iters_per(ii);
-    
-    in2hu_w  = full(abs(model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix))); %input->hidden weight matrix
-    %w_minmax = [min(in2hu_w(:))  max(in2hu_w(:))]
 
+
+    %% First, create the stimuli for this training run
+    fprintf('\nCreating stims...');
+    [train,~] = create_dataset(ws, model, ii);
+    X = train.X;
+    Y = train.X(1:end-1,:);
+
+    %% Next, train the model
     fprintf('\nTraining for %d epochs [%d:%d of %d]:\n', ...
             model.MaxIterations, ...
             1+sum(ws.iters_per(1:ii-1)), ...
             sum(ws.iters_per(1:ii)), ...
             sum(ws.iters_per));
     [model,o_p]       = guru_nnTrain(model, X, Y);
-    model.EtaInit     = model.Eta;   % preserve training info for next time around
-%      model = rmfield(model, 'Eta');
+    if (true) % preserve training info for next time around
+      model.EtaInit     = model.Eta;   
+    else      % restart training parameters
+      model = rmfield(model, 'Eta');
+    end;
 
-    % No pruning requsted (sometimes done for comparison)
-    if (model.nConnPerHidden_End==model.nConnPerHidden_Start), continue; end;
+
+    %% Finally, do the pruning, but ONLY when:
+    %   * these values are not equal (no pruning requsted; sometimes done for comparison)
+    %   * in the last iteration of the loop (train a bit without pruning)
+    if (ii<ws.nloops && model.nConnPerHidden_End~=model.nConnPerHidden_Start)
+      model = do_pruning(model, ws, o_p, ii);
+    end;
+
+  end; % for nloops (of pruning)
+
+
+  % Make sure that all pruning has completed, and as expected
+  nConnCurr      = (nnz(model.Conn)-model.nHidden-model.nOutput);
+  guru_assert( nConnCurr==model.nConnPerHidden_End*model.nHidden*2, 'Remove exactly the right # of connections!!');
+
+
+  %% Do analyses
+  [s,fs] = do_analysis(model, ws);
+
+
+
+function [train,test] = create_dataset(ws, model, ii)
+%
+%
+
+
+  if exist('ii','var')
+    opts = {ws.dataset_train.opts{:} 'blurring', ws.kernels(ii)}
+  else
+    opts = ws.dataset_train.opts;
+  end;
+
+	switch(ws.dataset_train.name)
+		case {'c' 'cafe'},   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '', opts);
+		case {'n' 'natimg'}, [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '', opts);
+		case {'s' 'sf'},     [~, train, test] = de_MakeDataset('sf',                  'vertonly','', opts);
+		case {'r' 'ch'},     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','', opts);
+		case {'u' 'uber'},   [~, train, test] = de_MakeDataset('uber',                'all',     '', opts);
+		otherwise,      error('dataset %s NYI', dataset_train{si});
+	end;
+
+  %%%%%%%%%%%%%%%%%
+  % Create & load stimulus set into some expected schema
+  %%%%%%%%%%%%%%%%%
+
+  if exist('model','var')
+    if (isfield(ws,'fullfidel') && isfield(ws.fullfidel,'axes')) % standard to which to normalize data
+      train.axes = ws.fullfidel.axes;
+      test.axes = train.axes;
+    end;
+    train = de_NormalizeDataset(train, struct('ac',model));
+    test  = de_NormalizeDataset(test, struct('ac',model'));
+  end;
+
+
+
+function model = do_pruning(model, ws, o_p, ii)
 
     % Determine how many connections must go
     nConnCurr      = (nnz(model.Conn)-model.nHidden-model.nOutput);
     nConnPerHidden = nConnCurr/model.nHidden/2;   %2 because input&output  
-    reductRate     = exp(log(model.nConnPerHidden_End/nConnPerHidden)/(ws.nloops-ii+1));
+    reductRate     = exp(log(model.nConnPerHidden_End/nConnPerHidden)/(ws.nloops-ii));
     
                 nout = round( (1-reductRate) * nConnPerHidden * model.nHidden * 2 );
     nout = nout - mod(nout,2); % must be even, so as we remove hidden->input and hidden->output pairs
     guru_assert( (nConnCurr-nout)>=model.nConnPerHidden_End*model.nHidden*2, 'Don''t remove too many connections!!');
             
     % Select connections to query
-    switch (prune_loc)
+    switch (ws.prune_loc)
       case 'input'
         in2hu_c  = model.Conn   (ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden connection matrix
         in2hu_w  = model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden weight matrix
@@ -187,7 +200,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     end;
   
     % Create some metric for selecting weights
-    switch (prune_strategy)
+    switch (ws.prune_strategy)
       case 'weights'
         in2hu_a = in2hu_w;
 
@@ -262,32 +275,12 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
     %		mean( nc(nc_div(3):(nc_div(4)  )) ), ...
     %		(nConnCurr-nout)/model.nHidden/2 ); %output ordered by input unit #
     %clear('cc','nc','nc_div');
-  end; % for nloops (of pruning)
-
-  % Make sure that all pruning has completed, and as expected
-  nConnCurr      = (nnz(model.Conn)-model.nHidden-model.nOutput);
-  guru_assert( nConnCurr==model.nConnPerHidden_End*model.nHidden*2, 'Remove exactly the right # of connections!!');
-
-  % Do final leg of training, but this time on 
-  %   non-blurred images
-  fprintf('\nTraining for %d epochs [%d:%d of %d]:\n', ...
-          model.MaxIterations, ...
-          1+sum(ws.iters_per(1:end-1)), ...
-          sum(ws.iters_per), ...
-          sum(ws.iters_per));
-%  f                   = ws.fimages(:,ws.trainset);
-%  dset                = de_NormalizeDataset(struct('X', f, 'name','full-fidelity'), struct('ac',model));
-  X                   = ws.fullfidel.X;               % Input vectors;  [pixels examples]
-  Y                   = ws.fullfidel.X(1:end-1,:);    % everything but the bias
-  %clear('dset');
-  model.MaxIterations = ws.iters_per(end);
-  lb = model.lambda;
-  model.lambda        = 0; % no weight decay, just for this moment
-  [model]             = guru_nnTrain(model, X, Y);
-  model.lambda        = lb;
-%  model               = rmfield(model, 'Eta');
-%  model               = rmfield(model, 'EtaInit');
     
+    
+    
+    
+function [s,fs] = do_analysis(model, ws)
+
   %%%%%%%%%%%%%%%%%
   % Analyze the model
   %%%%%%%%%%%%%%%%%
@@ -295,39 +288,38 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   fprintf('\nComparing...');
   
     
-  % 1. Test set error
-        ws.test.X     = ws.fimages(:, ws.testset);
-	ws.test       = de_NormalizeDataset(ws.test, struct('ac',model));
-	X_test        = ws.test.X;              % Input vectors;  [pixels examples]
-	Y_test        = ws.test.X(1:end-1,:);   % everything but the bias
-  %clear('dset');
+  % 1. Train & test set errors for final iteration
+  [train,test] = create_dataset(ws, model, ws.nloops);
+  X_train = train.X;
+  Y_train = train.X(1:ws.inPix,:);
+	X_test  = test.X;                % Input vectors;  [pixels examples]
+	Y_test  = test.X(1:ws.inPix,:);   % everything but the bias
+  clear('train','test');
   
-  [o_p]      = guru_nnExec(model, X_test, Y_test);
-  %[~,~,o_p]      = emo_backprop(X_test, Y_test, model.Weights, model.Conn, model.XferFn, model.errorType);
-  s.rimgs.test  = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
-  [o_p]      = guru_nnExec(model, X, Y);
-  %[~,~,o_p]      = emo_backprop(X,      Y,      model.Weights, model.Conn, model.XferFn, model.errorType);
+  [o_p]      = guru_nnExec(model, X_train, Y_train);
   s.rimgs.train = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
+  [o_p]      = guru_nnExec(model, X_test, Y_test);
+  s.rimgs.test  = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
   
   % Test set error
   fprintf('Test set error: %7.3e [vs. training error %7.3e]\n', ...
-      sum(sum(emo_nnError(model.errorType, Y_test - s.rimgs.test)))/numel(Y), ...
-      sum(model.err(end,:)) / numel(Y));
+      sum(sum(emo_nnError(model.errorType, Y_test  - s.rimgs.test)))/numel(Y_train), ...
+      sum(sum(emo_nnError(model.errorType, Y_train - s.rimgs.train)))/numel(Y_train));
+  clear('o_p');
 
-  clear('X_test','Y_test','o_p');
   
   % 2.Reconstructed images
   
   % Plot two sample images; original and reconstructed
   
   rcf = figure;
-  cb_orig = [min(ws.fimages(:)) max(ws.fimages(:))];
+  cb_orig = [min(Y_train(:)) max(Y_train(:))];
   cb_rcon = cb_orig; %[min(f(:))          max(f(:))];
 
   % Original train images    
-  subplot(4,3,1); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(1)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
-  subplot(4,3,2); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(round(end/2))), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
-  subplot(4,3,3); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.trainset(end)), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+  subplot(4,3,1); colormap(gray(256)); axis image; imagesc(reshape(Y_train(:,1), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
+  subplot(4,3,2); colormap(gray(256)); axis image; imagesc(reshape(Y_train(:,round(end/2)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
+  subplot(4,3,3); colormap(gray(256)); axis image; imagesc(reshape(Y_train(:,end), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
 
   % Recon train images
   subplot(4,3,4); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,1), ws.nInput),   cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
@@ -335,18 +327,16 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   subplot(4,3,6); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.train(:,end), ws.nInput), cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
   
   % Original test images
-  subplot(4,3,7); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(1)), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
-  subplot(4,3,8); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(round(end/2))), ws.nInput),  cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
-  subplot(4,3,9); colormap(gray(256)); axis image; imagesc(reshape(ws.fimages(:,ws.testset(end)), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []); 
+  subplot(4,3,7); colormap(gray(256)); axis image; imagesc(reshape(Y_test(:,1), ws.nInput),   cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
+  subplot(4,3,8); colormap(gray(256)); axis image; imagesc(reshape(Y_test(:,round(end/2)), ws.nInput),  cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
+  subplot(4,3,9); colormap(gray(256)); axis image; imagesc(reshape(Y_test(:,end), ws.nInput), cb_orig); colorbar; set(gca,'xtick', [], 'ytick', []);
   
   % Recon test images
   subplot(4,3,10); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,1), ws.nInput),   cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
   subplot(4,3,11); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
   subplot(4,3,12); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,end), ws.nInput), cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
-      
   
-%  clear('o_p','huacts','rimgs');
-%  clear('cb_orig','cb_rcon','cb_recn');
+  s.model = de_StatsFFTs( s.rimgs.train, ws.nInput );
   
   
   % 3. Connectivity plot
@@ -380,8 +370,7 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   imagesc(conn_img);  axis image; set(gca,'xtick',[],'ytick',[]); 
   plot(ws.mupos(hu2,2), ws.mupos(hu2,1), 'g*');
   title(sprintf('end #2 (%d conns)', nnz(conn_img)));
-  
-  
+    
   
   % 4. Connectivity stats
   s.dist_orig = cell(model.nHidden,1);
@@ -433,8 +422,8 @@ function [model,ws,s,fs] = autoencoder(model, G, ws)
   title('End: Histogram of distances from center');
   
   subplot(3,1,3);
-  bar( s.d_o - s.d_e );
-  title('Histogram difference');
+  bar( s.d_e - s.d_o );
+  title('Histogram difference (pos means more AFTER)');
   
 
 
