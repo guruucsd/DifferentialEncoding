@@ -29,7 +29,7 @@ de_SetupExptPaths('sergent_1982');
 %nHidden              = hpl.*[ 850 850 850 850 850 850 850 850 425 425 425 1700 1134];
 sigma                =    1*[  10   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
 nConnPerHidden_Start =    1*[  20   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[   5   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[  10   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   2   1   1   1   2   1   1   1   1   1   1   2   1];
 nHidden              = hpl.*[ 408 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));

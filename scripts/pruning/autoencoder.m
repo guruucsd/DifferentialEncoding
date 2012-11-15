@@ -82,7 +82,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
       model.EtaInit = 5E-3;          % Learning rate (to start)
       model.Acc     = 5E-10;          % (1+Acc) Multiplicative increase to eta (when training good)
       model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-      model.XferFn  = [6 4];              % 1.73 * tanh
+      model.XferFn  = [6 1];              % 1.73 * tanh
       model.useBias = 1;
   end;
   

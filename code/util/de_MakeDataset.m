@@ -90,14 +90,14 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 
     dset = de_StimApplyResizing(dset, opts);
 
+    dset = de_StimApplyFiltering(dset, opts);
+
     if (exist('dset_to_match','var'))
         dset = de_StimApplyWhitening(dset, opts, dset_to_match);
     else
         dset = de_StimApplyWhitening(dset, opts);
     end;
     
-    
-    dset = de_StimApplyFiltering(dset, opts);
 
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
