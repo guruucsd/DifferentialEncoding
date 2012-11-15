@@ -35,7 +35,7 @@ function expt_analyze(models, wss, s)
     
     % Collect spatial frequency info
     if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_sf_*.png')))==0)
-      [s.sf,  f.sf ] = expt_sf( models, wss, s.model );
+      [s.sf,  f.sf ] = expt_sf( models, wss );
       if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
       for ii=1:length(f.sf)
         saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
@@ -497,7 +497,7 @@ function [s, f] = expt_connections( models, ws, s_in )
 function [s, f] = expt_images( models, ws )
 
 %%%%%%%%%%%%%%%%%%%%%%
-function [s, f] = expt_sf( models, wss, sold )
+function [s, f] = expt_sf( models, wss )
 %
 % Analyze spatial frequency content when we run different types of images through.
 %
