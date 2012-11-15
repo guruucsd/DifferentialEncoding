@@ -146,7 +146,7 @@ function [train,test] = create_dataset(ws, model, ii)
 
 
   if exist('ii','var')
-    opts = {ws.dataset_train.opts{:} 'blurring', ws.kernels(ii)}
+    opts = {ws.dataset_train.opts{:} 'blurring', ws.kernels(ii)};
   else
     opts = ws.dataset_train.opts;
   end;
@@ -220,7 +220,7 @@ function model = do_pruning(model, ws, o_p, ii)
     nza      = in2hu_a(nzai);                                           %find actual weights
     [a,aidx] = sort(abs(nza));                                          %get weight values and indices, smallest first.  Indices are into nzwi vector
     bcil     = aidx(1:(nout/2));                                        % "bad connections" indices (in "local" vector of non-zero connections)
-    tv       = a(nout/2)                                                % threshhold value to remove HALF the connections (because the other half are on the output)
+    tv       = a(nout/2);                                               % threshhold value to remove HALF the connections (because the other half are on the output)
 
     tal      = find(abs(a(1:(nout/2)))==tv);                            % threshhold value weights that are cut, in "local" indices
     taf      = find(abs(nza)==tv);                                      % threshhold value weights, both cut and not, in "full" indices
@@ -229,7 +229,7 @@ function model = do_pruning(model, ws, o_p, ii)
       bcil((end-length(tal)+1):end) = taf(itot(1:length(tal)));       %   so we're biased to prune weights on earlier hidden units this code re-randomizes, to avoid this.
     end;
     clear('in2hu_a','nza','a','aidx');
-    clear('itot', 'tv','tal','taf');
+    clear('itot','tal','taf');
     
     % Remove the weights!
     in2hu_c(nzai(bcil)) = false;                                          %
@@ -256,15 +256,21 @@ function model = do_pruning(model, ws, o_p, ii)
 
     % Report the maximum weight size removed
     w_out = in2hu_w(nzai(bcil));
-    max_w_out = max(abs(w_out(:)))
-    clear('w_out','max_w_out');
+    max_w_out = max(abs(w_out(:)));
+    clear('w_out');
     clear('in2hu_w','nzai','bcil');
       
     % Report on how many non-zero connections have been introduced
     alllyrs = squeeze(sum(reshape(full(model.Conn(ws.inPix+1+[1:model.nHidden], 1:ws.inPix)), [model.nHidden model.nInput])));
-    n_zero_conns = length(find(alllyrs==0))
-    clear('alllyrs','n_zero_conns');
+    n_zero_conns = length(find(alllyrs==0));
+    clear('alllyrs');
       
+      
+    % Report on all at once
+    fprintf('tv=%5.4e, max_w_out=%5.4e, n_zero_conns=%5d', tv, max_w_out, n_zero_conns);
+    clear('tv','max_w_out','n_zero_conns')
+    
+    
     % Report on whether there are no weird biases in where we're pruning
     %cc     = model.Conn(ws.inPix+1+[1:model.nHidden], 1:ws.inPix);
     %nc     = full(sum(cc,2))'; %# connection per input
