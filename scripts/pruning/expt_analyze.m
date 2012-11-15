@@ -504,46 +504,22 @@ function [s, f] = expt_sf( models, wss, sold )
 % NOTE: even though the networks were trained on different kernels, 
 %   they are tested on images with the same kernel here.
 %
-    ws = wss{1}(1);
+  if (~exist('kernel','var')),   kernel = 1; end; %blurring kernel for test images
+  if (~exist('testsets','var')), testsets = {'natimg'}; end;
 
-  if (~exist('kernel','var')), kernel = 1; end; %blurring kernel for test images
-
-  testsets = {'natimg'};
-  mSets    = models{end}(end); 
+  %
+  ws = wss{1}(1);
+  ws.kernels(end) = kernel;
+  
+  %
+  mSets    = models{end}(end);
   for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
       
+  %
   for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
-    % Create the testing dataset, with the same options (and same whitening)
-    opt = ws.train.opt;
-    if isfield(ws.train,'axes'), opt{find(guru_findstr(ws.train.opt,'dnw'))+1} = ws.train.axes; end;
-		switch(testsets{ti})
-			case 'cafe',   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '',  opt);
-			case 'natimg', [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '',  opt);
-			case 'sergent',[~, train, test] = de_MakeDataset('sergent_1982',        'de',      '',  opt);
-			case 'sf',     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','',  opt);
-			case 'uber',   [~, train, test] = de_MakeDataset('uber',                'all',     '',  opt);
-			otherwise,      error('dataset %s NYI', testsets{ti});
-		end;
-
-		
-		% Get the relevant test set of images, but with
-		%   blurring,
-		%   decorrelation and whitening, 
-		%   and the same bias val as the original images
-
-		G = fspecial('gaussian',ws.kernels([kernel kernel]),4);
-		% Filter the images
-		ws.inPix = prod(test.nInput);
-		for ii=1:size(test.X,2)
-			fc = reshape(test.X(:,ii), test.nInput);
-			fc = imfilter(fc,G,'same');
-			test.X(:,ii) = reshape(fc, [ws.inPix 1]);
-		end;
-		dset          = de_NormalizeDataset(test, struct('ac',mSets)); %
-		dset = ws.train;%dset.bias     = biasVal;
-		%dset.X(end,:) = biasVal;
-		
+    
+    [train,test] = create_dataset(ws, mSets, ws.nloops); % use the final 
 
 		% Save the reconstructed images and frequency stats
 		%
@@ -552,7 +528,7 @@ function [s, f] = expt_sf( models, wss, sold )
 		%
 		s.(testsets{ti}).rimgs = cell(size(wss));
     for ri=1:length(wss)
-      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), wss{ri}(1).train, 1:size(wss{ri}(1).train.X,2));
+      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
     end;
     s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
 		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
