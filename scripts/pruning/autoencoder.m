@@ -18,7 +18,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
   % Set up model parameters & allocate space
   %%%%%%%%%%%%%%%%%
   
-  fprintf('\nCreating network... [blurring=%s]', guru_cell2str({ws.kernels'}));
+  fprintf('\nCreating network... [blurring=%s]', guru_cell2str({ws.kernels}));
 
   ws.fullfidel = create_dataset(ws);
   ws.nInput = ws.fullfidel.nInput;
