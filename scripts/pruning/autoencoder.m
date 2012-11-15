@@ -267,7 +267,7 @@ function model = do_pruning(model, ws, o_p, ii)
       
       
     % Report on all at once
-    fprintf('tv=%5.4e, max_w_out=%5.4e, n_zero_conns=%5d', tv, max_w_out, n_zero_conns);
+    fprintf('\ntv=%5.4e, max_w_out=%5.4e, n_zero_conns=%5d', full(tv), full(max_w_out), full(n_zero_conns));
     clear('tv','max_w_out','n_zero_conns')
     
     
@@ -308,7 +308,7 @@ function [s,fs] = do_analysis(model, ws)
   s.rimgs.test  = o_p;%(1+ws.inPix+model.nHidden+[1:model.nOutput], :);  % Reconstructed images
   
   % Test set error
-  fprintf('Test set error: %7.3e [vs. training error %7.3e]\n', ...
+  fprintf('\nTest set error: %7.3e [vs. training error %7.3e]\n', ...
       sum(sum(emo_nnError(model.errorType, Y_test  - s.rimgs.test)))/numel(Y_train), ...
       sum(sum(emo_nnError(model.errorType, Y_train - s.rimgs.train)))/numel(Y_train));
   clear('o_p');
