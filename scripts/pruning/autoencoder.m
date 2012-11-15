@@ -307,7 +307,7 @@ function [s,fs] = do_analysis(model, ws)
   subplot(4,3,11); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,round(end/2)), ws.nInput),  cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
   subplot(4,3,12); colormap(gray(256)); axis image; imagesc(reshape(s.rimgs.test(:,end), ws.nInput), cb_rcon); colorbar; set(gca,'xtick', [], 'ytick', []); 
   
-  s.model = de_StatsFFTs( s.rimgs.train, ws.nInput );
+ % s.model = de_StatsFFTs( s.rimgs.train, ws.nInput );
   
   
   % 3. Connectivity plot

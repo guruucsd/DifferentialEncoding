@@ -29,7 +29,7 @@ de_SetupExptPaths('sergent_1982');
 %nHidden              = hpl.*[ 850 850 850 850 850 850 850 850 425 425 425 1700 1134];
 sigma                =    1*[  10   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
 nConnPerHidden_Start =    1*[  20   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[  10   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[   5   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   2   1   1   1   2   1   1   1   1   1   1   2   1];
 nHidden              = hpl.*[ 408 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
@@ -45,7 +45,7 @@ dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
 iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
-tag                  = repmat( {'test20'}, size(sigma) );
+tag                  = repmat( {'test21'}, size(sigma) );
 
 kernels              = repmat( {repmat([8,1],[length(iters_per{1}) 1])}, size(sigma) );
 nkernels             = zeros(size(sigma));
@@ -57,7 +57,7 @@ for ii=1:length(kernels)
     end;
 end;
 
-mSets.debug          = 1:10;
+mSets.debug          = 1:11;
 mSets.lrrev          = false;
 %mSets.linout         = true;
 
@@ -85,7 +85,7 @@ for si=1:length(lambdas)
 
 	ws.scriptdir   = guru_fileparts(pwd,'name');
 	ws.desc        = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
-	[~,ws.homedir] = unix('echo $HOME'); ws.homedir = ws.homedir(2:end-1);
+	[~,ws.homedir] = unix('echo $HOME'); ws.homedir = strtrim(ws.homedir);
         ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
 	ws.pngdir      = fullfile('png', ws.tag, ws.desc); %sprintf('png-%s', ws.desc);
 		
@@ -98,10 +98,10 @@ for si=1:length(lambdas)
 	fns = cell(ws.N,ws.nkernels);
 
 	% Train
-	fprintf('\n==========\nTraining on kernels [ %s] %d times each; nCs=%2d, nCe=%2d, sig=%3.1f, hpl=%d, lambda=%3.2f\n', ...
+	fprintf('\n==========\nTraining on kernels [ %s] %d times each; nCs=%2d, nCe=%2d, sig=%3.1f, nH=%d, hpl=%d, lambda=%3.2f\n', ...
 			sprintf('%d ', kernels{si}), ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
-			mSets.hpl, mSets.lambda);
+			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
 	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
 		fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
@@ -138,7 +138,7 @@ for si=1:length(lambdas)
 	s.dist_end_full  = cell(ws.nkernels,ws.N);
 	models           = cell(ws.nkernels,1);
 	wss              = cell(ws.nkernels,1);
-  s.model          = cell(ws.nkernels,1);
+  %$s.model          = cell(ws.nkernels,1);
 
 	for fi=1:ws.nkernels
 		for ni=1:ws.N
@@ -165,7 +165,7 @@ for si=1:length(lambdas)
 			
 			models        {fi}    = [models{fi} model];
       wss{fi} = [wss{fi} ld.ws];
-      s.model{fi} = [s.model{fi} ld.s.model];
+      %s.model{fi} = [s.model{fi} ld.s.model];
     end;
 	end;
 
