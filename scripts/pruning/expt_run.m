@@ -76,7 +76,6 @@ for si=1:length(lambdas)
   ws.N         = N(si);
   ws.iters_per = iters_per{si};
   ws.tag       = tag{si};
-  ws.kernels   = kernels{si};
   ws.nkernels  = nkernels(si);
   ws.klabs     = klabs(si,:);
   ws.prune_loc = prune_loc{si};
@@ -110,8 +109,10 @@ for si=1:length(lambdas)
 	
 		if (exist(fns{mi},'file'))
 			if (ismember(11, mSets.debug)), fprintf('Skipping trained model @ %s\n', fns{mi}); end;
-			continue; 
+			continue;
 		end;
+
+    ws.kernels   = kernels{si}(:,fi)';
 		
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
