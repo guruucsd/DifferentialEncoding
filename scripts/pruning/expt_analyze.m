@@ -528,13 +528,12 @@ function [s, f] = expt_sf( models, wss, sold )
 		%
 		s.(testsets{ti}).rimgs = cell(size(wss));
     for ri=1:length(wss)
-      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
+      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X(1:ws.inPix,:),2));
     end;
-    s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
+    s.(testsets{ti}).orig  = de_StatsFFTs( test.X(1:ws.inPix,:), test.nInput);  % original images
 		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
 		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
 		
-    keyboard
 		% Plot the results
 		f_new = de_PlotFFTs(mSets, s.(testsets{ti}));
 		for ii=1:length(f_new)

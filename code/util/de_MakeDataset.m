@@ -90,8 +90,6 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 
     dset = de_StimApplyResizing(dset, opts);
 
-    dset = de_StimApplyFiltering(dset, opts);
-
     if (exist('dset_to_match','var'))
         dset = de_StimApplyWhitening(dset, opts, dset_to_match);
     else
@@ -99,7 +97,8 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
     end;
     
     
-%%%%%%%%%%%%%%%%%
+    dset = de_StimApplyFiltering(dset, opts);
+
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
 
@@ -164,7 +163,8 @@ function dset = de_StimApplyFiltering(dset, opts)
     if (blurring > 1)
         for ii=1:size(dset.X,2)
            dset.X(:,ii) = reshape( imfilter(reshape(dset.X(:,ii), dset.nInput(1:2)), ...
-                                            fspecial('gaussian', [blurring blurring], 4)), ...
+                                            fspecial('gaussian', [blurring blurring], 4), ...
+                                            'same'), ...
                                    [size(dset.X,1) 1] );
 
         end;
