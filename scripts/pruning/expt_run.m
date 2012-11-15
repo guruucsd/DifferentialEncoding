@@ -48,10 +48,12 @@ iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
 tag                  = repmat( {'test20'}, size(sigma) );
 
 kernels              = repmat( {repmat([8,1],[length(iters_per{1}) 1])}, size(sigma) );
+nkernels             = zeros(size(sigma));
+klabs                = cell(size(kernels));
 for ii=1:length(kernels)
     nkernels(ii)     = size(kernels{ii},2);
     for ki=1:nkernels(ii)
-      klabs(ii,ki)      = guru_cell2str({kernels{ii}(:,ki)'});
+      klabs{ii,ki}   = guru_cell2str({kernels{ii}(:,ki)'});
     end;
 end;
 
@@ -81,10 +83,11 @@ for si=1:length(lambdas)
   ws.prune_loc = prune_loc{si};
   ws.prune_strategy = prune_strategy{si};
 
-	ws.scriptdir = guru_fileparts(pwd,'name');
-	ws.desc      = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
-	ws.matdir    = fullfile('~/_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
-	ws.pngdir    = fullfile('png', ws.tag, ws.desc); %sprintf('png-%s', ws.desc);
+	ws.scriptdir   = guru_fileparts(pwd,'name');
+	ws.desc        = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
+	[~,ws.homedir] = unix('echo $HOME'); ws.homedir = ws.homedir(2:end-1);
+        ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
+	ws.pngdir      = fullfile('png', ws.tag, ws.desc); %sprintf('png-%s', ws.desc);
 		
 	
 
@@ -96,7 +99,7 @@ for si=1:length(lambdas)
 
 	% Train
 	fprintf('\n==========\nTraining on kernels [ %s] %d times each; nCs=%2d, nCe=%2d, sig=%3.1f, hpl=%d, lambda=%3.2f\n', ...
-			sprintf('%d ', ws.kernels), ws.N, ...
+			sprintf('%d ', kernels{si}), ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.hpl, mSets.lambda);
 	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
@@ -106,7 +109,6 @@ for si=1:length(lambdas)
 		%fprintf('k=%d #%d\n', ws.kernels(fi), ni);
 	
 		fns{mi}  = fullfile(ws.matdir,sprintf('pruning-de-freq-%s-%d.mat', ws.klabs{fi}, ni));
-	
 		if (exist(fns{mi},'file'))
 			if (ismember(11, mSets.debug)), fprintf('Skipping trained model @ %s\n', fns{mi}); end;
 			continue;
@@ -121,7 +123,6 @@ for si=1:length(lambdas)
 		
 		[curmodel,ws,s,fs] = autoencoder(curmodel, ws);      % run the script
 		close all;        % close figures
-	
 		% Move output
 		if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
 		unix( ['mv "' fs{4} '" "' fns{mi} '"'] );
