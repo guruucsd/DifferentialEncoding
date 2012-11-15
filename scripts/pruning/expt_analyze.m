@@ -35,7 +35,7 @@ function expt_analyze(models, wss, s)
     
     % Collect spatial frequency info
     if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_sf_*.png')))==0)
-      [s.sf,  f.sf ] = expt_sf( models, wss );
+      [s.sf,  f.sf ] = expt_sf( models, wss, s.model );
       if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
       for ii=1:length(f.sf)
         saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
@@ -497,7 +497,7 @@ function [s, f] = expt_connections( models, ws, s_in )
 function [s, f] = expt_images( models, ws )
 
 %%%%%%%%%%%%%%%%%%%%%%
-function [s, f] = expt_sf( models, wss, kernel )
+function [s, f] = expt_sf( models, wss, sold )
 %
 % Analyze spatial frequency content when we run different types of images through.
 %
@@ -506,13 +506,13 @@ function [s, f] = expt_sf( models, wss, kernel )
 %
     ws = wss{1}(1);
 
-    if (~exist('kernel','var')), kernel = 1; end; %blurring kernel for test images
+  if (~exist('kernel','var')), kernel = 1; end; %blurring kernel for test images
 
-    testsets = {'natimg'};
-    mSets    = models{end}(end); 
-    for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
-        
-    for ti=1:length(testsets)
+  testsets = {'natimg'};
+  mSets    = models{end}(end); 
+  for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
+      
+  for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
     % Create the testing dataset, with the same options (and same whitening)
     opt = ws.train.opt;
@@ -551,13 +551,14 @@ function [s, f] = expt_sf( models, wss, kernel )
 		%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
 		%
 		s.(testsets{ti}).rimgs = cell(size(wss));
-                for ri=1:length(wss)
-                  s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), wss{ri}(1).train, 1:size(wss{ri}(1).train.X,2)); 
-	      	end;
-                s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
+    for ri=1:length(wss)
+      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), wss{ri}(1).train, 1:size(wss{ri}(1).train.X,2));
+    end;
+    s.(testsets{ti}).orig  = de_StatsFFTs( test.X, test.nInput);  % original images
 		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
 		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
 		
+    keyboard
 		% Plot the results
 		f_new = de_PlotFFTs(mSets, s.(testsets{ti}));
 		for ii=1:length(f_new)
@@ -566,7 +567,7 @@ function [s, f] = expt_sf( models, wss, kernel )
 		if (exist('f','var')), f = [f f_new];
 		else, f = f_new; end;
 		
-    end;    
+  end;
     
 %%%%%%%%%%%%%%%%%%%%%%
 function [s, f] = expt_trn( models, ws, kernel )

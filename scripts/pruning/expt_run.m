@@ -38,21 +38,22 @@ dnw                  =      true(size(sigma));
 zscore               = 0.025*ones(size(sigma));
 AvgErr               =    0*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
+prune_loc            = repmat({'input'}, size(sigma)); %input or output
+prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weights, or activity
+
 dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
 iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
-tag                  = repmat( {'test16'}, size(sigma) );
+tag                  = repmat( {'test20'}, size(sigma) );
 
-kernels              = repmat( {[8 1]}, size(sigma) );
+kernels              = repmat( {repmat([8,1],[length(iters_per{1}) 1])}, size(sigma) );
 for ii=1:length(kernels)
-    nkernels(ii)     = length(kernels{ii});
-    klabs(ii,:)      = guru_csprintf('%dpx', num2cell(kernels{ii}));
-    for fi=1:nkernels(ii), 
-        filters{ii,fi} = fspecial('gaussian',kernels{ii}([fi fi]),4); 
+    nkernels(ii)     = size(kernels{ii},2);
+    for ki=1:nkernels(ii)
+      klabs(ii,ki)      = guru_cell2str({kernels{ii}(:,ki)'});
     end;
 end;
-
 
 mSets.debug          = 1:10;
 mSets.lrrev          = false;
@@ -71,22 +72,15 @@ for si=1:length(lambdas)
 	mSets.AvgErr               = AvgErr(si);
 	mSets.zscore               = zscore(si);
 
-	switch(dataset_train{si})
-		case {'c' 'cafe'},   [~, ws.train, ws.test] = de_MakeDataset('young_bion_1981',     'orig',    '', {sz{si} 'dnw', dnw(si)});
-		case {'n' 'natimg'}, [~, ws.train, ws.test] = de_MakeDataset('vanhateren',          'orig',    '', {sz{si} 'dnw', dnw(si)});
-		case {'s' 'sf'},     [~, ws.train, ws.test] = de_MakeDataset('sf',                  'vertonly','', {sz{si} 'dnw', dnw(si)});
-		case {'r' 'ch'},     [~, ws.train, ws.test] = de_MakeDataset('christman_etal_1991', 'all_freq','', {sz{si} 'dnw', dnw(si)});
-		case {'u' 'uber'},   [~, ws.train, ws.test] = de_MakeDataset('uber',                'all',     '', {sz{si} 'dnw', dnw(si)});
-		otherwise,      error('dataset %s NYI', dataset_train{si});
-	end;
-	
-    ws.N         = N(si);
-    ws.iters_per = iters_per{si};
-    ws.tag       = tag{si};
-    ws.kernels   = kernels{si};
-    ws.nkernels  = nkernels(si);
-    ws.klabs     = klabs(si,:);
-    ws.filters   = filters(si,:);
+	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si)}});
+  ws.N         = N(si);
+  ws.iters_per = iters_per{si};
+  ws.tag       = tag{si};
+  ws.kernels   = kernels{si};
+  ws.nkernels  = nkernels(si);
+  ws.klabs     = klabs(si,:);
+  ws.prune_loc = prune_loc{si};
+  ws.prune_strategy = prune_strategy{si};
 
 	ws.scriptdir = guru_fileparts(pwd,'name');
 	ws.desc      = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
@@ -124,8 +118,7 @@ for si=1:length(lambdas)
 		curmodel.ni       = ni;
 		curmodel.randSeed = ni;
 		
-		G                 = ws.filters{fi};  % set the appropriate filter for this run
-		[curmodel,ws,s,fs] = autoencoder(curmodel, G, ws);      % run the script
+		[curmodel,ws,s,fs] = autoencoder(curmodel, ws);      % run the script
 		close all;        % close figures
 	
 		% Move output
@@ -143,6 +136,8 @@ for si=1:length(lambdas)
 	s.dist_end_full  = cell(ws.nkernels,ws.N);
 	models           = cell(ws.nkernels,1);
 	wss              = cell(ws.nkernels,1);
+  s.model          = cell(ws.nkernels,1);
+
 	for fi=1:ws.nkernels
 		for ni=1:ws.N
 			ld = load(fns{ni,fi}, 'model', 's', 'ws'); 
@@ -167,17 +162,19 @@ for si=1:length(lambdas)
 	
 			
 			models        {fi}    = [models{fi} model];
-		        wss{fi} = [wss{fi} ld.ws];
-               	end;
+      wss{fi} = [wss{fi} ld.ws];
+      s.model{fi} = [s.model{fi} ld.s.model];
+    end;
 	end;
-	
+
+
 	% Save off results
 	if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
 	save(fullfile(ws.matdir, 'expt_sf'));
 
-    expt_analyze( models, wss, s );
-    close all;
+  expt_analyze( models, wss, s );
+  close all;
     
-    toc
-    fprintf('\n\n');
+  toc
+  fprintf('\n\n');
 end;
