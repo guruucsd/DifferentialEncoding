@@ -123,12 +123,12 @@ for si=1:length(lambdas)
 	
 		% Move output
 		if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
-		unix( ['mv ' fs{4} ' ' fns{mi}] );
+		unix( ['mv "' fs{4} '" "' fns{mi} '"'] );
 	
 		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
-		unix( ['mv ' fs{1} ' ' fullfile(ws.pngdir, sprintf('z_recon-%s-%d.png', ws.klabs{fi}, ni))] );
-		unix( ['mv ' fs{2} ' ' fullfile(ws.pngdir, sprintf('z_conn-%s-%d.png',  ws.klabs{fi}, ni))] );
-		unix( ['mv ' fs{3} ' ' fullfile(ws.pngdir, sprintf('z_hist-%s-%d.png',  ws.klabs{fi}, ni))] );
+		unix( ['mv "' fs{1} '" "' fullfile(ws.pngdir, sprintf('z_recon-%s-%d.png', ws.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{2} '" "' fullfile(ws.pngdir, sprintf('z_conn-%s-%d.png',  ws.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{3} '" "' fullfile(ws.pngdir, sprintf('z_hist-%s-%d.png',  ws.klabs{fi}, ni)) '"'] );
 	end;
 	
 	% Collect stats
