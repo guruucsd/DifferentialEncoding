@@ -3,11 +3,12 @@ function [train,test] = create_dataset(ws, model, ii)
 %
 
 
-  if exist('ii','var')
-    opts = {ws.dataset_train.opts{:} 'blurring', ws.kernels(ii)};
+  if exist('ii','var') && ws.kernels(ii) > 1
+    opts = {ws.dataset_train.opts{:}, 'lowpass', 1.25};
   else
     opts = ws.dataset_train.opts;
   end;
+  opts
 
   % Use the same whitening transform for all datasets
   if isfield(ws,'fullfidel') && isfield(ws.fullfidel,'axes')

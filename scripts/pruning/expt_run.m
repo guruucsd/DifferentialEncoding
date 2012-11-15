@@ -34,7 +34,7 @@ hpl                  =    1*[   2   1   1   1   2   1   1   1   1   1   1   2   
 nHidden              = hpl.*[ 408 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
 lambdas              = 0.00*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
-dnw                  =      true(size(sigma));
+dnw                  =    false(size(sigma));
 zscore               = 0.025*ones(size(sigma));
 AvgErr               =    0*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
@@ -44,10 +44,10 @@ prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weig
 dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
-iters_per            = repmat( {[10*ones(1,5)]}, size(sigma) );
-tag                  = repmat( {'test21'}, size(sigma) );
+iters_per            = repmat( {[5*ones(1,4) 10]; [5*ones(1,4) 5]}, length(sigma) );
+tag                  = repmat( {'test25'}, size(sigma) );
 
-kernels              = repmat( {repmat([8,1],[length(iters_per{1}) 1])}, size(sigma) );
+kernels              = repmat( {[1.5 2 2 2 1;1 1 1 1 1]'}, length(sigma) );
 nkernels             = zeros(size(sigma));
 klabs                = cell(size(kernels));
 for ii=1:length(kernels)
@@ -99,7 +99,7 @@ for si=1:length(lambdas)
 
 	% Train
 	fprintf('\n==========\nTraining on kernels [ %s] %d times each; nCs=%2d, nCe=%2d, sig=%3.1f, nH=%d, hpl=%d, lambda=%3.2f\n', ...
-			sprintf('%d ', kernels{si}), ws.N, ...
+			[ws.klabs{:}], ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
 	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
