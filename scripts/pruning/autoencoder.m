@@ -27,7 +27,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
   model.nOutput = prod(model.nInput);
   
   % These parameters are large resources
-  if (~isfield(model, 'distn')),                model.distn                = {'norme'}; end;
+  if (~isfield(model, 'distn')),                model.distn                = {'normem2'}; end;
   if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
   if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
   if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
@@ -82,7 +82,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
       model.EtaInit = 5E-3;          % Learning rate (to start)
       model.Acc     = 5E-10;          % (1+Acc) Multiplicative increase to eta (when training good)
       model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-      model.XferFn  = [6 4];              % 1.73 * tanh
+      model.XferFn  = [6 6];              % 1.73 * tanh
       model.useBias = 1;
   end;
   
@@ -96,9 +96,11 @@ function [model,ws,s,fs] = autoencoder(model, ws)
   ws.nloops      = length(ws.iters_per);
 
   % last iteration is training without pruning
+  AvgError = model.AvgError;
   for ii=1:ws.nloops
     model.MaxIterations = ws.iters_per(ii);
-
+    model.AvgError = (ii==ws.nloops)*AvgError; %only train to an error criterion on the last loop
+    model = guru_rmfield(model, 'Error');
 
     %% First, create the stimuli for this training run
     fprintf('\nCreating stims...');
