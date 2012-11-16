@@ -68,7 +68,7 @@ function [avg_resp, std_resp, bestofall, wts] = nn_2layer(varargin)
                   %imagesc(w_pdf1-0.5*w_pdf2); colorbar;
                 otherwise, error('unknown weight mode: %s', p.w_mode);
             end;
-            w = w / sum(abs(w(:)));
+            w = w / max(abs(sum(w(:))), 1); %p.nin; %sum(abs(w(:))); %implicitly dividing by p_in
             wts(sampnum, :,:) = w;
 
             %
@@ -105,7 +105,7 @@ function [avg_resp, std_resp, bestofall, wts] = nn_2layer(varargin)
 
             % normalize
             resps_by_freq = reshape(resps, [length(p.freqs) p.norients*p.nphases]);
-            resps_by_freq_norm = resps_by_freq/mean(resps_by_freq(:));
+            resps_by_freq_norm = resps_by_freq;%/mean(resps_by_freq(:));
 
             switch p.a_mode
                 case 'max'
