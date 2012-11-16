@@ -31,7 +31,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     end;
     if (isempty(weight_factor))
 		lg            = @(x) (2/(1+exp(-(x.^2)/8))-1); %logistic, range [-1 1], cross at 0
-		weight_factor = lg(numCon*nLoc*sqrt(hpl)/inPix - 1); %sqrt(hpl) because sparse connections per layer => spread out hus => need more "damping" of pdf for nodes we already connected to
+		weight_factor = eps+lg(numCon*nLoc*sqrt(hpl)/inPix - 1); %sqrt(hpl) because sparse connections per layer => spread out hus => need more "damping" of pdf for nodes we already connected to
     end;
     guru_assert(weight_factor>0, '"weight factor" must be >0');
     
@@ -104,7 +104,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                         pdn   = mvnpdf(X, mn, cv);
                         if strcmp(distn_name, 'norme2')
                           [~,mp] = max(pdn);
-                          pdn(mp) = 1E10; % always connects to its own position
+                          pdn(mp) = 100; % always connects to its own position
                         elseif strcmp(distn_name, 'normem2')
                           [~,mp] = max(pdn);
                           pdn(mp) = 0; % always connects to its own position
@@ -176,34 +176,32 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
             layer  = logical(spalloc(sI(1),sI(2),numCon));
             cnn    = zeros(numCon,1);
 
+       
             for ci=1:numCon
               val     = cdn(end)*rand; % Now select.
-              cnn(ci) = find(cdn<val,1,'last'); % find the first instance above that value
-              curidx  = cnn(ci);%idx(cnn(ci));
-              
+              cnn(ci) = find(cdn>=val,1,'first'); % find the first instance above that value
+              curidx  = cnn(ci)-1;%idx(cnn(ci));
+              guru_assert(curidx<=length(pdn));
+              guru_assert(curidx>0);
+
+              % add the connection
               layer (X(curidx,1), X(curidx,2)) = true;
               alllyr(X(curidx,1), X(curidx,2)) = alllyr(X(curidx,1), X(curidx,2))+1;
               
-              % Now remove that one from the list before continuing
-              plost = cdn(curidx+1)-cdn(curidx);%pdn(curidx)*w(curidx);
-              %guru_assert(~any(0>(cdn((curidx+2):end)-plost)));
+              % update the distribution
+              pdn(curidx) = 0;
+              cdn = [0;cumsum(max(0,pdn).*w)];
               
-              cdn(curidx+1) = cdn(curidx);
-              blue = cdn;
-              cdn((curidx+2):end) = cdn((curidx+2):end)-plost;
-              cdn(cdn<0) = -cdn(cdn<0);
-              
-                  % Update this after the above.
+              % Update this after the above.
               w(curidx) = w(curidx)*weight_factor; % don't need to update cdn now, as we don't connect to the same node in the same layer anyway.
               if (~any(w)), % unless we run out of nodes to connect to!
                 w=ones(size(w));
                 cdn    = [0;cumsum(max(eps,pdn).*w)];
                 %cdn    = cdn(idx);
               end;
-              guru_assert(all(cdn>=0), 'cumulative distribution must have all elements >=0');
+              guru_assert(all(cdn>=0 | isnan(cdn)), 'cumulative distribution must have all elements >=0');
               guru_assert(~all(cdn==0) || ci==numCon, 'must have something to select!');
             end;
-          
             if (ismember(10,dbg))
               if (mod(li,100)==0), fprintf(' %d', li); end;
             end;
