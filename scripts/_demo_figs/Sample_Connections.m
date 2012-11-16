@@ -5,9 +5,10 @@ clear all; close all;
 
 addpath(genpath('../../code'));
 de_SetupExptPaths('young_bion_1981');
-load(de_GetDataFile('young_bion_1981', 'orig', [], {'small'}));
+load(de_GetDataFile('young_bion_1981', 'orig', [], {'small', 'dnw', false}));
 img = reshape(train.X(end:-1:1, 16), train.nInput)';
 
+rand('seed',1);
 
 %figure;
 for ii=1:120
@@ -17,12 +18,13 @@ for ii=1:120
     %ylabel(sprintf('%d',ii));
 end
 
+fixed     = true; % don't use random connections, but fix them to match some previous figure
 nConns    = 5;              % # connections from hidden->input/output
-sigmas    = [3 16];
+sigmas    = [5 16];
 imageSize = [34 25];      % input/output size
-gshape    = [2.5 0;0 1];      % multivariate gaussian sigma shape
+gshape    = [2 0;0 2];      % multivariate gaussian sigma shape
 huloc     = imageSize/2;    % position of hidden unit in center of image
-gridfreq  = 0.5;
+gridfreq  = 1;
 nSamples  = 1;
 
 %a = de_connector2D([34 25],1,1,25,'norme',0,3,0,1); %
@@ -62,11 +64,13 @@ for n=1:nSamples
 end;
 allsamps = allsamps/nSamples/nConns;
 
-allcxns(1,1,1,:) = [huloc(1)-6 huloc(2)];
-allcxns(1,1,2,:) = [huloc(1)-3 huloc(2)-3];
-allcxns(1,1,3,:) = [huloc(1)-3 huloc(2)+3];
-allcxns(1,1,4,:) = [huloc(1)+3 huloc(2)];
-allcxns(1,1,5,:) = [huloc(1)+6 huloc(2)-3];
+if (fixed)
+    allcxns(1,1,1,:) = [huloc(1)-6 huloc(2)];
+    allcxns(1,1,2,:) = [huloc(1)-3 huloc(2)-3];
+    allcxns(1,1,3,:) = [huloc(1)-3 huloc(2)+3];
+    allcxns(1,1,4,:) = [huloc(1)+3 huloc(2)];
+    allcxns(1,1,5,:) = [huloc(1)+6 huloc(2)-3];
+end;
 
 %%%%%%%%%%%%%%%
 % 3D average plot of connectivity
