@@ -507,6 +507,8 @@ function [s, f] = expt_sf( models, wss )
   if (~exist('kernel','var')),   kernel = 0; end; %blurring kernel for test images
   if (~exist('testsets','var')), testsets = {'natimg','sergent','cafe'}; end;
 
+  f = de_NewFig('dummy');
+
   %
   ws = wss{1}(1);
   ws.kernels(end) = kernel;
@@ -518,7 +520,8 @@ function [s, f] = expt_sf( models, wss )
   %
   for ti=1:length(testsets)
 		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
-    
+      figs = de_NewFig('dummy');
+    ws.dataset_train.name = testsets{ti}; ws.dataset_test.name = testsets{ti};%ws.dataset_train;
     [train,test] = create_dataset(ws, mSets, ws.nloops); % use the final 
 
 		% Save the reconstructed images and frequency stats
@@ -526,22 +529,22 @@ function [s, f] = expt_sf( models, wss )
 		%  NOTE: the models must be reversed.  Or... should they?  lol...
 		%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
 		%
-		s.(testsets{ti}).rimgs = cell(size(wss));
+    s.(testsets{ti}).rimgs = cell(size(wss));
+    %selimg = round(linspace(1,size(test.X,2),16));
     for ri=1:length(wss)
-      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X(1:ws.inPix,:),2));
+      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
+      figs = [figs de_PlotOutputImages(mSets, s.(testsets{ti}).rimgs{ri}, test.XLAB)];
     end;
     s.(testsets{ti}).orig  = de_StatsFFTs( test.X(1:ws.inPix,:), test.nInput);  % original images
 		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
 		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
 		
 		% Plot the results
-		f_new = de_PlotFFTs(mSets, s.(testsets{ti}));
-		for ii=1:length(f_new)
-			f_new(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, f_new(ii).name); 
+		figs = [figs de_PlotFFTs(mSets, s.(testsets{ti}))];
+		for ii=1:length(figs) % rename figures so that figures across different datasets have differen tnames
+			figs(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, figs(ii).name); 
 		end;
-		if (exist('f','var')), f = [f f_new];
-		else, f = f_new; end;
-		
+		f = [f figs];
   end;
     
 %%%%%%%%%%%%%%%%%%%%%%
