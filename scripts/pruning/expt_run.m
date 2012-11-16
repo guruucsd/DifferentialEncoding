@@ -6,58 +6,40 @@ close all;
 addpath(genpath('../../code'));
 de_SetupExptPaths('sergent_1982');
 
-%~/de/code/lib/'));
-%addpath(genpath('~/de/code/paths/'));
-%addpath(genpath('~/de/code/train/'));
-%addpath(genpath('~/de/code/util/'));
-
-%= Sig=6, 15->10 nhidden=850*2 on a 10-10-10-10-10 sched
-%= Sig=6, 10->5 nhidden=850*2 on a 10-10-10-10-10 sched
-%= Sig=15, 10->5 nhidden=850*2 on a 10-10-10-10-10 sched
-%= Sig=15, 15->8 nhidden=850*1 on a 10-10-10-10-10 sched
-%= Sig=15, 15->8 nhidden=425*3 on a 10-10-10-10-10 sched
-%= Sig=30, 60->5 nhidden=425*3 on a 10-10-10-10-10 sched
-%= Sig=30, 60->5 nhidden=425*3 on a 15-10-8-7-5-5 sched
-%= Sig=20, 20->10; nhidden=425*3
-%= Sig=20, 15->10; nhidden=1700
-%= Sig=20, 15->10;  nhidden=1134
-
-%sigma                =    1*[  15  15   2   6   6   6  15  15  15  30  20   20   20]; % Width of gaussian
-%nConnPerHidden_Start =    1*[  10  10  20  30  10  15  10  15  15  60  20   15   15]; % # initial random connections to input (& output), per hidden unit
-%nConnPerHidden_End   =    1*[   5   5   5  15   5  10   5   8   8   5  10   10   10]; % # post-pruning random connections to input (& output), per hidden unit
-%hpl                  =    1*[   2   1   2   2   2   2   1   3   3   3   1    1    1];
-%nHidden              = hpl.*[ 850 850 850 850 850 850 850 850 425 425 425 1700 1134];
-sigma                =    1*[  15   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
-nConnPerHidden_Start =    1*[  20   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[  10   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
-hpl                  =    1*[   2   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 408 111 425 425 425 425 425 425 425 425 425 102 102];
+sigma                =    1*[  15];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
+nConnPerHidden_Start =    1*[  20];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[   8];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+hpl                  =    1*[   4];%   1   1   1   2   1   1   1   1   1   1   2   1];
+nHidden              = hpl.*[ 108];% 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
 lambdas              = 0.00*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
-dnw                  =    false(size(sigma));
+dnw                  =   false(size(sigma));
 zscore               = 0.025*ones(size(sigma));
-AvgError             = 0*ones(size(sigma));
+AvgError             = 1E-4*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weights, or activity
 
-dataset_test         = dataset_train;
+N                    = 8*ones(size(sigma));
+tag                  = repmat( {'dev'}, size(sigma) );
 
-N                    = 4*ones(size(sigma));
-iters_per            = repmat( {[10*ones(1,4) 20]; [10*ones(1,4) 10]}, size(sigma) );
-tag                  = repmat( {'test6'}, size(sigma) );
-
-kernels              = repmat( {[1.5 2 3 4 0];[0 0 0 0 0]}, size(sigma) );
-nkernels             = zeros(size(sigma));
+%iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
+%iters_per            = repmat( {[20 1]; [20 1]}, size(sigma) );
+iters_per            = repmat( {[4*ones(1,10) 1]; [4*ones(1,10) 1]}, size(sigma) );
+%kernels              = repmat( {[linspace(1.5,10,10) 0]; [linspace(-10,-1.5,10) 0]}, size(sigma) );
+kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
+%kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
+%kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
 klabs                = cell(size(kernels));
-for ii=1:length(kernels)
+
+for ii=1:size(kernels,2)
     nkernels(ii)     = size(kernels,1);
     for ki=1:nkernels(ii)
-      klabs{ki,ii}   = guru_cell2str(kernels(ki,ii));
+      klabs{ki,ii}   = [guru_cell2str(kernels(ki,ii)) ' - ' guru_cell2str(iters_per(ki,ii))];
     end;
 end;
 
-mSets.debug          = 1:10;
+mSets.debug          = 1:11;
 mSets.lrrev          = false;
 %mSets.linout         = true;
 
@@ -96,41 +78,41 @@ for si=1:length(lambdas)
 	%%%%%%%%%%%%%%%%%
 	
 	fns = cell(ws.N,ws.nkernels);
-
+        wss = cell(ws.N, ws.nkernels);
+        fi=0; ni=0;
 	% Train
 	fprintf('\n==========\nTraining on kernels [ %s] %d times each; nCs=%2d, nCe=%2d, sig=%3.1f, nH=%d, hpl=%d, lambda=%3.2f\n', ...
 			[ws.klabs{:}], ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
-	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
-		fi = 1+floor((mi-1)/ws.N);
+	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf	
+            fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
+            wss{ni,fi} = ws;
 
-		%fprintf('k=%d #%d\n', ws.kernels(fi), ni);
-	
-		fns{mi}  = fullfile(ws.matdir,sprintf('pruning-de-freq-%s-%d.mat', ws.klabs{fi}, ni));
+		fns{mi}  = fullfile(wss{ni,fi}.matdir,sprintf('pruning-de-freq-%s-%d.mat', wss{ni,fi}.klabs{fi}, ni));
 		if (exist(fns{mi},'file'))
 			if (ismember(11, mSets.debug)), fprintf('Skipping trained model @ %s\n', fns{mi}); end;
 			continue;
 		end;
 
-    ws.kernels   = kernels{fi,si};
-	ws.iters_per = iters_per{fi,si};	
+                wss{ni,fi}.kernels   = kernels{fi,si};
+	        wss{ni,fi}.iters_per = iters_per{fi,si};	
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
 		curmodel.ni       = ni;
 		curmodel.randSeed = ni;
 		
-		[curmodel,ws,s,fs] = autoencoder(curmodel, ws);      % run the script
+		[curmodel,wss{ni,fi},s,fs] = autoencoder(curmodel, wss{ni,fi});      % run the script
 		close all;        % close figures
 		% Move output
-		if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
+		if (~exist(wss{ni,fi}.matdir,'dir')), mkdir(wss{ni,fi}.matdir); end;
 		unix( ['mv "' fs{4} '" "' fns{mi} '"'] );
 	
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
-		unix( ['mv "' fs{1} '" "' fullfile(ws.pngdir, sprintf('z_recon-%s-%d.png', ws.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{2} '" "' fullfile(ws.pngdir, sprintf('z_conn-%s-%d.png',  ws.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{3} '" "' fullfile(ws.pngdir, sprintf('z_hist-%s-%d.png',  ws.klabs{fi}, ni)) '"'] );
+		if (~exist(wss{ni,fi}.pngdir,'dir')), mkdir(wss{ni,fi}.pngdir); end;
+		unix( ['mv "' fs{1} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_recon-%s-%d.png', wss{ni,fi}.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{2} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_conn-%s-%d.png',  wss{ni,fi}.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{3} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_hist-%s-%d.png',  wss{ni,fi}.klabs{fi}, ni)) '"'] );
 	end;
 	
 	% Collect stats
