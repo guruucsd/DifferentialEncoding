@@ -504,8 +504,8 @@ function [s, f] = expt_sf( models, wss )
 % NOTE: even though the networks were trained on different kernels, 
 %   they are tested on images with the same kernel here.
 %
-  if (~exist('kernel','var')),   kernel = 1; end; %blurring kernel for test images
-  if (~exist('testsets','var')), testsets = {'natimg'}; end;
+  if (~exist('kernel','var')),   kernel = 0; end; %blurring kernel for test images
+  if (~exist('testsets','var')), testsets = {'natimg','sergent','cafe'}; end;
 
   %
   ws = wss{1}(1);
