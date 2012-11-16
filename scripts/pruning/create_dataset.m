@@ -4,8 +4,13 @@ function [train,test] = create_dataset(ws, model, ii)
 
 
   % Full fidelity is 0
-  if exist('ii','var') && ws.kernels(ii) > 0
-    opts = {ws.dataset_train.opts{:}, 'lowpass', ws.kernels(ii)};
+  if exist('ii','var') && ws.kernels(ii) ~= 0
+    if ws.kernels(ii)>0
+      opts = {ws.dataset_train.opts{:}, 'lowpass', ws.kernels(ii)};
+    else
+      opts = {ws.dataset_train.opts{:}, 'highpass', -ws.kernels(ii)};
+    end;
+
   else
     opts = ws.dataset_train.opts;
   end;
@@ -21,8 +26,9 @@ function [train,test] = create_dataset(ws, model, ii)
 		case {'n' 'natimg'}, [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '', opts);
 		case {'s' 'sf'},     [~, train, test] = de_MakeDataset('sf',                  'vertonly','', opts);
 		case {'r' 'ch'},     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','', opts);
+                case {'e' 'sergent'},[~, train, test] = de_MakeDataset('sergent_1982',        'sergent_1982','', opts);
 		case {'u' 'uber'},   [~, train, test] = de_MakeDataset('uber',                'all',     '', opts);
-		otherwise,      error('dataset %s NYI', dataset_train{si});
+		otherwise,      error('dataset %s NYI', dataset_train.name);
 	end;
 
   %%%%%%%%%%%%%%%%%
