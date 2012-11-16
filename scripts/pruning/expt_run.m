@@ -27,7 +27,7 @@ de_SetupExptPaths('sergent_1982');
 %nConnPerHidden_End   =    1*[   5   5   5  15   5  10   5   8   8   5  10   10   10]; % # post-pruning random connections to input (& output), per hidden unit
 %hpl                  =    1*[   2   1   2   2   2   2   1   3   3   3   1    1    1];
 %nHidden              = hpl.*[ 850 850 850 850 850 850 850 850 425 425 425 1700 1134];
-sigma                =    1*[  10   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
+sigma                =    1*[  15   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
 nConnPerHidden_Start =    1*[  20   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
 nConnPerHidden_End   =    1*[  10   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   2   1   1   1   2   1   1   1   1   1   1   2   1];
@@ -36,7 +36,7 @@ dataset_train        =      repmat({'n'}, size(sigma));
 lambdas              = 0.00*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =    false(size(sigma));
 zscore               = 0.025*ones(size(sigma));
-AvgErr               =    0*ones(size(sigma));
+AvgError             = 0*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weights, or activity
@@ -44,20 +44,20 @@ prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weig
 dataset_test         = dataset_train;
 
 N                    = 4*ones(size(sigma));
-iters_per            = repmat( {[5*ones(1,4) 10]; [5*ones(1,4) 5]}, length(sigma) );
-tag                  = repmat( {'test25'}, size(sigma) );
+iters_per            = repmat( {[10*ones(1,4) 20]; [10*ones(1,4) 10]}, size(sigma) );
+tag                  = repmat( {'test6'}, size(sigma) );
 
-kernels              = repmat( {[1.5 2 2 2 1;1 1 1 1 1]'}, length(sigma) );
+kernels              = repmat( {[1.5 2 3 4 0];[0 0 0 0 0]}, size(sigma) );
 nkernels             = zeros(size(sigma));
 klabs                = cell(size(kernels));
 for ii=1:length(kernels)
-    nkernels(ii)     = size(kernels{ii},2);
+    nkernels(ii)     = size(kernels,1);
     for ki=1:nkernels(ii)
-      klabs{ii,ki}   = guru_cell2str({kernels{ii}(:,ki)'});
+      klabs{ki,ii}   = guru_cell2str(kernels(ki,ii));
     end;
 end;
 
-mSets.debug          = 1:11;
+mSets.debug          = 1:10;
 mSets.lrrev          = false;
 %mSets.linout         = true;
 
@@ -71,15 +71,15 @@ for si=1:length(lambdas)
 	mSets.lambda               = lambdas(si);
 	mSets.hpl                  = hpl(si);
 	mSets.nHidden              = nHidden(si);
-	mSets.AvgErr               = AvgErr(si);
+	mSets.AvgError             = AvgError(si);
 	mSets.zscore               = zscore(si);
 
 	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si)}});
   ws.N         = N(si);
-  ws.iters_per = iters_per{si};
+  ws.iters_per = iters_per(:,si);
   ws.tag       = tag{si};
   ws.nkernels  = nkernels(si);
-  ws.klabs     = klabs(si,:);
+  ws.klabs     = klabs(:,si);
   ws.prune_loc = prune_loc{si};
   ws.prune_strategy = prune_strategy{si};
 
@@ -114,8 +114,8 @@ for si=1:length(lambdas)
 			continue;
 		end;
 
-    ws.kernels   = kernels{si}(:,fi)';
-		
+    ws.kernels   = kernels{fi,si};
+	ws.iters_per = iters_per{fi,si};	
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
 		curmodel.ni       = ni;
