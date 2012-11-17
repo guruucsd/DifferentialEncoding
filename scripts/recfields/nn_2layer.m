@@ -1,10 +1,11 @@
-function [avg_resp, std_resp, bestofall, wts] = nn_2layer(varargin)
+function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 %
 
     addpath(genpath('../../code'));
     de_SetupExptPaths('sergent_1982');
 
-    p = struct( 'sz', [20 20], ... %image size
+    p = struct( 'seed', rand(1), ...
+                'sz', [20 20], ... %image size
                 'nbatches', 20, ... %
                 'nsamps', 5, ...
                 'a_mode', 'mean', ... % activation mode
@@ -26,7 +27,9 @@ function [avg_resp, std_resp, bestofall, wts] = nn_2layer(varargin)
     if (~isfield(p, 'Sigma')),  p.Sigma  = [2*p.sz(1) 0; 0 0.5*p.sz(2)]; end;
     if (~isfield(p, 'lambda')), p.lambda = prod(p.sz)/p.nin; end;
 
-
+    rand('seed', p.seed);
+    randn('seed', p.seed);
+    
     % Create grid of points for calculating images
     [X1,X2] = meshgrid([1:p.sz(1)]', [1:p.sz(2)]');
     X = [X1(:) X2(:)];
