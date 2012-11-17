@@ -136,12 +136,14 @@ for i=1:length(sigmas)
     for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [2 1], 'k', 'LineWidth', 2); end;
 
     % hidden unit
-    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'LineWidth', 10)
+    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'LineWidth', 10);
     
     % image @ input
     colormap gray;
-    surf(zeros(size(img)), img, 'EdgeColor','none')
+    h = surf(zeros(size(img)), img, 'EdgeColor','none');
+    h = surf(2*ones(size(img)), img, 'EdgeColor','none');  alpha(h,0.25);
 
+    
     
     %%%%%%%%%%%%%%%
     % 3-layer
