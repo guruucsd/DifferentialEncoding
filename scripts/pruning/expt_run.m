@@ -6,22 +6,22 @@ close all;
 addpath(genpath('../../code'));
 de_SetupExptPaths('sergent_1982');
 
-sigma                =    1*[  15];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
+sigma                =    1*[  20];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
 nConnPerHidden_Start =    1*[  20];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
 nConnPerHidden_End   =    1*[   8];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
-hpl                  =    1*[   4];%   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 108];% 111 425 425 425 425 425 425 425 425 425 102 102];
+hpl                  =    1*[   6];%   1   1   1   2   1   1   1   1   1   1   2   1];
+nHidden              = hpl.*[ 408];% 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
-lambdas              = 0.00*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
+lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
-zscore               = 0.025*ones(size(sigma));
+zscore               = 0.02*ones(size(sigma));
 AvgError             = 1E-4*ones(size(sigma));
-sz                   = repmat({'small'}, size(sigma));
+sz                   = repmat({'medium'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'activity'},size(sigma)); %weights, weighted_weights, or activity
 
-N                    = 8*ones(size(sigma));
-tag                  = repmat( {'dev'}, size(sigma) );
+N                    = 4*ones(size(sigma));
+tag                  = repmat( {'med'}, size(sigma) );
 
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
 %iters_per            = repmat( {[20 1]; [20 1]}, size(sigma) );
@@ -85,34 +85,34 @@ for si=1:length(lambdas)
 			[ws.klabs{:}], ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
-	for mi=1:ws.nkernels*ws.N %lsf,msf,hsf	
+	parfor mi=1:ws.nkernels*ws.N %lsf,msf,hsf	
             fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
-            wss{ni,fi} = ws;
+            wss{mi} = ws;
 
-		fns{mi}  = fullfile(wss{ni,fi}.matdir,sprintf('pruning-de-freq-%s-%d.mat', wss{ni,fi}.klabs{fi}, ni));
+		fns{mi}  = fullfile(wss{mi}.matdir,sprintf('pruning-de-freq-%s-%d.mat', wss{mi}.klabs{fi}, ni));
 		if (exist(fns{mi},'file'))
 			if (ismember(11, mSets.debug)), fprintf('Skipping trained model @ %s\n', fns{mi}); end;
 			continue;
 		end;
 
-                wss{ni,fi}.kernels   = kernels{fi,si};
-	        wss{ni,fi}.iters_per = iters_per{fi,si};	
+                wss{mi}.kernels   = kernels{fi,si};
+	        wss{mi}.iters_per = iters_per{fi,si};	
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
 		curmodel.ni       = ni;
 		curmodel.randSeed = ni;
 		
-		[curmodel,wss{ni,fi},s,fs] = autoencoder(curmodel, wss{ni,fi});      % run the script
+		[curmodel,wss{mi},s,fs] = autoencoder(curmodel, wss{mi});      % run the script
 		close all;        % close figures
 		% Move output
-		if (~exist(wss{ni,fi}.matdir,'dir')), mkdir(wss{ni,fi}.matdir); end;
+		if (~exist(wss{mi}.matdir,'dir')), mkdir(wss{mi}.matdir); end;
 		unix( ['mv "' fs{4} '" "' fns{mi} '"'] );
 	
-		if (~exist(wss{ni,fi}.pngdir,'dir')), mkdir(wss{ni,fi}.pngdir); end;
-		unix( ['mv "' fs{1} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_recon-%s-%d.png', wss{ni,fi}.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{2} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_conn-%s-%d.png',  wss{ni,fi}.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{3} '" "' fullfile(wss{ni,fi}.pngdir, sprintf('z_hist-%s-%d.png',  wss{ni,fi}.klabs{fi}, ni)) '"'] );
+		if (~exist(wss{mi}.pngdir,'dir')), mkdir(wss{mi}.pngdir); end;
+		unix( ['mv "' fs{1} '" "' fullfile(wss{mi}.pngdir, sprintf('z_recon-%s-%d.png', wss{mi}.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{2} '" "' fullfile(wss{mi}.pngdir, sprintf('z_conn-%s-%d.png',  wss{mi}.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{3} '" "' fullfile(wss{mi}.pngdir, sprintf('z_hist-%s-%d.png',  wss{mi}.klabs{fi}, ni)) '"'] );
 	end;
 	
 	% Collect stats
