@@ -38,7 +38,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
     
           set(gca,'xlim',[0 max(ffts.freqs_1D)]);
           legend(lgnd{:}, 'Orig');
-          xlabel(xlbl); ylabel('power');
+          xlabel(guru_text2label(xlbl)); ylabel('power');
       end;
       
       
@@ -48,7 +48,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
           plot(ffts.freqs_1D, [avgPowerModel1_1D; avgPowerModel2_1D])
           
           set(gca,'xlim',[0 max(ffts.freqs_1D)]);
-          legend(lgnd{:}); xlabel(xlbl); ylabel('power');
+          legend(lgnd{:}); xlabel(guru_text2label(xlbl)); ylabel('power');
       end;
       
       
@@ -68,7 +68,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
           
           yl = get(gca,'ylim');
           set(gca,'xlim', [min(ffts.freqs_1D) max(ffts.freqs_1D)], 'ylim',[yl(1) yl(2)]);
-          legend(lgnd{:}, 'Orig'); xlabel(xlbl); ylabel('log_{10}(power)');
+          legend(lgnd{:}, 'Orig'); xlabel(guru_text2label(xlbl)); ylabel('log_{10}(power)');
       end;
     
     
@@ -80,7 +80,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
     
           yl = get(gca,'ylim');
           set(gca,'xlim', [0 max(ffts.freqs_1D)], 'ylim',[yl(1) yl(2)]);
-          legend(lgnd{:}); xlabel(xlbl); ylabel('log_{10}(power)');
+          legend(lgnd{:}); xlabel(guru_text2label(xlbl)); ylabel('log_{10}(power)');
       end;
       
       
