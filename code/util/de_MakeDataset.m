@@ -246,7 +246,7 @@ function figs = de_visualizeData(dset)
           colormap gray;
           imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
           axis image; set(gca, 'xtick',[],'ytick',[]);
-          xlabel(dset.XLAB{im2show(ii)});
+          xlabel(guru_text2label(dset.XLAB{im2show(ii)}));
   end;
 
   % View frequency info for images

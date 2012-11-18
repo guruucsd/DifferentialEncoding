@@ -463,7 +463,7 @@ function de_StimCreateHL(stimSet, taskType, opt)
         set(gca, 'xtick',[],'ytick',[]);
         hold on;
         TC = num2cell(round(obj.T(:,i)));
-        xlabel(sprintf('%s: %s (%s)', obj.XLAB{i}, sprintf('%d', TC{:}), obj.TLAB{i}));
+        xlabel(sprintf('%s: %s (%s)', guru_text2label(obj.XLAB{i}), sprintf('%d', TC{:}), guru_text2label(obj.TLAB{i})));
       end;
     
       %

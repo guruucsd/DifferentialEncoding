@@ -356,7 +356,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
         %
         set(gca, 'xtick',[],'ytick',[]);
         hold on;
-        xlabel(obj.XLAB);
+        xlabel(guru_text2label(obj.XLAB));
       end;
 
       %

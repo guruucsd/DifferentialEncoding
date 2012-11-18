@@ -57,7 +57,7 @@ function [fig] = de_PlotOutputImages(models,  imgs, lbls)
       hold on;
 
       set(gca, 'xtick',[],'ytick',[]);
-      if (~isempty(lbls{ii})), xlabel(lbls{ii}); end;
+      if (~isempty(lbls{ii})), xlabel(guru_text2label(lbls{ii})); end;
     end;
     
     %
