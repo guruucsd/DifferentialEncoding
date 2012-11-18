@@ -18,7 +18,12 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     model.Error = model.AvgError*numel(Y);
   end;
 
-  model.Eta = sparse(model.EtaInit.*model.Conn);
+  if ~isfield(model, 'Eta')
+    model.Eta = sparse(model.EtaInit.*model.Conn);
+  else
+    model.Eta = model.Eta.*model.Conn; % validate that we won't train any non-connections
+  end;
+
 %  lastErr   = NaN;
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
