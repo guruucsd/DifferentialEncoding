@@ -1,10 +1,16 @@
 clear all variables; clear all globals;
 
+<<<<<<< HEAD
 stats = {'images','ffts'};
 plts = {'ls-bars', stats{:}};
 [args,opts]  = shared_sergent_args('plots',plts,'stats',stats,'runs',25, ...
                             'ac.zscore', 0.05, 'ac.EtaInit', 2.1E-1, 'ac.AvgError', 1E-4, 'ac.MaxIterations', 100,  ...
                             ...
+=======
+stats = {};%{'images','ffts'};
+plts = {'ls-bars', stats{:}};
+[args,opts]  = shared_sergent_args('plots',plts,'stats',stats,'runs',25, 'ac.zscore', 0.025, 'ac.EtaInit', 2.1E-1, 'ac.AvgError', 5E-5, 'ac.MaxIterations', 100,  ...
+>>>>>>> 9eb64698df069cc8a5e90e9691a3c91ad4c76325
                             'errorType', 1, ...
                             'p.errorType', 3,... % cross-entropy
                             'p.XferFn', [6 3], ...  %sigmoid->sigmoid
