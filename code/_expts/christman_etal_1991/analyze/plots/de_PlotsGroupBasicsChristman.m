@@ -1,4 +1,4 @@
-function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
+function figs = de_PlotsGroupBasicsChristman( mSets, ms, ss )
 
   figs = de_NewFig('dummy');
 
@@ -16,9 +16,9 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
 
       hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
                     sprintf('LH (\\sigma=%3.1f)', mSets.sigma(2))};
-      task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
+      task_lbls = {'Low Freq','High Freq'};
 
-      figs(end+1) = de_NewFIg(ds);
+      figs(end+1) = de_NewFig(ds);
       hold on;
 
       plot(1, perf(1,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
@@ -35,5 +35,5 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
       text(2.125, perf(2,2), hemi_lbls{2}, 'FontSize', 18)
       ylabel('log_{10}(Mean Square Error)');
 
-      print(gcf, '-dpng', ['kitterle-' ds]);
+      print(gcf, '-dpng', ['christman-' ds ]);
   end;
