@@ -1,4 +1,4 @@
-function [ms,ss] = ktterle_interaction_analysis(tst_freq, tst_type)
+function [ms,ss] = kitterle_interaction_analysis(tst_freq, tst_type)
 
   % Reconstitute into expected format
   ms.freq = tst_freq.models;

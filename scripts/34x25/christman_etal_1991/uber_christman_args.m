@@ -1,4 +1,4 @@
-function [args,opts] = uber_kitterle_args(varargin)
+function [args,opts] = uber_christman_args(varargin)
 %
 %  Final shared settings for left-side-bias runs
   % Get shared args
