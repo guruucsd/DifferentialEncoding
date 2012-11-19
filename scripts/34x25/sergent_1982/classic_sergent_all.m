@@ -1,6 +1,6 @@
 % Run with stimuli as in Hsiao et al (2008)
 
-[args,opts] = sergent_args('plots', {'ls-bars'}, 'stats',{});
+[args,opts] = classic_sergent_args('plots', {'ls-bars'}, 'stats',{});
 
 [mSets, models, stats] = de_Simulator('sergent_1982', 'de', 'sergent', {opts{:}}, args{:});
 [mSets, models, stats] = de_Simulator('sergent_1982', 'de', 'sergent', {opts{:}, 'D1#T1'}, args{:});

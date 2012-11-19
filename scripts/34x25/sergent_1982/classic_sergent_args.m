@@ -1,14 +1,11 @@
-function [args,opts] = sergent_args(varargin)
+function [args,opts] = classic_sergent_args(varargin)
 %
 %  Final shared settings for 2YP runs
 %   http://www.willamette.edu/~gorr/classes/cs449/classify.html
 
   % Get shared args
   addpath('..');
-  [cargs,opts] = common_args();
-  rmpath('..');
-
-  args = de_ArgsInit ( cargs{:}, ... %Network structure
+  [args,opts] = classic_args(...
              'runs',    10, ...
              'errorType', 1, ...
              ...
@@ -34,5 +31,3 @@ function [args,opts] = sergent_args(varargin)
              'plots', {'ls-bars'}, ...
              'stats', {'ls-bars'}, ...
              varargin{:} );
-
-
