@@ -1,15 +1,9 @@
-function [args,opts] = kitterle_args(varargin)
+function [args,opts] = classic_kitterle_args(varargin)
 %
 
   % Get shared args
   addpath('..');
-  [cargs,opts] = common_args();
-  rmpath('..');
-
-  cycles = [5 12]; % are we sure about this?
-%  opts = {opts{:}, 'cycles', cycles};
-
-  args = de_ArgsInit ( cargs{:}, ... %Network structure
+  [args,opts] = classic_args( ...
              'runs',    25, ...
              ...
              'p.XferFn', 6,               'p.useBias', 1, ...
@@ -31,4 +25,9 @@ function [args,opts] = kitterle_args(varargin)
              'out.plots', {'png'},  ...
              'plots', {'ffts', 'images'}, ...
              'stats', {'ffts', 'images', 'ipd'}, ...
-             varargin{:} );
+             varargin{:} ...
+            );
+
+  cycles = [5 12]; % are we sure about this?
+  opts = {opts{:}, 'cycles', cycles};
+
