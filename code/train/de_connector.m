@@ -17,5 +17,3 @@ function [Con,Wts] = de_connector(model)
   else
       [Con]     = de_connect_random(model);
   end;
-
-
