@@ -48,7 +48,6 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('ac.debug',         aKeys)), args(end+1:end+2) = {'ac.debug',         1}; end;
   if (~ismember('ac.continue',      aKeys)), args(end+1:end+2) = {'ac.continue',      0}; end;
 
-  if (~ismember('ac.nHidden',       aKeys)), args(end+1:end+2) = {'ac.nHidden',       1}; end;
   if (~ismember('ac.lambda',        aKeys)), args(end+1:end+2) = {'ac.lambda',        0}; end;
   if (~ismember('ac.zscore',        aKeys)), args(end+1:end+2) = {'ac.zscore',        false}; end;
 
