@@ -73,7 +73,8 @@ function [model] = de_DE(model)
 
         % Add bias
         if (model.p.useBias)
-            biasArray=ones(1,nTrials);
+            biasVal = mean(abs(X_train(:)));
+            biasArray=biasVal*ones(1,nTrials);
             X_train     = [X_train;biasArray];  %bias is last input
             clear('biasArray');
         end;
@@ -102,7 +103,7 @@ function [model] = de_DE(model)
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
         fprintf(' | e_p(%5d): %4.3e',size(model.p.err,1),avgErr);
         if (isfield(model.p, 'Weights'))
-            fprintf(' wts=[%5.2f %5.2f]', min(model.p.Weights(:)), max(model.p.Weights(:)))
+            fprintf(' wts=[%5.2f %5.2f]', full(min(model.p.Weights(:))), full(max(model.p.Weights(:))))
         end;
         model.p            = rmfield(model.p, 'err');
 
@@ -125,7 +126,7 @@ function [model] = de_DE(model)
         
         % Add bias
         if (model.p.useBias)
-            biasArray=ones(1,nTest);
+            biasArray=biasVal*ones(1,nTrials);
             X_test     = [X_test;biasArray];  %bias is last input
             clear('biasArray');
         end;
