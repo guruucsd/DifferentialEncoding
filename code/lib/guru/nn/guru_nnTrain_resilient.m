@@ -71,7 +71,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
     % Had a problem; probably moving too fast.
     if (any(isnan(model.err(ip,:))))
-      return;
+      break;
     end;
 
     %% Do checks before applying gradient, as error is for CURRENT weights,
