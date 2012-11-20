@@ -1,7 +1,7 @@
 clear all variables; clear all globals;
 
 
-stats={'images','connectivity','ffts'};
+stats={};%'images','connectivity','ffts'};
 plots=stats;
 
 [args,opts] = uber_kitterle_args( 'runs', 25, 'plots',plots,'stats',stats );
