@@ -16,6 +16,7 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
   if (~isfield(mSets.data, 'tt')),  [stats] = de_DoStat('tt',  stats, 'tt',  stc, 'de_StatsTrainTimeAC',  mss); end;
   if (~isfield(mSets.data, 'ti')),  [stats] = de_DoStat('ti',  stats, 'ti',  stc, 'de_StatsTrainItersAC', mss); end;
   if (~isfield(mSets.data, 'ipd')), [stats] = de_DoStat('ipd', stats, 'ipd', stc, 'de_StatsInterpatchDistance', mss); end;
+  if (~isfield(mSets.data, 'sta')), [stats] = de_DoStat('sta', stats, 'sta', stc, 'de_StatsSTA', mss); end;
 
   % Optional stats
 
