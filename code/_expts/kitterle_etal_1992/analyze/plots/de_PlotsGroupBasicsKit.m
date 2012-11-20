@@ -18,7 +18,7 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
                     sprintf('LH (\\sigma=%3.1f)', mSets.sigma(2))};
       task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
 
-      figs(end+1) = de_NewFIg(ds);
+      figs(end+1) = de_NewFig(ds);
       hold on;
 
       plot(1, perf(1,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
