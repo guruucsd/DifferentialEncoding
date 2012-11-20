@@ -1,6 +1,6 @@
 clear all variables; clear all globals;
 
-stats = {'ipd'};%{'images','ffts'};
+stats = {'sta'};%{'images','ffts'};
 plts = {'ls-bars', stats{:}};
 
 [args,opts]  = uber_sergent_args('plots',plts,'stats',stats,'runs',25);
