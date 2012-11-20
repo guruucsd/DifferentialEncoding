@@ -28,7 +28,7 @@ function [fig] = de_PlotHUEncoding(models, huencs)
     cx            = [-max(abs(huenc(:))) max(abs(huenc(:)))]; %make sure it's symmetric, so zero is consistent across plots
 
     for ii=1:nImages
-        img = enc2img(huenc(:,ii), mupos, imgsize);
+        [img] = enc2img(huenc(:,ii), mupos, imgsize);
 
         % Plot the connectivity pattern
         subplot(nRows, nCols, ii);
@@ -44,6 +44,7 @@ function [fig] = de_PlotHUEncoding(models, huencs)
     mfe_suptitle(t);
 
 
+    
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function fig = de_PlotHUEncoding_Instance2D(model, huenc)
   %2d plot
@@ -68,7 +69,21 @@ function [fig] = de_PlotHUEncoding(models, huencs)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function img = enc2img(enc, mupos, imgsize)
+  function [img,imgsize] = enc2img(enc, mupos, imgsize)
+      
+    scalefact = imgsize(1)/imgsize(2);
+    hpl = size(mupos,1); %hidden units per hidden layer
+    xsz = sqrt(hpl/scalefact);
+    ysz = xsz * scalefact;
+    sz  = round([ysz xsz]);
+    if (prod(sz)==hpl)
+        mupos(:,1) = round(mupos(:,1)/imgsize(1)*ysz);
+        mupos(:,2) = round(mupos(:,2)/imgsize(2)*xsz);
+        imgsize = sz;
+    else
+        mupos = round(mupos);
+    end;
+          
     img = zeros(imgsize);
     mpi = sub2ind(imgsize,mupos(:,1),mupos(:,2));
     img(mpi) = enc;

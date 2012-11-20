@@ -45,10 +45,14 @@ function figs = de_FigurizerAC(mSets, mss, stats)
 %    else,                              figs = [ figs de_DoPlot('image-threshd', 'de_PlotOutputImagesThreshd', mSets, ms, mSets.data.train) ]; end;
 
     if (~isempty(stats.rej.ac.huencs.(ds))),  figs = [ figs de_DoPlot('hu-encodings', 'de_PlotHUEncoding', mSets, ms, stats.rej.ac.huencs.(ds){ss}) ];
-    else, warning('Must get hu encodings in stats to run plots.');
+    elseif ismember('hu-encodings', mSets.plots), warning('Must get hu encodings in stats to run plots.');
     end;
 
     if (~isempty(stats.rej.ac.huouts.(ds))),  figs = [ figs de_DoPlot('hu-output', 'de_PlotHUOutput', mSets, ms, stats.rej.ac.huouts.(ds){ss}) ];
-    else, warning('Must get hu outputs in stats to run plots.'); end;
+    elseif ismember('hu-output', mSets.plots), warning('Must get hu outputs in stats to run plots.'); end;
+
+    if (~isempty(stats.rej.ac.sta)),  figs = [ figs de_DoPlot('sta', 'de_PlotSTA', mSets, ms, stats.rej.ac.sta{ss}) ];
+    elseif ismember('sta', mSets.plots), warning('Must get sta in stats to run plots.'); end;
+
   end;  %ss
 
