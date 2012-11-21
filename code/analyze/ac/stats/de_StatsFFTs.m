@@ -1,6 +1,7 @@
 function [stats_fft] = de_StatsFFTs(images, nInput)
 
-    if (~iscell(images)), images = {images}; end; % next two "massages" allow original image set
+  keyboard
+  if (~iscell(images)), images = {images}; end; % next two "massages" allow original image set
 	switch length(size(images{1}))
 		case 2          %     and reconstructed image sets to be processed by the same code
 			for ii=1:length(images)

@@ -116,8 +116,13 @@ function dset = de_NormalizeDataset(dset, mSets)
 
       % Normalize expected outputs based on classifier transfer function
       dset.T = dset.T - 0.5;
-		  dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
+      dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
 
+      % Duplicate the outputs, for robust training
+      if (isfield(mSets.p, 'ndupes'))
+          dset.T = repmat(dset.T, [mSets.p.ndupes 1]);
+      end;
+      
       % validate dset
 %      guru_assert(~any(isnan(dset.T(:))), 'nan T-values');
 %      guru_assert(~any(dset.T(:)<mSets.p.minmax(1)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));

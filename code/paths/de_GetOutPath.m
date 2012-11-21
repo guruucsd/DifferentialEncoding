@@ -54,30 +54,11 @@ function outdir = de_GetOutPath(model, dirType)
         outdir = model.out.resultspath;
       end;
 
-    case {'acn','pn'}
-       error('who is calling me like this?');
-%      origString = '';
-%      origString = [ origString ...
-%                     sprintf('DN=%s', sprintf('%s-', model.distn{:})), ...
-%                     sprintf('MU=%s', sprintf('%f-', model.mu(:))), ...
-%                     sprintf('SG=%s', sprintf('%f-', model.sigma(:))), ...
-%                     sprintf('AE=%f', model.ac.AvgError), ...
-%                     sprintf('MI=%d', model.ac.MaxIterations), ...
-%                     sprintf('AC=%f', model.ac.Acc), ...
-%                     sprintf('DC=%f', model.ac.Dec), ...
-%                     sprintf('EI=%f', model.ac.EtaInit), ...
-%                     sprintf('XF=%d', model.ac.XferFn), ...
-%                     sprintf('WT=%s', model.ac.WeightInitType) ];
-%      %hash = mfe_md5(origString);
-%      hash = hash_path(origString);%sprintf('%d', sum(origString.*[1:10:10*length(origString)]));
-%      outdir = fullfile(de_GetOutPath(model, 'data'), hash); %saving under data directory
-
     % Directory containing all trained models.
     %   should contain ALL [overall] AND [ac] model settings.
     case {'ac'}
         if (isfield(model,'uberpath'))
             outdir = model.uberpath;
-            %fprintf('[uber-path]');
         else
             % Ridiculous internal directory name needs to be unique, but shortened.
             %   That's what hashes are for!
@@ -88,6 +69,7 @@ function outdir = de_GetOutPath(model, dirType)
             % That was just the directory name; now prepend the base directory!
             outdir = fullfile(de_GetOutPath(model, 'runs'), hash); %saving under data directory
         end;
+
     case {'p'}
         origString = de_GetOutPath(model, 'ac_p_base');
         if (isfield(model, 'uberpath')) % don't confuse p for uber and non-uber cases
@@ -121,6 +103,7 @@ function outdir = de_GetOutPath(model, dirType)
                          sprintf('NH=%d', model.nHidden), ... % These are stamped elsewhere,
                          sprintf('HP=%d', model.hpl), ...     %   but just to be safe,
                          sprintf('NC=%d', model.nConns), ...  %   stamp them here too.
+                         sprintf('DE=%s', model.deType), ...  %   stamp them here too.
                          ];
 
           origString = [ origString ... % add on AC model settings
@@ -144,7 +127,7 @@ function outdir = de_GetOutPath(model, dirType)
                         ];
 
           if (isfield(model.ac, 'zscore'))
-              origString = sprintf('%s,ZS=%d', origString, model.ac.zscore);
+              origString = sprintf('%s,ZS=%f', origString, model.ac.zscore);
           end;
 
           outdir = origString; % bubble this back up as clear-text
