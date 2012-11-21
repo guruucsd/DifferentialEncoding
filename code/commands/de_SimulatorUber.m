@@ -14,23 +14,17 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   training_expt     = training_info_split{1};
   training_imageset = training_info_split{2};
 
-  non_p_args = {};
-  ii = 1;
-  while (ii <= length(args))
-    if (ischar(args{ii}) && length(args{ii})>2 && strcmp(args{ii}(1:2),'p.'))
-      ii = ii + 2;
-    else
-      non_p_args{end+1} = args{ii};
-      ii = ii + 1;
-    end;
-  end;
+  % Remove args for perceptron
+  non_p_argname_idx = find(guru_findstr(args(1:2:end),'p.')~=1);
+  non_p_arg_idx = sort([2*non_p_argname_idx-1,2*non_p_argname_idx]);
+  uber_args = args(non_p_arg_idx);
 
   %%%%%%%%%%%%%%%%
   % Pull out the path to the stored autoencoders
   %%%%%%%%%%%%%%%%%
   %dbstop in de_LoadOrTrain
 
-  [trn.mSets, trn.models, trn.stats] = de_Simulator(training_expt, training_imageset, '', opts, non_p_args{:})
+  [trn.mSets, trn.models, trn.stats] = de_Simulator(training_expt, training_imageset, '', opts, uber_args{:});
 
   % Get the autoencoder directories
   ac = [trn.models(1,:).ac];
