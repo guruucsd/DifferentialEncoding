@@ -6,7 +6,7 @@ hu_hpl = [850 1; 425 2; 108 8; 425 1; 108 4];
 sigma  = [ 2 4; 4 8; 4 12; 6 8; 6 12];
 nconn  = [ 8; 10; 15; 20; 40];
 
-stats = {'ipd','connectivity','images','ffts'};
+stats = {'ipd','distns','images','ffts'};
 plts = {'ls-bars', stats{:}};
 
 train_data = cell(length(hu_hpl),length(sigma),length(nconn));
@@ -25,7 +25,7 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
                                      'plots',plts,'stats',stats,'runs',25);
 
     % Make sure that this is trainable.
-    [trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, {args{:}, 'runs', 2, 'plots',{},'stats',{}});
+    [trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, {args{:}, 'runs', 2});%, 'plots',{},'stats',{}});
 
     % If not, skip; leave the data empty
     if numel(trn.models)<2
