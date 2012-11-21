@@ -1,5 +1,5 @@
-function [stats, figs, mss]  = de_Analyzer(mSets, mss, rej)
-%function [stats, figs]  = de_Analyzer(mSets, mss)
+function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
+%function [stats, figs]  = de_AnalyzerDE(mSets, mss,rej)
 %
 
   % Make cell array

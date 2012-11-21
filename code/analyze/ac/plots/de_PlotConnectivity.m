@@ -1,5 +1,5 @@
-function [figs] = de_PlotConnectivity(mSets, mss)
-%function [figs] = de_PlotConnectivity(models)
+function [figs] = de_PlotConnectivity(mSets, stats)
+%function [figs] = de_PlotConnectivity(mSets, stats)
 %
 % Show the average or instance connectivity of a model
 %
@@ -8,7 +8,7 @@ function [figs] = de_PlotConnectivity(mSets, mss)
 %
 % Output:
 % h             : array of handles to plots
-
+  keyboard
  
   nDims   = length(mSets.nInput);
   if (nDims~=2), error('Connectivity plot NYI for non-2D case'); end;
@@ -21,22 +21,21 @@ function [figs] = de_PlotConnectivity(mSets, mss)
   figs(end+1) = de_NewFig('connect-inst');
   figs(end+1) = de_NewFig('connect-2Dto1D');
   
+  clim = [0 max(stats.mean2D(:))];
   
-  layer = zeros([length(mss) mSets.nInput]);
-  
-  for ii=1:length(mss)
-    models=mss{ii};
-    
-    % Pull out weights
-    models = de_LoadProps(models, 'ac', 'Weights');
+  for ii=1:length(mSets.sigma)
 
-    % Find best hidden unit to analyze
-    [mu,mupos] = de_connector_positions(models(1).nInput, models(1).nHidden/models(1).hpl);
-    [cy,cx] = find(mu);
-    [~,pt] = min( sqrt( (cy-size(mu,1)/2).^2 + (cx-size(mu,2)/2).^2 ) );
-    
     % Average connectivity
     figure(figs(1).handle); subplot(nRows,nCols,ii);
+    imagesc(layer, clim); hold on; 
+    set(gca, 'xtick', [], 'ytick', []);
+    plot(mupos(pt,2), mupos(pt,1), 'g*', 'LineWidth', 5.0, 'MarkerSize', 5.0)
+    
+    xlabel('pixel');
+    ylabel('P(connection)');
+    yl=get(gca,'ylim');
+%    legend({sprintf('\\sigma=%3.1f', models.sigma), 'Expected Gaussian'}, 'Location', 'NorthOutside');
+    
     [pt, layer(ii,:,:)] = ...
     de_PlotConnectivity_Avg   (figs(1), models, pt, mupos);
     
@@ -124,15 +123,3 @@ function de_PlotConnectivity_2Dto1D(fig, sigma, center, layer)
     legend({sprintf('\\sigma=%3.1f', sigma), 'Expected Gaussian'}, 'Location', 'NorthOutside');
     
     
-    
-% old code
-%    ptsa = find( abs(cy-size(mu,1)/2) < 5 );
-%    ptsb = find( abs(cx-size(mu,2)/2) < 4 );
-%    pts  = intersect(ptsa, ptsb);
-%    if (any(pts))
-      %cy(pts), cx(pts)
-      %pt = pts( floor(length(pts)/2) ); %midpoint
-    %else
-    %  pt = floor(size(cavg,1)/hpl/2); %hidden unit (attempting to be centered)
-    %end;
-
