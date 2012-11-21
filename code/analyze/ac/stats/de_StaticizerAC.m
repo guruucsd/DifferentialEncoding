@@ -38,11 +38,8 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
   end;
 
-  if (~isfield(stats, 'distns')), stats.distns = []; end;
-  [stats.distns] = de_DoStat('distns', stats, 'distns',  stc, 'de_StatsDistributions', mss);
-
-  if (~isfield(stats, 'freqprefs')), stats.freqprefs = []; end;
-  [stats.freqprefs] = de_DoStat('freqprefs', stats, 'freqprefs',  stc, 'de_StatsFreqPreferences', mss);
+  [stats] = de_DoStat('distns', stats, 'distns',  stc, 'de_StatsDistributions', mss);
+  [stats] = de_DoStat('freqprefs', stats, 'freqprefs',  stc, 'de_StatsFreqPreferences', mss);
 
 
   if (~isfield(stats, 'images')), stats.images = []; end;
