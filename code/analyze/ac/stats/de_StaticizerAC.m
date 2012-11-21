@@ -38,8 +38,6 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
   end;
 
-  keyboard
-  [stats] = de_DoStat('connectivity', stats, 'connectivity',  stc, 'de_StatsConnectivity', mss);
   [stats] = de_DoStat('distns', stats, 'distns',  stc, 'de_StatsDistributions', mss);
   [stats] = de_DoStat('freqprefs', stats, 'freqprefs',  stc, 'de_StatsFreqPreferences', mss);
 

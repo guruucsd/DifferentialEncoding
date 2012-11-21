@@ -18,8 +18,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   figs = [ figs de_DoPlot('train-error',   'de_PlotTrainErrorAC',   mSets, mSets, stats) ];
   figs = [ figs de_DoPlot('train-time',    'de_PlotTrainTimeAC',    mSets, mSets, stats) ];
   figs = [ figs de_DoPlot('train-iters',   'de_PlotTrainItersAC',   mSets, mSets, stats) ];
-  figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity', mSets, mSets, stats.rej.ac.connectivity) ];
-%  figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity_Avg2Dto1D', mSets, mSets, mss) ];
+  %figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity', mSets, mSets, stats.rej.ac.connectivity) ];
   figs = [ figs de_DoPlot('ffts',          'de_PlotFFTs',         mSets, mSets, stats.rej.ac.ffts) ];
   figs = [ figs de_DoPlot('distns',        'de_PlotDistributions',mSets, mSets, stats.rej.ac.distns) ];
 
