@@ -35,7 +35,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
 
     % Plot the
     if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages_)) ];
-    else, warning('Must get images in stats to run plots.'); end;
+    elseif ismember('images',mSets.plots), warning('Must get images in stats to run plots.'); end;
 
 %    if (isfield(mSets.data, 'test')), figs = [ figs de_DoPlot('image-diffs', 'de_PlotOutputImageDiffs', mSets, ms, mSets.data.test) ];
 %    else,                             figs = [ figs de_DoPlot('image-diffs', 'de_PlotOutputImageDiffs', mSets, ms, mSets.data.train) ]; end;
