@@ -75,6 +75,7 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
       if (~ismember('p.nHidden',        aKeys)), args(end+1:end+2) = {'p.nHidden',       1}; end;
       if (~ismember('p.lambda',         aKeys)), args(end+1:end+2) = {'p.lambda',        0}; end;
       if (~ismember('p.zscore',         aKeys)), args(end+1:end+2) = {'p.zscore',        false}; end;
+      if (~ismember('p.ndupes',         aKeys)), args(end+1:end+2) = {'p.ndupes',        1}; end;
     
       if (~ismember('p.rej.props',      aKeys)), args(end+1:end+2) = {'p.rej.props',  {'err'}}; end;
       if (~ismember('p.rej.type',       aKeys)), args(end+1:end+2) = {'p.rej.type',   {'sample_std-normd'}}; end;

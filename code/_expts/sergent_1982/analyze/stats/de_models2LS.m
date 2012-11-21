@@ -47,13 +47,17 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
 
     p     = [models.p];
     o     = [p.output];
-    tmp   = de_calcPErr( vertcat(o.test), mSets.data.test.T, errorType );
-    
+    o_p   = reshape(horzcat(o.test),[numel(o(1).test),length(o)])';
+    tmp   = de_calcPErr( o_p, mSets.data.test.T, errorType );
+        
     % Calc ls for each model      
+    ndupes = size(o_p,2)/length(mSets.data.train.ST);
+    allidx = cell(length(mSets.data.train.TIDX));
     LS_permodel      = zeros(rons, length(mSets.data.train.TIDX));
     for j = 1:length(mSets.data.train.TIDX)
       if (~isempty(mSets.data.train.TIDX{j}))
-        LS_permodel(:,j) = mean(tmp(:,mSets.data.train.TIDX{j}),2); %average over each sub-trial type
+        allidx{j} = repmat(mSets.data.train.TIDX{j},[ndupes 1]) .* repmat(1:ndupes, [length(mSets.data.train.TIDX{j}) 1])';
+        LS_permodel(:,j) = mean(tmp(:,allidx{j}(:)),2); %average over each sub-trial type
       else
         LS_permodel(:,j) = NaN(size(LS_permodel(:,j)));
       end;
@@ -63,7 +67,7 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
     LS_mean  = zeros(length(mSets.data.train.TIDX),1);
     LS_stde  = zeros(length(mSets.data.train.TIDX),1);
     for j=1:length(mSets.data.train.TIDX)
-      x      = tmp(:,mSets.data.train.TIDX{j});
+      x      = tmp(:,allidx{j}(:));
       LS_mean(j) = mean(x(:));
       LS_stde(j) = guru_stde(x(:));
     end;
