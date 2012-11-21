@@ -1,11 +1,16 @@
+% This successfully run, under the below commit, for 850x1
+% git checkout a0713561f421b56368ecbe77e476d75a4b1fc2bb
+% and results are saved into
+% 850x1.mat
+%
 clear all variables; clear all globals;
 dbstop if error
 
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
-hu_hpl = [850 1; 425 2; 108 8; 425 1; 108 4];
+hu_hpl = [108 8; 108 4; 850 1; 425 2; 425 1];
 sigma  = [ 2 4; 4 8; 4 12; 6 8; 6 12];
-nconn  = [ 8; 10; 15; 20; 40];
+nconn  = [ 6; 10; 15; 20; 40];
 
 stats = {'ipd','distns','images','ffts'};
 plts = {'ls-bars', stats{:}};
@@ -57,6 +62,7 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
             fprintf('Hey!  Using cached results! :D\n');
         else
             [trn25,tst25] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
+            close all;
         end;
        
         % Blank out some 'expensive' fields
@@ -76,6 +82,9 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
     end;
 
 
-end; end; end;
+end; end; 
+  
+  save(sprintf('h%dx%d.mat', hu_hpl(hi,:)));
+end;
 
-save
+save('all.mat');
