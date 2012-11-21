@@ -17,7 +17,8 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
   if (~isfield(model,'Error'))
     model.Error = model.AvgError*numel(Y);
   end;
-
+  guru_assert(model.Error>=0);
+  
   model.Eta = model.EtaInit;
   lastErr   = inf;
   currErr   = inf;

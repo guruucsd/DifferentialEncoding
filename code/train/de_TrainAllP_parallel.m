@@ -43,7 +43,8 @@ function [models] = de_TrainAllP_parallel(mSets, modelsAC)
         model.p.randState = randState;
         rand ('state',model.p.randState);
             
-
+        % $TODO: only run IF the model hasn't been rejected.
+        '
         fprintf('[%3d]',mm);
         m = de_Trainer(model);
         if (~m.p.cached), fprintf('\n'); end;
