@@ -56,7 +56,6 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
         if isfield(trn25,'stats') && isfield(tst25,'stats')
             fprintf('Hey!  Using cached results! :D\n');
         else
-keyboard
             [trn25,tst25] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
         end;
        
