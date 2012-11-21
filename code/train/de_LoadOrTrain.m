@@ -54,6 +54,7 @@ function model = de_LoadOrTrain(model)
   switch (model.deType)
     case 'de',         model = de_DE     (model);
     case 'de-deep',    model = de_DE_Deep(model);
+    case 'de-stacked', model = de_DE_Stacked(model);
     otherwise, error('Unknown DE type: %s', model.deType);
   end;
 
