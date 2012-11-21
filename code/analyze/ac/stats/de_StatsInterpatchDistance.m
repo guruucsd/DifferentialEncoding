@@ -122,8 +122,8 @@ function [ipd] = de_StatsInterpatchDistance(models)
           end;
       end;
       
-      ipd.nn_dists{ss} = nn_dists;
-      ipd.fc_dists{ss} = fc_dists;
+%      ipd.nn_dists{ss} = nn_dists;
+%      ipd.fc_dists{ss} = fc_dists;
       ipd.nearest_neighbor_mean(ss)  = mean(horzcat(nn_dists{:})); %inter-patch distance
       ipd.nearest_neighbor_std (ss)  = std (horzcat(nn_dists{:}));
       ipd.from_center_mean(ss)       = mean(horzcat(fc_dists{:}));     %average distance from center
