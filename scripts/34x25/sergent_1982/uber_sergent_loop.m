@@ -6,7 +6,7 @@ hu_hpl = [850 1; 425 2; 108 8; 425 1; 108 4];
 sigma  = [ 2 4; 4 8; 4 12; 6 8; 6 12];
 nconn  = [ 8; 10; 15; 20; 40];
 
-stats = {'ipd','connectivity','images','ffts'};
+stats = {'ipd','distns','images','ffts'};
 plts = {'ls-bars', stats{:}};
 
 train_data = cell(length(hu_hpl),length(sigma),length(nconn));
