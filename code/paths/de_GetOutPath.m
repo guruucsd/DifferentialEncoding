@@ -98,7 +98,8 @@ function outdir = de_GetOutPath(model, dirType)
           %origString = guru_fileparts(model.dataFile, 'filename'); %
 
           origString = [ 'opt=' guru_cell2str(model.data.opt, '.')];
-
+          %origString = ''; % options should be pasted on 
+          
           origString = [ origString ... % add on base model settings
                          sprintf('UBER=%d', isfield(model, 'uberpath')), ...
                          sprintf('DN=%s', sprintf('%s-', model.distn{:})), ... %if we call in based on a "full" mSets,
@@ -131,8 +132,14 @@ function outdir = de_GetOutPath(model, dirType)
 
           % Pruning: the original model
           if isfield(model.ac,'ct') % pruning study
+
+              % need to select
+              if ~isfield(model.ac.ct, 'hemi') && isfield(model, 'hemi')
+                  model.ac.ct.hemi = model.hemi;               
+              end;
+              
               origString = [origString ...
-                            sprintf('CT=%s', de_GetOutFile(model.ac.ct, 'conn')) ...
+                            sprintf('CT=%s', de_GetOutFile(model.ac.ct, 'conn', 'fullPath',false)) ...
                            ];
           end;
 

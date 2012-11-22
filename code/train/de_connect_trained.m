@@ -9,52 +9,23 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     %%%%%%%%%%%%%%%%%
     % Set up model parameters & allocate space
     %%%%%%%%%%%%%%%%%
+    
+    % In order for other caching to happen, all props MUST be set before
+    % now.
 
-    if (~isfield(ct, 'dataset')),   ct.dataset   = 'natimg'; end;
-    if (~isfield(ct, 'deType')),    ct.deType    = 'de'; end;
-    if (~isfield(ct, 'steps')),     ct.steps     = {[8 8 8 8 8] [1 1 1 1 1]}; end;
-    if (~isfield(ct, 'iters_per')), ct.iters_per = {ct.iters_per_step(1)*ones(size(ct.steps{1})) ...
-                                                    ct.iters_per_step(2)*ones(size(ct.steps{2}))}; end;
-    if (~isfield(ct,'nConnPerHidden_Start')), ct.nConnPerHidden_Start = 2*mSets.nConns; end;
-    if (~isfield(ct,'nConnPerHidden_End')),   ct.nConnPerHidden_End   = mSets.nConns; end;
+    % Select the specified hemisphere
+    ct.iters_per = ct.iters_per{mSets.hemi};
+    ct.steps = ct.steps{mSets.hemi};
+    ct.sigma = ct.sigma(mSets.hemi);
+    
+    % Combine all settings into a single model
+    model    = guru_mergeStruct( mSets, ct );
+    model.ac = rmfield(model.ac, 'ct');
 
-    model.debug                = mSets.debug;
-    model.deType               = ct.deType;
-    model.nConnPerHidden_Start = ct.nConnPerHidden_Start;
-    model.nConnPerHidden_End   = ct.nConnPerHidden_End;
-    model.distn                = mSets.distn;
-    model.mu                   = mSets.mu;
-    model.sigma                = max(mSets.sigma);
-    model.nHidden              = mSets.nHidden;
-    model.hpl                  = mSets.hpl;
-
-    % stim props
-    model.nInput               = mSets.nInput;
-    model.nOutput              = prod(model.nInput);
-    model.zscore               = isfield(model, 'zscore') && model.zscore;
-
-    model.dataset                 = ct.dataset;
-    model.iters_per               = ct.iters_per{mSets.hemi};
-    model.steps                   = ct.steps{mSets.hemi};
-    model.npruning_loops          = ct.npruning_loops;
-    model.prune_loc               = ct.ac.prune_loc;
-    model.prune_strategy          = ct.ac.prune_strategy;
-    model.keep_weights            = ct.keep_weights;%true;
-
-    model.ac            = ct.ac;        % get training args from ct
-    model.ac.debug      = mSets.ac.debug;
-    model.ac.randState  = mSets.ac.randState;
-    model.ac.errorType  = 2;
-    model.ac.zscore     = mSets.ac.zscore;
-    if (isfield(model.ac, 'EtaInitInit'))
-        model.ac.EtaInit    = model.ac.EtaInitInit/sqrt(model.steps(1)); %lol
-    end;
-    model.ac.useBias    = 1;
+    % Add any additional properties
     model.ac.continue   = true;
-    model.ac.tol        = mSets.ac.tol;
-    model.ac.minmax     = [];
+    keyboard
 
-%    model.ac.noise_input= ct.ac.noise_input;
 
     %%%%%%%%%%%%%%%%%
     % Check if this connectivity profile has been cached
