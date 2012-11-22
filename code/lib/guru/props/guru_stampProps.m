@@ -1,7 +1,7 @@
 function mSets = guru_stampProps(varargin)
 
   % No input, can only return empty output
-  if (length(varargin)==0)
+  if (isempty(varargin))
     mSets = struct();
     error('No input arguments')
   end;
@@ -19,7 +19,7 @@ function mSets = guru_stampProps(varargin)
 
   % Even # of inputs; start with emtpy object
   else
-    msets = struct();
+    mSets = struct();
   end;
 
   % expect strings at every second input
