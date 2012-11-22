@@ -24,7 +24,6 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
 
     % Add any additional properties
     model.ac.continue   = true;
-    keyboard
 
 
     %%%%%%%%%%%%%%%%%
