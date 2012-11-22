@@ -2,8 +2,6 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
 %
 % Run sergent task by training on all images
 
-  tic;
-
   %%%%%%%%%%%%%%%%
   % Train autoencoders on some set of images
   %%%%%%%%%%%%%%%%%
@@ -50,4 +48,4 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
 
   [tst.mSets, tst.models, tst.stats] = de_Simulator(testing_expt, testing_imageset, testing_task, opts, p_args{:});
 
-  toc
+ 

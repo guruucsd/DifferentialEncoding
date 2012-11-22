@@ -89,7 +89,6 @@ function [model] = de_DE_Multi(model)
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
-        keyboard
             model.p.Weights(pInputs+[1:acHidden], 1:pInputs) = model.ac.Weights(pInputs+[1:acHidden], 1:pInputs); %input=>acHidden
             model.p.Weights(pInputs+acHidden+pHidden+[1:acOutputs], pInputs+[1:acHidden]) = model.ac.Weights(pInputs+acHidden+[1:acOutputs], pInputs+[1:acHidden]); %acHidden=>acOutputs
             model.p.Weights(pInputs+[1:acHidden], pInputs) = model.ac.Weights(pInputs+[1:acHidden], pInputs); %bias=>acHidden
@@ -106,12 +105,12 @@ function [model] = de_DE_Multi(model)
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        o_p = guru_nnExec(model.p, X_train(:,good_test), Y_train(:,good_test) );
+        o_p = guru_nnExec(model.p, X_train(:,good_train), Y_train(:,good_train) );
         model.p.output.train = o_p(acOutputs+[1:pOutputs],:);
       
         % TEST
         X_test = model.data.test.X;
-        Y_test = model.data.test.X(1:end-1,:);
+        Y_test = [model.data.test.X(1:end-1,:); model.data.test.T];
 
         good_test  = ~isnan(sum(model.data.test.T,1));
         nTest      = sum(good_test); % count the # of trials with no NaN anywhere in them
@@ -119,7 +118,8 @@ function [model] = de_DE_Multi(model)
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         o_p = guru_nnExec(model.p, X_test(:,good_test), Y_test(:,good_test) );
         model.p.output.test = o_p(acOutputs+[1:pOutputs],:);
-      end;
+        mean(model.p.output.test,1)
+    end;
   end;
 
 
