@@ -1,7 +1,9 @@
-  function [model] = de_DE(model)
-%function [model] = de_DE(model)
+function [model] = de_DE_Deep(model)
+%function [model] = de_DE_deep(model)
 %
 % Train differential encoder.
+%  First, train the hidden layer to reproduce an image of a smaller size.
+%  Then, add the next layer of units and train.
 %
 % Inputs:
 % model      : see de_model for details

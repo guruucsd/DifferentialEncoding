@@ -1,7 +1,10 @@
-function [model] = de_DE(model)
-%function [model] = de_DE(model)
+function [model] = de_DE_Multi(model)
+%function [model] = de_DE_Multi(model)
 %
 % Train differential encoder.
+%  Train the autoencoder normally.
+%  Construct the p network to be like 'stacked'.
+%  But while training the p, also train the autoencoder
 %
 % Inputs:
 % model      : see de_model for details
@@ -62,49 +65,39 @@ function [model] = de_DE(model)
 
       if (~model.p.cached)
         good_train = ~isnan(sum(model.data.train.T,1));
-        nTrials    = sum(good_train); % count the # of trials with no NaN anywhere in them
+        nTrain    = sum(good_train); % count the # of trials with no NaN anywhere in them
 
-        % Use hidden unit encodings as inputs
-        X_train    = model.ac.hu.train;
-        X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
-        if isfield(model.p, 'zscore') && model.p.zscore>0
-          X_train    = model.p.zscore * X_train ./ repmat( std(X_train, 0, 1), [size(X_train,1), 1] ); %z-score the code
-        end;
-
-        % Add bias
-        if (model.p.useBias)
-            biasVal = mean(abs(X_train(:)));
-            biasArray=biasVal*ones(1,nTrials);
-            X_train     = [X_train;biasArray];  %bias is last input
-            clear('biasArray');
-        end;
-
-        Y_train = model.data.train.T;
-
+        % Use images as inputs
+        X_train = model.data.train.X;
+        Y_train = [model.data.train.X(1:end-1,:); model.data.train.T];
 
         % Set up connectivity matrix:
-        % 1:size(X,1) : inputs units (& bias?) to p
-        %      : bias unit
-        % nHidden+2:end : output unit(s)
         pInputs         = size(X_train,1);
+        acHidden        = model.nHidden;
         pHidden         = model.p.nHidden;
+        acOutputs       = size(X_train,1)-1;
         pOutputs        = size(model.data.train.T,1);
-        pUnits          = pInputs + pHidden + pOutputs;
+        pUnits          = pInputs + acHidden+pHidden + acOutputs+pOutputs;
 
         if (~model.p.continue)
             model.p.Conn    = false( pUnits, pUnits );
-
-            model.p.Conn(pInputs+[1:pHidden],          [1:pInputs])=true; %input->hidden
-            model.p.Conn(pInputs+pHidden+[1:pOutputs], pInputs+[1:pHidden])=true; %hidden->output
+            model.p.Conn(1:(pInputs+acHidden), 1:(pInputs+acHidden)) = model.ac.Conn(1:(pInputs+acHidden), 1:(pInputs+acHidden)); %input=>acHidden
+            model.p.Conn(pInputs+acHidden+[1:pHidden],  pInputs+[1:acHidden]) = true; %acHidden=>pHidden
+            model.p.Conn(pInputs+acHidden+pHidden+[1:acOutputs],  pInputs+[1:acHidden]) = true; %acHidden=>acOutput
+            model.p.Conn(pInputs+acHidden+pHidden+acOutputs+[1:pOutputs], pInputs+acHidden+[1:pHidden])=true; %pHidden=>pOutput
             model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
+        keyboard
+            model.p.Weights(pInputs+[1:acHidden], 1:pInputs) = model.ac.Weights(pInputs+[1:acHidden], 1:pInputs); %input=>acHidden
+            model.p.Weights(pInputs+acHidden+pHidden+[1:acOutputs], pInputs+[1:acHidden]) = model.ac.Weights(pInputs+acHidden+[1:acOutputs], pInputs+[1:acHidden]); %acHidden=>acOutputs
+            model.p.Weights(pInputs+[1:acHidden], pInputs) = model.ac.Weights(pInputs+[1:acHidden], pInputs); %bias=>acHidden
+            model.p.Weights(pInputs+acHidden+pHidden+[1:acOutputs], pInputs) = model.ac.Weights(pInputs+acHidden+[1:acOutputs], pInputs); %bias=>acHidden
         end;
-
-
+         
         % Train
-        [model.p] = guru_nnTrain(model.p, X_train(:,good_train), Y_train(:, good_train));
+        [model.p] = guru_nnTrain(model.p, X_train(:,good_train), Y_train(:,good_train));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
         fprintf(' | e_p(%5d): %4.3e',size(model.p.err,1),avgErr);
         if (isfield(model.p, 'Weights'))
@@ -113,34 +106,19 @@ function [model] = de_DE(model)
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(:,good_train) );
-        
+        o_p = guru_nnExec(model.p, X_train(:,good_test), Y_train(:,good_test) );
+        model.p.output.train = o_p(acOutputs+[1:pOutputs],:);
       
         % TEST
-        p_test     = model.p;
+        X_test = model.data.test.X;
+        Y_test = model.data.test.X(1:end-1,:);
 
         good_test  = ~isnan(sum(model.data.test.T,1));
         nTest      = sum(good_test); % count the # of trials with no NaN anywhere in them
 
-        % Use hidden unit encodings as inputs
-        X_test    = model.ac.hu.test;
-        X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
-        if isfield(model.p, 'zscore') && model.p.zscore>0
-          X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
-        end;
-        
-        % Add bias
-        if (model.p.useBias)
-            biasArray=biasVal*ones(1,nTrials);
-            X_test     = [X_test;biasArray];  %bias is last input
-            clear('biasArray');
-        end;
-
-        Y_test = model.data.test.T;
-
-
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.test = guru_nnExec(model.p, X_test(:,good_test), Y_test(:,good_test) );
+        o_p = guru_nnExec(model.p, X_test(:,good_test), Y_test(:,good_test) );
+        model.p.output.test = o_p(acOutputs+[1:pOutputs],:);
       end;
   end;
 
