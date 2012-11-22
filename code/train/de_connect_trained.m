@@ -23,7 +23,10 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     model.ac = rmfield(model.ac, 'ct');
 
     % Add any additional properties
+<<<<<<< HEAD
     model.nOutput       = prod(model.nOutput);
+=======
+>>>>>>> 5951a8dbe27ff68e64259b4539557123250e61a7
     model.ac.continue   = true;
 
 
