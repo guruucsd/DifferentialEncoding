@@ -10,15 +10,18 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     % Set up model parameters & allocate space
     %%%%%%%%%%%%%%%%%
 
-    if (~isfield(ct, 'dataset')),   ct.dataset     = 'uber'; end;
+    if (~isfield(ct, 'dataset')),   ct.dataset   = 'natimg'; end;
+    if (~isfield(ct, 'deType')),    ct.deType    = 'de'; end;
     if (~isfield(ct, 'steps')),     ct.steps     = {[8 8 8 8 8] [1 1 1 1 1]}; end;
     if (~isfield(ct, 'iters_per')), ct.iters_per = {ct.iters_per_step(1)*ones(size(ct.steps{1})) ...
                                                     ct.iters_per_step(2)*ones(size(ct.steps{2}))}; end;
+    if (~isfield(ct,'nConnPerHidden_Start')), ct.nConnPerHidden_Start = 2*mSets.nConns; end;
+    if (~isfield(ct,'nConnPerHidden_End')),   ct.nConnPerHidden_End   = mSets.nConns; end;
 
     model.debug                = mSets.debug;
-
-    model.nConnPerHidden_Start = 2*mSets.nConns;
-    model.nConnPerHidden_End   = mSets.nConns;
+    model.deType               = ct.deType;
+    model.nConnPerHidden_Start = ct.nConnPerHidden_Start;
+    model.nConnPerHidden_End   = ct.nConnPerHidden_End;
     model.distn                = mSets.distn;
     model.mu                   = mSets.mu;
     model.sigma                = max(mSets.sigma);
