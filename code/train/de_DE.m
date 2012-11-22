@@ -93,6 +93,7 @@ function [model] = de_DE(model)
 
             model.p.Conn(pInputs+[1:pHidden],          [1:pInputs])=true; %input->hidden
             model.p.Conn(pInputs+pHidden+[1:pOutputs], pInputs+[1:pHidden])=true; %hidden->output
+            model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
