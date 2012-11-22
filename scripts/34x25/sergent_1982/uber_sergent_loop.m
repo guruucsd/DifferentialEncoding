@@ -8,28 +8,39 @@ dbstop if error
 
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
-hu_hpl = [108 8; 108 4; 850 1; 425 2; 425 1];
-sigma  = [ 2 4; 4 8; 4 12; 6 8; 6 12];
+hu_hpl = [ 108 8; 108 4; 850 1; 425 2; 425 1];
+sigmas = [ 2 4; 2 6; 2 8; 2 12; 4 6; 4 8; 4 12; 6 8; 6 12; 8 12];
 nconn  = [ 6; 10; 15; 20; 40];
 
 stats = {'ipd','distns','images','ffts'};
 plts = {'ls-bars', stats{:}};
 
-trn = cell(length(hu_hpl),length(sigma),length(nconn));
-tst  = cell(size(trn));
+for hi=1:length(hu_hpl),
+  outfile = sprintf('h%dx%d.mat', hu_hpl(hi,:));
 
-% key stats
-interact = zeros(size(trn));
-rejs     = zeros([size(trn),2]);
-bars     = zeros([size(trn),2,2]);
-ipd_fc   = zeros(size(rejs));
-ipd_nn   = zeros(size(rejs));
+  % Cache results
+  if exist(outfile,'file'), continue; end;
+  
+  % Otherwise, save all results to disk
+  trn = cell(length(sigmas)*length(nconn),1);
+  tst  = cell(size(trn));
 
-for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
+  % key stats
+  interact = cell(size(trn));%zeros(size(trn));
+  rejs     = cell(size(trn));%zeros([size(trn),2]);
+  bars     = cell(size(trn));%zeros([size(trn),2,2]);
+  ipd_fc   = cell(size(trn));%zeros(size(rejs));
+  ipd_nn   = cell(size(trn));%zeros(size(rejs));
+
+  parfor sci=1:length(sigmas)*length(nconn)
+    si = 1+floor((sci-1)/length(nconn));
+    ci = sci-(si-1)*length(nconn);
+    %fprintf('%d %d %d\n', hi, si, ci); continue;
+    
     nparams = prod(hu_hpl(hi, :)) * nconn(ci);
 
     [args,opts]  = uber_sergent_args('nHidden', prod(hu_hpl(hi, :)), 'hpl', hu_hpl(hi,2), ...
-                                     'sigma', sigma(si, :), 'nConns', nconn(ci), ...
+                                     'sigma', sigmas(si, :), 'nConns', nconn(ci), ...
                                      'ac.EtaInit', 5E-2 * (425*2*12/nparams), ...
                                      'plots',plts,'stats',stats,'runs',25);
 
@@ -40,16 +51,16 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
     catch
         rej = [2 2];
     end
-
+    
+    
     % If not, skip; leave the data empty
     if any(rej==2)
-      warning('parameter combination fails: hu_hpl=[%d %d], sigma=[%f %f], nconn=%d', hu_hpl(hi,:), sigma(si,:), nconn(ci));
-      keyboard     
-      interact(hi,si,ci) = NaN;
-      rejs(hi,si,ci,:) = NaN;
-      bars(hi,si,ci,:,:) = NaN;
-      ipd_fc(hi,si,ci,:) = NaN;
-      ipd_nn(hi,si,ci,:) = NaN;
+      error(NaN, 'parameter combination fails: hu_hpl=[%d %d], sigma=[%f %f], nconn=%d', hu_hpl(hi,:), sigmas(si,:), nconn(ci));
+      interact{hi,sci} = NaN;
+      rejs{hi,sci} = NaN(1,2);
+      bars{hi,sci} = NaN(2,2);
+      ipd_fc{hi,sci} = NaN(1,2);
+      ipd_nn{hi,sci} = NaN(1,2);
 
     % If so, train all!
     else
@@ -71,20 +82,28 @@ for hi=1:length(hu_hpl), for si=1:length(sigma), for ci=1:length(nconn)
         trn25.stats.rej.ac.ffts   = []; tst25.stats.rej.ac.ffts   = [];
 
         % Save off the results
-        trn{hi,si,ci}  = trn25;
-        tst{hi,si,ci}  = tst25;
+        trn{hi,sci}  = trn25;
+        tst{hi,sci}  = tst25;
 
-        interact(hi,si,ci) = tst25.stats.rej.basics.anova.stats{4,end};
-        rejs(hi,si,ci,:)   = [nnz(sum(tst25.stats.raw.r{1},2)) nnz(sum(tst25.stats.raw.r{end},2))];    
-        bars(hi,si,ci,:,:) = [tst25.stats.rej.basics.ls_mean{1}(3:4) tst25.stats.rej.basics.ls_mean{end}(3:4)];
-        ipd_fc(hi,si,ci,:) = tst25.stats.rej.ac.ipd.from_center_mean;
-        ipd_nn(hi,si,ci,:) = tst25.stats.rej.ac.ipd.nearest_neighbor_mean;
+        interact{hi,sci} = tst25.stats.rej.basics.anova.stats{4,end};
+        rejs{hi,sci}     = [nnz(sum(tst25.stats.raw.r{1},2)) nnz(sum(tst25.stats.raw.r{end},2))];    
+        bars{hi,sci}     = [tst25.stats.rej.basics.ls_mean{1}(3:4) tst25.stats.rej.basics.ls_mean{end}(3:4)];
+        ipd_fc{hi,sci}   = tst25.stats.rej.ac.ipd.from_center_mean;
+        ipd_nn{hi,sci}   = tst25.stats.rej.ac.ipd.nearest_neighbor_mean;
+        
     end;
+    trn2 = []; tst2 = []; %parfor 'clear'
+    trn25 = []; tst25 = []; %parfor 'clear'
+  end;
 
-
-end; end; 
+  % Turn into data
+  interact = reshape(cell2mat(interact), [length(sigmas) length(nconn)]);
+  rej      = reshape(cell2mat(rej),      [size(interact) 2]);
+  bars     = reshape(cell2mat(bars),     [size(interact) 2 2]);
+  ipd_fc   = reshape(cell2mat(ipd_fc),   size(bars));
+  ipd_nn   = reshape(cell2mat(ipd_nn),   size(bars));
   
-  save(sprintf('h%dx%d.mat', hu_hpl(hi,:)));
+  save(outfile);
 end;
 
 save('all.mat');
