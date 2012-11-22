@@ -33,6 +33,7 @@ function outdir = de_GetOutPath(model, dirType)
             
             outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', hash);
 
+
     % Top-level output directory for trained models and analysis stats.
     %   sub-directories will be more specific
     case {'runs','stats'},
@@ -44,6 +45,7 @@ function outdir = de_GetOutPath(model, dirType)
         outdir = model.out.runspath;
       end;
 
+
     % Main output directory for analysis summaries and plots (i.e. human-readable!)
     case {'results', 'plot', 'summary', 'settings-map'}
       if (isempty(model))
@@ -53,6 +55,7 @@ function outdir = de_GetOutPath(model, dirType)
       else
         outdir = model.out.resultspath;
       end;
+
 
     % Directory containing all trained models.
     %   should contain ALL [overall] AND [ac] model settings.
@@ -69,6 +72,7 @@ function outdir = de_GetOutPath(model, dirType)
             % That was just the directory name; now prepend the base directory!
             outdir = fullfile(de_GetOutPath(model, 'runs'), hash); %saving under data directory
         end;
+
 
     case {'p'}
         origString = de_GetOutPath(model, 'ac_p_base');
@@ -107,7 +111,6 @@ function outdir = de_GetOutPath(model, dirType)
                          ];
 
           origString = [ origString ... % add on AC model settings
-                         sprintf('CT=%d', isfield(model.ac, 'ct')), ...
                          sprintf('NI=%d', model.ac.noise_input), ...
                          sprintf('WT=%s', model.ac.WeightInitType), ...
                          sprintf('WS=%f', model.ac.WeightInitScale), ...
@@ -125,6 +128,13 @@ function outdir = de_GetOutPath(model, dirType)
                          sprintf('LB=%d', model.ac.lambda), ...
                          sprintf('WL=[ %d %d ]', model.ac.wlim(1), model.ac.wlim(2)) ...
                         ];
+
+          % Pruning: the original model
+          if isfield(model.ac,'ct') % pruning study
+              origString = [origString ...
+                            sprintf('CT=%s', de_GetOutFile(model.ac.ct, 'conn') ...
+                           ];
+          end;
 
           if (isfield(model.ac, 'zscore'))
               origString = sprintf('%s,ZS=%f', origString, model.ac.zscore);
