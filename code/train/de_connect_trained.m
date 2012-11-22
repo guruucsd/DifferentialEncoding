@@ -23,8 +23,8 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     model.ac = rmfield(model.ac, 'ct');
 
     % Add any additional properties
+    model.nOutput       = prod(model.nOutput);
     model.ac.continue   = true;
-    keyboard
 
 
     %%%%%%%%%%%%%%%%%
