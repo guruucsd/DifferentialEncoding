@@ -6,9 +6,12 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
   
   if (~exist('errorType','var')), errorType=1; end;
 
-  if (iscell(models))
-    mSets = models{1}(1);
-    
+  if (~iscell(models))
+    mss = cell(size(models,2));
+    for si=1:length(mss), mss{si} = models(:,si); end;
+    models = mss;
+  end;
+   
     LS_permodel = cell(length(models),1);
     LS_mean     = cell(length(models),1);
     LS_stde     = cell(length(models),1);
@@ -16,18 +19,6 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
     for i=1:length(models)
       [LS_permodel{i}, LS_mean{i}, LS_stde{i}] = de_internalGetLS(models{i}, errorType);
     end;
-    
-  else
-    mSets = models(1);
-    
-    LS_permodel = cell(size(models,2),1);
-    LS_mean     = cell(size(models,2),1);
-    LS_stde     = cell(size(models,2),1);
-    LS_pval     = cell(size(models,2),1);
-    for i=1:size(models,2)
-      [LS_permodel{i}, LS_mean{i}, LS_stde{i}] = de_internalGetLS(models(:,i), errorType);
-    end;
-  end;
   
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  

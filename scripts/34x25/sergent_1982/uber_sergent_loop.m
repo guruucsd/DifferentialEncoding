@@ -15,7 +15,7 @@ nconn  = [ 20; 6; 10; 15; 20; 40];
 for hi=1:length(hu_hpl),
 
   % Look for cached results on disk
-  outfile = sprintf('h%dx%d.mat', hu_hpl(hi,:));
+  outfile = sprintf('uber-h%dx%d.mat', hu_hpl(hi,:));
   if exist(outfile,'file'), continue; end;
 
   % Build a local cache
@@ -44,5 +44,4 @@ for hi=1:length(hu_hpl),
   end;
 
   save(outfile,'trn','tst');
-  keyboard
 end;

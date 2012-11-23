@@ -10,13 +10,13 @@ dbstop if error
 
 hu_hpl = [ 108 8; 108 4; 850 1; 425 2; 425 1];
 sigmas = [ 2; 4; 6; 8; 12 ];
-nconn  = [ 10; 15; 20; 40];
+nconn  = [ 6; 10; 15; 20];
 cfact  = [ 1.5 2 5];
 
 for hi=1:length(hu_hpl)
 
   % Look for cached results on disk
-  outfile = sprintf('h%dx%d.mat', hu_hpl(hi,:));
+  outfile = sprintf('pruning-h%dx%d.mat', hu_hpl(hi,:));
   if exist(outfile,'file'), continue; end;
 
   % Build a local cache
@@ -24,26 +24,42 @@ for hi=1:length(hu_hpl)
   for si=1:length(sigmas), for ci=1:length(nconn), for fi=1:length(cfact)
 
     % Set up params
-    nparams = prod(hu_hpl(hi, :)) * nconn(ci);
-    [args,opts]  = uber_sergent_args('parallel', 'true', 'runs',25, ...
+    nparams = prod(hu_hpl(hi, :)) * nconn(ci) * cfact(fi)/2;
+    [args,opts]  = uber_sergent_args('parallel', true, 'out.caching', true, 'runs',25, ...
                                      'nHidden', prod(hu_hpl(hi, :)), 'hpl', hu_hpl(hi,2), ...
                                      'sigma', [1 1]*sigmas(si), 'nConns', nconn(ci), ...
                                      'ac.EtaInit', 5E-2 * (425*2*12/nparams), ...
                                      'plots',{},'stats', {'ipd','distns','ffts'});
     args         = pruning_args( args{:}, 'ac.ct.nConnPerHidden_Start', ceil(nconn(ci)*cfact(fi)) );
 
+    % Create a "mini"-cache
+    mSets = de_GetUberArgs('p', args{:});
+    miniFile = fullfile(de_GetOutPath(mSets, 'ac_p_base'), ...
+                        sprintf('pruning-h%dx%d-s%.1f-c%dx%.1f',hu_hpl(hi,:),sigmas(si),nconn(ci),cfact(fi)))
+    clear('mSets');
 
-    % Get the result
-    [trn{si,ci,fi},tst{si,ci,fi}] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
+    if exist(miniFile,'file')
+        load(miniFile, 'junk');
+        if ~isfield(junk,'trn'), fprintf('lasterr: %s\n', junk); keyboard; end;
 
+    else
+        % Get the result
+        try
+          [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
+          close all;
+          junk.trn.models = []; junk.tst.models = [];
+          save(miniFile, 'junk');
 
-    % Clean up
-    close all;
-    trn{ci,fi}.models = [];              tst{ci,fi}.models = [];
-    %trn{ci}.stats.rej.ac.images = []; tst{ci}.stats.rej.ac.images = [];
-    %trn{ci}.stats.rej.ac.ffts   = []; tst{ci}.stats.rej.ac.ffts   = [];
+        catch
+          warning(lasterr);
+          junk = lasterr;
+          save(miniFile, 'junk');
+        end;
+    end;
+
+    trn{si,ci,fi} = junk.trn; 
+    tst{si,ci,fi} = junk.tst;
   end; end; end;
 
   save(outfile,'trn','tst');
-  keyboard
 end;
