@@ -33,9 +33,9 @@ for hi=1:length(hu_hpl)
     args         = pruning_args( args{:}, 'ac.ct.nConnPerHidden_Start', ceil(nconn(ci)*cfact(fi)) );
 
     % Create a "mini"-cache
-    mSets = de_GetUberArgs('p', args{:});
-    miniFile = fullfile(de_GetOutPath(mSets, 'ac_p_base'), ...
-                        sprintf('pruning-h%dx%d-s%.1f-c%dx%.1f',hu_hpl(hi,:),sigmas(si),nconn(ci),cfact(fi)))
+    %mSets = de_GetUberArgs('p', 'uber/natimg', 'sergent_1982/de/sergent', opts, args);
+    miniFile = '__dummy__'; %fullfile(de_GetOutPath(mSets, 'ac_p_base'), ...
+                        %sprintf('pruning-h%dx%d-s%.1f-c%dx%.1f',hu_hpl(hi,:),sigmas(si),nconn(ci),cfact(fi)))
     clear('mSets');
 
     if exist(miniFile,'file')
@@ -48,17 +48,18 @@ for hi=1:length(hu_hpl)
           [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
           close all;
           junk.trn.models = []; junk.tst.models = [];
-          save(miniFile, 'junk');
+          %save(miniFile, 'junk');
 
         catch
           warning(lasterr);
           junk = lasterr;
-          save(miniFile, 'junk');
+          %save(miniFile, 'junk');
         end;
     end;
 
     trn{si,ci,fi} = junk.trn; 
     tst{si,ci,fi} = junk.tst;
+    clear('junk');
   end; end; end;
 
   save(outfile,'trn','tst');
