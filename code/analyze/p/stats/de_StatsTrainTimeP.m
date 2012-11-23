@@ -18,6 +18,7 @@ function [tt] = de_StatsTrainTime(models)
   tt = cell(length(models), 1);
   
   for s=1:length(models)
+      if isempty(models{s}), continue; end;
       p  = [models{s}.p];
       tt{s}  = [p.trainTime]';
   end;

@@ -22,13 +22,16 @@ function [mSets,models,stats] = de_Simulator(expt, stimSet, taskType, opt, varar
   [settings] = de_Defaults(expt, stimSet, taskType, opt, 'dataFile', dataFile, varargin{:});
   [mSets]    = de_CreateModelSettings(settings{:});
 
-  % Log the mapping between settings and integer to a text file,
-  %   so we can easily look for this mapping later
-  de_LogSettingsMap(mSets);
+  % Check if we even should be running
 
   %%%%%%%%%%%%%%%%%
   % Training
   %%%%%%%%%%%%%%%%%
+
+  % Log the mapping between settings and integer to a text file,
+  %   so we can easily look for this mapping later
+  de_LogSettingsMap(mSets);
+
 
   % Train autoencoders
   if (mSets.parallel),   [models]      = de_TrainAllAC_parallel (mSets);
@@ -51,11 +54,6 @@ function [mSets,models,stats] = de_Simulator(expt, stimSet, taskType, opt, varar
 
   % Analyze the results
   [stats, figs] = de_Analyzer(mSets, models);
-
-  try
-  diff(stats.rej.ac.ipd.nearest_neighbor_mean)/mean(stats.rej.ac.ipd.nearest_neighbor_mean)
-  catch
-  end;
 
   % Save these off
   [s,mSets]     = de_SaveAll(mSets, models, stats, figs);
