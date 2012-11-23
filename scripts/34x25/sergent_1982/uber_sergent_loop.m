@@ -8,9 +8,9 @@ dbstop if error
 
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
-hu_hpl = [ 108 8; 108 4; 850 1; 425 2; 425 1];
+hu_hpl = [ 108 8; 108 6; 850 1; 425 2; 425 1];
 sigmas = [ 2; 4; 6; 8; 12 ];
-nconn  = [ 6; 10; 15; 20; 40];
+nconn  = [ 20; 6; 10; 15; 20; 40];
 
 for hi=1:length(hu_hpl),
 
@@ -22,11 +22,15 @@ for hi=1:length(hu_hpl),
   trn = cell(size(nconn)); tst = cell(size(nconn));
   for ci=1:length(nconn)
     nparams = prod(hu_hpl(hi, :)) * nconn(ci);
-
-    [args,opts]  = uber_sergent_args('runs',25, ...
+    %if (nparams < 108*4*12),
+    %    fprintf('we know we can''t train with this low param value: h=%dx%d,c=%d; skipping!\n', hu_hpl(hi,:),nconn(ci));
+    %    continue;
+    %end;
+    [args,opts]  = uber_sergent_args('parallel', true, 'runs',25, ...
                                      'nHidden', prod(hu_hpl(hi, :)), 'hpl', hu_hpl(hi,2), ...
                                      'sigma', sigmas, 'nConns', nconn(ci), ...
-                                     'ac.EtaInit', 5E-2 * (425*2*12/nparams), ...
+                                     'ac.EtaInit', 4E-2 * (425*2*12/nparams), ...
+                                     'ac.Acc', 2E-5, ...
                                      'plots',{},'stats', {'ipd','distns','ffts'});
 
     % Get the result

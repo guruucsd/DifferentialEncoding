@@ -10,7 +10,7 @@ dbstop if error
 
 hu_hpl = [ 108 8; 108 4; 850 1; 425 2; 425 1];
 sigmas = [ 2; 4; 6; 8; 12 ];
-nconn  = [ 6; 10; 15; 20; 40];
+nconn  = [ 10; 15; 20; 40];
 cfact  = [ 1.5 2 5];
 
 for hi=1:length(hu_hpl)
@@ -25,7 +25,7 @@ for hi=1:length(hu_hpl)
 
     % Set up params
     nparams = prod(hu_hpl(hi, :)) * nconn(ci);
-    [args,opts]  = uber_sergent_args('runs',25, ...
+    [args,opts]  = uber_sergent_args('parallel', 'true', 'runs',25, ...
                                      'nHidden', prod(hu_hpl(hi, :)), 'hpl', hu_hpl(hi,2), ...
                                      'sigma', [1 1]*sigmas(si), 'nConns', nconn(ci), ...
                                      'ac.EtaInit', 5E-2 * (425*2*12/nparams), ...

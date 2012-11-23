@@ -10,24 +10,32 @@ function [ipd] = de_StatsInterpatchDistance(models)
 % Output:
 % ti : # of training iterations
 
-  % Only makes sense for 2D
-  if (length(models{1}(1).nInput)~=2)
-      warning('Inter-Patch distance only implemented for 2D models.');
-      ipd = [];
-  end;
-  
   % Normalize the structure that we get (this is not the best place to do this...)  
   if (isstruct(models))
     models = mat2cell(models, size(models,1), ones(size(models,2),1));
   end;
-  
-  
   
   ipd.nn_dists = cell(length(models), 1);
   ipd.fc_dists = cell(length(models), 1);
   
   for ss=1:length(models)
       ms = models{ss};
+
+      % Validate
+      if (length(ms)==0)
+          warning('No models to calc stats for');
+          continue;
+
+      % Only makes sense for 2D
+      elseif (length(ms(1).nInput)~=2)
+          warning('Inter-Patch distance only implemented for 2D models.');
+          ipd = [];
+          return
+      end;
+
+
+
+
       if (~isfield(ms(1), 'ac')...              % Load weights 
        || ~isfield(ms(1).ac, 'Conn') ...
        || isempty(ms(1).ac.Conn))
@@ -160,7 +168,10 @@ function [ipd] = de_StatsInterpatchDistance(models)
       ipd.top25.from_center_std (ss)       = std (horzcat(fc_dists_closest{:}));
   end;
 
-  if (length(models)==2)
+  if (~isfield(ipd,'nearest_neighbor_mean'))
+     ipd = [];
+
+  elseif (length(models)==2)
     fprintf('[Total  ]\t%5.2f%% diff to nearest neighbor;\t%5.2f%% diff from center\n', ...
             100*diff(ipd.nearest_neighbor_mean)      /mean(ipd.nearest_neighbor_mean), ...
             100*diff(ipd.from_center_mean)           /mean(ipd.from_center_mean));
