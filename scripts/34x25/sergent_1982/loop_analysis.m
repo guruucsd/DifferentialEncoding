@@ -19,8 +19,8 @@ tst = tst(idx);
 
 % Collect stats
 rejs        = nan(nc, ns);  % rejections
-ipd_spread  = nan(nc, ns);  % rejections
-ipd_nearest = nan(nc, ns);  % rejections
+ipd_spread  = nan(nc, ns);  % ipd
+ipd_nearest = nan(nc, ns);  % ipd
 bars        = nan(nc, ns, 2);
 pow1D       = nan(nc, ns, nf);
 
