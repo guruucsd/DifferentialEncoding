@@ -1,7 +1,7 @@
 clear all variables; clear all globals;
 
 stats = {'connectivity', 'images','ffts'};
-plts = {'ls-bars', stats{:}};
+plts = {stats{:}};
 
 [args,opts] = uber_face_args( 'plots',plts,'stats',stats,'runs',25 );
 
