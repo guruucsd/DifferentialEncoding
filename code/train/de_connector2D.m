@@ -43,7 +43,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
           if (rds ~= 0.0), warning('Ignoring non-zero rds=%4.1f', rds); end;
         case {'normr', 'normre'}
         case {'full','fulle'}, opts={'nofill'};
-                      
+        case {'ipd','ipd-local'}, ipd = rds;  
         otherwise, error('Unknown distribution: %s', distn_name);
     end;
     
@@ -68,7 +68,20 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
 
                 % Sample based on given distribution and parameters
                 switch (distn_name)
-
+                    case {'ipd', 'ipd-local'}
+                      Xa = round(sort([mupos(mi,2):-ipd:1 mupos(mi,2):ipd:sI(2)]));
+                      Ya = round(sort([mupos(mi,1):-ipd:1 mupos(mi,1):ipd:sI(1)]));
+                      
+                      theta = 2*pi*rand; %really just need pi (half circle is enough; distn's are symmetric), but ...
+                      rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
+                        
+                      mn    = mupos(mi,:);
+                      cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
+                      pdn   = zeros(sI);
+                      pdn(Ya,Xa) = 1;
+                      pdn   = pdn .* reshape(mvnpdf(X, mn, cv),sI(end:-1:1))';     %transform linear array to 2D
+                      pdn   = reshape(transpose(pdn),[numel(pdn) 1])./sum(pdn(:)); %transform back into expected linear array
+                      
                     case {'gam','gamma'}
                        r = gamrnd(k,theta,numCon,1); %shape, x.  As shape goes high and x goes low, interpatch distance decreases (less spread in points)
                        d = 2*pi*rand(size(r));
@@ -229,8 +242,8 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         nCalls = sum(strcmp(x(1).name, {x.name}));
         if (nCalls >= 200)
             error('Failed to connect network to ALL inputs/outputs after %d calls; quitting...', nCalls);
-        else
-            clear('halfCon', 'Con');
+%        else
+%            clear('halfCon', 'Con');
         end;
         
         if (dbg), fprintf('.'); end;
