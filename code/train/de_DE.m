@@ -18,8 +18,10 @@ function [model] = de_DE(model)
   % Create and train the autoencoder
   %--------------------------------%
 
-  if (~model.ac.cached)
+  if (model.ac.cached)
+    fprintf('| (cached)');
 
+  else
     % Set up input/output pairs
     X = model.data.train.X;
     Y = model.data.train.X(1:end-1,:);
@@ -47,8 +49,6 @@ function [model] = de_DE(model)
     % Make sure the autoencoder's connectivity is set.
     model = de_LoadProps(model, 'ac', 'Weights');
     model.ac.Conn = (model.ac.Weights~=0);
-
-    fprintf('| (cached)');
 
     [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
     [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
