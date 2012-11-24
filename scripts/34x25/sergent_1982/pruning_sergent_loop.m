@@ -8,10 +8,10 @@ dbstop if error
 
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
-hu_hpl = [ 108 8; 108 4; 850 1; 425 2; 425 1];
-sigmas = [ 2; 4; 6; 8; 12 ];
-nconn  = [ 6; 10; 15; 20];
-cfact  = [ 1.5 2 5];
+hu_hpl = [ 850 1; 425 2; 108 8; 108 4; 425 1];
+sigmas = [ 15; 12; 8; 4 ];
+nconn  = [ 6; 12; 20];
+cfact  = [ 1.25 2 4];
 
 for hi=1:length(hu_hpl)
 
@@ -32,11 +32,7 @@ for hi=1:length(hu_hpl)
                                      'plots',{},'stats', {'ipd','distns','ffts'});
     args         = pruning_args( args{:}, 'ac.ct.nConnPerHidden_Start', ceil(nconn(ci)*cfact(fi)) );
 
-    % Create a "mini"-cache
-    %mSets = de_GetUberArgs('p', 'uber/natimg', 'sergent_1982/de/sergent', opts, args);
-    miniFile = '__dummy__'; %fullfile(de_GetOutPath(mSets, 'ac_p_base'), ...
-                        %sprintf('pruning-h%dx%d-s%.1f-c%dx%.1f',hu_hpl(hi,:),sigmas(si),nconn(ci),cfact(fi)))
-    clear('mSets');
+    miniFile = fullfile(sprintf('pruning-h%dx%d-s%.1f-c%dto%d',hu_hpl(hi,:),sigmas(si),ceil(nconn(ci)*cfact(fi)),nconn(ci)));
 
     if exist(miniFile,'file')
         load(miniFile, 'junk');
@@ -48,12 +44,12 @@ for hi=1:length(hu_hpl)
           [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
           close all;
           junk.trn.models = []; junk.tst.models = [];
-          %save(miniFile, 'junk');
+          save(miniFile, 'junk');
 
         catch
           warning(lasterr);
           junk = lasterr;
-          %save(miniFile, 'junk');
+          save(miniFile, 'junk');
         end;
     end;
 
