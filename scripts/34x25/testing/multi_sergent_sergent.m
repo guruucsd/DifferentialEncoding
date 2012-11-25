@@ -1,4 +1,6 @@
-% Sergent stims, task, and target set, using cross-entropy error
+% Test how adding multiple output units with the same value
+%   affects training on the output
+addpath('../sergent_1982');
 clear all variables;
 
 stats = {};%{'images','ffts'};

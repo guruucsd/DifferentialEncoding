@@ -3,6 +3,7 @@
 % and results are saved into
 % 850x1.mat
 %
+addpath('../sergent_1982');
 clear all variables; clear all globals;
 dbstop if error
 
@@ -16,7 +17,7 @@ cfact  = [ 1.25 2 4];
 for hi=1:length(hu_hpl)
 
   % Look for cached results on disk
-  outfile = sprintf('pruning-h%dx%d.mat', hu_hpl(hi,:));
+  outfile = fullfile('mat',sprintf('sergent-pruning-h%dx%d.mat', hu_hpl(hi,:)));
   if exist(outfile,'file'), continue; end;
 
   % Build a local cache
@@ -32,7 +33,7 @@ for hi=1:length(hu_hpl)
                                      'plots',{},'stats', {'ipd','distns','ffts'});
     args         = pruning_args( args{:}, 'ac.ct.nConnPerHidden_Start', ceil(nconn(ci)*cfact(fi)) );
 
-    miniFile = fullfile('mat', sprintf('pruning-h%dx%d-s%.1f-c%dto%d.mat',hu_hpl(hi,:),sigmas(si),ceil(nconn(ci)*cfact(fi)),nconn(ci)));
+    miniFile = fullfile('mat', sprintf('sergent-pruning-h%dx%d-s%.1f-c%dto%d.mat',hu_hpl(hi,:),sigmas(si),ceil(nconn(ci)*cfact(fi)),nconn(ci)));
 
     if exist(miniFile,'file')
         load(miniFile, 'junk');
