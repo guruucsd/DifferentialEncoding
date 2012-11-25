@@ -10,17 +10,8 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
     % Collect options & settings for all studies
     %%%%%%%%%%%%%%%%%%%%
 
-	sz         = 'large';
-	if (guru_hasopt(opt, 'small')),  sz = 'small'; end;
-	if (guru_hasopt(opt, 'medium')), sz = 'medium'; end;
 
-	mSets.ac.minmax  = guru_getopt(opt, 'minmax', []);
-%	mSets.ac.absmean = guru_getopt(opt, 'absmean', 1.26E-2);
-	mSets.ac.debug   = [];
-	mSets.ac.zscore = true;
-
-	all_opt = {sz};
-
+    
     %%%%%%%%%%%%%%%%%%%%
     % Collect input images for all studies
     %%%%%%%%%%%%%%%%%%%%
@@ -32,13 +23,10 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
     %% Christman
     % Get options for christman study
-    c_opts = all_opt;%{'thetas', guru_getopt(opt, 'c_thetas', pi/2), all_opt{:}};
+    c_opts = {};%{'thetas', guru_getopt(opt, 'c_thetas', pi/2), all_opt{:}};
     c_opts(end+[1:2]) = { 'cycles' guru_getopt(opt, 'c_cycles', [3 5 8 12 16]) };
 
-%    if (guru_hasopt(opt, 'c_freqs')), c_opts(end+[1:2]) = { 'freqs'  guru_getopt(opt, 'c_freqs') };
-%    else,                             c_opts(end+[1:2]) = { 'cycles' guru_getopt(opt, 'c_cycles', 2*2.^[0:4])  };
-%    end;
-
+    fprintf('Making christman dataset with options=%s\n', guru_cell2str(c_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -47,10 +35,10 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
     %% Kitterle
     % Specify options EXPLICTLY
-    k_opts = all_opt;
+    k_opts = {};
     k_opts(end+[1:2]) = { 'cycles' guru_getopt(opt, 'k_cycles', [5 12]) };
 
-    % Create dataset
+    fprintf('Making kitterle dataset with options=%s\n',  guru_cell2str(k_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -58,8 +46,9 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
 
     %% Sergent
-    s_opts =  all_opt;
+    s_opts =  {};
 
+    fprintf('Making sergent dataset with options=%s\n',  guru_cell2str(s_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -67,8 +56,9 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
 
     %% SF
-    sf_opts =  all_opt;
+    sf_opts =  {};
 
+    fprintf('Making sf dataset with options=%s\n',  guru_cell2str(sf_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -76,8 +66,9 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
 
     %% Young: grab all the face files at once (there are a bunch!); smallest size possible!
-    y_opts =  all_opt;
+    y_opts =  {};
 
+    fprintf('Making young_bion dataset with options=%s\n',  guru_cell2str(y_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -85,8 +76,10 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
 
     %% Van Hateren
-    v_opts =  all_opt;
+    v_opts =  {};
+    v_opts(end+[1:2]) = { 'nimg', guru_getopt(opt, 'nimg',100) };
 
+    fprintf('Making vanhateren dataset with options=%s\n',  guru_cell2str(v_opts));
     [datafiles{end+1}, ...
      trains{end+1}, ...
      tests{end+1}, ...
@@ -150,6 +143,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
         otherwise, error('Unknown stim set: %s', stimSet);
     end;
 
+    
     %%%%%%%%%%%%%%%%%%%%
     % Now, make an autoencoding dataset out of it
     %%%%%%%%%%%%%%%%%%%%
@@ -166,6 +160,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
         nTestImages(ii)  = size(tests{ii}.X,2);
     end;
 
+    
     % Simple, expensive, hacky way to
     %   normalize the total # of input images
     %
@@ -186,7 +181,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
     lastTrainImage = 0;
     lastTestImage  = 0;
     for ii=1:length(trains)
-		trains{ii} = de_NormalizeDataset( trains{ii}, mSets );
+		%trains{ii} = de_NormalizeDataset( trains{ii}, mSets );
 
         for jj=1:trainMult(ii)
             train.X(:,lastTrainImage+[1:size(trains{ii}.X,2)]) = trains{ii}.X;
@@ -194,7 +189,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
             lastTrainImage = lastTrainImage + size(trains{ii}.X,2);
         end;
 
-		tests{ii} = de_NormalizeDataset( tests{ii}, mSets );
+		%tests{ii} = de_NormalizeDataset( tests{ii}, mSets );
 
         for j=1:testMult(ii)
             test.X (:,lastTestImage +[1:size(tests{ii}.X, 2)]) = tests{ii}.X;
@@ -202,11 +197,10 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
             lastTestImage  = lastTestImage  + size(tests{ii}.X,2);
         end;
     end;
+    
 
     %%%%%%%%%%%%%%%%%%%%
     % Now, prep for return
     %%%%%%%%%%%%%%%%%%%%
 
-%    aux.c_freqs   = c_freqs;
-%    aux.k_freqs   = k_freqs;
     aux.datafiles = datafiles;
