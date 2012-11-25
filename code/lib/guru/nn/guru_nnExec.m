@@ -39,7 +39,6 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   else
     if isfield(model, 'debug') && ismember(10,model.debug)
       fprintf('Running %d re-entrant loops of model\n', model.ts);
-      keyboard
     end;
 
     o = X(1:nIn,:);
