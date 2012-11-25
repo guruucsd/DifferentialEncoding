@@ -36,10 +36,11 @@ for hi=1:length(hu_hpl)
 
     if exist(miniFile,'file')
         load(miniFile, 'junk');
-        if ~isfield(junk,'trn'), fprintf('lasterr: %s\n', junk); keyboard; end;
+        if ~isfield(junk,'trn'), fprintf('lasterr: %s\n', junk); keyboard;
+        else, fprintf('Loaded cached file %s\n', miniFile); end;
 
     else
-       % try
+        try
           % Try a mini version, so that we don't spend too much time failing
           % to do stuff
           [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, {args{:}, 'runs', 2, 'plots',{},'stats',{}});
@@ -55,11 +56,11 @@ for hi=1:length(hu_hpl)
           junk.trn.models = []; junk.tst.models = [];
           save(miniFile, 'junk');
 
-        %catch
+        catch
           warning(lasterr);
           junk = lasterr;
           save(miniFile, 'junk');
-        %end;
+        end;
     end;
 
     trn{si,ci,fi} = junk.trn; 
