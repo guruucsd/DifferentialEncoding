@@ -1,4 +1,5 @@
-% Sergent stims, task, and target set, using cross-entropy error
+% Try training a deep autoencoder, with each layer representing an image
+addpath('../sergent_1982');
 clear all variables;
 
 stats = {'ipd'};%{'images','ffts'};

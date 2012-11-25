@@ -1,3 +1,6 @@
+% Testing a new distribution, that only positions hidden units onto a grid
+%   See if this still shows the frequency processing asymmetry
+addpath('../sergent_1982');
 clear all variables; clear all globals;
 
 stats = {'ipd', 'connectivity', 'images', 'ffts', 'distns'};
