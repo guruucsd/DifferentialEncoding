@@ -41,14 +41,14 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
       fprintf('Running %d re-entrant loops of model\n', model.ts);
     end;
 
-    o = X(1:nIn,:);
+    oy = X(1:nIn,:);
     for tsi=1:model.ts
       %if model.useBias
-        [err,~,oz]=emo_backprop([o;X(end,:)], Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+        [err,~,o]=emo_backprop([oy;X(end,:)], Y, model.Weights, model.Conn, model.XferFn, model.errorType );
       %else
       %  [err,grad,oz]=emo_backprop(o, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
       %end
-      o = oz(nIn+1+nHid+[1:nOut],:);
+      oy = o(nIn+1+nHid+[1:nOut],:);
     end;
   end;
 
