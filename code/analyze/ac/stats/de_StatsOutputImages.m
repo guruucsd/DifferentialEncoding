@@ -23,13 +23,18 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
     images{mi} = zeros([length(models), models(1).nInput, nImages]);
 
     for ii=1:length(models)
-      if (isfield(models(ii).ac, 'Weights'))
-          model = models(ii);
-      else
-          model = de_LoadProps(models(ii), 'ac', 'Weights');
+      m = models(ii);
+      if ~isfield(m.ac,'output')
+        try
+           error('Can''t cache this property without taking into account the dataset, whcih we currently don''t do!');
+           m = de_LoadProps(m,ac,'output');
+        catch
+          if (~isfield(m.ac, 'Weights'))
+              m = de_LoadProps(m, 'ac', 'Weights');
+          end;
+          [m.ac.output]   = guru_nnExec(m.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
+        end;
+        images{mi}(ii,:,:,:)  = reshape(m.ac.output, [dset.nInput nImages]);
       end;
-
-      [o]   = guru_nnExec(model.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
-      images{mi}(ii,:,:,:)  = reshape(o, [dset.nInput nImages]);
     end;
   end;

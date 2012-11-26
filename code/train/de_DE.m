@@ -46,12 +46,20 @@ function [model] = de_DE(model)
   % Even if it's cached, we need the output characteristics
   %   of the model.
   if (~isfield(model.ac,'hu'))
-    % Make sure the autoencoder's connectivity is set.
-    model = de_LoadProps(model, 'ac', 'Weights');
-    model.ac.Conn = (model.ac.Weights~=0);
+    
+    try
+      error('Can''t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
+      model = de_LoadProps(model, 'ac',{'hu','output'});
+      %if size(  
+    catch
+      if ismember(10, model.debug), fprintf('failed to find hu output on disk; computing now.'); end;
+      % Make sure the autoencoder's connectivity is set.
+      model = de_LoadProps(model, 'ac', 'Weights');
+      model.ac.Conn = (model.ac.Weights~=0);
 
-    [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
-    [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
+      [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
+      [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
+    end;
   end;
 
 
