@@ -23,7 +23,17 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   figs = [ figs de_DoPlot('distns',        'de_PlotDistributions',mSets, mSets, stats.rej.ac.distns) ];
 
   % Plot the original images
-  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, mSets.data.(ds).X(1:end-1,selectedImages_),  mSets.data.(ds).XLAB(selectedImages_)) ];
+
+      orig_img = mSets.data.(ds).X(1:end-1,selectedImages_);
+      if guru_hasopt(mSets.data.test.opt, 'img2pol')
+          for ii=1:size(orig_img,2)
+            rtimg = reshape(orig_img(:,ii),mSets.data.(ds).nInput);
+            xyimg = guru_pol2img(rtimg);
+            orig_img(:,ii) = xyimg(:);
+          end;
+      end;
+      
+  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, orig_img,  mSets.data.(ds).XLAB(selectedImages_)) ];
 
   %----------------
   % Loop over sigmas and trials
@@ -31,8 +41,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   %----------------
   for ss=1:length(mSets.sigma)
     ms = mss{ss};
-
-    % Plot the
+% Plot the
     if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages_)) ];
     elseif ismember('images',mSets.plots), warning('Must get images in stats to run plots.'); end;
 
