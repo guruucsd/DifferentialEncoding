@@ -29,11 +29,29 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
 
   if (~isfield(stats, 'ffts')), stats.ffts = []; end;
   if (isfield(mSets.data, 'test')),
-      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       mSets.data.test.X(1:end-1,:),  mSets.data.test.nInput);
+      orig_img = mSets.data.test.X(1:end-1,:);
+      if guru_hasopt(mSets.data.test.opt, 'img2pol')
+          for ii=1:size(orig_img,2)
+            rtimg = reshape(orig_img(:,ii),mSets.data.test.nInput);
+            xyimg = guru_pol2img(rtimg);
+            orig_img(:,ii) = xyimg(:);
+          end;
+      end;
+      
+      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       orig_img,  mSets.data.test.nInput);
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'model', stc, 'de_StatsFFTs',       stats.images.test,             mSets.data.test.nInput);
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
   else,
-      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       mSets.data.train.X(1:end-1,:), mSets.data.train.nInput);
+      orig_img = mSets.data.train.X(1:end-1,:);
+      
+      if guru_hasopt(mSets.data.test.opt, 'img2pol')
+          for ii=1:size(orig_img,2)
+            rtimg = reshape(orig_img(:,ii),mSets.data.train.nInput);
+            xyimg = guru_pol2img(rtimg);
+            orig_img(:,ii) = xyimg(:);
+          end;
+      end;
+      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       orig_img, mSets.data.train.nInput);
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'model', stc, 'de_StatsFFTs',       stats.images.train,            mSets.data.test.nInput);
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
   end;
