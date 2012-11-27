@@ -1,4 +1,4 @@
-function loop_collect_data(trn, tst)
+function filout = loop_collect_data(trn, tst)
 
 if ~exist('de_PlotFFTs','file')
     if ~exist('uber_sergent_args','file'), addpath('../sergent_1982'); end;
@@ -82,3 +82,5 @@ for ci=1:nc
 end;
 
     
+filout = [tempfile() '.mat'];
+save(filout);
