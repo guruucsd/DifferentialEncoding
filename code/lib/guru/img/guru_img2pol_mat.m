@@ -1,4 +1,4 @@
-function rtcoeff = guru_img2polmat(imgsz)
+function rtcoeff = guru_img2pol_mat(imgsz)
 %
 % rt = A * xy;
 % where xy and rt are [npix 1] sized vectors
@@ -17,31 +17,36 @@ midpt = imgsz/2;
 [X,Y] = meshgrid(1:imgsz(2), 1:imgsz(1));
 [TH,R] = cart2pol((X - midpt(2) - .5)/2,(Y - midpt(1) - .5)/2);
 
-ts = linspace(min(TH(:)),max(TH(:)),imgsz(1)); nt=length(ts);
-rs = linspace(min(R(:)), max(R(:)), imgsz(2)); nr=length(rs);
-
+tsb = linspace(min(TH(:)),max(TH(:)),imgsz(1)); tsb=[tsb-diff(tsb(1:2))/2 tsb(end)+diff(tsb(1:2))]; nt=length(tsb)-1;
+rsb = linspace(min(R(:)), max(R(:)), imgsz(2)); rsb=[rsb-diff(rsb(1:2))/2 rsb(end)+diff(rsb(1:2))]; nr=length(rsb)-1;
 
  % get all relevant points in this 'bin', then linearly interpolate end; end;
 imgidx = cell(nt,nr);
-prev_ts = ts(1)-1/(2*npix);
 for ti=1:nt
-    prev_rs = rs(1)-1/(2*npix);
     for ri=1:nr
-        curidx = find(prev_rs<R & R<=rs(ri) & prev_ts<TH & TH<=ts(ti))';
+        curidx = find(rsb(ri)<R & R<=rsb(ri+1) & tsb(ti)<TH & TH<=tsb(ti+1))';
         imgidx{ti,ri} = curidx;
-        prev_rs = rs(ri);
     end;
-    prev_ts = ts(ti);
 end;
 if length([imgidx{:}]) ~= npix, error('failed to find some pixels'); end;
 
 % Map values directly
-rtcoeff = zeros(npix,npix);
+rtcoeff = spalloc(npix,npix,round(npix*npix)*0.01);
 for ti=1:nt
     for ri=1:nr
-        if ~isempty(imgidx{ti,ri})
-            rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}) = 1/length(imgidx{ti,ri});
-        end;
+        
+        %tsb(ti+1)-tsb(ti)
+        error_vector  = sqrt( (R(imgidx{ti,ri})-rsb(ri+1)).^2 + (TH(imgidx{ti,ri})-tsb(ti+1)).^2 );
+        maxerr_vector = sqrt( (rsb(ri+1)-rsb(ri)).^2        + (tsb(ti+1)-tsb(ti)).^2 );
+        qt            = error_vector./maxerr_vector;
+        coeff         = 1.01 - qt./sum(qt);
+        coeff2        = coeff./sum(coeff);
+        if any(isnan(coeff2)), keyboard;
+        elseif sum(coeff2) ==0, coeff2=inf; end;
+%        elseif sum(coeff2) ~= 1, keyboard; end;
+ %       rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}) = coeff2;%1/length(imgidx{ti,ri});
+        rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}) = 1/length(imgidx{ti,ri});
+%            if any(isnan( rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}))), keyboard; end;
     end;
 end;
 
@@ -74,8 +79,16 @@ while ~isempty(allpix)
     surrounded = find(pct_neighbors_on==max(pct_neighbors_on));
     for si=1:length(surrounded)
         cpix = allpix(surrounded(si));
+        [ti,ri] = ind2sub(imgsz, cpix);
         cnb  = neighbors{cpix}(touched(neighbors{cpix}));
-        rtcoeff(cpix, :) = mean(rtcoeff(cnb,:),1); % weighted coefficients of previous dude's pixels
+        
+        error_vector  = sqrt( (R(cnb)-rsb(ri)).^2    + (TH(cnb)-tsb(ti)).^2 );
+        maxerr_vector = sqrt( (rsb(ri+1)-rsb(ri)).^2 + (tsb(ti+1)-tsb(ti)).^2 );
+        coeff = exp(1*error_vector./maxerr_vector);
+        norm_coeff = coeff/sum(coeff);
+        
+        rtcoeff(cpix, :) = norm_coeff * rtcoeff(cnb,:);%mean(rtcoeff(cnb,:),1); % weighted coefficients of previous dude's pixels
+        %rtcoeff(cpix, :) = mean(rtcoeff(cnb,:),1); % weighted coefficients of previous dude's pixels
         touched(cpix) = true;
     end;
     
