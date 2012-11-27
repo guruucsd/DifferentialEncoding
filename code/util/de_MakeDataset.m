@@ -108,11 +108,39 @@ function dset = de_StimApplyTransform(dset, opts)
         npix = prod(dset.nInput);
         for ii=1:size(dset.X,2)
             xyimg = reshape(dset.X(1:npix,ii),dset.nInput);
-            rtimg = guru_img2pol(xyimg);
+            rtimg = mfe_img2pol(xyimg);
             dset.X(1:npix,ii) = rtimg(:);
         end;
     end;
 
+    if guru_hasopt(opts, 'contrast')
+      clevel = guru_getopt(opts, 'contrast', []);
+      keyboard
+      
+      % But we want the target data to be the original image!
+      dset.Y = dset.X;
+      
+      % First apply the image change
+      % Taken from http://maksim.sorokin.dk/it/2010/11/08/brightness-and-contrast-in-matlab/
+      error('not implemented well; redo!');
+      for ii=1:size(dset.X,2)
+          img = reshape(dset.X(:,ii), dset.nInput);
+          img_range = [min(img(:)) max(img(:))];
+          sigmoid   = @(x) 1./(1+exp(-x));
+          switch clevel
+            case 'low', 
+                mir = mean(img_range);
+                img = imadjust(img, img_range, [img_range(1)+mir/2 img_range(2)-mir/2]
+            case 'high'
+                simg = sigmoid(img); 
+                img = imadjust(simg, [min(simg(:)) max(simg(:))], [0 1]);
+            otherwise, error('Unknown contrast level: %s', clevel);
+          end;
+          dset.X(:,ii) = img(:);
+      end;      
+      
+    end;
+    
     
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
