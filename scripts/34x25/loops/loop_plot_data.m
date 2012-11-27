@@ -1,9 +1,11 @@
-function loop_plot_data(data, plt, dbg)
+function loop_plot_data(fn, plt, dbg)
 
+if ~exist('fn', 'file'), error('could not find filename %s', fn); end;
 if ~exist('plt','var'), plt = {'all'}; end;
+if ~ismember(1,dbg), dbg = []; end;
 
+load(fn);
 
-         
 %%========================
 % Analyze behavioral 'interaction' between 'hemispheres'
 %=========================
@@ -221,7 +223,7 @@ for ii=1:2
                         end;
 
 
-                        if exist('dbg','var')
+                        if ismember(1, dbg)
                             clf(gcf); hold on;
                             plot(freqs1D, pddiff);
                             plot(freqs1D(ridx(goodidx)), pddiff(ridx(goodidx)), 'r*');
@@ -263,7 +265,7 @@ for ii=1:2
 
     
     % Plot all that didn't have real crossing points, see if they look reasonable.
-    if ismember('mystery_nan',plt) || (exist('dbg','var') && ismember('all',plt))
+    if ismember('mystery_nan',plt) || (ismember(1,dbg) && ismember('all',plt))
         failed_idx = find(abs(xover_freq)==freqs1D(end), 20);
         mystery_nan = failed_idx;%failed_idx(pddiff_all(1,failed_idx)>0 & ~all(pddiff_all(:,failed_idx)>0));
         
@@ -280,7 +282,7 @@ for ii=1:2
 
 
     % Plot all that had unusual crossing points, see if they look reasonable
-    if ismember('mystery_ge13',plt) || (exist('dbg','var') && ismember('all',plt))
+    if ismember('mystery_ge13',plt) || (ismember(1,dbg) && ismember('all',plt))
         mystery_ge13 = find(abs(xover_freq)>=13 & abs(xover_freq)<freqs1D(end), 20);
 
         de_NewFig('mystery_ge13');
@@ -299,7 +301,7 @@ for ii=1:2
     end;
 
     
-    if ismember('mystery_opposite',plt) || (exist('dbg','var') && ismember('all',plt))
+    if ismember('mystery_opposite',plt) || (ismember(1,dbg) && ismember('all',plt))
         mystery_opposite = find(ipdd_nearest>0 & xover_freq<0,20);
         
         de_NewFig('mystery_opposite');
@@ -403,7 +405,7 @@ end;
 
 
 
-if exist('dbg','var')
+if ismember(1,dbg)
   keyboard;
 end;
 
