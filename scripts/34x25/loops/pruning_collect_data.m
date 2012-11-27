@@ -9,7 +9,31 @@ function pruning_analysis(trn, tst, plt, dbg)
 % 2. use full data to do pruning analysis
 %
 
-if (~exist('plt','var')), plt = {'all'}; end;
+if ~exist('plt','var'), plt = {'all'}; end;
+if ~exist('de_PlotFFTs','file')
+    if ~exist('uber_sergent_args','file'), addpath('../sergent_1982'); end;
+    uber_sergent_args();
+end;
+
+trn   = reshape([trn{:}], size(trn));
+tst   = reshape([tst{:}], size(tst));
+mSets = reshape([trn.mSets], size(trn));
+sigmas = [mSets.sigma]; sigmas = reshape(sigmas(1:2:end), size(trn));
+nconn = reshape([mSets.nConns], size(tst));
+
+sigmas = unique(sigmas); ns=length(sigmas);
+nconn  = unique(nconn);  nc=length(nconn);
+trn2 = cell(ns,nc); tst2 = cell(ns,nc);
+for mi=1:numel(trn)
+    si = find(sigmas == mSets(mi).sigma(1));
+    ci = find(nconn  == mSets(mi).nConns);
+    trn2{si,ci} = [trn2{si,ci} trn(mi)];
+    tst2{si,ci} = [tst2{si,ci} tst(mi)];
+end;
+
+loop_analysis(trn2,tst2)
+
+% sigmas are the same on axis 1, nconn on axis 2
 
 keyboard
 
