@@ -88,6 +88,8 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 %   (so that they use the same information)
 %
 
+    dset = de_StimApplyTransform(dset, opts);
+    
     dset = de_StimApplyResizing(dset, opts);
 
     dset = de_StimApplyFiltering(dset, opts);
@@ -99,6 +101,19 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
     end;
     
 
+function dset = de_StimApplyTransform(dset, opts)
+
+    % Convert all images into polar coordinates, like Plaut & Behrmann 2011
+    if guru_hasopt(opts, 'img2pol')
+        npix = prod(dset.nInput);
+        for ii=1:size(dset.X,2)
+            xyimg = reshape(dset.X(1:npix,ii),dset.nInput);
+            rtimg = guru_img2pol(xyimg);
+            dset.X(1:npix,ii) = rtimg(:);
+        end;
+    end;
+
+    
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
 

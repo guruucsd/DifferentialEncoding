@@ -16,14 +16,16 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
   nImages = length(selectedImages); % # images we got
 
   images = cell(size(mss));
-  for mi=1:length(mss)
-    models = mss{mi};
+  for si=1:length(mss)
+    models = mss{si};
     if isempty(models), continue; end;
 
-    images{mi} = zeros([length(models), models(1).nInput, nImages]);
+    images{si} = zeros([length(models), models(1).nInput, nImages]);
 
-    for ii=1:length(models)
-      m = models(ii);
+
+    for mi=1:length(models)
+      m = models(mi);
+
       if ~isfield(m.ac,'output')
         try
            error('Can''t cache this property without taking into account the dataset, whcih we currently don''t do!');
@@ -34,7 +36,16 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
           end;
           [m.ac.output]   = guru_nnExec(m.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
         end;
-        images{mi}(ii,:,:,:)  = reshape(m.ac.output, [dset.nInput nImages]);
+      end;
+      images{si}(mi,:,:,:)  = reshape(m.ac.output, [dset.nInput nImages]);
+
+      if guru_hasopt(dset.opt, 'img2pol')
+        for ii=1:nImages
+            rtimg = squeeze(images{si}(mi,:,:,ii));
+            xyimg = guru_pol2img(rtimg);
+            images{si}(mi,:,:,ii) = xyimg;
+        end;
       end;
     end;
   end;
+

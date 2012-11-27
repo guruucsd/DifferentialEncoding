@@ -1,7 +1,10 @@
 function [stats_fft] = de_StatsFFTs(images, nInput)
 
-    if (~iscell(images)), images = {images}; end; % next two "massages" allow original image set
-	switch length(size(images{1}))
+    % next two "massages" allow original image set
+
+    if (~iscell(images)), images = {images}; end; 
+    
+	switch ndims(images{1})
 		case 2          %     and reconstructed image sets to be processed by the same code
 			for ii=1:length(images)
 				images{ii} = reshape(images{ii}, [1 nInput, size(images{ii}, length(size(images{ii})))]);
