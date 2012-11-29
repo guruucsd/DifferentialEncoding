@@ -81,6 +81,12 @@ for ci=1:nc
     end;
 end;
 
-    
-filout = [tempfile() '.mat'];
+
+% Clean up workspace
+clear('mSets','trn','tst');
+clear('ci','ci2','si','si2');
+keyboard
+
+% Now save off the workspace
+filout = [tempname() '.mat'];
 save(filout);
