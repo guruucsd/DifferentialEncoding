@@ -1,6 +1,6 @@
 function loop_plot_data(fn, plt, dbg)
 
-if ~exist('fn', 'file'), error('could not find filename %s', fn); end;
+if ~exist(fn,  'file'), error('could not find filename %s', fn); end;
 if ~exist('plt','var'), plt = {'all'}; end;
 if ~ismember(1,dbg), dbg = []; end;
 
@@ -11,12 +11,14 @@ load(fn);
 %=========================
 
 % Sergent task
-if isfield(tst(1).stats.rej.basics,'bars')
-    bars = permute(reshape(cell2mat(perf)', [2 size(perf)]), [3 2 1]);
+if length(perf{1})==2
+    bars = permute(reshape(cell2mat(perf)', [2 size(perf)]), [2 3 1]);
     bars_diff = diff(bars,[],3);
     
-else
+elseif length(perf{1})==1
     bars_diff = cell2mat(perf);
+else
+    error('unknown perf data');
 end;
 
 % Image representing interaction
@@ -139,7 +141,7 @@ if ismember('nearest_diff_img',plt) || ismember('all',plt)
             if (ci==nc),xlabel(sprintf('sig=%.1f',sigmas(si))); end;
         end;
     end;
-    mfe_suptitle('Difference in density†(nearest neighbor distance)');
+    mfe_suptitle('Difference in density (nearest neighbor distance)');
 end;
 
 
@@ -163,13 +165,14 @@ for ii=1:2
 
     for ci=1:nc
         for si=1:ns
-
+            
             for ci2=1:nc
                 for si2=1:ns
 
                     % Modeling the fft crossing point
                     pddiff = reshape(pdiff(ci,si,:) - pdiff(ci2,si2,:),[1 nf]);
                     pddiff_all(:,ci,si,ci2,si2) = pddiff;
+                    if all(isnan(pddiff)), continue; end;
                     
                     % fit a polynomial; add padding to get rid of edge
                     % wiggles, which are not stable
