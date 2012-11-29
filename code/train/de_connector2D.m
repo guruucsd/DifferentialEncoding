@@ -17,6 +17,13 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     if (~exist('tol','var')), tol=0; end;
     if (~exist('weight_factor','var')), weight_factor = []; end;
     
+    fake_zero = (sH==0);
+    if fake_zero
+       guru_assert(hpl==0);
+       sH = prod(sI);
+       hpl = 1;
+    end;
+    
     %
     parts       = mfe_split('-',distn);
     distn_name  = parts{1}; opts = parts(2:end); clear('parts');
@@ -250,5 +257,12 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
 
         % Recursive call if we're above some tolerance (here, 1%)
         Con = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol);
+    end;
+    
+    if fake_zero
+        Con2 = zeros(2*inPix);
+        Con2(inPix+[1:inPix],1:inPix) = Con(inPix+[1:inPix],1:inPix);
+        Con2 = Con;
+        mu = [];
     end;
     
