@@ -33,6 +33,7 @@ function [mu,mupos] = de_connector_positions_new(sI,sH,dbg)
 
   % Determine the scaling
   scalefactor = prod(sI)/sH;
+  guru_assert(scalefactor>=1, sprintf('sH or hpl is off; %d units requested in %d locations/pixels!', sH, prod(sI)));
   newgrid = round(sI/sqrt(scalefactor));
   guru_assert(prod(newgrid)==sH, 'can''t fit');
 
@@ -51,8 +52,8 @@ function [mu,mupos] = de_connector_positions_new(sI,sH,dbg)
   mupos = [Y(:) X(:)];
   mu = zeros(sI);
   mu(round(Y(:)), round(X(:))) = 1;
-  guru_assert(nnz(mu)==sH);
-
+  guru_assert(nnz(mu)==sH, '# of requested locations must match the # of provided locations!');
+  
 
 
 function [mu,mupos] = de_connector_positions_classic(sI,sH,dbg)

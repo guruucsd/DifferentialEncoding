@@ -105,14 +105,45 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        npix = prod(dset.nInput);
-        for ii=1:size(dset.X,2)
-            xyimg = reshape(dset.X(1:npix,ii),dset.nInput);
-            rtimg = guru_img2pol(xyimg);
-            dset.X(1:npix,ii) = rtimg(:);
+        nimg = size(dset.X,2);
+        location = guru_getopt(opts, 'location', 'CVF');
+        switch location
+            
+            case 'CVF'
+                npix = prod(dset.nInput);
+                for ii=1:nimg
+                    xyimg = reshape(dset.X(1:npix,ii),dset.nInput);
+                    rtimg = mfe_img2pol(xyimg);
+                    dset.X(1:npix,ii) = rtimg(:);
+                end;
+                
+            case {'LVF','RVF'}
+                
+                % Right-pad images
+                X = zeros(dset.nInput(1), dset.nInput(2)*2, nimg);
+                X(1:dset.nInput(1),1:dset.nInput(2),:) = reshape(dset.X,[dset.nInput,nimg]);
+                
+                % Convert images to polar coords
+                nInput = [size(X,1), size(X,2)];
+                npix   = prod(nInput);
+                npix_orig = size(dset.X,1);
+                nx_orig = dset.nInput(2);
+                for ii=1:size(dset.X,2)
+                    xyimg = squeeze(X(:,:,ii));
+                    rtimg = mfe_img2pol(xyimg);
+                    
+                    if (strcmp(location,'RVF'))
+                        rtimg = rtimg(:, end:-1:1) % flip image across vertical afor RVF
+                        rtimg = rtimg(:, 1:nx_orig);
+                    else
+                        rtimg = rtimg(:,nx_orig+[1:nx_orig]); % remove the zero pixels, get back to the original shape
+                    end;
+                    dset.X(1:npix_orig,ii) = rtimg(:);
+                end;
+                
+                %figure; subplot(1,3,2); imshow(xyimg); subplot(1,3,3); imshow(rtimg); subplot(1,3,1); imshow(reshape(dset.X(:,ii), dset.nInput));
         end;
     end;
-
     
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
