@@ -18,6 +18,7 @@ function [ti] = de_StatsTrainItersP(models)
   ti = cell(length(models), 1);
   
   for s=1:length(models)
+      if isempty(models{s}), continue; end;
       p  = [models{s}.p];
       ti{s}  = [p.Iterations]';
   end;

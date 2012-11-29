@@ -13,7 +13,10 @@ function dset = de_NormalizeDataset(dset, mSets)
           switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
               case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
                                                        % in the [-1 1] range as well
-              otherwise,  mSets.ac.minmax    = [0 1];
+              case {1}, mSets.ac.minmax = [];
+              case {2,3}, mSets.ac.minmax    = [0 1];
+              case {5}, mSets.ac.minmax = 0.5*[-1 1];
+              otherwise, error('unknown transfer function');
           end;
       end;
   end;
@@ -51,10 +54,7 @@ function dset = de_NormalizeDataset(dset, mSets)
     dset.X  = (dset.X - repmat(zs.delta_mean, [size(dset.X,1) 1])) .* repmat(zs.delta_std, [size(dset.X,1) 1]);
     dset.zs = zs;
 
-    if (~isempty(mSets.ac.minmax))
-        dset.X = mean(mSets.ac.minmax) + dset.X;
-    end;
-
+    
   % Prepare to put into minmax range by subtracting out midpoint of original [0 1] range
   elseif (~isempty(mSets.ac.minmax))
     if (isfield(dset,'minmax')), dset.X = dset.X - diff(dset.minmax)/2;
@@ -66,7 +66,7 @@ function dset = de_NormalizeDataset(dset, mSets)
   if (~isempty(mSets.ac.minmax))
 
       % Normalize inputs based on transfer function
-      dset.X = diff(mSets.ac.minmax)*(dset.X) + mean(mSets.ac.minmax);
+      dset.X = dset.X + mean(mSets.ac.minmax);
 
   end;
 
@@ -116,8 +116,13 @@ function dset = de_NormalizeDataset(dset, mSets)
 
       % Normalize expected outputs based on classifier transfer function
       dset.T = dset.T - 0.5;
-		  dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
+      dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
 
+      % Duplicate the outputs, for robust training
+      if (isfield(mSets.p, 'ndupes'))
+          dset.T = repmat(dset.T, [mSets.p.ndupes 1]);
+      end;
+      
       % validate dset
 %      guru_assert(~any(isnan(dset.T(:))), 'nan T-values');
 %      guru_assert(~any(dset.T(:)<mSets.p.minmax(1)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));
