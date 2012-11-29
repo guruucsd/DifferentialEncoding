@@ -2,20 +2,24 @@ function [stats] = de_StatsDistributions(mss)
 %
 % Returns the distribution of weights and connections over all models within each sigma
 
-  mSets = mss{end}(end);
-  [~,mupos] = de_connector_positions(mSets.nInput, mSets.nHidden/mSets.hpl);
-  mupos = round(mupos);
-
   stats.weights_in  = cell(length(mss),1);
   stats.weights_out = cell(length(mss),1);
   stats.cxns_in     = cell(length(mss),1);
   stats.cxns_out    = cell(length(mss),1);
-  midpt = mSets.nInput+1;
 
   for si=1:length(mss)
+    if isempty(mss{si}), 
+      continue;
+    elseif ~exist('mSets','var')
+      mSets = mss{si}(end);
+      [~,mupos] = de_connector_positions(mSets.nInput, mSets.nHidden/mSets.hpl);
+      mupos = round(mupos);
+      midpt = mSets.nInput+1;
+    end;
+
     nall = length(mss{si})*size(mupos,1);
     nPix = prod(mSets.nInput);
-
+    
     stats.weights_in{si}  = zeros(mSets.nInput*2);
     stats.weights_out{si} = zeros(mSets.nInput*2);
     stats.cxns_in{si}     = zeros(mSets.nInput*2);
