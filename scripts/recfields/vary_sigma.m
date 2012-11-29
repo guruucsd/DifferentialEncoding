@@ -1,5 +1,6 @@
  function vary_sigma()
-
+    if ~exist('guru_csprintf','file'), addpath(genpath('../../code')); end;
+ 
 %  freqs = [ 0.0001 0.01 * [ 1.5 3 6 12 18 24 30 36] 0.5]; % using only harmonics
   freqs = [ 0.0001 0.01 * [ 2 4 6 8 10 12 14 16 18 20 25 30 35 50]]; %using non-harmonics
   sigmas = 20*[1/32 1/16 1/8 1/2 2 8];%8 2 1/2 1/8 1/16 1/32];
@@ -10,8 +11,8 @@
             'freqs',  freqs, ...
             'nin', 10, ...
             'distn', 'norme2', ...
-            'nsamps', 3, ...
-            'nbatches', 1 ...
+            'nsamps', 10, ...
+            'nbatches', 10 ...
          };
   
   cpi   = freqs/0.06;
@@ -49,10 +50,17 @@
   xlabel('frequency (cycles per image)');
 
   % non-normalized
+  colors = @(si) (reshape(0.1 + repmat(length(sigmas)-si(:), [1 3])/numel(sigmas) * 2 .* repmat([0 1 0],[numel(si) 1]),[numel(si) 3]));
   figure; 
   hold on;
-  plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
-  errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+  %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
+  %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+  for si=1:length(sigmas)
+    plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, 'Color', colors(si), 'LineWidth', 2);
+  end;
+  for si=1:length(sigmas)
+    errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+  end;
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
