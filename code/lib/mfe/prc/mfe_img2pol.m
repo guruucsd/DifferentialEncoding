@@ -27,15 +27,15 @@ imP = zeros(M, N);
 dr = (rMax - rMin)/(M-1); 
 dth = 2*pi/N;
 
-r=rMin:dr:rMin+(M-1)*dr; 
-th=(0:dth:(N-1)*dth)'; 
+r=linspace(rMin,rMax,M); 
+th=linspace(0,2*pi,N);%:dth:(N-1)*dth)'; 
 [th,r]=meshgrid(th,r);  
 x=r.*cos(th); 
 y=r.*sin(th); 
-xP = x(end:-1:1,:)*sx + yRc; 
-yP = y(end:-1:1,:)*sy + xRc; 
-imP = interp2(imR, xP, yP); %interpolate (imR, xR, yR);
-keyboard
+xP = x(end:-1:1,:)*sx + xRc; 
+yP = y(end:-1:1,:)*sy + yRc; 
+imP = interp2(imR, yP, xP); %interpolate (imR, xR, yR);
+
 
 function imP = ImToPolar2 (imR, rMin, rMax, M, N)
 % IMTOPOLAR converts rectangular image to polar form. The output image is 
