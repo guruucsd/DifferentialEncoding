@@ -1,4 +1,4 @@
-function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
+function [train,test] = de_StimCreate(stimSet, taskType, opt)
 %Input:
 %  stimSet  : a string specifying which INPUT sets to train autoencoder on
 %               orig     => original images
@@ -130,9 +130,11 @@ function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
     nimgs_out  = 2*nimgs_in;
     X = zeros(prod(nInput_Out), nimgs_out);
 
+    imgnum = zeros(nimgs_in,1);
     for fi=1:nimgs_in
         img = mfe_readIML(fullfile(indir, fs(fi).name));
-
+        imgnum(fi) = sscanf(fs(fi).name, 'imk%d.iml');
+        
         % Select the middle portion of the image
         cpt      = round(nInput_In)/2;
         pixrange = round([(cpt(1)  -nInput_Out(1)/2)   (cpt(2)  -nInput_Out(2)) ; ...
@@ -154,8 +156,8 @@ function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
 
     % Divide into datasets
     XLBL = cell(nimgs_out,1);
-    XLBL(1:2:end-1) = {'left'};
-    XLBL(2:2:end)   = {'right_rev'};
+    XLBL(1:2:end-1) = guru_csprintf('left-%d',     num2cell(imgnum));
+    XLBL(2:2:end)   = guru_csprintf('right_rev-%d',num2cell(imgnum));
 
     dataset  = cell(nimgs_out,1);
     dataset(1:floor(nimgs_out/2))     = {'1'};
