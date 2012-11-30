@@ -105,6 +105,11 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
+
+dset = de_MakeDataset('sergent_1982','de','sergent',{'small'});
+dset = load(dset)  ;                                           
+dset = dset.train; 
+
         nimg = size(dset.X,2);
         location = guru_getopt(opts, 'location', 'CVF');
         switch location
@@ -132,16 +137,13 @@ function dset = de_StimApplyTransform(dset, opts)
                     xyimg = squeeze(X(:,:,ii));
                     rtimg = mfe_img2pol(xyimg);
                     
+                    npad = dset.nInput(2)/2;
+                    rtimg = rtimg(:,1+floor(npad):end-ceil(npad));
                     if (strcmp(location,'RVF'))
-                        rtimg = rtimg(:, end:-1:1) % flip image across vertical afor RVF
-                        rtimg = rtimg(:, 1:nx_orig);
-                    else
-                        rtimg = rtimg(:,nx_orig+[1:nx_orig]); % remove the zero pixels, get back to the original shape
+                        rtimg = rtimg(:, end:-1:1); % flip image across vertical afor RVF
                     end;
                     dset.X(1:npix_orig,ii) = rtimg(:);
                 end;
-                
-                %figure; subplot(1,3,2); imshow(xyimg); subplot(1,3,3); imshow(rtimg); subplot(1,3,1); imshow(reshape(dset.X(:,ii), dset.nInput));
         end;
     end;
     
