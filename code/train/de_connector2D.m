@@ -74,7 +74,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                       
                       theta = 2*pi*rand; %really just need pi (half circle is enough; distn's are symmetric), but ...
                       rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-                      keyboard
+                      error('ipd distribution NYI');
                       mn    = mupos(mi,:);
                       cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
                       pdn   = zeros(sI);
