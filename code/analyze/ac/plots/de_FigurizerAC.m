@@ -23,17 +23,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   figs = [ figs de_DoPlot('distns',        'de_PlotDistributions',mSets, mSets, stats.rej.ac.distns) ];
 
   % Plot the original images
-
-      orig_img = mSets.data.(ds).X(1:end-1,selectedImages_);
-      if guru_hasopt(mSets.data.test.opt, 'img2pol')
-          for ii=1:size(orig_img,2)
-            rtimg = reshape(orig_img(:,ii),mSets.data.(ds).nInput);
-            xyimg = guru_pol2img(rtimg);
-            orig_img(:,ii) = xyimg(:);
-          end;
-      end;
-      
-  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, orig_img,  mSets.data.(ds).XLAB(selectedImages_)) ];
+  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, mSets.data.(ds).X(1:end-1,selectedImages_),  mSets.data.(ds).XLAB(selectedImages_)) ];
 
   %----------------
   % Loop over sigmas and trials

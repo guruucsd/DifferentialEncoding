@@ -30,15 +30,13 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
       end;
 
       [o]   = guru_nnExec(model.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
-      images{si}(mi,:,:,:)  = reshape(o, [dset.nInput nImages]);
+
+      % Convert back from polar to regular image
+%      if guru_hasopt(dset.opt, 'img2pol')
+%          o = de_pol2img(o, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
+%      end;
       
-      if guru_hasopt(dset.opt, 'img2pol')
-        for ii=1:nImages
-            rtimg = squeeze(images{si}(mi,:,:,ii));
-            xyimg = guru_pol2img(rtimg);
-            images{si}(mi,:,:,ii) = xyimg;
-        end;
-      end;
+      images{si}(mi,:,:,:)  = reshape(o, [dset.nInput nImages]);
     end;
   end;
   
