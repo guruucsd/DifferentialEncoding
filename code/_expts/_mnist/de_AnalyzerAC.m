@@ -14,4 +14,5 @@ function [stats, figs]  = de_AnalyzerAC(mSets, mss)
   [mss]        = de_DoRejections(mss, stats.raw.r);
   
   % we should be doing something here, no?
-  keyboard
+  error('mnist-specific analyses NYI');
+  
