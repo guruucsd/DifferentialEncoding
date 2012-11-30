@@ -133,6 +133,7 @@ dset = dset.train;
                 npix   = prod(nInput);
                 npix_orig = size(dset.X,1);
                 nx_orig = dset.nInput(2);
+                figure
                 for ii=1:size(dset.X,2)
                     xyimg = squeeze(X(:,:,ii));
                     rtimg = mfe_img2pol(xyimg);
