@@ -92,7 +92,6 @@ function [ipd] = de_StatsInterpatchDistance(models)
             
               % Average distance from center
               fc_dists{mm,hui}(ci) = sqrt( (cx(ci)-mupos(hh,2)).^2 + (cy(ci)-mupos(hh,1)).^2);
-              % keyboard
 
               % Manual search for nearest neighbor
               for di=ci+1:length(cx)
@@ -118,10 +117,9 @@ function [ipd] = de_StatsInterpatchDistance(models)
                 end;
                 nn_dists{mm,hui} = []; %these will be removed
                 
-            elseif any(nn_dist(:)<1)
-                keyboard
-                
             else
+                guru_assert(all(nn_dist(:)>=1), 'nearest neighbor distance cannot be smaller than one!');
+                
                 %nn_dist = nn_dist(1:end-1,2:end); % dist is upper triangular; only off-diagonal elements
                 %                            % make sense.  Select only the comparisons that make sense.
                 nn_dists{mm,hui} = min(nn_dist);
