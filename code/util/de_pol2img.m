@@ -42,6 +42,8 @@ function [xyimgs] = de_pol2img(rtimgs, location, nInput)
 
                 % Strip off padding
         end;
+        
+        xyimg(isnan(xyimg)) = 0; %
         xyimgs(:,ii) = xyimg(:);
     end;
     
