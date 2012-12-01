@@ -121,7 +121,7 @@ function de_StimCreateAC(stimSet, opt)
         otherwise
             % load every file in the given directory
             files = dir( fullfile(de_GetBaseDir(), 'data', stimSet) );
-            keyboard
+            error('Unknown stim set: %s', stimSet);
     end;
 
     % Now, normalize to be between 0 and 1!

@@ -148,4 +148,4 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
   stats.std_resp = std_resp;
 
   squeeze(mean(mean(std_resp{end},2),1)) - squeeze(mean(mean(std_resp{1},2),1))
-  keyboard
+  keyboard % implementation in-progress; should not be integrated into main branch!

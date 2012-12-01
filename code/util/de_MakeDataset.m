@@ -105,13 +105,17 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        npix = prod(dset.nInput);
-        for ii=1:size(dset.X,2)
-            xyimg = reshape(dset.X(1:npix,ii),dset.nInput);
-            rtimg = mfe_img2pol(xyimg);
-            dset.X(1:npix,ii) = rtimg(:);
-        end;
+        %de_visualizeData(dset);
+
+        dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(dset); % just for now
+        
+        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(junk); % just for now
+        
+        %keyboard
     end;
+ 
 
     if guru_hasopt(opts, 'contrast')
       clevel = guru_getopt(opts, 'contrast', []);
@@ -140,7 +144,7 @@ function dset = de_StimApplyTransform(dset, opts)
       end;      
       
     end;
-    
+
     
 function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 %
@@ -281,8 +285,9 @@ function figs = de_visualizeData(dset)
 
   % View some sample images
   figs(end+1) = de_NewFig('data', '__img', [34 25], nImages);
-  im2show     = randperm(size(dset.X,2));
-  im2show     = sort(im2show(1:nImages));
+  im2show     = de_SelectImages(dset, nImages);
+  %randperm(size(dset.X,2));
+  %im2show     = sort(im2show(1:nImages));
 
   for ii=1:nImages
           subplot(4,4,ii);

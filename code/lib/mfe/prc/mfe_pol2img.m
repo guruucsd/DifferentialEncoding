@@ -1,4 +1,4 @@
-function imR = PolarToIm (imP, rMin, rMax, Mr, Nr)
+function imR = mfe_pol2img(imP, rMin, rMax, Mr, Nr)
 % POLARTOIM converts polar image to rectangular image. 
 %
 % V0.1 16 Dec, 2007 (Created) Prakash Manandhar, pmanandhar@umassd.edu
@@ -18,70 +18,40 @@ if ~exist('rMax','var'), rMax=1; end;
 if ~exist('Mr','var'), Mr=size(imP,1); end;
 if ~exist('Nr','var'), Nr=size(imP,2); end;
 
-imR = zeros(Mr, Nr);
-Om = (Mr+1)/2; % co-ordinates of the center of the image
-On = (Nr+1)/2;
-sx = (Mr-1)/2; % scale factors
+[M N] = size(imP); % size of rectangular image 
+xRc = (Nr+1)/2; % co-ordinates of the center of the image 
+yRc = (Mr+1)/2; 
+sx = (Nr-1)/2; % scale factors 
+sy = (Mr-1)/2;
+
+r=linspace(rMax,rMin,M); 
+th=linspace(0,2*pi,N);%:dth:(N-1)*dth)'; 
+[th,r]=meshgrid(th,r);%r,th); 
+x=r.*cos(th); 
+y=r.*sin(th); 
+xP = x*sx + xRc; 
+yP = y*sy + yRc; 
+
+F = TriScatteredInterp(xP(:),yP(:),imP(:));
+[X,Y] = meshgrid(1:N,1:M);
+imR = reshape(F(X(:),Y(:)), [M N]);
+return
+
+
+[Mr Nr] = size(imP); % size of rectangular image 
+xRc = (Mr+1)/2; % co-ordinates of the center of the image 
+yRc = (Nr+1)/2; 
+sx = (Mr-1)/2; % scale factors 
 sy = (Nr-1)/2;
 
-[M N] = size(imP);
+r=linspace(rMin,rMax,M); 
+th=linspace(0,2*pi,N);%:dth:(N-1)*dth)'; 
+[th,r]=meshgrid(th,r);  
+x=r.*cos(th); 
+y=r.*sin(th); 
+xP = x(end:-1:1,:)*sx + xRc; 
+yP = y(end:-1:1,:)*sy + yRc; 
 
-delR = (rMax - rMin)/(M-1);
-delT = 2*pi/N;
-
-ra = zeros(size(imP));
-ta = zeros(size(imP));
-xa = zeros(size(imP));
-ya = zeros(size(imP));
-
-for xi = 1:Mr
-for yi = 1:Nr
-    x = (Mr - xi - On)/sy;
-    y = (Nr - yi - Om)/sx;
-    xa(yi,xi) = x;
-    ya(yi,xi) = y;
-    r = sqrt(x*x + y*y);
-    t = atan2(y, x);
-    if t < 0
-        t = t + 2*pi;
-    end
-    ra(yi,xi) = r;
-    ta(yi,xi) = t;
-    if r >= rMin & r <= rMax
-       imR (yi, xi) = interpolate (imP, r, t, rMin, rMax, N, M, delR, delT);
-    end
-end
-end
-
-
-%imR = interp2(imP,ra,ta);
-
-function v = interpolate (imP, r, t, rMin, rMax, M, N, delR, delT)
-    ri = 1 + (r - rMin)/delR;
-    ti = 1 + t/delT;
-    rf = floor(ri);
-    rc = ceil(ri);
-    tf = floor(ti);
-    tc = ceil(ti);
-    if tc > N
-        tc = tf;
-    end
-    if rf == rc & tc == tf
-        v = imP (rc, tc);
-    elseif rf == rc
-        v = imP (rf, tf) + (ti - tf)*(imP (rf, tc) - imP (rf, tf));
-    elseif tf == tc
-        v = imP (rf, tf) + (ri - rf)*(imP (rc, tf) - imP (rf, tf));
-    else
-       A = [ rf tf rf*tf 1
-             rf tc rf*tc 1
-             rc tf rc*tf 1
-             rc tc rc*tc 1 ];
-       z = [ imP(rf, tf)
-             imP(rf, tc)
-             imP(rc, tf)
-             imP(rc, tc) ];
-       a = A\double(z);
-       w = [ri ti ri*ti 1];
-       v = w*a;
-    end
+F = TriScatteredInterp(yP(:),xP(:),imP(:));
+[X,Y] = meshgrid(1:M,1:N);
+imR = reshape(F(Y(:),X(:)), [N M])';
