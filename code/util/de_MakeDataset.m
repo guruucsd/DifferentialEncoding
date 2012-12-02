@@ -9,6 +9,8 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 %   * filtering: 'lowpass','highpass','bandpass'
 %   * 
 
+    if ~exist('opt','var'), opt = {}; end;
+
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
@@ -105,18 +107,17 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        %de_visualizeData(dset);
+        de_visualizeData(dset);
 
         dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        %de_visualizeData(dset); % just for now
+        de_visualizeData(dset); % just for now
         
-        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        %de_visualizeData(junk); % just for now
+        junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        de_visualizeData(junk); % just for now
         
-        %keyboard
+        keyboard
     end;
  
-
     if guru_hasopt(opts, 'contrast')
       clevel = guru_getopt(opts, 'contrast', []);
       keyboard
@@ -126,7 +127,6 @@ function dset = de_StimApplyTransform(dset, opts)
       
       % First apply the image change
       % Taken from http://maksim.sorokin.dk/it/2010/11/08/brightness-and-contrast-in-matlab/
-      error('not implemented well; redo!');
       for ii=1:size(dset.X,2)
           img = reshape(dset.X(:,ii), dset.nInput);
           img_range = [min(img(:)) max(img(:))];
@@ -134,19 +134,25 @@ function dset = de_StimApplyTransform(dset, opts)
           switch clevel
             case 'low', 
                 mir = mean(img_range);
-                img = imadjust(img, img_range, [img_range(1)+mir/2 img_range(2)-mir/2]
+                caimg = imadjust(img, img_range, [img_range(1)+mir/2 img_range(2)-mir/2], 0.5);
             case 'high'
                 simg = sigmoid(img); 
-                img = imadjust(simg, [min(simg(:)) max(simg(:))], [0 1]);
+                caimg = imadjust(simg, [min(simg(:)) max(simg(:))], [0 1]);
             otherwise, error('Unknown contrast level: %s', clevel);
           end;
-          dset.X(:,ii) = img(:);
+          caimg = caimg - mean(caimg(:)) + mean(img(:));
+          caimg(caimg>img_range(2)) = img_range(2);
+          caimg(caimg<img_range(1)) = img_range(1);
+
+          %subplot(1,2,1); imshow(img, [0 1]); subplot(1,2,2); imshow(caimg, [0 1]);
+          
+          dset.X(:,ii) = caimg(:);
       end;      
       
     end;
 
     
-function dset = de_StimApplyResizing(dset, opts, dset_to_match)
+function dset = de_StimApplyResizing(dset, opts)
 %
 
     % Resizing--this should be last
