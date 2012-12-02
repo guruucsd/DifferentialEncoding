@@ -25,13 +25,14 @@ sx = (Nr-1)/2; % scale factors
 sy = (Mr-1)/2;
 
 r=linspace(rMax,rMin,M); 
-th=linspace(0,2*pi,N);%:dth:(N-1)*dth)'; 
+th=linspace(0+atan(2/M)/2, 2*pi-atan(2/M)/2,N);%:dth:(N-1)*dth)'; 
 [th,r]=meshgrid(th,r);%r,th); 
 x=r.*cos(th); 
 y=r.*sin(th); 
 xP = x*sx + xRc; 
 yP = y*sy + yRc; 
 
+warning off MATLAB:TriScatteredInterp:DupPtsAvValuesWarnId
 F = TriScatteredInterp(xP(:),yP(:),imP(:));
 [X,Y] = meshgrid(1:N,1:M);
 imR = reshape(F(X(:),Y(:)), [M N]);

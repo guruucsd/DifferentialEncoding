@@ -11,9 +11,9 @@ function stats = de_StatsGroupBasicsKit( mSets, ms, ss )
 
       % Find # instances to use
       nInstF = [ size(ss.freq.rej.sf.rej.basics.perf.(ds){1},1), ...
-                 size(ss.freq.rej.sf.rej.basics.perf.(ds){2},1) ];
+                 size(ss.freq.rej.sf.rej.basics.perf.(ds){end},1) ];
       nInstT = [ size(ss.type.rej.sf.rej.basics.perf.(ds){1},1), ...
-                 size(ss.type.rej.sf.rej.basics.perf.(ds){2},1) ];
+                 size(ss.type.rej.sf.rej.basics.perf.(ds){end},1) ];
       nInst  = min([nInstF nInstT]);
 
       % Extract indices of data for expt 1
