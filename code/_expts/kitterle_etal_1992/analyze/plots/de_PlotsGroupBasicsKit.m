@@ -8,14 +8,14 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
 
       % Get mean and std for each hemi in each task
       means = [ mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,1)) ...
-                mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,2)) ; ...
+                mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,end)) ; ...
                 mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,1)) ...
-                mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,2)) ];
+                mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,end)) ]
 
-      perf = log10(means'); %means are rows=task,cols=hemi; perf is opposite
+      perf = means';%log10(means'); %means are rows=task,cols=hemi; perf is opposite
 
       hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
-                    sprintf('LH (\\sigma=%3.1f)', mSets.sigma(2))};
+                    sprintf('LH (\\sigma=%3.1f)', mSets.sigma(end))};
       task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
 
       figs(end+1) = de_NewFig(ds);
