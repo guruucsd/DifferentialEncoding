@@ -52,7 +52,7 @@ function [model] = de_DE(model)
       model = de_LoadProps(model, 'ac',{'hu','output'});
       %if size(  
     catch
-      if ismember(10, model.debug), fprintf('failed to find hu output on disk; computing now.'); end;
+      if ismember(11, model.debug), fprintf('Failed to find hu output on disk; computing now.\n'); end;
       % Make sure the autoencoder's connectivity is set.
       model = de_LoadProps(model, 'ac', 'Weights');
       model.ac.Conn = (model.ac.Weights~=0);
@@ -75,11 +75,11 @@ function [model] = de_DE(model)
         % Use hidden unit encodings as inputs
         X_train    = model.ac.hu.train;
         if isfield(model.p, 'zscore') && model.p.zscore>0
-          X_train    = X_train - repmat(mean(X_train,2), [size(X_train,1) 1]); %zero-mean the code
+          X_train    = X_train - repmat(mean(X_train,1), [size(X_train,1) 1]); %zero-mean the code
           X_train    = model.p.zscore * X_train ./ repmat( std(X_train, 0, 1), [size(X_train,1), 1] ); %z-score the code
         elseif isfield(model.p,'zscore_across') && model.p.zscore_across>0
-          X_train    = X_train - repmat(mean(X_train,2), [size(X_train,1) 1]); %zero-mean the code
-          X_train    = model.p.zscore_across * X_train ./ repmat( std(X_train, 0, 2), [size(X_train,1), 1] ); %z-score the code
+          X_train    = X_train - repmat(mean(X_train,2), [1 size(X_train,2)]); %zero-mean the code
+          X_train    = model.p.zscore_across * X_train ./ repmat( std(X_train, 0, 2), [1 size(X_train,2)] ); %z-score the code
         end;
         fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'train', min(X_train(:)), max(X_train(:)), mean(X_train(:)), std(X_train(:)));
 
@@ -138,11 +138,11 @@ function [model] = de_DE(model)
         X_test    = model.ac.hu.test;
 %        X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
         if isfield(model.p, 'zscore') && model.p.zscore>0
-          X_test    = X_test - repmat(mean(X_test,2), [size(X_test,1) 1]); %zero-mean the code
+          X_test    = X_test - repmat(mean(X_test,1), [size(X_test,1) 1]); %zero-mean the code
           X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
         elseif isfield(model.p,'zscore_across') && model.p.zscore_across>0
-          X_test    = X_test - repmat(mean(X_test,2), [size(X_test,1) 1]); %zero-mean the code
-          X_test    = model.p.zscore_across * X_test ./ repmat( std(X_test, 0, 2), [size(X_test,1), 1] ); %z-score the code
+          X_test    = X_test - repmat(mean(X_test,2), [1 size(X_test,2)]); %zero-mean the code
+          X_test    = model.p.zscore_across * X_test ./ repmat( std(X_test, 0, 2), [1 size(X_test,2)] ); %z-score the code
         end;
         fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
         
