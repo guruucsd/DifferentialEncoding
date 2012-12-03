@@ -5,7 +5,7 @@
     fprintf(fh, 'Differential Encoder: %dD\n', length(mSets.nInput));
     
     fprintf(fh, '\tRuns:       %-4d\n',   mSets.runs);
-    fprintf(fh, '\tDist''n:    %-4.1f\n', mSets.distn{:});
+    fprintf(fh, '\tDist''n: %10s\n',      mSets.distn{:});
     fprintf(fh, '\tMu:         %-4.1f\n', mSets.mu);
     fprintf(fh, '\tSigma:      %-4.1f\n', mSets.sigma);
     fprintf(fh, '\tnConns:     %-4d\n',   mSets.nConns);
@@ -53,11 +53,11 @@
     end;
 
     fprintf(fh, 'Analysis:\n');
-    fprintf(fh, '\tac Rejection Props: %5.4f\n', mSets.ac.rej.props{:});
+    fprintf(fh, '\tac Rejection Props: %10s\n', mSets.ac.rej.props{:});
     fprintf(fh, '\tac Rejection Width: %5.4f\n', mSets.ac.rej.width(:));
     fprintf(fh, '\tac Rejection Type:  %s\n',    mSets.ac.rej.type{:});
     if (isfield(mSets, 'p'))
-        fprintf(fh, '\tp  Rejection Props: %5.4f\n', mSets.p.rej.props{:});
+        fprintf(fh, '\tp  Rejection Props: %5.4s\n', mSets.p.rej.props{:});
         fprintf(fh, '\tp  Rejection Width: %5.4f\n', mSets.p.rej.width(:));
         fprintf(fh, '\tp  Rejection Type:  %s\n',    mSets.p.rej.type{:});
         fprintf(fh, '\n\n');
