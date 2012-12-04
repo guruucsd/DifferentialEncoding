@@ -6,6 +6,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 
     p = struct( 'seed', rand(1), ...
                 'sz', [20 20], ... %image size
+                'img2pol', false, ...
                 'nbatches', 20, ... %
                 'nsamps', 5, ...
                 'a_mode', 'mean', ... % activation mode
@@ -89,6 +90,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                         phase = 2*pi*phsi/p.nphases;
 
                         x = 0.5+mfe_grating2d( p.freqs(fi), phase, orient, 0.5, p.sz(1), p.sz(2));
+                        if p.img2pol, x = mfe_img2pol(x); end;
                         resp = x(:)/sum(x(:));
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));
