@@ -114,8 +114,6 @@ function dset = de_StimApplyTransform(dset, opts)
         
         %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
         %de_visualizeData(junk); % just for now
-        
-        %keyboard
     end;
  
     if guru_hasopt(opts, 'contrast')

@@ -69,5 +69,5 @@ for hi=1:length(hu_hpl)
     clear('junk');
   end; end; end;
 
-  save(outfile,'trn','tst');
+  save(outfile,'trn','tst','-v7.3');
 end;
