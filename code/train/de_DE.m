@@ -37,10 +37,11 @@ function [model] = de_DE(model)
 
     % report results to screen
     fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));
-    mn = 0+min(min(model.ac.Weights(nPixels+[1:model.nHidden], 1:nPixels)));
-    mx = 0+max(max(model.ac.Weights(nPixels+[1:model.nHidden], 1:nPixels)));
-    fprintf(' wts=[%5.2f %5.2f]', mn,mx)
-
+    ih_mn = 0+min(min(model.ac.Weights(nPixels+1+[1:model.nHidden], 1:nPixels+1)));
+    ih_mx = 0+max(max(model.ac.Weights(nPixels+1+[1:model.nHidden], 1:nPixels+1)));
+    ho_mn = 0+min(min(model.ac.Weights(nPixels+1+model.nHidden+[1:nPixels], nPixels+[1:model.nHidden])));
+    ho_mx = 0+max(max(model.ac.Weights(nPixels+1+model.nHidden+[1:nPixels], nPixels+[1:model.nHidden])));
+    fprintf('\twts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}', ih_mn,ih_mx,ho_mn,ho_mx);
   end;
 
   % Even if it's cached, we need the output characteristics
@@ -52,7 +53,7 @@ function [model] = de_DE(model)
       model = de_LoadProps(model, 'ac',{'hu','output'});
       %if size(  
     catch
-      if ismember(10, model.debug), fprintf('failed to find hu output on disk; computing now.'); end;
+      if ismember(11, model.debug), fprintf('\tfailed to find hu output on disk; computing now.\n'); end;
       % Make sure the autoencoder's connectivity is set.
       model = de_LoadProps(model, 'ac', 'Weights');
       model.ac.Conn = (model.ac.Weights~=0);
@@ -79,7 +80,7 @@ function [model] = de_DE(model)
           X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
           X_train    = model.p.zscore * X_train ./ repmat( std(X_train, 0, 1), [size(X_train,1), 1] ); %z-score the code
         end;
-        fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'train', min(X_train(:)), max(X_train(:)), mean(X_train(:)), std(X_train(:)));
+        fprintf('\tP dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'train', min(X_train(:)), max(X_train(:)), mean(X_train(:)), std(X_train(:)));
 
         % Add bias
         if (model.p.useBias)
@@ -139,7 +140,7 @@ function [model] = de_DE(model)
           X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
           X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
         end;
-        fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
+        fprintf('\tP dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
         
         % Add bias
         if (model.p.useBias)

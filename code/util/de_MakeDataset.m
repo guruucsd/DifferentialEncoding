@@ -107,15 +107,15 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        de_visualizeData(dset);
+        %de_visualizeData(dset);
 
         dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        de_visualizeData(dset); % just for now
+        %de_visualizeData(dset); % just for now
         
-        junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        de_visualizeData(junk); % just for now
+        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(junk); % just for now
         
-        keyboard
+        %keyboard
     end;
  
     if guru_hasopt(opts, 'contrast')
