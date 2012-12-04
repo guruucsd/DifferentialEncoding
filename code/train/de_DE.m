@@ -74,10 +74,12 @@ function [model] = de_DE(model)
 
         % Use hidden unit encodings as inputs
         X_train    = model.ac.hu.train;
-        X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
+       % X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
         if isfield(model.p, 'zscore') && model.p.zscore>0
+          X_train    = X_train - repmat(mean(X_train), [size(X_train,1) 1]); %zero-mean the code
           X_train    = model.p.zscore * X_train ./ repmat( std(X_train, 0, 1), [size(X_train,1), 1] ); %z-score the code
         end;
+        fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'train', min(X_train(:)), max(X_train(:)), mean(X_train(:)), std(X_train(:)));
 
         % Add bias
         if (model.p.useBias)
@@ -132,10 +134,12 @@ function [model] = de_DE(model)
 
         % Use hidden unit encodings as inputs
         X_test    = model.ac.hu.test;
-        X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
+%        X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
         if isfield(model.p, 'zscore') && model.p.zscore>0
+          X_test    = X_test - repmat(mean(X_test), [size(X_test,1) 1]); %zero-mean the code
           X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
         end;
+        fprintf('P dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
         
         % Add bias
         if (model.p.useBias)
