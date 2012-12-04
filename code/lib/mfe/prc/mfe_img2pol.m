@@ -30,5 +30,3 @@ y=r.*sin(th);
 xP = x*sx + xRc; 
 yP = y*sy + yRc; 
 imP = interp2(imR, xP, yP); %interpolate (imR, xR, yR);
-keyboard
-th
