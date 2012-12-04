@@ -334,7 +334,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
 
     %keyboard
 
-    ipd = de_StatsInterpatchDistance({model})
+    %ipd = de_StatsInterpatchDistance({model})
 
 
     %%%%%%%%%%%%%%%%%

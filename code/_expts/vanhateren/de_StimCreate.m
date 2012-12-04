@@ -39,7 +39,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % With this info, create our X and TT vectors
-  [X, nInput, XLAB, DS] = stim2D(stimSet, 'train', taskType);
+  [X, nInput, XLAB, DS] = stim2D(stimSet, taskType);
 
   % Now index and apply options, including input weightings.
   [X, nInput]          = de_applyOptions(opt, X, nInput);
@@ -116,6 +116,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   %
   %
   %
+    nimgs_in   = sscanf(stimSet, '%d');
 
     indir = fullfile(de_GetOutPath([], 'datasets'), 'vanhateren');
     if (~exist(indir, 'dir')), error('van Hateren raw images do not exist at expected location: %s', indir); end;
@@ -124,7 +125,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     if (length(fs)<nimgs_in), error('Expected %d van Hateren images; only found %d at %s.', nimgs_in, length(fs), indir); end;
 
     nInput_In  = [1024 1536]; %y,x
-    nimgs_in   = sscanf(stimSet, '%d');
     if ischar(nimgs_in), error('stimSet must be an integer'); end;
     
     % Read each image

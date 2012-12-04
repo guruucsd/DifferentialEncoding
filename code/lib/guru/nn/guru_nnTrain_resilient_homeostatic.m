@@ -107,6 +107,9 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
+        
+        huidx = huidx(meanact~=0);
+        meanact = meanact(meanact~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
         %keyboard
     elseif true || isfield(model,'meanwts')
