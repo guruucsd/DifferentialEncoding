@@ -16,7 +16,7 @@
     catch
       if isempty(strfind(lasterr, 'can''t fit'))
         error(lasterr);
-      elseif ismember(5, dbg)
+      elseif ismember(11, dbg)
         fprintf('Failed to connect with new system; trying old!');
       end;
     end;
