@@ -6,6 +6,10 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     % We'll use recursive calls into the system, to make this quicker.
     %   but we'll make sure NOT to call back into this code.
 
+
+    % Make sure!
+    guru_assert(length(ct.sigma) ~= 2 || diff(ct.sigma)==0, 'Canonical case: 2 sigmas, should be the same!');
+
     %%%%%%%%%%%%%%%%%
     % Set up model parameters & allocate space
     %%%%%%%%%%%%%%%%%
