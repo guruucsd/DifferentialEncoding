@@ -37,6 +37,8 @@ function outdir = de_GetOutPath(model, dirType)
             model.sigma = model.sigma(model.hemi);
         end;
         
+        origString = '';
+
         % Add conn-specific model settings
         origString = [ origString ...
                        sprintf('SG=%f,',   model.sigma), ...
@@ -59,9 +61,10 @@ function outdir = de_GetOutPath(model, dirType)
                      
                      
             hash       = hash_path(origString);
-    
+            outdir     = hash;          
+
     case {'conn'}
-            outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', de_getOutPath(model, 'conn_base'));
+            outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', de_GetOutPath(model, 'conn_base'));
 
 
     % Top-level output directory for trained models and analysis stats.
@@ -170,7 +173,7 @@ function outdir = de_GetOutPath(model, dirType)
               end;
               
               origString = [origString ...
-                            sprintf('CT=%s', de_GetOutPath(model.ac.ct, 'conn_base', 'fullPath', false)) ...
+                            sprintf('CT=%s', de_GetOutPath(model.ac.ct, 'conn_base')) ...
                            ];
           end;
 

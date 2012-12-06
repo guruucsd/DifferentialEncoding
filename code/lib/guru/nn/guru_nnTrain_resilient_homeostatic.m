@@ -102,18 +102,51 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
         model.Weights = model.Weights .* (1-model.lambda);
-    elseif true || isfield(model, 'avgact')
-        model.avgact = 0.01;
+    end;
+    if isfield(model, 'avgact2')
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
         
         huidx = huidx(meanact~=0);
         meanact = meanact(meanact~=0);
+        keyboard;
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
         %keyboard
-    elseif true || isfield(model,'meanwts')
+    elseif isfield(model, 'avgact') %Sullivan & de sa (2006)
+        huidx = nInputs+1+[1:nHidden];
+        huacts = opc(huidx,:);
+        meanact = mean(abs(huacts),2);
+
+        if ~exist('avgact','var'), avgact = zeros(size(meanact)); end;
+        avgact = model.bc*meanact+(1-model.bc)*avgact;
+        actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
+        %fprintf('avgact=%f, actnorm=%f\n',mean(avgact(find(avgact))), mean(actnorm(find(avgact))));
         
+        %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
+        huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);    
+        model.Weights(huidx,1:(nInputs+1)) = model.Weights(huidx,1:(nInputs+1)) ./ repmat(actnorm,[1 nInputs+1]);
+        %keyboard
+        
+
+
+
+    elseif isfield(model, 'meanwt')
+        huidx = nInputs+1+[1:nHidden];
+        huwts = model.Weights(huidx,1:(nInputs+1));
+        meanwt = mean(abs(huwts),2);
+
+        huidx = huidx(meanwt~=0);
+        meanwt = meanwt(meanwt~=0);
+        model.Weights(huidx,1:(nInputs+1)) = model.meanwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanwt,[1 nInputs+1]);
+    elseif isfield(model, 'totwt')
+        huidx = nInputs+1+[1:nHidden];
+        huwts = model.Weights(huidx,1:(nInputs+1));
+        totwt = sum(abs(huwts),2);
+
+        huidx = huidx(totwt~=0);
+        totwt = totwt(totwt~=0);
+        model.Weights(huidx,1:(nInputs+1)) = model.totwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(totwt,[1 nInputs+1]);
     end;
     guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))
