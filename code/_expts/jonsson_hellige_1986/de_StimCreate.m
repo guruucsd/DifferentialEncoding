@@ -24,18 +24,19 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   if (~iscell(opt)),             opt      = {opt};  end;
 
   [train.nInput]  = guru_getopt(opt, 'nInput',  [135 100]);
-  [train.blurs]   = guru_getopt(opt, 'blurs', [0 2 4]);
+  [train.blurs]   = guru_getopt(opt, 'blurs', [1 3 5]);
   %%
 
   % With this info, create our X and TT vectors
   [train.X, train.XLAB] = stim2D(stimSet, train.nInput);
-  [train.X, train.XLAB] = de_applyOptions(opt, train.X, train.XLAB, train.blurs);
+  [train.X, train.XLAB] = de_applyOptions(opt, train.X, train.XLAB, train.nInput, train.blurs);
 
   % Nail down targets for each task
   if (~isempty(taskType))
       [train.T, train.TLAB]         = de_createTargets(taskType, train.X, train.XLAB);
   end;
 
+  test = train;
 
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -66,21 +67,27 @@ function [X,XLAB] = stim2D(stimSet, nInput)
             text('units','pixels','position',[midpt(1)   midpt(2)/2],'fontsize',fontsize,'string',lets{ti},'VerticalAlignment', 'middle', 'HorizontalAlignment','center') 
             text('units','pixels','position',[midpt(1) 3*midpt(2)/2],'fontsize',fontsize,'string',lets{bi},'VerticalAlignment', 'middle', 'HorizontalAlignment','center') 
 
-            for ri=1:10
-                % Capture the text image 
-                % Note that the size will have changed by about 1 pixel
-                figure(hf);
-                tim = getframe(gca); 
-
-                % Extract the cdata
-                tim2 = tim.cdata;
-
-                % Make a mask with the negative of the text 
-                tmask = tim2==0; 
-
-                if any(tmask(:)), break; end;
-            end;
+%            for ri=1:10
+%                % Capture the text image 
+%                % Note that the size will have changed by about 1 pixel
+%                figure(hf);
+%                tim = getframe(gca); 
+%
+%                % Extract the cdata
+%                tim2 = tim.cdata;
+%
+%                % Make a mask with the negative of the text 
+%                tmask = tim2==0; 
+%
+%                if any(tmask(:)), break; end;
+%            end;
+            tf = [tempname() '.tif'];
+            print(hf, tf, '-dtiff');
             close(hf) 
+            tim = imread(tf);
+            tim2 = tim(end-nInput(1):end,1:nInput(2));
+            tmask = tim2==0;
+
             if ~any(tmask(:)), error('?'); end;
 
             % Place white text 
@@ -93,19 +100,19 @@ function [X,XLAB] = stim2D(stimSet, nInput)
             %imshow(im);
             %axis off
             X(:,ii) = im(:);
-            XLAB(ii) = sprintf('%s|%s', lets{ti}, lets{bi});
+            XLAB{ii} = sprintf('%s|%s', lets{ti}, lets{bi});
         end;
     end;
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X_new, XLAB_new] = de_applyOptions(X, XLAB, nInput, blurs)
+  function [X_new, XLAB_new] = de_applyOptions(opt, X, XLAB, nInput, blurs)
   %
   % Apply gaussian blur to each image
 
   nimg = size(X,2);
   X_new = zeros(size(X,1), nimg*3);
-  XLAB_new = size(X_new,2);
+  XLAB_new = cell(size(X_new,2),1);
 
   for ii=1:nimg
       for bi=1:length(blurs)
@@ -128,12 +135,11 @@ function [X,XLAB] = stim2D(stimSet, nInput)
   % Only one task at the moment: compare upper and lower letters
 
   nimg = size(X,2);
-  T = zeros(nimg,1);
+  T = zeros(1,nimg);
   TLAB = cell(nimg,1);
   
   for ii=1:nimg
-      [tlet,blet] = sscanf(XLAB{ii}, '%s|%s');
-      T(ii) = double(tlet(1)==blet(1));
+      tlet = XLAB{ii}(1); blet=XLAB{ii}(3);
+      T(ii) = double(tlet==blet);
       if T(ii), TLAB{ii} = 'same'; else, TLAB{ii} = 'diff'; end;
   end;
-
