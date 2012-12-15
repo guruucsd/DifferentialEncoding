@@ -1,0 +1,9 @@
+62377128:
+DE: 2D network; distn={normre }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/kitterle_etal_1992.sf_mixed/data_kitterle_etal_1992.sf_mixed.recog_freq.{.freqs.5.000000e-02.1.500000e-01}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  150, Acc: 0.00000, EtaInit: 0.00010, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations: 1000, Acc: 1.01000, EtaInit: 0.01000, Dec: 1.15000, XferFn: 4
+	62413478:
+DE: 2D network; distn={normre }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/kitterle_etal_1992.sf_mixed/data_kitterle_etal_1992.sf_mixed.recog_type.{.freqs.5.000000e-02.1.500000e-01}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  150, Acc: 0.00000, EtaInit: 0.00010, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations: 1000, Acc: 1.01000, EtaInit: 0.01000, Dec: 1.15000, XferFn: 4
+	

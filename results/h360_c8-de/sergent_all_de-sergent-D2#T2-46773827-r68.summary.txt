@@ -1,0 +1,68 @@
+Differential Encoder: 2D
+	Runs:       68  
+	Dist'n:    110.0
+	Dist'n:    111.0
+	Dist'n:    114.0
+	Dist'n:    109.0
+	Dist'n:    101.0
+	Mu:         0.0 
+	Sigma:      3.0 
+	Sigma:      6.0 
+	nConns:     8   
+	nHidden:    360 
+	nHd-Per-Lyr:4   
+
+	Error Type: 2
+	Data File:  /home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.D2#T2}.mat
+
+
+AutoEncoder:
+	RandState:      2    
+	Tolerance:      0.0000
+	AvgError:       0.0050
+	MaxIterations:  102  
+	TrainMode:      resilient
+	EtaInit:        0.0000
+	Acc:            0.0000
+	Dec:            0.2500
+	XferFn          6    
+	UseBias:        1    
+	Grad Power:     3    
+	Lambda (wt dcy):5.000000e-02
+	WeightInitType: rand-normd
+
+
+Perceptron:
+	nHidden:        1    
+	RandState:      2    
+	AvgError:       0.0000
+	MaxIterations:  500  
+	TrainMode:      batch
+	EtaInit:        0.0100
+	Acc:            1.0025
+	Dec:            1.2500
+	XferFn          4    
+	UseBias:        1    
+	Grad Power:     1    
+	Lambda (wt dcy):2.000000e-02
+	WeightInitType: rand-normd
+
+
+Analysis:
+	ac Rejection Props: 101.0000
+	ac Rejection Props: 114.0000
+	ac Rejection Props: 114.0000
+	ac Rejection Width:   NaN
+	ac Rejection Type:  max
+	p  Rejection Props: 101.0000
+	p  Rejection Props: 114.0000
+	p  Rejection Props: 114.0000
+	p  Rejection Width: 3.0000
+	p  Rejection Type:  sample_std-normd
+
+
+Summary:
+	Rejections (ordered by Sigma): 1
+	Rejections (ordered by Sigma): 0
+
+

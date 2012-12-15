@@ -1,0 +1,25 @@
+44564910:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	46770555:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.D1#T1}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	46772206:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.D1#T2}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	46772176:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.D2#T1}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	46773827:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.D2#T2}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	47812886:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/sergent_1982.de/data_sergent_1982.de.sergent.{.swapped}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  102, Acc: 0.00000, EtaInit: 0.00001, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations:  500, Acc: 1.00250, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	

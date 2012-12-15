@@ -1,0 +1,5 @@
+71786231:
+DE: 2D network; distn={norme }, m=[ 0.0 ], o=[ 3.0  6.0 ], nConns=8, nHidden=360, dataFile=/home/bcipolli/de/data/christman_etal_1991.high_freq/data_christman_etal_1991.high_freq.recog.{.freqs.6.000000e-02.1.200000e-01.2.400000e-01.4.800000e-01.9.600000e-01}.mat
+	AC: AvgErr: 0.0050, MaxIterations:  159, Acc: 0.00000, EtaInit: 0.00010, Dec: 0.25000, XferFn: 6
+	P:  AvgErr: 0.0000, MaxIterations: 2500, Acc: 1.00500, EtaInit: 0.01000, Dec: 1.25000, XferFn: 4
+	
