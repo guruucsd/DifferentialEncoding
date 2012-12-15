@@ -1,13 +1,11 @@
-function H=mfe_grating2d(f,phi,theta,A,height,width)
-% H=grating2d(f,phi,theta,A,height,width) 
+function H=grating2d(f,phi,theta,A,height,width)
 % function to generate a 2D grating image
-%
 % f = frequency
 % phi = phase
 % theta = angle
 % A = amplitude
-% height
-% width
+% H=grating2d(f,phi,theta,A) 
+% size of grating
   if (~exist('height','var')), height=100; end;
   if (~exist('width','var')),  width=100; end;
 
@@ -17,7 +15,6 @@ function H=mfe_grating2d(f,phi,theta,A,height,width)
   H = zeros(height,width);
   for y=1:height
       for x=1:width
-          H(y,x)=A*cos(wx*(x-width/2)+phi+wy*(y-height/2));
+          H(y,x)=A*cos(wx*(x)+phi+wy*(y));
       end
   end
-  

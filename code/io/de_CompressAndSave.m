@@ -1,6 +1,6 @@
 function model = de_CompressAndSave(model)
 % This function:
-%  * removes large, redundant information (ac.Conns, p.Conns are both
+%  * removes large, redundant information (ac.Conns, p.Conns are both 
 %      implicitly found in ac.Weights, p.Weights
 %  * saves large matrices to disk (ac.Weights, p.Weights, ac.err, p.output
 %  * removes those properties from the models (we'll have to load them back up any time we need them)
@@ -20,87 +20,71 @@ function model = de_CompressAndSave(model)
   d = de_GetOutPath(model, 'ac');  if (~exist(d, 'dir')), mkdir(d);  end;
   d = de_GetOutPath(model, 'p');   if (~exist(d, 'dir')), mkdir(d);  end;
   clear('d');
-
-  %% ac
+  
+  %% ac 
   % weights
   if (isfield(model.ac, 'Weights'))
-    fwts = de_GetOutFile(model, 'ac.weights');
-    if (~exist(fwts,'file'))
+    if (model.ac.cached==0)
       weights = model.ac.Weights;
-      save( fwts, 'weights');
+      save( de_GetOutFile(model, 'ac.weights'), 'weights');
       clear('weights');
     end;
-    clear('fwts');
+    
+    % clean
     model.ac = rmfield(model.ac, 'Weights');
-  end;
 
-
+      
     % output
-  if (isfield(model.ac,'err'))
-    ferr = de_GetOutFile(model, 'ac.err');
-    if (~exist(ferr,'file'))
-      err    = model.ac.err;
-      save( ferr, 'err');
-      clear('err');
+    if (isfield(model.ac,'err'))
+      if (model.ac.cached == 0)
+        err = model.ac.err;
+        save( de_GetOutFile(model, 'ac.err'), 'err');
+        clear('err');
+      end;
+      
+      % clean
+      model.ac = rmfield(model.ac, 'err');
+    
+      % metadata
+      if (model.ac.cached == 0)
+        ac = model.ac;
+        save( de_GetOutFile(model, 'ac'), 'ac');
+        clear('ac');
+      end;
     end;
-    clear('ferr');
-    model.ac = rmfield(model.ac, 'err');
-  end;
+  end;  
 
-  % Hidden units
-  if (isfield(model.ac,'hu'))
-    fhu = de_GetOutFile(model, 'ac.hu');
-    if (~exist(fhu,'file'))
-      hu     = model.ac.hu;
-      save( fhu, 'hu');
-      clear('hu');
-    end;
-    clear('fhu');
-    model.ac = rmfield(model.ac, 'hu');
-  end;
-
-    % Output
-    if (isfield(model.ac,'output'))
-      output = model.ac.output;
-      save( de_GetOutFile(model, 'ac.output'), 'output');
-      clear('output');
-      model.ac = rmfield(model.ac, 'output');
-    end;
-
-    % metadata
-    ac = model.ac;
-    save( de_GetOutFile(model, 'ac'), 'ac');
-    clear('ac');
-  %end;
-
-
+  
   %% p
   if (isfield(model, 'p'))
+      % weights  
+      if (isfield(model.p, 'Weights'))
+        if (model.p.cached == 0)
+          weights = model.p.Weights;
+          save( de_GetOutFile(model, 'p.weights'), 'weights');
+          clear('weights');
+        end;
 
-    % weights
-    if (isfield(model.p, 'Weights'))
-      fwts = de_GetOutFile(model, 'p.weights');
-      if (~exist(fwts,'file'))
-        weights = model.p.Weights;
-        save( fwts, 'weights');
-        clear('weights');
+        % clean
+        model.p = rmfield(model.p, 'Weights');
+
+        % output
+        if (isfield(model.p, 'output'))
+          if (model.p.cached == 0)
+            output = model.p.output;
+            save( de_GetOutFile(model, 'p.output'), 'output');
+            clear('output');
+          end;
+
+          % clean
+          model.p = rmfield(model.p, 'output');
+
+          % metadata
+          if (model.p.cached == 0)
+            p = model.p;
+            save( de_GetOutFile(model, 'p'), 'p');
+            clear('p');
+          end;
+        end;
       end;
-      clear('fwts');
-      model.p = rmfield(model.p, 'Weights');
-    end;
-
-    % output
-    %if (isfield(model.p, 'output'))
-    %    output = model.p.output;
-    %    save( de_GetOutFile(model, 'p.output'), 'output');
-    %    clear('output');
-    %
-    %    % clean
-    %    model.p = rmfield(model.p, 'output');
-    %  end;
-
-      % metadata
-	p = model.p;
-	save( de_GetOutFile(model, 'p'), 'p');
-	clear('p');
   end;

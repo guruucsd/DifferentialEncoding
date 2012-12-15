@@ -13,47 +13,16 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
 %  o    : calculated output at LAST step.
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
-  if isfield(model, 'linout'), warning('linout deprecated; use XferFn with multiple values instead.'); end;
-
-  % Calc
-  nUnits = size(model.Weights,1); nIn = size(X,1)-1; nOut = size(Y,1); nHid = nUnits-nIn-nOut-1; % remove input, output, and 
   
-  % Set up transfer function for each unit
-  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHid+prod(nOut)))
-    model.XferFn = [model.XferFn*ones(1,nHid) ones(1,nOut)]; %linear hidden->output
-  elseif (length(model.XferFn)==2)
-    model.XferFn = [model.XferFn(1)*ones(1,nHid) model.XferFn(2)*ones(1,nOut)];
-  end;
-
-  % Special case for dropout
-  %   reduce the value of the hidden->output weights by dropout %
-  if (isfield(model, 'dropout'))
-    model.Weights(nIn+1+nHid+[1:nOut], nIn+1+[1:nHid]) = (1-model.dropout)*model.Weights(nIn+1+nHid+[1:nOut], nIn+1+[1:nHid]);
-  end;
-
-  % Execute the model and determine the errorType
-  if ~isfield(model, 'ts')
-    [err,~,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
+  errorType   = 4-mod(model.errorType,2); % get out all data
   
-  % Multiple loops
-  else
-    if isfield(model, 'debug') && ismember(10,model.debug)
-      fprintf('Running %d re-entrant loops of model\n', model.ts);
-    end;
+  % Determine model error
+  [err,grad,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, errorType );
 
-    oy = X(1:nIn,:);
-    for tsi=1:model.ts
-      %if model.useBias
-        [err,~,o]=emo_backprop([oy;X(end,:)], Y, model.Weights, model.Conn, model.XferFn, model.errorType );
-      %else
-      %  [err,grad,oz]=emo_backprop(o, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
-      %end
-      oy = o(nIn+1+nHid+[1:nOut],:);
-    end;
-  end;
-
-  oact = o(nIn+1+nHid+[1:nOut], :);
+  nOutput = size(Y,1);
+  oact = o((end-nOutput+1):end,:);
   
   if (nargout>2)
-    huact = o(nIn+1+[1:nHid], :);
+    nInput = size(X,1);
+    huact = o((nInput+1):(end-nOutput),:);
   end;

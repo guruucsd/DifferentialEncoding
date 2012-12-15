@@ -1,6 +1,7 @@
 function [img] = guru_freq1to2(freqs, sz2D)
 %
 % Takes a 2D fft, and converts it to a 1D FFT
+guru_assert(false);
 
   [x,y] = meshgrid(1:sz2D(2), 1:sz2D(1));
   

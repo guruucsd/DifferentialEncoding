@@ -11,7 +11,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
 % Output:
 % h             : array of handles to plots
 
-  tidx = [mSets.data.aux.idx.LpSm   mSets.data.aux.idx.LmSp];
+  tidx = [mSets.data.LpSm   mSets.data.LmSp];
 
   fig = de_NewFig('ls-bars', 'bars', 1, length(tidx));
     
@@ -46,7 +46,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
   mfe_barweb(stats.basics.bars(tidx, :), ...
              stats.basics.bars_stde(tidx, :), ...
              0.6, ...
-             strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')),...
+             strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')),...
              [], [], [], [], [], lentries);
   hold on;
   
@@ -60,7 +60,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
     mfe_xticklabels(1:2, {'Global', 'Local'});
     xlabel('Target Level');
   else
-    mfe_xticklabels(1:length(tidx), strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')));
+    mfe_xticklabels(1:length(tidx), strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')));
     xlabel('Condition');
   end;
  

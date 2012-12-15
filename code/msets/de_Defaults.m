@@ -11,10 +11,6 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   
   % Whatever we don't have, add!
   
-  % Run parameters
-  if (~ismember('parallel',         aKeys)), args(end+1:end+2) = {'parallel', false}; end;
-
-  %
   if (~ismember('expt',             aKeys)), args(end+1:end+2) = {'expt', expt}; end;
 
   if (~ismember('distn',            aKeys)), args(end+1:end+2) = {'distn',   'norme'}; end;
@@ -46,9 +42,8 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('ac.WeightInitType',aKeys)), args(end+1:end+2) = {'ac.WeightInitType','rand-normd'}; end;
   if (~ismember('ac.WeightInitScale',aKeys)),args(end+1:end+2) = {'ac.WeightInitScale',0.25}; end;
   if (~ismember('ac.debug',         aKeys)), args(end+1:end+2) = {'ac.debug',         1}; end;
-  if (~ismember('ac.continue',      aKeys)), args(end+1:end+2) = {'ac.continue',      0}; end;
 
-  if (~ismember('ac.ts',            aKeys)), args(end+1:end+2) = {'ac.ts',            1}; end;
+  if (~ismember('ac.nHidden',       aKeys)), args(end+1:end+2) = {'ac.nHidden',       1}; end;
   if (~ismember('ac.lambda',        aKeys)), args(end+1:end+2) = {'ac.lambda',        0}; end;
   if (~ismember('ac.zscore',        aKeys)), args(end+1:end+2) = {'ac.zscore',        false}; end;
 
@@ -71,13 +66,10 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
       if (~ismember('p.WeightInitType', aKeys)), args(end+1:end+2) = {'p.WeightInitType','rand-normd'}; end;
       if (~ismember('p.WeightInitScale',aKeys)), args(end+1:end+2) = {'p.WeightInitScale',0.10}; end;
       if (~ismember('p.debug',          aKeys)), args(end+1:end+2) = {'p.debug',         1}; end;
-      if (~ismember('p.continue',       aKeys)), args(end+1:end+2) = {'p.continue',      0}; end;
     
       if (~ismember('p.nHidden',        aKeys)), args(end+1:end+2) = {'p.nHidden',       1}; end;
-      if (~ismember('p.ts',             aKeys)), args(end+1:end+2) = {'p.ts',            1}; end;
       if (~ismember('p.lambda',         aKeys)), args(end+1:end+2) = {'p.lambda',        0}; end;
       if (~ismember('p.zscore',         aKeys)), args(end+1:end+2) = {'p.zscore',        false}; end;
-      if (~ismember('p.ndupes',         aKeys)), args(end+1:end+2) = {'p.ndupes',        1}; end;
     
       if (~ismember('p.rej.props',      aKeys)), args(end+1:end+2) = {'p.rej.props',  {'err'}}; end;
       if (~ismember('p.rej.type',       aKeys)), args(end+1:end+2) = {'p.rej.type',   {'sample_std-normd'}}; end;
@@ -93,11 +85,9 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('plots',            aKeys)), args(end+1:end+2) = {'plots', {'default'}}; end; %ls-bars', 'outliers'}}; end;
   if (~ismember('stats',            aKeys)), args(end+1:end+2) = {'stats', {'default'}}; end;
   
-  if (~ismember('out.runspath',     aKeys)), args(end+1:end+2) = {'out.runspath',    de_GetOutPath([], 'runs')}; end;
-  if (~ismember('out.resultspath',  aKeys)), args(end+1:end+2) = {'out.resultspath', de_GetOutPath([], 'results')}; end;
+  if (~ismember('out.runspath',     aKeys)), args(end+1:end+2) = {'out.runspath',    fullfile(de_GetBaseDir(), 'runs')}; end;
+  if (~ismember('out.resultspath',  aKeys)), args(end+1:end+2) = {'out.resultspath', fullfile(de_GetBaseDir(), 'results')}; end;
   if (~ismember('out.data',         aKeys)), args(end+1:end+2) = {'out.data',        {'info','mat'}}; end;
   if (~ismember('out.plots',        aKeys)), args(end+1:end+2) = {'out.plots',       {'png','fig'}}; end;
-  if (~ismember('out.stem',         aKeys)), args(end+1:end+2) = {'out.stem',        sprintf('%s[u%d,p%d]%d', guru_callerAt(1), ...
-                                                                                                              any(strcmp(args(ischar(args)), 'uberpath')), ...
-                                                                                                              any(strcmp(args(ischar(args)), 'uberpath')))}; end;
+  if (~ismember('out.stem',         aKeys)), args(end+1:end+2) = {'out.stem',        guru_callerAt(1)}; end;
   if (~ismember('out.pub',          aKeys)), args(end+1:end+2) = {'out.pub',   0}; end;

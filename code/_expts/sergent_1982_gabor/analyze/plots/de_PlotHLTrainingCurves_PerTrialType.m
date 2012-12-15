@@ -53,8 +53,8 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
                                             [m.p.MaxIterations-size(c_eP,1) 1]);
       end;
 
-      guru_assert(isempty(find(c_eAC<0)), 'AC error should never be negative!');
-      guru_assert(isempty(find(c_eP<0)),  'P error should never be negative!');
+      if (~isempty(find(c_eAC<0))), keyboard; end;
+      if (~isempty(find(c_eP<0))), keyboard; end;
       
       avg_eAC(ss,:,:) = squeeze(avg_eAC(ss,:,:)) + c_eAC;
       avg_eP(ss,:,:)  = squeeze(avg_eP(ss,:,:))  + c_eP;

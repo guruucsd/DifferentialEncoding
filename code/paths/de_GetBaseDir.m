@@ -8,20 +8,26 @@ function DE_PATH = de_GetBaseDir(p)
   end;
 
   while (length(p)>1)
-     if (exist(fullfile(p, 'code')) == 7 ...
-         && exist(fullfile(p, 'scripts')) == 7)
-         break;
+     if ((guru_findstr('v1.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v2.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v3.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v4.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v5.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v6.', guru_fileparts(p, 'name'))==1) || ...
+         (guru_findstr('v7.', guru_fileparts(p, 'name'))==1) || ...
+         (      strcmp('de',  guru_fileparts(p, 'name'))==1) || ...
+         (      strcmp('DE',  guru_fileparts(p, 'name'))==1) || ...
+         (      strcmp('COGSCI_2012',guru_fileparts(p,'name'))==1))
+        break;
      end;
      p=guru_fileparts(p, 'pathstr'); %go to parent directory
   end;
 
   if (length(p)==1)
-      try, 
-          p = de_GetBaseDir('~/de');
-      
-          error('BaseDir not found.  DE basedir must contain "code" and "scripts" subdirectories');
-          p = [];
-      end;
+      error('BaseDir not found.  DE basedir must be embedded in a directory starting with "v1."');
+    p = [];
+  elseif (~exist(fullfile(p, 'code')))
+      error('BaseDir identified but does not contain directory "code".');
   end;
   
   % We have it!

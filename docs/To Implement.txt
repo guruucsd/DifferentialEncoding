@@ -1,4 +1,0 @@
-Yovel et al, 2001: "equalize saliency" (due to crowding effects):
-  - show that relatively smaller local stimuli lead to a global precedence, and less of a hemisphere x level interaction
-
- 

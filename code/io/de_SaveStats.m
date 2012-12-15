@@ -8,5 +8,5 @@ function out = de_SaveStats(mSets, stats)
   
   fprintf('Saving stats to %s\n', fn);
 
-  save( fn, 'stats' );
+  save( fn, 'stats', '-v7.3' );
   

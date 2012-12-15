@@ -15,16 +15,6 @@ function [models] = de_TrainAllP(mSets, modelsAC)
   %   (if testing "robustness" of model)
   %----------------
   
-  % Train the networks
-  fprintf('Training classifier %dD networks [uber=%d]: mu=%s, o=%s, nConns=%s, nHidden=%s, trials=%s\n', ...
-          length(mSets.nInput),...
-          isfield(mSets, 'uberpath'), ...
-          ['[ ' sprintf('%3.1f ',mSets.mu) ']'], ...
-          ['[ ' sprintf('%3.1f ',mSets.sigma) ']'], ...
-          ['[ ' sprintf('%2d ',  mSets.nConns) ']'], ...
-          ['[ ' sprintf('%3d ',  mSets.nHidden) ']'], ...
-          ['[ ' sprintf('%3d ',  mSets.runs) ']'] );
-
   for mm=1:numel(modelsAC)
     randState = mSets.p.randState;
     
@@ -44,9 +34,9 @@ function [models] = de_TrainAllP(mSets, modelsAC)
         rand ('state',model.p.randState);
             
 
-        fprintf('[%3d]',mm);
+        fprintf('#%-4d',mm);
         models(mm,pd,pe,pa,pi) = de_Trainer(model);
-        if (~models(mm,pd,pe,pa,pi).p.cached), fprintf('\n'); end;
+        fprintf('\n');
               
         %% CRITICAL: UPDATE THE RANDOM STATE!!
         randState = randState + 1;      

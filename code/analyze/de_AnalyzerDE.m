@@ -1,22 +1,27 @@
 function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
-%function [stats, figs]  = de_AnalyzerDE(mSets, mss,rej)
+%function [stats, figs]  = de_AnalyzerDE(mSets, mss)
 %
 
   % Make cell array
   mss = num2cell(mss, 1);
 
   % Load cached if they exist; only non-present stats will be rerun
-  stats = de_LoadStats( mSets, mss );
-  figs  = de_LoadFigs( mSets, stats ); % currently always fails to find cached figs
+  if (false && exist(de_GetOutFile(mSets, 'stats'), 'file'))
+      load( de_GetOutFile(mSets, 'stats'), 'stats' );
+      
+  else
+      stats = [];
+  end;
+  figs = de_NewFig('dummy');
   
   
-  % Pull out the most basic stats BEFORE rejections
-  [stats.raw.ac]     = de_StaticizerAC(mSets, mss, stats.raw.ac, {'default'});
+  % Pull out the most basic stats
+  [stats.raw.ac]     = de_StaticizerAC(mSets, mss, {'default'});
   if (isfield(mSets,'p'))
-      [stats.raw.p]      = de_StaticizerP(mSets, mss, stats.raw.p, {'default'});
+      [stats.raw.p]      = de_StaticizerP(mSets, mss, {'default'});
   end;
   
-  % DO rejections
+  % Do rejections
   %   This "if" statement allows callers to run their own rejection
   %     procedure, instead of what's done here.
   if (exist('rej','var')), stats.raw.r = rej;
@@ -30,12 +35,12 @@ function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
   
 
   % Do AC generic stats & figs 
-  [stats.rej.ac] = de_StaticizerAC(mSets, mss_rej, stats.rej.ac);
+  [stats.rej.ac] = de_StaticizerAC(mSets, mss_rej);
   [figs]         = [figs de_FigurizerAC(mSets, mss_rej, stats)];
 
   % Do P generic stats & figs
   if (isfield(mSets, 'p'))
-    [stats.rej.p]  = de_StaticizerP(mSets, mss_rej, stats.rej.p);
+    [stats.rej.p]  = de_StaticizerP(mSets, mss_rej);
     [figs]         = [figs de_FigurizerP(mSets, mss_rej, stats)];
   end;
   

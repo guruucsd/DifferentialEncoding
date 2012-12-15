@@ -15,15 +15,15 @@ function [models] = de_TrainAllAC(mSets)
     %   (if testing "robustness" of model)
     %----------------
     
-    model = mSets;
-    
+    model        = mSets;
+
     % Train the networks
     fprintf('Training autoencoder %dD networks: mu=%s, o=%s, nConns=%s, nHidden=%s, trials=%s\n', ...
             length(model.nInput),...
-            ['[ ' sprintf('%3.1f ',mSets.mu) ']'], ...
-            ['[ ' sprintf('%3.1f ',mSets.sigma) ']'], ...
-            ['[ ' sprintf('%2d ',  mSets.nConns) ']'], ...
-            ['[ ' sprintf('%3d ',  mSets.nHidden) ']'], ...
+            ['[ ' sprintf('%3.1f ',model.mu) ']'], ...
+            ['[ ' sprintf('%3.1f ',model.sigma) ']'], ...
+            ['[ ' sprintf('%2d ',  model.nConns) ']'], ...
+            ['[ ' sprintf('%3d ',  model.nHidden) ']'], ...
             ['[ ' sprintf('%3d ',  mSets.runs) ']'] );
 
 
@@ -47,10 +47,9 @@ function [models] = de_TrainAllAC(mSets)
 
         niters = max( length(mSets.mu), length(mSets.sigma) );
 
-        for ii=1:niters
+        for i=1:niters
             
             new_model           = guru_rmfield(model, 'p');
-            new_model.hemi      = ii;
             
             % Generate randState for ac
             new_model.ac.randState = randState;
@@ -59,51 +58,49 @@ function [models] = de_TrainAllAC(mSets)
             
             % Parse out ACTUAL model settings
             if length(mSets.mu)==1,  new_model.mu = mSets.mu;
-            else,                    new_model.mu = mSets.mu(ii);
+            else,                    new_model.mu = mSets.mu(i);
             end;
             
             if length(mSets.sigma)==1,  new_model.sigma = mSets.sigma;
-            else,                       new_model.sigma = mSets.sigma(ii);
+            else,                       new_model.sigma = mSets.sigma(i);
             end;
             
             if length(mSets.nHidden)==1, new_model.nHidden = mSets.nHidden;
-            else,                        new_model.nHidden = mSets.nHidden(ii);
+            else,                        new_model.nHidden = mSets.nHidden(i);
             end;
             
             if length(mSets.hpl)==1,     new_model.hpl = mSets.hpl;
-            else,                        new_model.hpl = mSets.hpl(ii);
+            else,                        new_model.hpl = mSets.hpl(i);
             end;
             
             if length(mSets.nConns)==1,  new_model.nConns = mSets.nConns;
-            else,                        new_model.nConns = mSets.nConns(ii);
+            else,                        new_model.nConns = mSets.nConns(i);
             end;
             
             if length(mSets.ac.EtaInit)==1, new_model.ac.EtaInit = mSets.ac.EtaInit;
-            else,                           new_model.ac.EtaInit = mSets.ac.EtaInit(ii);
+            else,                           new_model.ac.EtaInit = mSets.ac.EtaInit(i);
             end;
             
             if length(mSets.ac.Acc)==1, new_model.ac.Acc = mSets.ac.Acc;
-            else,                       new_model.ac.Acc = mSets.ac.Acc(ii);
+            else,                       new_model.ac.Acc = mSets.ac.Acc(i);
             end;
             
             if length(mSets.ac.Dec)==1, new_model.ac.Dec = mSets.ac.Dec;
-            else,                       new_model.ac.Dec = mSets.ac.Dec(ii);
+            else,                       new_model.ac.Dec = mSets.ac.Dec(i);
             end;
             
             if length(mSets.ac.lambda)==1, new_model.ac.lambda = mSets.ac.lambda;
-            else,                          new_model.ac.lambda = mSets.ac.lambda(ii);
+            else,                          new_model.ac.lambda = mSets.ac.lambda(i);
             end;
             
             if (isfield(mSets, 'uberpath'))
             if length(mSets.uberpath)==1,  new_model.uberpath = mSets.uberpath;
-            else,                          new_model.uberpath = mSets.uberpath{ii};
+            else,                          new_model.uberpath = mSets.uberpath{i};
             end; end;
             
             
-            fprintf('[%3d]',zz);
-            models(zz,ii) = de_Trainer(new_model);
-            if (~models(zz,ii).ac.cached), fprintf('\n'); end;
+            fprintf('#%-4d',zz);
+            models(zz,i) = de_Trainer(new_model);
+            fprintf('\n');
         end;  %zz
     end;
-    
-    fprintf('\n');

@@ -11,9 +11,9 @@ function [fig] = de_PlotHLBars(mSets, stats)
 % Output:
 % h             : array of handles to plots
 
-  tidx = [mSets.data.aux.idx.LpSpID mSets.data.aux.idx.LpSpNID ...
-          mSets.data.aux.idx.LpSm   mSets.data.aux.idx.LmSp  ...
-          mSets.data.aux.idx.LmSmID mSets.data.aux.idx.LmSmNID];
+  tidx = [mSets.data.LpSpID mSets.data.LpSpNID ...
+          mSets.data.LpSm   mSets.data.LmSp  ...
+          mSets.data.LmSmID mSets.data.LmSmNID];
 
   fig = de_NewFig('ls-bars', 'bars', 1, length(tidx));
     
@@ -46,7 +46,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
   mfe_barweb(stats.basics.bars(tidx, :), ...
              stats.basics.bars_stde(tidx, :), ...
              0.8, ...
-             strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')),...
+             strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')),...
              [], [], [], [], [], lentries);
   hold on;
   
@@ -64,7 +64,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
 %  else
 %    bar(err(tidx, :));
 %    set(gca,'tickdir','out');
-%    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')));
+%    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')));
 %    
 %    if (length(mSets.sigma)==2)
 %      legend(lentries, 'Location','NorthWest');

@@ -1,0 +1,19 @@
+How to reproduce COGSCI results:
+
+Sergent:
+Run scripts/31x13_gauss/sergent_1982/sergent_all
+
+Kitterle:
+Run scripts/31x13_gauss/kitterle_etal_1992/kitterle_by_freq and kitterle_by_type
+
+Face Recognition:
+Run _bak/scripts/hsiao_etal_2008/lsb_small
+
+LSB:
+Run scripts/34x25_gauss/hsiao_etal_2008/lsb_chimeric_left and lsb_chimeric_right
+  compare left vs right chimeric
+  
+Christman:
+Run scripts/31x13_gauss/christman_etal_1991/christman_high_freq and christman_low_freq
+
+

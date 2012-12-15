@@ -1,130 +1,106 @@
-function dset = de_NormalizeDataset(dset, mSets)
-%
-%  Change a dataset, based on some particular model settings.
-%
-%  dset.X should come in with values in range [0 1]
-%  mSets contains the options for the dataset
-  if (~isfield(mSets.ac, 'minmax'))
+function mSets = de_NormalizeDataset(mSets)
 
-      if ((isfield(mSets.ac, 'linout') && mSets.ac.linout) || (length(mSets.ac.XferFn)==2 && mSets.ac.XferFn(end)==1)) % anything can happen on the output
-          mSets.ac.minmax = [];
+  % Data files have data going from 0 to 1.  
+  % Make sure to match training sessions with data settings
 
-      else
-          switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
-              case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
-                                                       % in the [-1 1] range as well
-              case {1}, mSets.ac.minmax = [];
-              case {2,3}, mSets.ac.minmax    = [0 1];
-              case {5}, mSets.ac.minmax = 0.5*[-1 1];
-              otherwise, error('unknown transfer function');
-          end;
-      end;
+
+
+
+  switch (mSets.ac.XferFn)
+      case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be 
+                                               % in the [-1 1] range as well
+      otherwise,  mSets.ac.minmax    = [0 1];
   end;
+  
+  % Alias for convenience
+  train.X = mSets.data.train.X;
+  test.X  = mSets.data.test.X;
 
-  %%%%%%%%%%%%%%%%%%%%%%%
-  % Autoencoder normalization
-  %%%%%%%%%%%%%%%%%%%%%%%
+  % Z-score 
+  if (false && Sets.ac.zscore_across)
+      
+      train.X = train.X - repmat(mean(train.X,2), [1 size(train.X,2)]);
+      stdTr   = std(train.X,[],2);
+      train.X(stdTr>0,:) = repmat(train.X(stdTr>0), [1 size(train.X,2)]);
 
-  % Z-score: pixel-by-pixel
-  if (isfield(mSets.ac, 'zscore_across') && mSets.ac.zscore_across)
+      test.X  = test.X  - repmat(mean(test.X,2),  [1 size(test.X,2)]);
+      stdTs   = std(test.X,[],2);
+      test.X(stdTs>0,:)  = repmat(test.X(stdTr>0),  [1 size(test.X,2)]);
 
-      stdTr             = std(dset.X,[],2);                                    % std
-      dset.X(stdTr>0,:) = 0.1*dset.X(stdTr>0,:) ./ repmat(stdTr(stdTr>0), [1 size(dset.X,2)]);
+      % Now normalize to expected range
+      % Scale to proper range
+      train.X = train.X ./ ( (max(train.X(:))-min(train.X(:))) / diff(mSets.ac.minmax) );
+      test.X  = test.X  ./ ( (max(test.X (:))-min(test.X (:))) / diff(mSets.ac.minmax) );
+      
+      % Then shift to be centered in range of the sigmoid
+      train.X = train.X - min(train.X(:)) + mSets.ac.minmax(1);
+      test.X  = test.X  - min(test.X(:))  + mSets.ac.minmax(1);
 
-      dset.X            = dset.X - repmat(mean(dset.X,2), [1 size(dset.X,2)]); %zero-mean
+  elseif (false && mSets.ac.zscore)
+    train.X = (train.X - repmat(mean(train.X), [size(train.X,1) 1])) ./ repmat(std(train.X), [size(train.X,1) 1]);
+    test.X  = (test.X  - repmat(mean(test.X),  [size(test.X,1)  1])) ./ repmat(std(test.X),  [size(test.X,1)  1]);
 
-      if (~isempty(mSets.ac.minmax))
-          dset.X = mean(mSets.ac.minmax) + dset.X;
-      end;
+    train.X = mean(mSets.ac.minmax) + train.X;
+    test.X  = mean(mSets.ac.minmax) + test.X;
 
-  % Z-score: across all images and pixels at once
-  elseif (isfield(mSets.ac, 'zscore'))
-    if (islogical(mSets.ac.zscore)), % will produce mean 0, std 0.1 data at each pixel
-      zs.delta_mean = mean(dset.X, 1);
-      zs.delta_std  = 0.1 ./ std(dset.X);
-    elseif isnumeric(mSets.ac.zscore) 
-      zs.delta_mean = mean(dset.X);
-      zs.delta_std  = mSets.ac.zscore ./ std(dset.X, [], 1);
-    elseif isstruct(mSets.ac.zscore)
-      zs = mSets.ac.zscore;
-    else
-      error('Unrecognized type for zscore property.');
-    end;
-
-    dset.X  = (dset.X - repmat(zs.delta_mean, [size(dset.X,1) 1])) .* repmat(zs.delta_std, [size(dset.X,1) 1]);
-    dset.zs = zs;
-
-    
-  % Prepare to put into minmax range by subtracting out midpoint of original [0 1] range
-  elseif (~isempty(mSets.ac.minmax))
-    if (isfield(dset,'minmax')), dset.X = dset.X - diff(dset.minmax)/2;
-    else,                        dset.X = dset.X - 0.5;
-    end;
-  end;
-
-  % Now put into the defined range
-  if (~isempty(mSets.ac.minmax))
-
-      % Normalize inputs based on transfer function
-      dset.X = dset.X + mean(mSets.ac.minmax);
-
-  end;
-
-  % Haaaaaack....
-  if (isfield(mSets.ac, 'absmean'))
-    dset.X = dset.X*(mSets.ac.absmean/mean(abs(dset.X(:))));
-  end;
-
-  % Bias has not been added, so can just examine values
-  if (ismember(2, mSets.ac.debug))
-      fprintf('[%s] min/max=[%4.3e %4.3e]; mean=%4.3e std=%4.3e\n', ...
-              dset.name, min(dset.X(:)), max(dset.X(:)),...
-                         mean(dset.X(:)), std(dset.X(:)) );
+  else
+      train.X = train.X - 0.5;
+      test.X  = test.X  - 0.5;
+      
+      
+      % Normalize inputs based on transfer function 
+      train.X = diff(mSets.ac.minmax)*(train.X) + mean(mSets.ac.minmax);
+      test.X  = diff(mSets.ac.minmax)*(test.X) + mean(mSets.ac.minmax);
+      
   end;
 
   % Add a bias to all inputs
-  %
-  % NOTE: only do if "useBias" field is defined
-  %
-  if (isfield(mSets.ac, 'useBias'))
-      if (~isfield(dset, 'bias')), dset.bias = mean(abs(dset.X(:))); end;
-      dset.X(end+1,:) = dset.bias*mSets.ac.useBias;
-  end;
+  test.X(end+1,:)  = 0+mSets.ac.useBias;
+  train.X(end+1,:) = 0+mSets.ac.useBias;
 
-
+  
   % Validate train; screw you, test!
-  guru_assert(~any(isnan(dset.X(:))), 'nan X-values');
-  if (~isempty(mSets.ac.minmax))
-      guru_assert(~any(dset.X(:)<mSets.ac.minmax(1)), sprintf('X-values outside [%d %d] range', mSets.ac.minmax)); % We won't be able to replicate
-      guru_assert(~any(dset.X(:)>mSets.ac.minmax(2)), sprintf('X-values outside [%d %d] range', mSets.ac.minmax)); %   these values with the autoencoder
-  end;
-
-
-
-  %%%%%%%%%%%%%%%%%%%%%%%
-  % Perceptron normalization
-  %%%%%%%%%%%%%%%%%%%%%%%
-
-  if (isfield(dset,'T') && isfield(mSets, 'p'))
-
-      if (~isfield(mSets.p, 'minmax'))
-          switch (mSets.p.XferFn(end)) % either a single number, or a vector with output nodes at the end
-              case {4,6}, mSets.p.minmax    = [-1 1];
-              otherwise,  mSets.p.minmax    = [0 1];
+  guru_assert(~any(isnan(mSets.data.train.X(:))), 'nan X-values');
+  guru_assert(mSets.ac.zscore || ~any(train.X(:)<mSets.ac.minmax(1)), sprintf('X-values outside [%d %d] range', mSets.ac.minmax));
+  guru_assert(mSets.ac.zscore || ~any(train.X(:)>mSets.ac.minmax(2)), sprintf('X-values outside [%d %d] range', mSets.ac.minmax));
+  
+  % Re-assign result
+  mSets.data.train.X = train.X;
+  mSets.data.test.X  = test.X;
+  
+  
+  
+  if (isfield(mSets, 'p'))
+      switch (mSets.p.XferFn)
+          case {4,6}, mSets.p.minmax    = [-1 1];
+          otherwise,  mSets.p.minmax    = [0 1];
+      end;
+  
+      % Alias for convenience
+      train.T = mSets.data.train.T;
+      test.T  = mSets.data.test.T;
+    
+      if (mSets.p.zscore)
+          error('z-scoring on the classifier output NYI');
+        
+      else
+          train.T = train.T - 0.5;
+          test.T  = test.T  - 0.5;
+          
+          % Normalize expected outputs based on classifier transfer function
+          if (isfield(mSets, 'p'))
+              train.T = diff(mSets.p.minmax)*train.T + mean(mSets.p.minmax);
+              test.T  = diff(mSets.p.minmax)*test.T  + mean(mSets.p.minmax);
           end;
       end;
-
-      % Normalize expected outputs based on classifier transfer function
-      dset.T = dset.T - 0.5;
-      dset.T = diff(mSets.p.minmax)*dset.T + mean(mSets.p.minmax);
-
-      % Duplicate the outputs, for robust training
-      if (isfield(mSets.p, 'ndupes'))
-          dset.T = repmat(dset.T, [mSets.p.ndupes 1]);
-      end;
       
-      % validate dset
-%      guru_assert(~any(isnan(dset.T(:))), 'nan T-values');
-%      guru_assert(~any(dset.T(:)<mSets.p.minmax(1)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));
-%      guru_assert(~any(dset.T(:)>mSets.p.minmax(2)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));
-  end;
+      % validate train; screw you, test!
+      guru_assert(~any(isnan(train.T(:)) & ~isnan(mSets.data.train.T(:))), 'nan T-values');
+      guru_assert(~any(train.T(:)<mSets.p.minmax(1)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));
+      guru_assert(~any(train.T(:)>mSets.p.minmax(2)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));
+      
+      % Re-assign result
+      mSets.data.train.T = train.T;
+      mSets.data.test.T  = test.T;
+  end;    
+  

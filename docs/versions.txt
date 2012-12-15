@@ -1,9 +1,0 @@
-3.17: 
-  * changed connectivity patterns (grid-like 202 and 425 instead of lazier version which fails connecting all, more often)
-  * made navon figures into bitmaps
-  * made ac/p hash use datafile name
-  * made uber christman use theta=0 (instead of pi/2)
-  * added common_args.m (only working for 34x25)
-
-  * did NOT implement "any size" for faces
-  * want to migrate to larger size; Navon figure bitmaps are mucked up

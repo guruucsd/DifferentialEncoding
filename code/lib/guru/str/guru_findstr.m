@@ -1,20 +1,15 @@
-function is = guru_findstr(str, tomatch, startIdx,style)
-%is = guru_findstr(str, tomatch, startIdx,style)
+function is = guru_findstr(str, tomatch, startIdx)
+%
 %  Just like findstr, BUT
 %    - ONLY returns the FIRST MATCH
 %    - works on cell arrays
 %
 %  So, multiple matches => multiple input strings, one match per input string.
 %
-% str: string (or cell array)
-% tomatch: substring to match
-% startIdx: index inside string to start searching
-%     (str if ischar, or each string element of the cell array)
-% style: all or first or last (only applies when str is a cell array)
-
-  if (~exist('startIdx','var')), startIdx = 1; end;
-  if (~exist('style', 'var')), style='all'; end;
-
+  if (~exist('startIdx','var'))
+    startIdx = 1;
+  end;
+  
   if (~iscell(str))
     tmp = findstr(str(startIdx:end), tomatch);
     if (isempty(tmp))
@@ -37,12 +32,5 @@ function is = guru_findstr(str, tomatch, startIdx,style)
         end;
       end;
     end;
-  end;
-
-  switch style
-    case 'all', ; % do nothing
-    case 'first', is = is(1);
-    case 'last', is=is(end);
-    otherwise, error('Unknown style parameter: %s', style);
   end;
   

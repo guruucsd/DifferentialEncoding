@@ -12,7 +12,7 @@ function carr = guru_csprintf(fmt, cells, delim)
 % carr  : cell array of strings
 
   if (~exist('delim','var') || isempty(delim))
-    delim = '|||';
+    delim = '|x|';
   end;
   
   %
@@ -26,21 +26,13 @@ function carr = guru_csprintf(fmt, cells, delim)
       
       for i=1:length(cells)
           if     (iscell    (cells{i})), carr{i} = guru_cell2str(cells{i}, ' ');
-          elseif (isnumeric (cells{i}))
-              if length(cells{i})==numel(cells{i})
-                carr{i} = ['[' num2str(cells{i}) ']']; 
-              else
-                carr{i}=['[' num2str(size(cells{i})) ']'];
-              end;
-              carr{i} = regexprep(carr{i}, '\s+',' ');
-
+          elseif (isnumeric (cells{i})), carr{i} = ['[' num2str(cells{i}) ']'];
           elseif (ischar    (cells{i})), carr{i} = cells{i};
           elseif (isinteger (cells{i})), carr{i} = num2str(cells{i});
           elseif (islogical (cells{i})), carr{i} = num2str(cells{i});
-          elseif (isfloat   (cells{i})), carr{i} = num2str(cells{i}); carr{i} = regexprep(carr{i}, '\s+',' ');
-          elseif (isreal    (cells{i})), carr{i} = num2str(cells{i}); carr{i} = regexprep(carr{i}, '\s+',' ');
+          elseif (isfloat   (cells{i})), carr{i} = num2str(cells{i});
+          elseif (isreal    (cells{i})), carr{i} = num2str(cells{i});
           else, error('Unknown type for conversion to string.');
           end;
       end;          
   end;
-    

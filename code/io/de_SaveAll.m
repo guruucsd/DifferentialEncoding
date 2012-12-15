@@ -36,23 +36,18 @@ function [success,mSets] = de_SaveAll(mSets, models, stats, figs)
   
   % Save the plots
   if (exist('figs','var'))
-    if (ismember(11, mSets.debug)), fprintf('Saving plots...'); end;
     [mSets.out] = de_SavePlots(mSets, figs);
-    if (ismember(11, mSets.debug)), fprintf('done.\n'); end;
   end;
   
   % Save the stats
-  if (exist('stats','var') && ~stats.cached)
-    if (ismember(11, mSets.debug)), fprintf('Saving stats...'); end;
-    [mSets.out] = de_SaveStats(mSets, stats);
-    if (ismember(11, mSets.debug)), fprintf('done.\n'); end;
+  if (exist('stats','var'))
+    fprintf('Skipping saving stats.\n');
+    %[mSets.out] = de_SaveStats(mSets, stats);
   end;
   
   % Save model & stats results
   if (exist('models','var') && exist('stats','var'))
-    if (ismember(11, mSets.debug)), fprintf('Saving data...'); end;
     [mSets.out] = de_SaveData(mSets, models, stats);
-    if (ismember(11, mSets.debug)), fprintf('done.\n'); end;
   end;
 
   success = 1;

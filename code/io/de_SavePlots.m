@@ -1,8 +1,8 @@
-function out = de_SavePlots(mSets, figs)
+function out = de_SavePlots(modelSettings, figs)
 %
 %
 
-  out = mSets.out;
+  out = modelSettings.out;
   
   % Loop over figure names to make sure they're all unique.
   figNames = {figs.name};
@@ -21,28 +21,32 @@ function out = de_SavePlots(mSets, figs)
 
     % Loop over each plot
     for j=1:length(figs)
-      out.files{end+1} = de_GetOutFile(mSets, 'plot', figs(j).name, ext, mSets.runs);
+      out.files{end+1} = de_GetOutFile(modelSettings, 'plot', figs(j).name, ext, modelSettings.runs);
       
-      % Don't re-create existing figures
-      if (figs(j).cached), continue; end;
-      
-      if (ismember(1,mSets.debug))
+      if (ismember(1,modelSettings.debug))
         fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], guru_replace(out.files{end}, de_GetBaseDir(), ''));
       end;
+      
+%      figure(figs(j).handle);
+%      sz = get(figs(j).handle, 'PaperPosition');
+%      set(figs(j).handle, 'PaperPosition', [sz(1:2) sz(3:4)/1.25]);
       
       %i/o
       if (~exist(guru_fileparts(out.files{end}, 'pathstr'), 'dir'))
         mkdir(guru_fileparts(out.files{end}, 'pathstr')); 
       end;
-    
-      saveas(figs(j).handle, out.files{end}, ext(2:end));
+      if (strcmp('fig',ext(2:end)))
+        saveas(figs(j).handle, out.files{end});
+      else
+        print(figs(j).handle, out.files{end}, ['-d' ext(2:end)]);
+      end;
       
       % Make a version of the plot for publication
-      if (mSets.out.pub)
+      if (true || false)
         ft = ext(2:end);
         if (~strcmp(ft, 'fig'))
           hatch_fn = [out.files{end}(1:end-4) '-pub' out.files{end}(end-3:end)];
-          if (ismember(1,mSets.debug))
+          if (ismember(1,modelSettings.debug))
             fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], guru_replace(hatch_fn, de_GetBaseDir(), ''));
           end;
 
@@ -52,8 +56,6 @@ function out = de_SavePlots(mSets, figs)
         end;
       end;
       %close(figs(j).handle);
-    end; %each plot
-  end; %each output type
+    end;
+  end;
 
-  % Now save the plot metadata, for re-loading cached plots
-  
