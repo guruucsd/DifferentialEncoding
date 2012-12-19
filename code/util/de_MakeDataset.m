@@ -210,8 +210,8 @@ function dset = de_StimApplyResizing(dset, opts)
 function dset = de_StimApplyFiltering(dset, opts)
 
     % Blurring
-    blurring = guru_getopt(opts, 'blurring', 1);
-    if (blurring > 1)
+    blurring = guru_getopt(opts, 'blurring', 0);
+    if (blurring > 0)
         for ii=1:size(dset.X,2)
            dset.X(:,ii) = reshape( imfilter(reshape(dset.X(:,ii), dset.nInput(1:2)), ...
                                             fspecial('gaussian', [blurring blurring], 4), ...
