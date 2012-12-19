@@ -22,21 +22,38 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
 
     images{si} = zeros([length(models), models(1).nInput, nImages]);
 
-    for mi=1:length(models)
-      if (isfield(models(mi).ac, 'Weights'))
-          model = models(mi);
-      else
-          model = de_LoadProps(models(mi), 'ac', 'Weights');
+
+
+  for mi=1:length(models)
+
+     m = models(mi);
+
+      % Only re-run neural net if we didn't save the output already
+
+     if ~isfield(m.ac,'output')
+
+        try
+          % Try to load the result
+          error('Can''t cache this property without taking into account the dataset, whcih we currently don''t do!');
+          m = de_LoadProps(m,ac,'output');
+        catch
+          % Make sure the weights are loaded
+          if (~isfield(m.ac, 'Weights'))
+              m = de_LoadProps(m, 'ac', 'Weights');
+          end;
+          
+          % Run the network
+          [m.ac.output]   = guru_nnExec(m.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
+        end;
       end;
-
-      [o]   = guru_nnExec(model.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
-
+      
       % Convert back from polar to regular image
 %      if guru_hasopt(dset.opt, 'img2pol')
-%          o = de_pol2img(o, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
+%          m.ac.output = de_pol2img(m.ac.output, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
 %      end;
       
-      images{si}(mi,:,:,:)  = reshape(o, [dset.nInput nImages]);
+      % Store the result
+      images{si}(mi,:,:,:)  = reshape(m.ac.output, [dset.nInput nImages]);
     end;
+
   end;
-  

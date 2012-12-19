@@ -40,11 +40,11 @@ function dset = de_NormalizeDataset(dset, mSets)
   % Z-score: across all images and pixels at once
   elseif (isfield(mSets.ac, 'zscore'))
     if (islogical(mSets.ac.zscore)), % will produce mean 0, std 0.1 data at each pixel
-      zs.delta_mean = mean(dset.X);
+      zs.delta_mean = mean(dset.X, 1);
       zs.delta_std  = 0.1 ./ std(dset.X);
     elseif isnumeric(mSets.ac.zscore) 
       zs.delta_mean = mean(dset.X);
-      zs.delta_std  = mSets.ac.zscore ./ std(dset.X);
+      zs.delta_std  = mSets.ac.zscore ./ std(dset.X, [], 1);
     elseif isstruct(mSets.ac.zscore)
       zs = mSets.ac.zscore;
     else
