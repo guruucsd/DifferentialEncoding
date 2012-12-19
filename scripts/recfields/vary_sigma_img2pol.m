@@ -1,4 +1,4 @@
- function vary_sigma()
+ function vary_sigma_img2pol()
 
 %  freqs = [ 0.0001 0.01 * [ 1.5 3 6 12 18 24 30 36] 0.5]; % using only harmonics
   freqs = [ 0.0001 0.01 * [ 2 4 6 8 10 12 14 16 18 20 25 30 35 50]]; %using non-harmonics
@@ -8,9 +8,9 @@
             'w_mode', 'posmean', ...
             'a_mode', 'mean', ...
             'freqs',  freqs, ...
-            'nin', 10, ...
-            'distn', 'norme2', ...
-            'nsamps', 3, ...
+            'nin', 2, ...
+            'distn', 'norme', ...
+            'nsamps', 1, ...
             'nbatches', 1 ...
          };
   
@@ -50,15 +50,13 @@
   xlabel('frequency (cycles per image)');
 
   % non-normalized
-  figure; 
-  hold on;
   colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
   figure; 
   hold on;
   %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
   %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
   for si=1:length(sigmas)
-    plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, 'Color', colors(si), 'LineWidth', 3);
+    plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
   end;
   for si=1:length(sigmas)
     errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
@@ -68,18 +66,19 @@
   xlabel('frequency (cycles per image)');
   ylabel('output activity (linear xfer fn)');
   legend(lbls, 'Location', 'best', 'FontSize',16);
+  title('non-normalized');
   
   % normalized
   figure; 
   hold on;
-  plot(cpi, (sign(avg_mean).*ns_mean)', 'LineWidth', 2);
+  plot(cpi, (sign(avg_mean).*ns_mean)', '*-', 'LineWidth', 2);
   errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*ns_mean)', ns_std');
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
   ylabel('output activity (normalized)');
   legend(lbls, 'Location', 'best', 'FontSize',14);
-  
+  title('normalized');
   %figure;
   %subplot(1,3,1); imshow(0.5+mfe_grating2d( 0.06, 0, pi/2, 0.5, 20, 20 ));
   %subplot(1,3,2); imagesc(squeeze(wts_mean(2,:,:)));
