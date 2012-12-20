@@ -86,10 +86,12 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
                 elseif fi==length(p.freqs), bandpass = [p.freqs(end)/2 inf];
                 else, bandpass = [mean(p.freqs(fi-1:fi)) mean(p.freqs(fi:fi+1))];
                 end;
-                [~,dset] = de_MakeDataset('vanhateren', sprintf('%d',p.norients*p.nphases),'',{'small', 'bandpass',norm(p.sz)/2*bandpass});
+                opts = {'small','bandpass',norm(p.sz)/2*bandpass};
+                if p.img2pol, opts={opts{:}, 'img2pol'}; end;
+                [~,dset] = de_MakeDataset('vanhateren', sprintf('%d',p.norients*p.nphases),'', opts);
                 if (any(dset.X(:)))
                     dset = de_NormalizeDataset(dset, struct('ac',struct('XferFn',1,'zscore',0.05,'debug',1:15)));
-                    %dset.X = dset.X(1:end-1,:);
+                    %dset.X = dset.X - min(dset.X(:));%dset.X = dset.X(1:end-1,:);
                 end;
                 
                 nimages = size(dset.X,2);
@@ -98,9 +100,8 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
                     phsi = 1+mod(ci-1,p.nphases); phase=NaN;
 
                     x = reshape(dset.X(:,1),dset.nInput);
-                    if p.img2pol, x = mfe_img2pol(x); end;
-                  
-                    resp = x(:)/sum(x(:));
+                    resp = x(:);
+                    
                     for ixi=1:p.niters
                         resp = sum(resp.*w(:));
                     end;
