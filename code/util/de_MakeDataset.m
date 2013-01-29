@@ -90,11 +90,11 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 %   (so that they use the same information)
 %
 
+    dset = de_StimApplyFiltering(dset, opts);
+
     dset = de_StimApplyTransform(dset, opts);
     
     dset = de_StimApplyResizing(dset, opts);
-
-    dset = de_StimApplyFiltering(dset, opts);
 
     if (exist('dset_to_match','var'))
         dset = de_StimApplyWhitening(dset, opts, dset_to_match);
@@ -107,15 +107,13 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        de_visualizeData(dset);
+        %de_visualizeData(dset);
 
         dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        de_visualizeData(dset); % just for now
+        %de_visualizeData(dset); % just for now
         
-        junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        de_visualizeData(junk); % just for now
-        
-        keyboard
+        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(junk); % just for now
     end;
  
     if guru_hasopt(opts, 'contrast')
@@ -212,8 +210,8 @@ function dset = de_StimApplyResizing(dset, opts)
 function dset = de_StimApplyFiltering(dset, opts)
 
     % Blurring
-    blurring = guru_getopt(opts, 'blurring', 1);
-    if (blurring > 1)
+    blurring = guru_getopt(opts, 'blurring', 0);
+    if (blurring > 0)
         for ii=1:size(dset.X,2)
            dset.X(:,ii) = reshape( imfilter(reshape(dset.X(:,ii), dset.nInput(1:2)), ...
                                             fspecial('gaussian', [blurring blurring], 4), ...

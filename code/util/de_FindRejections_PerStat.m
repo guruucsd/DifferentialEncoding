@@ -42,7 +42,7 @@
       end; %switch
     end;
     
-    pctRejected = nnz(sum(rejectTypes,2))/size(rejectTypes,1)
+    pctRejected = nnz(sum(rejectTypes,2))/size(rejectTypes,1);
     if  pctRejected >= 0.25
         warning(sprintf('Large number of rejections: %.1f%%', 100*pctRejected)); 
     end;

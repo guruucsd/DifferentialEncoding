@@ -27,11 +27,44 @@ function outdir = de_GetOutPath(model, dirType)
     case {'datasets'}
         outdir = fullfile('~', 'datasets');
 
-    case {'conn'}
-            origString = de_GetOutPath(model, 'ac_p_base');
+    % Connections are stored to a directory based ONLY on its own properties,
+    %   NOTHING about how it will be used after the pruned connections are established
+    case 'conn_base'
+        % Make sure to select one of the settings given
+        if isfield(model, 'hemi') && iscell(model.iters_per), 
+            model.iters_per = model.iters_per{model.hemi};
+            model.steps     = model.steps{model.hemi};
+            model.sigma = model.sigma(model.hemi);
+        end;
+        
+        origString = '';
+
+        % Add conn-specific model settings
+        origString = [ origString ...
+                       sprintf('SG=%f,',   model.sigma), ...
+                       sprintf('NS=%d,',   model.nConnPerHidden_Start), ...
+                       sprintf('NE=%d,',   model.nConnPerHidden_End), ...
+                     ];
+
+        % Add workspace settings
+        origString = [ origString ...
+                       sprintf('DS=%s,',   model.dataset), ...
+                       sprintf('IP=[%s],', sprintf(' %d',model.iters_per)), ...
+                       sprintf('ST=[%s],', sprintf(' %d',model.steps)), ...
+                       sprintf('NP=%d,',   model.npruning_loops), ...
+                       sprintf('PL=%s,',   model.prune_loc), ...
+                       sprintf('PS=%s,',   model.prune_strategy), ...
+                       sprintf('KW=%d,',   model.keep_weights), ...
+                       sprintf('NK=%d,',   model.ac.nzc_ok), ...
+                       sprintf('OP=%s',    guru_cell2str(model.data.opt, '.')), ...
+                     ];
+                     
+                     
             hash       = hash_path(origString);
-            
-            outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', hash);
+            outdir     = hash;          
+
+    case {'conn'}
+            outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', de_GetOutPath(model, 'conn_base'));
 
 
     % Top-level output directory for trained models and analysis stats.
@@ -140,7 +173,7 @@ function outdir = de_GetOutPath(model, dirType)
               end;
               
               origString = [origString ...
-                            sprintf('CT=%s', de_GetOutFile(model.ac.ct, 'conn', 'fullPath',false)) ...
+                            sprintf('CT=%s', de_GetOutPath(model.ac.ct, 'conn_base')) ...
                            ];
           end;
 
