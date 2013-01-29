@@ -94,7 +94,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
         dt_div_T_repd = ns.dt./T_repd;       % pre-calculate commonly used value
         
         for ti=1:pats.tsteps
-            bi = (backIdx{biIdx(ti)}+biIncr(ti));
+            bi = (backIdx{biIdx(ti)}+biIncr(ti)); %backwards indexing, for convenience
             
             % Calculate dy and y
             if (ti==1)
@@ -109,8 +109,15 @@ function [net,data] = r_train_resilient_batch(net,pats)
             % Calculate x and fx SECOND.  Y precedes x; so y(ti) should ref
             % x(ti-1) and x(ti) should ref y(ti)
             % Use most efficient time-indexing function to compute x(t)
-            y_d         = y(bi).*(ti>=D_repd);
-            x(ti,:,:)   = sum(w_repd .* y_d, 2);
+            y_d         = y(bi).*(ti>=(D_repd));
+            axon_noise  = (D_repd>1) .* D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % local has no noise, version
+            %axon_noise  = D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); all delays, including local, has noise
+            %axon_noise  = 1      .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); static amount of noise on all cxns
+             %(1-net.sets.reliability).*(1./(1+2*exp(-D_repd)));
+            if iter==1 && ti==1 && net.sets.axon_noise, max(abs(axon_noise(:))); end;
+            if iter==1 && ti==1 && net.sets.axon_noise, fprintf('Average noise per pattern per synapse: %.2e, or %.2f%% of activation\n',  sum(abs(axon_noise(:)))/net.ncc/2/pats.npat, 100 * sum(abs(axon_noise(:)))/net.ncc/2/pats.npat / mean(abs(y(:)))), end;
+
+            x(ti,:,:)   = sum(w_repd .* (y_d+axon_noise), 2);
             fx(ti,:,:)  = net.fn.f(x(ti,:,:));
             fpx(ti,:,:) = net.fn.fp(fx(ti,:,:));
             

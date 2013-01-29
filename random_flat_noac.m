@@ -3,28 +3,28 @@ addpath(genpath('code'));
 dbstop if error;
 %dbstop if warning;
 
-tsteps = 22;
+tsteps = 30;
 Idel = 1;
-Idur = tsteps-Idel;
+Idur = 6;%tsteps-Idel;
 Sdel = 1; %start measuring output right when it goes off 
 Sdur = 1;  %measure for 5 time-steps
 
-net.sets.rseed = 290;
+net.sets.rseed = 291;
 
 %training parameters
-net.sets.niters          = 500;
+net.sets.niters          = 1500;
 net.sets.online          = false;
 net.sets.ncc             = 2;
 net.sets.cc_wt_lim       = inf*[-1 1];
-net.sets.W_LIM           = inf*[-5 5];
+net.sets.W_LIM           = inf*[-1 1];
 net.sets.train_criterion = 0.5; 
-net.sets.dataset         = 'random';
-net.sets.init_type       = 'lewis_elman';%'ringo';
+net.sets.dataset         = 'random';%lewis_elman';
+net.sets.init_type       = 'lewis_elman';%lewis_elman';
 net.sets.train_mode      = 'resilient';
 
 %timing parameters
 net.sets.dt     = 0.01;
-net.sets.T_INIT = [0.10 0.10];  %change     
+net.sets.T_INIT = 0.05.*[1 1];  %change     
 net.sets.T_LIM  = net.sets.T_INIT;
 net.sets.tstart = 0;
 net.sets.tsteps = tsteps  ;%we'll add another hidden layer, so measure output at one step later
@@ -35,7 +35,7 @@ net.sets.S_LIM  = net.sets.tstop -net.sets.dt*(Sdel +[Sdur 0]);  % min & max tim
 net.sets.D_INIT           = 1*[1 1];%*[1 1; 1 1]; %early lh&rh; late lh&rh
 net.sets.D_IH_INIT(1,:,:) = 1*[1 1; 1 1];             %lh;    early->late and late->early
 net.sets.D_IH_INIT(2,:,:) = net.sets.D_IH_INIT(1,:,:); %rh;    early->late and late->early
-net.sets.D_CC_INIT(1,:,:) = 22*[1 1; 1 1];             %early; l->r and r->l
+net.sets.D_CC_INIT(1,:,:) = 2*[1 1; 1 1];             %early; l->r and r->l
 net.sets.D_CC_INIT(2,:,:) = net.sets.D_CC_INIT(1,:,:); %late;  l->r and r->l
 
 net.sets.eta_w           = 9E-2;    %learning rate (initial)
@@ -45,7 +45,8 @@ net.sets.phi_w           = 0.25;      % multiplicative decrease to eta
 net.sets.alpha_w         = 0.25;       %momentum
 
 net.sets.grad_pow        = 3;
-
+%net.sets.reliability     = -10;
+net.sets.axon_noise       = 1E-5;%0.0005;
 net.sets.nhidden_per      = 10;% 15;
 %net.sets.autoencoder      = false;
 %net.sets.duplicate_output = false; % :( :( :(

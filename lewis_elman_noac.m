@@ -58,6 +58,7 @@ if (~net.sets.continue)
     net.sets.nhidden_per      = 25;% 15;
     net.sets.noise_init       = 0;%1;
     net.sets.noise_input      = 0;%001;%1;
+    net.sets.axon_noise       = 0;
 end;
 
 %
