@@ -141,8 +141,7 @@ function [s,f] = expt_histograms( models, ws, s_in )
     % Show the difference between LH and RH differences
     subplot(ws.nkernels+1,3,3*(ws.nkernels+1) + [-1 0]); % last row of three
     bar(s.bins, s.d_f{end}-s.d_f{1});
-
-
+save
 
 %%%%%%%%%%%%%%%%%%%%%%
 function [ipd, fs] = expt_ipd( models, ws )

@@ -6,13 +6,13 @@ close all;
 addpath(genpath('../../code'));
 de_SetupExptPaths('sergent_1982');
 
-sigma                =    1*[  15];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
-nConnPerHidden_Start =    1*[  36];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
+sigma                =    1*[   8];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
+nConnPerHidden_Start =    1*[  32];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
 nConnPerHidden_End   =    1*[   8];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
-hpl                  =    1*[   2];%   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 408];% 111 425 425 425 425 425 425 425 425 425 102 102];
-dataset_train        =      repmat({'sq'}, size(sigma));
-lambdas              = 0.00*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
+hpl                  =    1*[   8];%   1   1   1   2   1   1   1   1   1   1   2   1];
+nHidden              = hpl.*[ 108];% 111 425 425 425 425 425 425 425 425 425 102 102];
+dataset_train        =      repmat({'n'}, size(sigma));
+lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
 zscore               = 0.05*ones(size(sigma));
 AvgError             = 1E-4*ones(size(sigma));
@@ -21,7 +21,7 @@ prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'weights'},size(sigma)); %weights, weighted_weights, or activity
 
 N                    = 4*ones(size(sigma));
-tag                  = repmat( {'vert'}, size(sigma) );
+tag                  = repmat( {'standard2'}, size(sigma) );
 
 iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sigma) );
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
