@@ -8,7 +8,7 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
 
   % Split up info into meaningful variables
   training_info_split = mfe_split('/', training_info);
-  guru_assert(length(training_info_split)==2);
+  guru_assert(length(training_info_split)==2, 'training info must have correct format: expt/stimset');
   training_expt     = training_info_split{1};
   training_imageset = training_info_split{2};
 
@@ -39,7 +39,7 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   %%%%%%%%%%%%%%%%%
 
   testing_info_split  = mfe_split('/', testing_info);
-  guru_assert(length(testing_info_split) ==3);
+  guru_assert(length(testing_info_split) ==3, 'testing info must have correct format: expt/stimset/tasktype');
   testing_expt      = testing_info_split{1};
   testing_imageset  = testing_info_split{2};
   testing_task      = testing_info_split{3};

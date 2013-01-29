@@ -54,6 +54,7 @@ function [models] = de_TrainAllAC(mSets)
             
             % Generate randState for ac
             new_model.ac.randState = randState;
+            if isfield(model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
             rand ('state',new_model.ac.randState);
             
             
