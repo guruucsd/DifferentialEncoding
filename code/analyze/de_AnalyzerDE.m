@@ -12,7 +12,7 @@ function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
   
   % Pull out the most basic stats BEFORE rejections
   [stats.raw.ac]     = de_StaticizerAC(mSets, mss, stats.raw.ac, {'default'});
-  if (isfield(mSets,'p'))
+  if (isfield(mSets,'p') && isfield(mSets.data.train, 'T'))
       [stats.raw.p]      = de_StaticizerP(mSets, mss, stats.raw.p, {'default'});
   end;
   
@@ -23,7 +23,7 @@ function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
   else,                    stats.raw.r = []; end;
 
   stats.raw.r = de_FindRejectionsAC(mss, mSets.ac.rej, stats.raw, stats.raw.r);
-  if (isfield(mSets, 'p'))
+  if (isfield(mSets, 'p') && isfield(mSets.data.train, 'T'))
       stats.raw.r = de_FindRejectionsP (mss, mSets.p.rej, stats.raw, stats.raw.r);
   end;
   mss_rej     = de_DoRejections( mss, stats.raw.r, ismember(1,mSets.debug));
@@ -34,7 +34,7 @@ function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
   [figs]         = [figs de_FigurizerAC(mSets, mss_rej, stats)];
 
   % Do P generic stats & figs
-  if (isfield(mSets, 'p'))
+  if (isfield(mSets, 'p') && isfield(mSets.data.train, 'T'))
     [stats.rej.p]  = de_StaticizerP(mSets, mss_rej, stats.rej.p);
     [figs]         = [figs de_FigurizerP(mSets, mss_rej, stats)];
   end;
