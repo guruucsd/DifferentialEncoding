@@ -51,10 +51,13 @@ function [testdata] = r_forwardpass(net,pats,data)
         
         x(ti,:,:)   = sum(w_repd .* (y(bi).*(D_repd<=ti)), 2);
         fx(ti,:,:)  = net.fn.f(x(ti,:,:));
-        fpx(ti,:,:) = net.fn.fp(fx(ti,:,:));
+        fpx(ti,:,:) = net.fn.fp(x(ti,:,:), fx(ti,:,:));
+        
+        fx(ti,:,outidx) = net.fn.f(x(ti,:,outidx));
+        fpx(ti,:,outidx) = net.fn.fp(x(ti,:,outidx),fx(ti,:,outidx));
     end;
 
-    testdata.E    = net.fn.Err(pats.s, y(:,:,outidx), pats.d);
+    testdata.E    = pats.s .* net.fn.Err(y(:,:,outidx), pats.d);
 
     % Save some stats
     testdata.ypat = y(:,:,outidx);

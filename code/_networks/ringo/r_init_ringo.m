@@ -135,19 +135,29 @@ function [net] = r_init_ringo(net, pats)
     % Set up network parameters/values
     %%%%%%%%%%%%%%%%%%%%
 
-    net.fn.sse  = @(y,d)     (0.5.*(y-d).^2);
-    net.fn.Err  = @(s,y,d)   (0.5.*(s.*((y-d)).^2));
-    net.fn.Errp = @(s,y,d,p) (     (s.*((y-d)).^p));
+    if ~isfield(net, 'fn'), net.fn = struct(); end;
+    if ~isfield(net.fn, 'sse'),   net.fn.sse  = @(y,d)   (0.5.*(y-d).^2); end;
+%    if ~isfield(net.fn, 'Err'),   net.fn.Err  = @(y,d)   (0.5.*((y-d)).^2); end;
+%    if ~isfield(net.fn, 'Errp'),   net.fn.Errp = @(y,d,p) ((y-d).^p); end;
+ 
         
+    % Activation function:
+
     %zero-mean sigmoid
-%    net.fn.f      = @(x)  (-1 + 2./(1+exp(-x)));
-%    net.fn.fp     = @(fx) (fx-fx.^2);
+%    if ~isfield(net.fn, 'f'),  net.fn.f      = @(x)  (-1 + 2./(1+exp(-x))); end;
+%    if ~isfield(net.fn, 'fp'), net.fn.fp     = @(x,fx) (fx-fx.^2); end;
 
     %tanh
-%    net.fn.f      = @(x)  ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x)));
-%    net.fn.fp     = @(fx) (1-fx.^2);
+%    if ~isfield(net.fn, 'f'),  net.fn.f      = @(x)  ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x))); end;
+%    if ~isfield(net.fn, 'fp'), net.fn.fp     = @(x,fx) (1-fx.^2); end;
 
     %1.71*tanh(2*x/3)
-    net.fn.f     = @(x) (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1));
-    net.fn.fp    = @(fx) (1.7159*2/3*(1 - (fx/1.7159).^2));
+    if ~isfield(net.fn, 'f'),  net.fn.f     = @(x) (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1)); end;
+    if ~isfield(net.fn, 'fp'), net.fn.fp    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2)); end;
 
+
+    % Output activation function
+    
+    % Same as hidden
+    if ~isfield(net.fn, 'fo'),   net.fn.fo    = net.fn.f; end;
+    if ~isfield(net.fn, 'fpo'),  net.fn.fpo   = net.fn.fp; end;
