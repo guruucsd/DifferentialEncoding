@@ -114,27 +114,43 @@ function [net,data] = r_train_resilient_batch(net,pats)
             %axon_noise  = D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); all delays, including local, has noise
             %axon_noise  = 1      .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); static amount of noise on all cxns
              %(1-net.sets.reliability).*(1./(1+2*exp(-D_repd)));
-            if iter==1 && ti==1 && net.sets.axon_noise, max(abs(axon_noise(:))); end;
-            if iter==1 && ti==1 && net.sets.axon_noise, fprintf('Average noise per pattern per synapse: %.2e, or %.2f%% of activation\n',  sum(abs(axon_noise(:)))/net.ncc/2/pats.npat, 100 * sum(abs(axon_noise(:)))/net.ncc/2/pats.npat / mean(abs(y(:)))), end;
+            if iter==25 && ti==10 && net.sets.axon_noise, max(abs(axon_noise(:))); end;
+            if iter==25 && ti==10 && net.sets.axon_noise, 
+
+                actidx = y~=0;
+                avg_axon_noise = sum(abs(axon_noise(actidx(:)))) / pats.npat / length(net.idx.cc);
+                avg_act = mean(abs(y(actidx(:))));
+                
+                fprintf('Average noise per pattern per synapse: %.2e, or %.2f%% of activation\n',  avg_axon_noise, 100 * avg_axon_noise / avg_act);
+             end;
 
             x(ti,:,:)   = sum(w_repd .* (y_d+axon_noise), 2);
-            fx(ti,:,:)  = net.fn.f(x(ti,:,:));
-            fpx(ti,:,:) = net.fn.fp(fx(ti,:,:));
+            fx(ti,:,:)  = net.fn.f (x(ti,:,:));
+            fpx(ti,:,:) = net.fn.fp(x(ti,:,:), fx(ti,:,:)); %send x and fx for efficiency of computation
             
-            e(ti, :, outidx) = net.fn.Errp(pats.s(ti,:,:), ...
-                                           y(ti,:,outidx), ...
+            % Allow output units to follow different activation function than other units
+            fx(ti,:,outidx)  = net.fn.fo (x(ti,:,outidx));
+            fpx(ti,:,outidx) = net.fn.fpo(x(ti,:,outidx),fx(ti,:,outidx));
+            
+            e(ti, :, outidx) = (pats.s(ti,:,:) .* ...
+                               net.fn.Errp(y(ti,:,outidx), ...
                                            pats.d(ti,:,:), ...
-                                           ns.grad_pow) ...
+                                           ns.grad_pow)) ...
                                           .*((1-ns.wt_class)+ns.wt_class*(abs(y(ti,:,outidx)-pats.d(ti,:,:))>ns.train_criterion));
                                  
-            E(iter,:,ti,:)   = net.fn.Err(pats.s(ti,:,:), y(ti,:,outidx), pats.d(ti,:,:));
-    
-            %if (any(any( dy(ti,:,:)==pi))),     error('why dy nan???'); end;
-            %if (any(any( y (ti,:,:)==pi))),     error('why y nan???'); end;
-            %if (any(any( y_d       ==pi))),     error('why y_d nan???'); end;
-            %if (any(any( e(ti,:,outidx)==pi))), error('why dy nan???'); end;
+            if any(any( isnan(x(ti,:,:)))),      error('why x nan???'); end;
+            if any(any( isnan(dy(ti,:,:)))),     error('why dy nan???'); end;
+            if any(any( isnan( y (ti,:,:)))),    error('why y nan???'); end;
+            if any(any( isnan(y_d       ))),     error('why y_d nan???'); end;
+            if any(any( isnan(e(ti,:,outidx)))), error('why dy nan???'); end;
+
+
+            E(iter,:,ti,:)   = pats.s(ti,:,:) .* net.fn.Err(y(ti,:,outidx), pats.d(ti,:,:));
             
-            %if (any(any( isnan(E(iter,:,ti,:)) ))), error('E is nan'); end;
+            if (any(any( isnan(squeeze(E(iter,:,ti,:))) ))), error('E is nan'); end;
+            if (any(any( isinf(squeeze(E(iter,:,ti,:))) ))), error('E is inf'); end;
+            if (any(any( ~isreal(squeeze(E(iter,:,ti,:))) ))), error('E is complex'); end;
+            if (any(any( any(squeeze(E(iter,:,ti,:))<0) ))), error('E is negative'); end;
         end;
 
         % Save some stats
@@ -215,6 +231,10 @@ function [net,data] = r_train_resilient_batch(net,pats)
 
         % Calc some stats
         data.E_iter(iter) = sum(sum(data.E_pat(iter,:,:)));
+        
+        if isinf  (data.E_iter(iter)), error('E_iter is inf!'); end;
+        if isnan  (data.E_iter(iter)), error('E_iter is nan!'); end;
+        if ~isreal(data.E_iter(iter)), error('E_iter is complex!'); end;
 
         % 
         abs_diff         = abs(data.actcurve(pats.gb)-pats.d(pats.gb));
@@ -232,6 +252,8 @@ function [net,data] = r_train_resilient_batch(net,pats)
         end;
 
         % Do some reporting
+        %if isnan(data.E_iter(iter)), keyboard; end;
+        
         fprintf('Err=%6.2e; (%4.1f%% bt ) maxdiff=(%4.3f);', ...
                 data.E_iter(iter), ...
                 floor(1000*sum(bits_cor(:))/bits_set)/10.0, ...
@@ -386,6 +408,12 @@ function [net,data] = r_train_resilient_batch(net,pats)
         net.Df  = min(max(net.Df,ns.D_LIM(1)),ns.D_LIM(2));
         net.D   = round(net.Df); %
 
+
+        if any(isinf(net.w(:))), error('w is inf???'); end;
+        if any(isnan(net.w(:))), error('w is nan???'); end;
+        if any(isnan(net.T(:))), error('T is nan???'); end;
+        if any(isnan(net.D(:))), error('D is nan???'); end;
+        
         %%%%%%%%%%%%%%
         % Parameter updates 
         %%%%%%%%%%%%%%

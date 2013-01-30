@@ -105,19 +105,82 @@ function [net] = r_init_lewis_elman(net, pats)
     % Set up network parameters/values
     %%%%%%%%%%%%%%%%%%%%
 
-    net.fn.sse  = @(y,d)     (0.5.*(y-d).^2);
-    net.fn.Err  = @(s,y,d)   (0.5.*(s.*((y-d)).^2));
-    net.fn.Errp = @(s,y,d,p) (     (s.*((y-d)).^p));
-        
+    if ~isfield(net, 'fn'),      net.fn = struct(); end;
+    
+    % Error functions
+    
+    % sum-squared error
+    if ~isfield(net.fn, 'sse'),  net.fn.sse  = @(y,d)   (0.5.*(y-d).^2);        end;
+%    if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (net.fn.sse(y,d)); end;
+%    if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ((y-d).^p); end;
+
+    % Cross entropy
+    if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (ce(y,d)); end;
+    if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ( ((y+1)/2-(d+1)/2).^(p)); end;
+
+    
+    
+    % Activation functions
+    
+    % 1.72 tanh
+    if ~isfield(net.fn, 'f'),    net.fn.f     = @(x)    (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1)); end;
+    if ~isfield(net.fn, 'fp'),   net.fn.fp    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2)); end;
+    
     %zero-mean sigmoid
-%    net.fn.f      = @(x)  (-1 + 2./(1+exp(-x)));
-%    net.fn.fp     = @(fx) (fx-fx.^2);
+    %if ~isfield(net.fn, 'f'),    net.fn.f      = @(x)    (-1 + 2./(1+exp(-x))); end;
+    %if ~isfield(net.fn, 'fp'),   net.fn.fp     = @(x,fx) (fx-fx.^2); end;
 
     %tanh
-%    net.fn.f      = @(x)  ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x)));
-%    net.fn.fp     = @(fx) (1-fx.^2);
+    %if ~isfield(net.fn, 'f'),    net.fn.f      = @(x)    ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x))); end;
+    %if ~isfield(net.fn, 'fp'),   net.fn.fp     = @(x,fx) (1-fx.^2); end;
 
-    %1.71*tanh(2*x/3)
-    net.fn.f     = @(x) (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1));
-    net.fn.fp    = @(fx) (1.7159*2/3*(1 - (fx/1.7159).^2));
 
+    % output
+
+    % same as input
+    if ~isfield(net.fn, 'fo'),   net.fn.fo    = net.fn.f; end;
+    if ~isfield(net.fn, 'fpo'),  net.fn.fpo   = net.fn.fp; end;
+    
+    % softmax? used for cross-entropy error...
+    %if ~isfield(net.fn, 'fo'),    net.fn.fo     = @(x)    (f1(x)); end;
+    %if ~isfield(net.fn, 'fpo'),   net.fn.fpo    = @(x,fx) (f2(x)); end;
+    
+
+function Err = ce(y,d)
+    y = (y+1)/2;
+    d = (d+1)/2;
+    Err = -(d.*log(abs(y)) + (1-d).*log(abs(1-y)));
+    Err( abs(d-y)<=1 & (y<0 | y>1) ) = -Err( abs(d-y)<=1 & (y<0 | y>1) );
+   % Err( abs(d-y)>1  & (y<0 | y>1) ) 
+    Err(isnan(Err))   = 0;
+    Err(isinf(Err))   = log(1000);
+    Err(~isreal(Err)) = log(1000);
+    
+    if (any(Err(:)<0)), error('?'); end;
+        
+
+function o = f1(z)
+% z=[time pats outputs]
+% normalize over PATTERNS (dim 2)
+
+     exps  = exp(z);
+     sexps = repmat(sum(exps,2), [1 size(z,2),1]);
+     o     = exps./sexps;
+
+     o = 2.*(o-0.5);
+
+     if any(isnan(o(:))), error('o is nan!'); end;
+     if any(isinf(o(:))), error('o is inf!'); end;
+     
+function h1 = f2(z)
+% z=[time pats outputs]
+% normalize over PATTERNS (dim 2)
+
+     exps  = exp(z);
+     sexps = repmat(sum(exps,2), [1 size(z,2),1]);
+     h1    = (sexps+1)./(sexps.^2);
+
+     if any(isnan(h1(:))), error('h1 is nan!'); end;
+     if any(isinf(h1(:))), error('h1 is inf!'); end;
+
+    
