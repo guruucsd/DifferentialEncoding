@@ -12,14 +12,14 @@ Sdur = 1;  %measure for 5 time-steps
 net.sets.rseed = 291;
 
 %training parameters
-net.sets.niters          = 100;
+net.sets.niters          = 40;
 net.sets.online          = false;
 net.sets.ncc             = 0;
 net.sets.cc_wt_lim       = inf*[-1 1];
 net.sets.W_LIM           = inf*[-1 1];
 net.sets.train_criterion = 0.5; 
 net.sets.dataset         = 'random';%lewis_elman';
-net.sets.init_type       = 'lewis_elman';%lewis_elman';
+net.sets.init_type       = 'ringo';%lewis_elman';
 net.sets.train_mode      = 'resilient';
 
 %timing parameters

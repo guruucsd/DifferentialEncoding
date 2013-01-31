@@ -71,6 +71,31 @@ function [pats] = r_pats(net)
     
     [pats.train.gb]      = find(pats.train.s); %good time & good pattern
     [pats.test.gb]       = find(pats.test.s);  %good time & good pattern
+    
+    if strcmp(net.sets.init_type, 'ringo')%length(net.idx.lh_output) == length(net.idx.output)
+        pats.train.gb_rh = pats.train.gb;
+        pats.train.gb_lh = pats.train.gb;
+        pats.test.gb_rh  = pats.test.gb;
+        pats.test.gb_lh  = pats.test.gb;
+        
+        
+    else % assume LH output first
+        no_perhemi = size(pats.train.s,3)/2;
+        
+        rh_s = pats.train.s;
+        rh_s(:,:,1:no_perhemi) = 0;
+        pats.train.gb_rh = find(rh_s);
+        rh_s = pats.test.s;
+        rh_s(:,:,1:no_perhemi) = 0;
+        pats.test.gb_rh = find(rh_s);
+
+        lh_s = pats.train.s;
+        lh_s(:,:,no_perhemi+[1:no_perhemi]) = 0;
+        pats.train.gb_lh = find(lh_s);
+        lh_s = pats.test.s;
+        lh_s(:,:,no_perhemi+[1:no_perhemi]) = 0;
+        pats.test.gb_lh = find(lh_s);
+    end;
 
     pats.ninput          = size(pats.train.P,3)-1; %no bias
     pats.noutput         = size(pats.train.d,3);

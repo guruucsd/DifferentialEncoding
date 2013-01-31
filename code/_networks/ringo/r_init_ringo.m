@@ -35,7 +35,9 @@ function [net] = r_init_ringo(net, pats)
     net.idx.rh_early_ih  = setdiff(net.idx.rh_early_hu, net.idx.rh_early_cc);
     net.idx.lh_late_ih   = setdiff(net.idx.lh_late_hu, net.idx.lh_late_cc);
     net.idx.rh_late_ih   = setdiff(net.idx.rh_late_hu, net.idx.rh_late_cc);
-
+    net.idx.lh_ih        = sort([net.idx.lh_early_ih net.idx.lh_late_ih]);
+    net.idx.rh_ih        = sort([net.idx.rh_early_ih net.idx.rh_late_ih]);
+    
     net.idx.input  = [net.idx.lh_input  net.idx.rh_input ];
     net.idx.output = [net.idx.lh_output net.idx.rh_output];
     net.idx.hidden = setdiff(1:net.nunits, [net.idx.input net.idx.output]);
@@ -137,8 +139,8 @@ function [net] = r_init_ringo(net, pats)
 
     if ~isfield(net, 'fn'), net.fn = struct(); end;
     if ~isfield(net.fn, 'sse'),   net.fn.sse  = @(y,d)   (0.5.*(y-d).^2); end;
-%    if ~isfield(net.fn, 'Err'),   net.fn.Err  = @(y,d)   (0.5.*((y-d)).^2); end;
-%    if ~isfield(net.fn, 'Errp'),   net.fn.Errp = @(y,d,p) ((y-d).^p); end;
+    if ~isfield(net.fn, 'Err'),   net.fn.Err  = @(y,d)   (0.5.*((y-d)).^2); end;
+    if ~isfield(net.fn, 'Errp'),   net.fn.Errp = @(y,d,p) ((y-d).^p); end;
  
         
     % Activation function:
