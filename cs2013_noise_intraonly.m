@@ -14,11 +14,11 @@ net.sets.rseed = 291;
 %training parameters
 net.sets.niters          = 1000; %training iterations
 net.sets.online          = false;
-net.sets.ncc             = 3;
+net.sets.ncc             = 2;
 net.sets.cc_wt_lim       = inf*[-1 1];
 net.sets.W_LIM           = inf*[-1 1];
 net.sets.train_criterion = 0.5; 
-net.sets.dataset         = 'le_inter';%wis_elman';
+net.sets.dataset         = 'le_intra';%wis_elman';
 net.sets.init_type       = 'lewis_elman';
 net.sets.train_mode      = 'resilient';
 
@@ -50,9 +50,9 @@ net.sets.grad_pow        = 3;
 %net.sets.duplicate_output = false; % :( :( :(
 net.sets.nhidden_per      = 15;% 15;
 
-net.sets.axon_noise       = 1E-3;%1E-5;%0.0005;
+net.sets.axon_noise       = 2E-4;%1E-5;%0.0005;
 net.sets.noise_init       = 0;%.001;%1;
-net.sets.noise_input      = 0;%.001;%001;%1;
+net.sets.noise_input      = 1E-4;%.001;%001;%1;
 
 %
 [net,pats,data]          = r_main(net);

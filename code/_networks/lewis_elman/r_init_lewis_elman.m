@@ -111,36 +111,46 @@ function [net] = r_init_lewis_elman(net, pats)
     
     % sum-squared error
     if ~isfield(net.fn, 'sse'),  net.fn.sse  = @(y,d)   (0.5.*(y-d).^2);        end;
-%    if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (net.fn.sse(y,d)); end;
-%    if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ((y-d).^p); end;
+%ben
+
+    if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (net.fn.sse(y,d)); end;
+    if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ((y-d).^p); end;
 
     % Cross entropy
-    if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (ce(y,d)); end;
-    if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ( ((y+1)/2-(d+1)/2).^(p)); end;
+   % if ~isfield(net.fn, 'Err'),  net.fn.Err  = @(y,d)   (ce(y,d)); end;
+   % if ~isfield(net.fn, 'Errp'), net.fn.Errp = @(y,d,p) ( ((y+1)/2-(d+1)/2).^(p)); end;
 
     
     
     % Activation functions
     
     % 1.72 tanh
-    if ~isfield(net.fn, 'f'),    net.fn.f     = @(x)    (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1)); end;
-    if ~isfield(net.fn, 'fp'),   net.fn.fp    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2)); end;
+%    if ~isfield(net.fn, 'f'),    net.fn.f     = @(x)    (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1)); end;
+%    if ~isfield(net.fn, 'fp'),   net.fn.fp    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2)); end;
     
     %zero-mean sigmoid
     %if ~isfield(net.fn, 'f'),    net.fn.f      = @(x)    (-1 + 2./(1+exp(-x))); end;
     %if ~isfield(net.fn, 'fp'),   net.fn.fp     = @(x,fx) (fx-fx.^2); end;
 
     %tanh
-    %if ~isfield(net.fn, 'f'),    net.fn.f      = @(x)    ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x))); end;
-    %if ~isfield(net.fn, 'fp'),   net.fn.fp     = @(x,fx) (1-fx.^2); end;
+    if ~isfield(net.fn, 'f'),    net.fn.f      = @(x)    ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x))); end;
+    if ~isfield(net.fn, 'fp'),   net.fn.fp     = @(x,fx) (1-fx.^2); end;
 
 
     % output
 
     % same as input
-    if ~isfield(net.fn, 'fo'),   net.fn.fo    = net.fn.f; end;
-    if ~isfield(net.fn, 'fpo'),  net.fn.fpo   = net.fn.fp; end;
+%    if ~isfield(net.fn, 'fo'),   net.fn.fo     = @(x)    (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1)); end;
+%:    if ~isfield(net.fn, 'fpo'),  net.fn.fpo    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2)); end;
+
+%    if ~isfield(net.fn, 'fo'),   net.fn.fo    = net.fn.f; end;
+%    if ~isfield(net.fn, 'fpo'),  net.fn.fpo   = net.fn.fp; end;
     
+    % tanh (normal) (for squashing the output)
+    if ~isfield(net.fn, 'fo'),    net.fn.fo      = @(x)    ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x))); end;
+    if ~isfield(net.fn, 'fpo'),   net.fn.fpo     = @(x,fx) (1-fx.^2); end;
+
+
     % softmax? used for cross-entropy error...
     %if ~isfield(net.fn, 'fo'),    net.fn.fo     = @(x)    (f1(x)); end;
     %if ~isfield(net.fn, 'fpo'),   net.fn.fpo    = @(x,fx) (f2(x)); end;

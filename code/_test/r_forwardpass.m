@@ -53,8 +53,8 @@ function [testdata] = r_forwardpass(net,pats,data)
         fx(ti,:,:)  = net.fn.f(x(ti,:,:));
         fpx(ti,:,:) = net.fn.fp(x(ti,:,:), fx(ti,:,:));
         
-        fx(ti,:,outidx) = net.fn.f(x(ti,:,outidx));
-        fpx(ti,:,outidx) = net.fn.fp(x(ti,:,outidx),fx(ti,:,outidx));
+        fx(ti,:,outidx) = net.fn.fo(x(ti,:,outidx));
+        fpx(ti,:,outidx) = net.fn.fpo(x(ti,:,outidx),fx(ti,:,outidx));
     end;
 
     testdata.E    = pats.s .* net.fn.Err(y(:,:,outidx), pats.d);

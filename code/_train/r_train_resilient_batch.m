@@ -78,7 +78,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
     
 
     for iter=1:ns.niters
-        fprintf('[%4d]: ',iter);
+        if (mod(iter,ns.test_freq)==0)
+            fprintf('[%4d]: ',iter);
+        end;
 
         %%%%%%%%%%%%%%%%
         % Simulate forward
@@ -247,19 +249,20 @@ function [net,data] = r_train_resilient_batch(net,pats)
             nl = r_lesion_cc(net);
             td = r_forwardpass(nl,pats,data);
 
-            data.E_lesion(round(iter/ns.test_freq),:,:) = td.E(end,:,:);
+            data.E_lesion(round(iter/ns.test_freq),:,:) = td.E(find(sum(sum(pats.s,3),2),1,'last'),:,:);
             clear('nl','td');
         end;
 
         % Do some reporting
         %if isnan(data.E_iter(iter)), keyboard; end;
         
-        fprintf('Err=%6.2e; (%4.1f%% bt ) maxdiff=(%4.3f);', ...
-                data.E_iter(iter), ...
-                floor(1000*sum(bits_cor(:))/bits_set)/10.0, ...
-                max_diff);
-        if (ns.verbose && mod(iter,ns.test_freq)==0), abs_diff, end;
-        
+        if (mod(iter,ns.test_freq)==0)
+            fprintf('Err=%6.2e; (%4.1f%% bt ) maxdiff=(%4.3f);', ...
+                    data.E_iter(iter), ...
+                    floor(1000*sum(bits_cor(:))/bits_set)/10.0, ...
+                    max_diff);
+            if (ns.verbose && mod(iter,ns.test_freq)==0), abs_diff, end;
+        end;
             
         % We trained to criterion; break out!
         if (sum(bits_cor(:)) == bits_set)
@@ -314,11 +317,13 @@ function [net,data] = r_train_resilient_batch(net,pats)
         etaw_toch = v_wl0;
         etaT_toch = v_Tl0; 
         etaD_toch = v_Dl0;
-            
-        fprintf('  eta( w=%6.2e )',  mean(ns.eta_w(find(ns.eta_w))));
-        fprintf('  sign-change=(%4.1f%% /%4.1f%%)', ...
-                100*length(find(v_wl0))/length(find(net.wC)), ...
-                100*length(find(v_Tl0))/length(net.T));
+         
+        if (mod(iter,ns.test_freq)==0)
+            fprintf('  eta( w=%6.2e )',  mean(ns.eta_w(find(ns.eta_w))));
+            fprintf('  sign-change=(%4.1f%% /%4.1f%%)', ...
+                    100*length(find(v_wl0))/length(find(net.wC)), ...
+                    100*length(find(v_Tl0))/length(net.T));
+        end;
 
         if (length(giters)>1)
             rel_error  = (data.E_iter(iter) - data.E_iter(giters(2)))/(data.E_iter(iter));
@@ -429,9 +434,11 @@ function [net,data] = r_train_resilient_batch(net,pats)
             noosc_T = (1 + noosc_T) .* v_Tg0;
             noosc_D = (1 + noosc_D) .* v_Dg0;
         
-            fprintf('  cycles=(+%2d/-%2d +%2d/-%2d)', ...
-                    length(find(osc_w>2)), length(find(noosc_w>3)), ...
-                    length(find(osc_T>2)), length(find(noosc_T>3)) );
+            if (mod(iter,ns.test_freq)==0)
+                fprintf('  cycles=(+%2d/-%2d +%2d/-%2d)', ...
+                        length(find(osc_w>2)), length(find(noosc_w>3)), ...
+                        length(find(osc_T>2)), length(find(noosc_T>3)) );
+            end;
 
             ns.lambda_w(osc_w>2) = ns.lambda_w(osc_w>2) .* (1-ns.phi_w);
             ns.lambda_T(osc_T>2) = ns.lambda_T(osc_T>2) .* (1-ns.phi_T);
@@ -476,7 +483,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
         if (ns.eta_T_min && mean(ns.eta_T(:))<ns.eta_T_min), ns.eta_T = ns.eta_T*ns.eta_T_min/mean(ns.eta_T(:)); end;
         if (ns.eta_D_min && mean(ns.eta_D(:))<ns.eta_D_min), ns.eta_D = ns.eta_D*ns.eta_D_min/mean(ns.eta_D(:)); end;
         
-        fprintf('\n');
+        if (mod(iter,ns.test_freq)==0)
+            fprintf('\n');
+        end;
     end;
 
     

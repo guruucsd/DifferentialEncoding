@@ -13,7 +13,7 @@ function [data] = r_test(net,pats,data)
     data.nolesion.pats = pats_name;
         
     if net.ncc==0
-        net           = r_lesion_hemi(net, 'rh');
+        net           = r_lesion_cc(net);%, 'rh');
     else
         net           = r_lesion_cc(net);
     end;
