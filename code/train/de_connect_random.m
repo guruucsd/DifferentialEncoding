@@ -40,7 +40,7 @@ function [Con,Wts] = de_connect_random(model)
         nPix         = prod(model.nInput(1:2));
         nInputLayers = prod(model.nInput(3:end));
         nHidPerLayer = model.nHidden/nInputLayers;
-        Con = spalloc( 2*prod(model.nInput) + model.nHidden, 2*prod(model.nInput) + model.nHidden, 2*model.nHidden*nConns + 2*prod(model.nInput)+model.nHidden );
+        Con = spalloc( 2*prod(model.nInput) + model.nHidden, 2*prod(model.nInput) + model.nHidden, 2*model.nHidden*model.nConns + 2*prod(model.nInput)+model.nHidden );
 
         for i=1:nInputLayers
 
