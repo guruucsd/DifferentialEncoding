@@ -106,6 +106,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                         mn   = mupos(mi,:);
                         cv   = [sig 0; 0 sig];
                         pdn  = mvnpdf(X, mn, cv);
+                        %keyboard
                         
                     case {'normeh'}
                         theta = randn*(pi/2/hpl) + (pi/hpl*(h-1));  % divide half-circle (we-re symmetric) into (hpl) parts; allow jitter within that slide (according to pi/hpl)

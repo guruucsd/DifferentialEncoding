@@ -23,6 +23,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'cpi', [0.5 1 2 4 8 16 32] ...% freqs', 0.01 * [ 1.5 3 6 12 18 24 30 36 42 48 54] ...    %freqs = 0.015 * [ 6 9 12 15];
               );
     p = guru_stampProps(p, varargin{:});
+
     if isfield(p, 'freqs'), error('freqs should not be set. please set cpi!'); end;
     p.freqs = p.cpi./max(p.sz); %cycles
         
@@ -75,7 +76,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                   %imagesc(w_pdf1-0.5*w_pdf2); colorbar;
                 otherwise, error('unknown weight mode: %s', p.w_mode);
             end;
-            w = w / max(abs(sum(w(:))), 1); %p.nin; %sum(abs(w(:))); %implicitly dividing by p_in
+            %w = w / max(abs(sum(w(:))), 1); %p.nin; %sum(abs(w(:))); %implicitly dividing by p_in
             wts(sampnum, :,:) = w;
 
             %
@@ -102,7 +103,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                         end;
                         
                         % Calculate output node response
-                        resp = x(:)/sum(x(:));
+                        resp = x(:);%/sum(x(:));
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));
                         end;
