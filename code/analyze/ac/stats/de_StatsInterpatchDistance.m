@@ -22,7 +22,7 @@ function [ipd] = de_StatsInterpatchDistance(models)
       ms = models{ss};
 
       % Validate
-      if (length(ms)==0)
+      if isempty(ms)
           warning('No models to calc stats for');
           continue;
 
