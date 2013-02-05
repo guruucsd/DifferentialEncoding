@@ -1,6 +1,7 @@
 %close all;
 clear all variables;
 dbstop if error;
+if ~exist('guru_csprintf','file'), addpath(genpath('../../code')); end;
 
 % Amir et al (1993) results
 amir.areas={'V1','V2','V4','7a'};
@@ -14,28 +15,31 @@ amir.calc.patch_length = 2*amir.patch_area/pi./(amir.patch_width/2);%assume elli
 amir.calc.area_diameter = amir.avg_dist./(amir.avg_dist_pct./100); % estimated diameter /extent of cortical area
 amir.calc.patch_nn_pct = amir.patch_nn./amir.calc.area_diameter*100;  %estimate of % area extent between nearest neighbors
 
-min_sz = 55;%100./amir.calc.patch_nn_pct; % minimum image size to simulate that area
+%min_sz = 55;%100./amir.calc.patch_nn_pct; % minimum image size to simulate that area
 
 %%%%%%%
 expt=1;
 
 switch expt
     case {1, '1'}, 
-        sz = [75 75];
+        sz = [100 100];
         sigmas = [1 2 4 8 16 32 64 128];%
         cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
         nin    = [1 1 1 1 1  1  1  1]*10;
-        nsamps = 1;
+        nsamps = 25;
 end;
 
 am = cell(size(sigmas)); sm=cell(size(am)); ss=cell(size(am)); wm=cell(size(am)); p=cell(size(am));
 
 cl = [1 0 0; 0 1 0; 0 0 1; 1 1 0; 1 0 1; 0 1 1];
+cl = [cl; 0.5*cl];
+
 colors = @(si,szi) (reshape(repmat(3-(si(:)-1), [1 3])/3 * 1 .* repmat(cl(szi,:),[numel(si) 1]),[numel(si) 3]));
 
 % non-normalized
 f1 = figure;
-hold on;
+%set(gcf, hold on;
+set(gcf, 'Position', [10          90        1266         594]);
 set(gca, 'FontSize', 16);
 xlabel('spatial frequency (cycles per image)');
 ylabel('output activity (linear xfer fn)');
@@ -43,6 +47,7 @@ title('non-normalized (all)');
 
 % non-normalized
 f11 = figure;
+set(gcf, 'Position', [10          90        1266         594]);
 hold on;
 set(gca, 'FontSize', 16);
 xlabel('spatial frequency (cycles per image)');
@@ -50,6 +55,7 @@ ylabel('output activity (linear xfer fn)');
 title('non-normalized (all)'); 
 
 f2 = figure;
+set(gcf, 'Position', [10          90        1266         594]);
 hold on;
 set(gca, 'FontSize', 16);
 xlabel('spatial frequency (cycles per image)');
@@ -57,6 +63,7 @@ ylabel('output activity (linear xfer fn)');
 title('differences (all)'); 
 
 f22 = figure;
+set(gcf, 'Position', [10          90        1266         594]);
 hold on;
 set(gca, 'FontSize', 16);
 xlabel('spatial frequency (cycles per image)');
@@ -126,7 +133,6 @@ for szi=1:length(sigmas)
     plot(p{szi}(1).cpi,       -diff(sm{szi}(si,:),1), '*-', 'Color', colors(1,szi), 'LineWidth', 3, 'MarkerSize', 5);
     errorbar(p{szi}(1).cpi,   -diff(sm{szi}(si,:),1), sum(ss{szi}(si,:),1), 'Color', colors(1,szi));
     
-    keyboard
 end;
 
 guru_saveall_figures(mfilename());
