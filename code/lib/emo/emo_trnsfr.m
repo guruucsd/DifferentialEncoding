@@ -38,6 +38,7 @@ function [o, h1] = emo_trnsfr( Trn, z )
       sexps = repmat(sum(exps,1), [size(z,1),1]);
       o     = exps./sexps;
       if nargout>1, h1    = (sexps+1)./(sexps.^2); end;
+      keyboard
 
   otherwise,
       error('Unknown transfer function type');

@@ -5,7 +5,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   nDatapts  = size(X,2);
   nUnits    = size(model.Weights,1);
   nOutputs  = size(Y,1);
-  nHidden   = nUnits - nInputs - nOutputs;
+  nHidden   = nUnits - nInputs - nOutputs - 1;
 
   model.err = zeros([model.MaxIterations nDatapts]);
 
@@ -29,12 +29,16 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
 
+  if (isfield(model, 'noise_input'))
+    X_orig = X;
+  end;
+  
   for ip = 1:model.MaxIterations
+      
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
-        X_orig = X;
-        X      = X_orig + model.noise_input*(randn(size(X)));
-
+        X      = X_orig + model.noise_input*(randn(size(X))); % mean 0 noise
+        % note: noise exists on bias as well?
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 

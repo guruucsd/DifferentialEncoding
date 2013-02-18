@@ -1,4 +1,4 @@
-function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
+function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 % Train with basic backprop, in batch mode
 
   nInputs   = size(X,1)-1;
@@ -28,13 +28,14 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
-
+  if (isfield(model, 'noise_input'))
+    X_orig = X;
+  end;
+  
   for ip = 1:model.MaxIterations
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
-        X_orig = X;
         X      = X_orig + model.noise_input*(randn(size(X)));
-
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 
@@ -113,11 +114,14 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         keyboard;
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
         %keyboard
+        
+    % see eqn 4&5
     elseif isfield(model, 'avgact') %Sullivan & de sa (2006)
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
 
+        % Normalize each unit's activity
         if ~exist('avgact','var'), avgact = zeros(size(meanact)); end;
         avgact = model.bc*meanact+(1-model.bc)*avgact;
         actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
