@@ -31,7 +31,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
   if (isfield(model, 'noise_input'))
     X_orig = X;
   end;
-  
   for ip = 1:model.MaxIterations
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
