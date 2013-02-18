@@ -103,7 +103,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                         end;
                         
                         % Calculate output node response
-                        resp = x(:);%/sum(x(:));
+                        resp = x(:)/sum(x(:));
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));
                         end;
