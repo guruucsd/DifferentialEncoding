@@ -11,7 +11,7 @@ function [stats] = de_StaticizerHL(mSets, mss, stats)
   % Get the basic stats for after-rejections
   [stats.rej]    = de_DoStat([], stats.rej, 'basics', mSets.stats, 'de_StatsBasicsHL', mSets, mss, ismember(1,mSets.debug));
 
-  if (isfield(mSets, 'p'))
+  if (isfield(mSets, 'p') && isfield(mSets.data.train, 'T'))
       % optional stats
       [stats.rej] = de_DoStat('vs',  stats.rej, 'hum', mSets.stats, 'de_StatsVsHuman', mSets, stats.rej.basics.ls);
 
