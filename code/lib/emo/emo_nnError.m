@@ -9,6 +9,10 @@ function [err, errP] = emo_nnError(errorType, Y, T, RAW_ERROR)
 %
 % Output:
 % ERROR : The error calculation
+%
+% NOTE: $HACK: to make T and Y match for cross-entropy, things got fouled
+% up for RAW_ERROR.  Had to add a - sign, for all the gradients... did I
+% mess this up, upstream, forgetting a - sign in using the gradient?
 
   if (~exist('errorType','var') || isempty(errorType)), errorType = 2; end;
 
@@ -21,7 +25,7 @@ function [err, errP] = emo_nnError(errorType, Y, T, RAW_ERROR)
     case {2,'squ'},
       if ~exist('RAW_ERROR', 'var'), RAW_ERROR = Y-T; end;
       err = (RAW_ERROR.^2)/2;
-      if nargout>1, errP = RAW_ERROR; end;
+      if nargout>1, errP = -RAW_ERROR; end;
       
     case {3,'cent'}
         err = -(T.*log(Y) + (1-T).*log(1-Y));
