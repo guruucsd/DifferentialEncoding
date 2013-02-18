@@ -18,8 +18,11 @@ if (iscell(s))
     end;
 elseif (ischar(s))
     l = {};
-    while (length(s) > 0 && length(l)<max)
+    while ~isempty(s) && length(l)<max
         [t,s] = strtok(s,d);
         l = {l{:}, t};
     end
+    if ~isempty(s) % paste on the rest
+        l{end} = [l{end} s];
+    end;
 end;
