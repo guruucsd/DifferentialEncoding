@@ -37,13 +37,16 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   %%%%%%%%%%%%%%%%
   % Train classifiers on images run through the pre-trained autoencoders
   %%%%%%%%%%%%%%%%%
-
   testing_info_split  = mfe_split('/', testing_info);
-  guru_assert(length(testing_info_split) ==3, 'testing info must have correct format: expt/stimset/tasktype');
+  guru_assert(length(testing_info_split) >=2, 'testing info must have correct format: expt/stimset[/tasktype]');
   testing_expt      = testing_info_split{1};
   testing_imageset  = testing_info_split{2};
-  testing_task      = testing_info_split{3};
-
+  if length(testing_info_split)==2
+      testing_task = '';
+  else
+      testing_task      = testing_info_split{3};
+  end;
+  
   p_args = { args{:},'uberpath', dirs };
 
   [tst.mSets, tst.models, tst.stats] = de_Simulator(testing_expt, testing_imageset, testing_task, opts, p_args{:});
