@@ -40,7 +40,7 @@ function [net] = r_init_ringo(net, pats)
     
     net.idx.input  = [net.idx.lh_input  net.idx.rh_input ];
     net.idx.output = [net.idx.lh_output net.idx.rh_output];
-    net.idx.hidden = setdiff(1:net.nunits, [net.idx.input net.idx.output]);
+    net.idx.hidden = setdiff(2:net.nunits, [net.idx.input net.idx.output]);
     net.idx.lh_cc = [net.idx.lh_early_cc net.idx.lh_late_cc];
     net.idx.rh_cc = [net.idx.rh_early_cc net.idx.rh_late_cc];
     net.idx.cc    = sort([net.idx.lh_cc net.idx.rh_cc]);

@@ -9,7 +9,7 @@ Idur = 6;%tsteps-Idel;
 Sdel = 0; %start measuring output right when it goes off 
 Sdur = 1;  %measure for 5 time-steps
 
-net.sets.rseed = 288;
+net.sets.rseed = 289;
 
 %training parameters
 net.sets.niters          = 1000; %training iterations
@@ -35,7 +35,7 @@ net.sets.S_LIM  = net.sets.tstop -net.sets.dt*(Sdel +[Sdur 0]);  % min & max tim
 net.sets.D_INIT           = 1*[1 1];%*[1 1; 1 1]; %early lh&rh; late lh&rh
 net.sets.D_IH_INIT(1,:,:) = 1*[1 1; 1 1];             %lh;    early->late and late->early
 net.sets.D_IH_INIT(2,:,:) = net.sets.D_IH_INIT(1,:,:); %rh;    early->late and late->early
-net.sets.D_CC_INIT(1,:,:) = 1*[1 1; 1 1];             %early; l->r and r->l
+net.sets.D_CC_INIT(1,:,:) = 5*[1 2; 1 2];             %early; l->r and r->l
 net.sets.D_CC_INIT(2,:,:) = net.sets.D_CC_INIT(1,:,:); %late;  l->r and r->l
 
 net.sets.eta_w           = 1E-3;    %learning rate (initial)
@@ -44,33 +44,46 @@ net.sets.lambda_w        = 2E-2;    % lambda*E to control kappa.
 net.sets.phi_w           = 0.25;      % multiplicative decrease to eta
 net.sets.alpha_w         = 0.25;       %momentum
 
+net.sets.alpha_D        = 0.25;
+net.sets.eta_D          = 1E-5;
+net.sets.eta_w_min      = 0;
+net.sets.lambda_D       = 2E-5;
+net.sets.phi_D          = 0.25;
+
 net.sets.grad_pow        = 3;
 
 %net.sets.autoencoder      = false;
 %net.sets.duplicate_output = false; % :( :( :(
 net.sets.nhidden_per      = 15;% 15;
 
-net.sets.axon_noise       = 0E-4;%1E-5;%0.0005;
+net.sets.axon_noise       = 0*2E-2/net.sets.D_CC_INIT(1);
+net.sets.activity_dependent = true;
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
-%
-%[net,pats,data]          = r_main(net);
-%[data.an]                = r_analyze(net, pats, data);
-
-dirname = mfilename();
-sets = net.sets;
+dirname = fullfile('data',mfilename());
+sets= net.sets;
 
 if ~exist(dirname,'dir'), mkdir(dirname); end;
 for s=(288+[1:25])
+   % Make sure not to reuse networks!
    clear 'net';
    net.sets = sets;
+
    net.sets.rseed = s;
+
+   
+    matfile = fullfile(dirname, getfield(getfield(r_massage_params(net), 'sets'),'matfile'));
+    if exist(matfile, 'file')
+    fprintf('Skipping %s\n', matfile);
+        continue; 
+    end; % don't re-run
    try
      [net,pats,data]          = r_main(net);
      [data.an]                = r_analyze(net, pats, data);
      unix(['mv ' net.sets.matfile ' ./' dirname]);
    catch
+     fprintf(lasterr);
    end;
 end;
 

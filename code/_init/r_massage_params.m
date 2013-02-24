@@ -136,7 +136,9 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'grad_pow')),  sets.grad_pow    = 1;          end;
     if (~isfield(sets,'rseed')),     sets.rseed       = randi(1E3), end;
 
-%    if (isfield(sets, 'autoencoder') && ~sets.autoencoder)
+    if (~isfield(sets, 'axon_noise')), sets.axon_noise=0; 
+    elseif numel(sets.axon_noise)>1, guru_assert(sets.niters==numel(sets.axon_noise), 'axon_noise must be scalar, or size must match niters'); end;
+    %    if (isfield(sets, 'autoencoder') && ~sets.autoencoder)
 %        if (~isfield(sets,'ac')), sets.ac = sets; end;
         
         

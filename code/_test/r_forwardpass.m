@@ -49,7 +49,26 @@ function [testdata] = r_forwardpass(net,pats,data)
         % x(ti-1) and x(ti) should ref y(ti)
         % Use most efficient time-indexing function to compute x(t)
         
-        x(ti,:,:)   = sum(w_repd .* (y(bi).*(D_repd<=ti)), 2);
+        y_d         = y(bi).*(ti>=(D_repd));
+        
+        if any(net.sets.axon_noise)
+            if length(net.sets.axon_noise)>1
+              axon_noise = net.sets.axon_noise(end);
+              if axon_noise
+                axon_noise=(D_repd>1) .* D_repd .* (axon_noise) .* 2.*(rand(size(D_repd))-0.5);
+              end;
+            elseif isfield(net.sets,'activity_dependent') && net.sets.activity_dependent
+              axon_noise  = (D_repd>1) .* D_repd .* repmat(squeeze(y(ti,:,:)),[1 1 size(net.w,2)]) .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % [-1 1] local has no noise, version % should be activity-dependent
+            else
+              axon_noise  = (D_repd>1) .* D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % [-1 1] local has no noise, version % should be activity-dependent
+            end;
+            
+            x(ti,:,:)   = sum(w_repd .* (y_d+axon_noise), 2);
+        else
+            x(ti,:,:)   = sum(w_repd .* y_d, 2);
+        end;
+        
+        %x(ti,:,:)   = sum(w_repd .* (y(bi).*(D_repd<=ti)), 2);
         fx(ti,:,:)  = net.fn.f(x(ti,:,:));
         fpx(ti,:,:) = net.fn.fp(x(ti,:,:), fx(ti,:,:));
         

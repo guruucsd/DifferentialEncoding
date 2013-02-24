@@ -50,7 +50,7 @@ net.sets.grad_pow        = 3;
 %net.sets.duplicate_output = false; % :( :( :(
 net.sets.nhidden_per      = 15;% 15;
 
-net.sets.axon_noise       = 5E-4;%1E-5;%0.0005;
+net.sets.axon_noise       = 1E-3/net.sets.D_CC_INIT(1);%1E-5;%0.0005;
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 

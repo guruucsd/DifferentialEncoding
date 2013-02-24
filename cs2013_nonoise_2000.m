@@ -12,7 +12,7 @@ Sdur = 1;  %measure for 5 time-steps
 net.sets.rseed = 288;
 
 %training parameters
-net.sets.niters          = 1000; %training iterations
+net.sets.niters          = 2000; %training iterations
 net.sets.online          = false;
 net.sets.ncc             = 3;
 net.sets.cc_wt_lim       = inf*[-1 1];
@@ -35,7 +35,7 @@ net.sets.S_LIM  = net.sets.tstop -net.sets.dt*(Sdel +[Sdur 0]);  % min & max tim
 net.sets.D_INIT           = 1*[1 1];%*[1 1; 1 1]; %early lh&rh; late lh&rh
 net.sets.D_IH_INIT(1,:,:) = 1*[1 1; 1 1];             %lh;    early->late and late->early
 net.sets.D_IH_INIT(2,:,:) = net.sets.D_IH_INIT(1,:,:); %rh;    early->late and late->early
-net.sets.D_CC_INIT(1,:,:) = 1*[1 1; 1 1];             %early; l->r and r->l
+net.sets.D_CC_INIT(1,:,:) = 10*[1 1; 1 1];             %early; l->r and r->l
 net.sets.D_CC_INIT(2,:,:) = net.sets.D_CC_INIT(1,:,:); %late;  l->r and r->l
 
 net.sets.eta_w           = 1E-3;    %learning rate (initial)
