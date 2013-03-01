@@ -17,7 +17,8 @@ function [stats] = de_StatsDistributions(mss)
       midpt = mSets.nInput+1;
     end;
 
-    nall = length(mss{si})*size(mupos,1);
+    nconn = mSets.nConns;
+    nall = length(mss{si})*size(mupos,1)*nconn;
     nPix = prod(mSets.nInput);
     
     stats.weights_in{si}  = zeros(mSets.nInput*2);
@@ -33,6 +34,7 @@ function [stats] = de_StatsDistributions(mss)
 
       for hi=1:size(mupos,1)
         stats.weights_in{si}( [midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) = stats.weights_in{si}( [midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) + reshape(w_in2hid(hi,:),     mSets.nInput)/nall;
+
         stats.cxns_in{si}(    [midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) = stats.cxns_in{si}(    [midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) + reshape(w_in2hid(hi,:)~=0,  mSets.nInput)/nall;
 
         stats.weights_out{si}([midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) = stats.weights_out{si}([midpt(1):end]-mupos(hi,1), [midpt(2):end]-mupos(hi,2)) + reshape(w_hid2out(hi,:),    mSets.nInput)/nall;
