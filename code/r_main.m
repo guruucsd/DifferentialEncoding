@@ -30,5 +30,6 @@ function [net,pats,data,f,sets] = r_main(net,pats,data)
 %    [data.an]  = r_analyze(net, pats, data);
     
     % Save result
-    save(net.sets.matfile,'net','pats','data');
+    if ~exist(net.sets.dirname), mkdir(net.sets.dirname); end;
+    save(fullfile(net.sets.dirname, net.sets.matfile),'net','pats','data');
     

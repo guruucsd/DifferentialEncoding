@@ -1,0 +1,13 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2012 The MathWorks, Inc.
+                    R2012b (8.0.0.783) 64-bit (glnxa64)
+                              August 22, 2012
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+Training [autoencoder=0] network with tsteps=30, max_del=10, to tc=0.50
+[ 100]: Err=5.58e-01; (48.7% bt ) maxdiff=(1.325);  eta( w=1.51e-03 )  sign-change=(18.7% / 0.0%)  cycles=(+14/-223 + 0/-41)
+[ 200]: Err=3.11e-01; (71.5% bt ) maxdiff=(1.125);  eta( w=1.15e-03 )  sign-change=( 7.8% / 0.0%)  cycles=(+11/-299 + 0/-41)
