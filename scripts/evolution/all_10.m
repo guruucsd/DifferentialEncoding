@@ -1,21 +1,25 @@
 clear globals variables;
 
-
+for rseed=(289-1+[1:10])
+for ncc = [2 0]
 for axon_noise = [0 1E-3]
   for dataset = {'asymmetric_symmetric', 'asymmetric_asymmetric', 'symmetric_asymmetric', 'symmetric_symmetric'}
   
     net = common_args();
+    net.sets.dirname     = strrep(net.sets.dirname, 'all_10', sprintf('%s_%s_n%d', dataset{1}, iff(axon_noise==0, 'nonoise', 'noise'), ncc));
+
     net.sets.dataset     = dataset{1};
     net.sets.axon_noise  = axon_noise;
-    net.sets.ncc         = 2;
-    net.sets.nhidden_per = 10;
-    net.sets.n_nets      = 1;
-    
-    for rseed=(288+[1:10])
-      nets.sets.rseed = rseed;
-      looper(net);
-    end;
-  end;
-end;
 
+    net.sets.ncc         = ncc; 
+    net.sets.nhidden_per = 10;
+    
+    net.sets.rseed = rseed;
+    net.sets.n_nets = 1;
+    looper(net);
+
+end;
+end;
+end;
+end;
 

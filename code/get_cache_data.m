@@ -1,10 +1,22 @@
-function [data,ts] = get_cache_data(dirnames, force_load)
+function [data,ts] = get_cache_data(dirnames, force_load, cache_file)
 %
     global g_data_cache g_dir_cache;
-
+    
     if ~exist('force_load', 'var'),force_load= false; end;
-
-    if isnumeric(g_dir_cache), g_dir_cache={}; g_data_cache={}; end;
+    if ~exist('cache_file','var'), cache_file='cache_file.mat'; end;
+    
+    % first time, didn't exist
+    if isnumeric(g_dir_cache), 
+        if exist(cache_file,'file')
+          %tmp = load(cache_file);
+          %g_data_cache = tmp.g_data_cache;
+          load(cache_file);
+        else
+          g_dir_cache={}; 
+          g_data_cache={}; 
+        end;
+    end; 
+    
     if ischar(dirnames), dirnames = {dirnames}; end;
 
     % Purge old dataset from cache
@@ -17,9 +29,14 @@ function [data,ts] = get_cache_data(dirnames, force_load)
 
     % Add missing dataset(s) to (giant) cache
     for di=1:length(dirnames)
+      dn = dirnames{di};
+      if ~exist(dn), dn = fullfile('data', dirnames{di}); end;
+      if ~exist(dn), dn = fullfile('runs', dirnames{di}); end;
+      
         if ~ismember(dirnames{di}, g_dir_cache)
-            g_data_cache{end+1} = collect_data(fullfile('data',dirnames{di}));
-            g_dir_cache{end+1}  = dirnames{di}; end;
+            g_data_cache{end+1} = collect_data(dn);
+            g_dir_cache{end+1}  = dirnames{di}; 
+        end;
     end;
 
     % Select the current datasets

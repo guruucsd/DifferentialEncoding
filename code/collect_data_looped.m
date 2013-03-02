@@ -1,6 +1,6 @@
 function [d,nts,noise,delay] = collect_data_looped(dirname, force_load)
 
-if ~exist('dirname','var'),    dirname    = 'data/tdlc'; end;
+if ~exist('dirname','var'),    dirname    = 'runs'; end;
 if ~exist('force_load','var'), force_load = false; end;
 
 folders = dir(fullfile(dirname,'tdlc*'));

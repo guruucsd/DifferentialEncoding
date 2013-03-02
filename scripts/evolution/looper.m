@@ -12,8 +12,9 @@ for s=(min_rseed-1+[1:net.sets.n_nets])
 
     %
     matfile = fullfile(net.sets.dirname, getfield(getfield(r_massage_params(net), 'sets'),'matfile'));
+    %keyboard;
     if exist(matfile, 'file')
-    fprintf('Skipping %s\n', matfile);
+        fprintf('Skipping %s\n', matfile);
         continue;
     end; % don't re-run
 
