@@ -3,7 +3,7 @@ function looper(net);
 min_rseed = net.sets.rseed;
 sets= net.sets;
 
-for s=(min_rseed+[1:net.sets.n_nets])
+for s=(min_rseed-1+[1:net.sets.n_nets])
 
    % Make sure not to reuse networks!
    clear 'net';
