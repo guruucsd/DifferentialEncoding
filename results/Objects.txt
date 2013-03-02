@@ -1,0 +1,1 @@
+pats.train.gb:      indices where s=1 (i.e. where output is being measured)

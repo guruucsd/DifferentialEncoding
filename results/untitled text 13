@@ -1,0 +1,25 @@
+>> gaborfilters = gfCreateFilterBank(3,4,size(b),1);                                                                 >> filteredimg = gfFilterImage(b, gaborfilters,1);                                                                   >> for i=1:numel(filteredimg), close all; imagesc(filteredimg{i}/sum(filteredimg{i}(:))); print(gcf, '-dpng', sprintf('test%2d', i)); end;
+>> 
+
+
+  % create filters
+  gaborfilters = gfCreateFilterBank(frequency, orientation, filtersize, ftype);
+  
+
+    %filter, write to the output folder
+    filteredimg = gfFilterImage(img, gaborfilters, type);
+    
+    % downsample original and filter
+    if (resample ~= 1)
+      img = imresize(img, resample);
+      
+      for i=1:prod(size(filteredimg))
+        filteredimg{i} = imresize(filteredimg{i}, resample);
+      end;
+    end;
+    
+                filteredimg{k,o}(:)/sum(filteredimg{k,o}(:))
+   
+    patFile=fullfile(outputfolder, [strtok(strFile,'.') '.pat']);
+    save(patFile,'gaborpat','-ASCII');
+  end;
