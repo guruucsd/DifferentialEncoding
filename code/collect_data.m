@@ -70,13 +70,17 @@ function [an] = collect_data(dirname, resave)
   % Allocate space
   an.intra.intact.err = nan(length(blobs), an.ts.niters);
   an.inter.intact.err = nan(length(blobs), an.ts.niters);
+  an.all.intact.err   = nan(length(blobs), an.ts.niters);
   an.intra.lesion.err = nan(length(blobs), length(an.ts.lesion));
   an.inter.lesion.err = nan(length(blobs), length(an.ts.lesion));
+  an.all.lesion.err   = nan(length(blobs), length(an.ts.lesion));
   
   an.intra.intact.clserr = nan(size(an.intra.intact.err));
   an.inter.intact.clserr = nan(size(an.inter.intact.err));
+  an.all.intact.clserr   = nan(size(an.all.intact.err));
   an.intra.lesion.clserr = nan(size(an.intra.lesion.err));
   an.inter.lesion.clserr = nan(size(an.inter.lesion.err));
+  an.all.lesion.clserr   = nan(size(an.all.lesion.err));
   
   % Loop and fill in data
   for bi=1:length(blobs)
@@ -85,18 +89,22 @@ function [an] = collect_data(dirname, resave)
     %% Error values
     an.intra.intact.err(bi,1:size(data.E_pat,1)) = squeeze(mean(mean(data.E_pat(:,pats.idx.intra,:),3),2))';
     an.inter.intact.err(bi,1:size(data.E_pat,1)) = squeeze(mean(mean(data.E_pat(:,pats.idx.inter,:),3),2))';
+    an.all.intact.err(bi,1:size(data.E_pat,1))   = squeeze(mean(mean(data.E_pat(:,:,:),3),2))';
     an.intra.lesion.err(bi,1:size(data.E_lesion,1)) = mean(mean(data.E_lesion(:,pats.idx.intra,:),3),2)';
     an.inter.lesion.err(bi,1:size(data.E_lesion,1)) = mean(mean(data.E_lesion(:,pats.idx.inter,:),3),2)';
+    an.all.lesion.err(bi,1:size(data.E_lesion,1))   = mean(mean(data.E_lesion(:,:,:),3),2)';
 
     % Propagate values for early stopping
     an.intra.intact.err(bi,size(data.E_pat,1)+1:end)    = an.intra.intact.err(bi,size(data.E_pat,1));
     an.inter.intact.err(bi,size(data.E_pat,1)+1:end)    = an.inter.intact.err(bi,size(data.E_pat,1));
+    an.all.intact.err(bi,size(data.E_pat,1)+1:end)      = an.all.intact.err(bi,size(data.E_pat,1));
     an.intra.lesion.err(bi,size(data.E_lesion,1)+1:end) = an.intra.lesion.err(bi,size(data.E_lesion,1));
     an.inter.lesion.err(bi,size(data.E_lesion,1)+1:end) = an.inter.lesion.err(bi,size(data.E_lesion,1));
+    an.all.lesion.err(bi,size(data.E_lesion,1)+1:end)   = an.all.lesion.err(bi,size(data.E_lesion,1));
     
     % Some aggregates and differences
-    an.all.intact.err = (an.intra.intact.err + an.inter.intact.err)/2; 
-    an.all.lesion.err = (an.intra.lesion.err + an.inter.lesion.err)/2;   
+%    an.all.intact.err = (an.intra.intact.err + an.inter.intact.err)/2; 
+%    an.all.lesion.err = (an.intra.lesion.err + an.inter.lesion.err)/2;   
     an.intra.lei.err  = -(an.intra.intact.err(:,100:100:end) - an.intra.lesion.err);
     an.inter.lei.err  = -(an.inter.intact.err(:,100:100:end) - an.inter.lesion.err);
     an.all.lei.errmean = mean(an.all.lesion.err,1) - mean(an.all.intact.err(:,an.ts.lesion),1);
@@ -111,21 +119,26 @@ function [an] = collect_data(dirname, resave)
 
     an.intra.intact.clserr(bi,1:size(diff_intact,1)) = mean(mean( diff_intact(:,pats.idx.intra,:)>=net.sets.train_criterion, 3),2);
     an.inter.intact.clserr(bi,1:size(diff_intact,1)) = mean(mean( diff_intact(:,pats.idx.inter,:)>=net.sets.train_criterion, 3),2);
+    an.all.intact.clserr(bi,1:size(diff_intact,1))   = mean(mean( diff_intact(:,:,:)>=net.sets.train_criterion, 3),2);
     an.intra.lesion.clserr(bi,1:size(diff_lesion,1)) = mean(mean( diff_lesion(:,pats.idx.intra,:)>=net.sets.train_criterion, 3),2);
     an.inter.lesion.clserr(bi,1:size(diff_lesion,1)) = mean(mean( diff_lesion(:,pats.idx.inter,:)>=net.sets.train_criterion, 3),2);
+    an.all.lesion.clserr(bi,1:size(diff_lesion,1))   = mean(mean( diff_lesion(:,:,:)>=net.sets.train_criterion, 3),2);
 
+    % ????
     an.intra.lesion.err(bi,1:size(data.E_lesion,1)) = mean(mean(data.E_lesion(:,pats.idx.intra,:),3),2)';
     an.intra.lesion.clserr(bi,1:size(diff_lesion,1)) = mean(mean( diff_lesion(:,pats.idx.intra,:)>=net.sets.train_criterion, 3),2);
     
     % Propagate values for early stopping
     an.intra.intact.clserr(bi,size(diff_intact,1)+1:end) = an.intra.intact.clserr(bi,size(diff_intact,1));
     an.inter.intact.clserr(bi,size(diff_intact,1)+1:end) = an.inter.intact.clserr(bi,size(diff_intact,1));
+    an.all.intact.clserr(bi,size(diff_intact,1)+1:end)   = an.all.intact.clserr(bi,size(diff_intact,1));
     an.intra.lesion.clserr(bi,size(diff_lesion,1)+1:end) = an.intra.lesion.clserr(bi,size(diff_lesion,1));
     an.inter.lesion.clserr(bi,size(diff_lesion,1)+1:end) = an.inter.lesion.clserr(bi,size(diff_lesion,1));
+    an.all.lesion.clserr(bi,size(diff_lesion,1)+1:end)   = an.all.lesion.clserr(bi,size(diff_lesion,1));
 
     % Some aggregates and differences
-    an.all.intact.clserr = (an.intra.intact.clserr + an.inter.intact.clserr)/2; 
-    an.all.lesion.clserr = (an.intra.lesion.clserr + an.inter.lesion.clserr)/2;   
+    %an.all.intact.clserr = (an.intra.intact.clserr + an.inter.intact.clserr)/2; 
+    %an.all.lesion.clserr = (an.intra.lesion.clserr + an.inter.lesion.clserr)/2;   
     an.intra.lei.cls = -(an.intra.intact.clserr(:,100:100:end) - an.intra.lesion.clserr);
     an.inter.lei.cls = -(an.inter.intact.clserr(:,100:100:end) - an.inter.lesion.clserr);
 
