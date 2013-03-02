@@ -166,6 +166,8 @@ function [net] = r_massage_params(net)
     fn.train   = str2func(['r_train_'   sets.train_type]);
     fn.analyze = str2func(['r_analyze_' sets.dataset]);
     
+    if ~isfield(sets, 'dirname'), sets.dirname = '.'; end;
+
     % Make a filename for saving
     if (~isfield(sets,'matfile'))
         sets.matfile = sprintf('%s_t%d_d%d_r%d_%s',sets.dataset,sets.tsteps,max(sets.D_CC_INIT(:)),sets.rseed, r_get_hash(sets));
