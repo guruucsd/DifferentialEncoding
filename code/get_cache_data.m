@@ -1,21 +1,28 @@
-function [data,ts] = get_cache_data(dirnames, force_load, cache_file)
+function [data,ts] = get_cache_data(dirnames, cache_file)
 %
     global g_data_cache g_dir_cache;
     
-    if ~exist('force_load', 'var'),force_load= false; end;
-    if ~exist('cache_file','var'), cache_file='cache_file.mat'; end;
+    if ~exist('guru_file_parts','file'), addpath(genpath('code')); end;
+    if ~exist('cache_file','var'), 
+        cache_file='cache_file.mat'; 
+        force_load = false;
+    else
+        force_load = isempty(cache_file);
+    end;
+    if ~strcmp('.mat', guru_fileparts(cache_file, 'ext'))
+        cache_file = [cache_file '.mat'];
+    end;
     
     % first time, didn't exist
-    if isnumeric(g_dir_cache), 
-        if exist(cache_file,'file')
-          %tmp = load(cache_file);
-          %g_data_cache = tmp.g_data_cache;
-          load(cache_file);
-        else
-          g_dir_cache={}; 
-          g_data_cache={}; 
-        end;
-    end; 
+    if exist(cache_file,'file')
+      %tmp = load(cache_file);
+      %g_data_cache = tmp.g_data_cache;
+      load(cache_file);
+    elseif isnumeric(g_dir_cache), 
+
+      g_dir_cache={}; 
+      g_data_cache={}; 
+    end;
     
     if ischar(dirnames), dirnames = {dirnames}; end;
 
