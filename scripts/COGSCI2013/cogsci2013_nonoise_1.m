@@ -1,5 +1,5 @@
 clear globals variables;
-addpath(genpath('code'));
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 
@@ -61,7 +61,7 @@ net.sets.noise_input      = 1E-6;%.001;%001;%1;
 dirname = mfilename();
 sets = net.sets;
 
-if ~exist(dirname,'dir'), mkdir(dirname); end;
+dirname = r_out_path('runs', mfilename);
 for s=(288+[1:25])
    clear 'net';
    net.sets = sets;

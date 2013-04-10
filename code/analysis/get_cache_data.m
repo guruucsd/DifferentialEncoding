@@ -4,7 +4,7 @@ function [data,ts] = get_cache_data(dirnames, cache_file)
     
     if ~exist('guru_file_parts','file'), addpath(genpath('code')); end;
     if ~exist('cache_file','var'), 
-        cache_file='cache_file.mat'; 
+        cache_file = 'cache_file.mat'; %local directory
         force_load = false;
     else
         force_load = isempty(cache_file);
@@ -37,13 +37,14 @@ function [data,ts] = get_cache_data(dirnames, cache_file)
     % Add missing dataset(s) to (giant) cache
     for di=1:length(dirnames)
       dn = dirnames{di};
-      if ~exist(dn), dn = fullfile('data', dirnames{di}); end;
-      if ~exist(dn), dn = fullfile('runs', dirnames{di}); end;
+      if ~exist(dn,'file') && exist(fullfile(r_out_paths('runs'), dirnames{di}),'file')
+          dn = fullfile(r_out_paths('runs'), dirnames{di});
+      end;
       
-        if ~ismember(dirnames{di}, g_dir_cache)
-            g_data_cache{end+1} = collect_data(dn);
-            g_dir_cache{end+1}  = dirnames{di}; 
-        end;
+      if ~ismember(dirnames{di}, g_dir_cache)
+          g_data_cache{end+1} = collect_data(dn);
+          g_dir_cache{end+1}  = dirnames{di}; 
+      end;
     end;
 
     % Select the current datasets

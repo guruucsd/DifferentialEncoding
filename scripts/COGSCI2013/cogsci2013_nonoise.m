@@ -1,5 +1,5 @@
 clear globals variables;
-addpath(genpath('code'));
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 
@@ -58,7 +58,7 @@ net.sets.noise_input      = 1E-6;%.001;%001;%1;
 %[net,pats,data]          = r_main(net);
 %[data.an]                = r_analyze(net, pats, data);
 
-dirname = mfilename();
+dirname = r_out_path('runs', mfilename);
 sets = net.sets;
 
 if ~exist(dirname,'dir'), mkdir(dirname); end;
