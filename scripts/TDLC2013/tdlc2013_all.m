@@ -1,5 +1,5 @@
 clear globals variables;
-addpath(genpath('code'));
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 
@@ -55,7 +55,7 @@ for s=(288+[1:25])
   for tsteps=[15:5:50 75]
     for delay=[2 10]
       for noise=[2E-2/delay 0]
-          dirname = sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,iff(noise>0,'n',''));
+          dirname = fullfile(guru_getOutPath('cache'), 'ringo', sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
           if ~exist(dirname,'dir'), mkdir(dirname); end;
 
           % Make sure not to reuse networks!
@@ -88,7 +88,7 @@ for s=(288+[1:25])
           try
             [net,pats,data]          = r_main(net);
             [data.an]                = r_analyze(net, pats, data);
-            unix(['mv ' net.sets.matfile ' ./' dirname]);
+            unix(['mv ' net.sets.matfile ' ' dirname]);
           catch
             fprintf(lasterr);
           end;

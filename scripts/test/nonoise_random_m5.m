@@ -1,5 +1,5 @@
 clear globals variables;
-addpath(genpath('code'));
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 

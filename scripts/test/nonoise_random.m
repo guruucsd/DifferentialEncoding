@@ -1,5 +1,5 @@
 clear globals variables;
-addpath(genpath('code'));
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 
@@ -55,7 +55,7 @@ net.sets.activity_dependent = true;
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
-dirname = fullfile('data',mfilename());
+dirname = fullfile(guru_getOutPath('cache'), 'ringo', guru_fileparts(pwd, 'name'), guru_fileparts(mfilename, 'name'));
 sets= net.sets;
 
 if ~exist(dirname,'dir'), mkdir(dirname); end;

@@ -45,4 +45,3 @@ drawnow;
 pos2 = get(gca, 'Position');
 
 set(gca, 'Position', [0.57 pos2(2:end)]);%0.2086    0.2799    0.6489])
-
