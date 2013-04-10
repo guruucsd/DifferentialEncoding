@@ -9,12 +9,10 @@ function ringo_summary(prefix)
 
 if ~exist('prefix','var'), prefix = 'tdlc2013_all'; end;
 
-srcdir = fullfile(guru_getOutPath('cache'), 'ringo');
-
-dirs_d2_nonoise  = dir(fullfile(srcdir, [prefix '-*ts-2d']));
-dirs_d10_nonoise = dir(fullfile(srcdir, [prefix '-*ts-10d']));
-dirs_d2_noise    = dir(fullfile(srcdir, [prefix '-*ts-2dn']));
-dirs_d10_noise   = dir(fullfile(srcdir, [prefix '-*ts-10dn']));
+dirs_d2_nonoise  = dir(fullfile(r_out_path('cache'), [prefix '-*ts-2d']));
+dirs_d10_nonoise = dir(fullfile(r_out_path('cache'), [prefix '-*ts-10d']));
+dirs_d2_noise    = dir(fullfile(r_out_path('cache'), [prefix '-*ts-2dn']));
+dirs_d10_noise   = dir(fullfile(r_out_path('cache'), [prefix '-*ts-10dn']));
 
 [data,ts] = summarize_files(dirs_d2_nonoise, prefix);
 keyboard

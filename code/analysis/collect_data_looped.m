@@ -1,7 +1,7 @@
-function [d,nts,noise,delay] = collect_data_looped(dirname, force_load)
+function [d,nts,noise,delay] = collect_data_looped(dirname, cache_file)
 
 if ~exist('dirname','var'),    dirname    = 'runs'; end;
-if ~exist('force_load','var'), force_load = false; end;
+if ~exist('cache_file','var'), cache_file = ''; end; % no caching
 
 folders = dir(fullfile(dirname,'tdlc*'));
 
@@ -18,9 +18,7 @@ for foi=1:length(folders)
     folname = folders(foi).name;
     
     % Get the data 
-    % $HACK: too lazy to properly strip off the 'data' part, which isnot
-    % expected by get_cache_data
-    d{foi} = get_cache_data(fullfile(dirname(6:end), folname), force_load);
+    d{foi} = get_cache_data(fullfile(dirname, folname), cache_file); % break the caching
     d{foi} = d{foi}{1}; % strip off extra cell layer
     
     % Parse out particular properties
@@ -37,3 +35,4 @@ for foi=1:length(folders)
 %        delay{foi}(end+1) = 1;
 %    end;
 end;
+
