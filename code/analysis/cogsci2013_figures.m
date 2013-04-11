@@ -6,8 +6,8 @@ function fs = r_figures(clean_dir, noise_dir, plots, force_load)
 if ~exist('plots','var'),      plots     = [ 0.25 ]; end;
 if ~exist('force_load', 'var'),force_load= false; end;
 
-if ~exist('clean_dir','dir'), clean_dir = fullfile(r_out_path('cache'),clean_dir); end;
-if ~exist('noise_dir','dir'), noise_dir = fullfile(r_out_path('cache'),noise_dir); end;
+if ~exist(clean_dir,'dir'), clean_dir = fullfile(r_out_path('cache'),clean_dir); end;
+if ~exist(noise_dir,'dir'), noise_dir = fullfile(r_out_path('cache'),noise_dir); end;
 
 [cdata,ts] = get_cache_data(clean_dir, guru_iff(force_load, '', fullfile(r_out_path('cache'),'cs2013_cache.mat')));
 [ndata]    = get_cache_data(noise_dir, guru_iff(force_load, '', fullfile(r_out_path('cache'),'cs2013_cache.mat')));
