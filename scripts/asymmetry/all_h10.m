@@ -1,5 +1,7 @@
 clear globals variables;
 
+if ~exist('r_looper','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
+
 for rseed=(289-1+[1:10])
 for ncc = [2 0]
 for axon_noise = [0 1E-3]
@@ -16,7 +18,8 @@ for axon_noise = [0 1E-3]
     
     net.sets.rseed = rseed;
     net.sets.n_nets = 1;
-    looper(net);
+    
+    r_looper(net);
 
 end;
 end;

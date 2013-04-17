@@ -18,7 +18,6 @@ function [an] = collect_data(dirname, resave)
         fprintf('Skipping %s\n', fullfile(dirname, files(fi).name));
         continue;
       end;
-
       b.data.E_pat = b.data.E_pat/b.net.sets.dt;
       
       % reconstruct indices, for symmetric/asymmetric experiments
@@ -75,6 +74,11 @@ function [an] = collect_data(dirname, resave)
   an.ts.intact = [1 an.ts.lesion];
   
   % Allocate space
+  an.intra.weights.lh = zeros(length(blobs), length(b.net.idx.lh_ih), length(b.net.idx.lh_ih));
+  an.intra.weights.rh = zeros(length(blobs), length(b.net.idx.rh_ih), length(b.net.idx.rh_ih));
+  an.inter.weights.lh = zeros(length(blobs), length(b.net.idx.lh_cc), length(b.net.idx.lh_cc));
+  an.inter.weights.rh = zeros(length(blobs), length(b.net.idx.rh_cc), length(b.net.idx.rh_cc));
+
   an.intra.intact.err = nan(length(blobs), an.ts.niters);
   an.inter.intact.err = nan(length(blobs), an.ts.niters);
   an.all.intact.err   = nan(length(blobs), an.ts.niters);
@@ -92,6 +96,12 @@ function [an] = collect_data(dirname, resave)
   % Loop and fill in data
   for bi=1:length(blobs)
     data = blobs{bi}.data; pats = blobs{bi}.pats; net = blobs{bi}.net;
+
+    %% Weights
+    an.intra.weights.lh(bi,:,:) = net.w(b.net.idx.lh_ih, net.idx.lh_ih);
+    an.intra.weights.rh(bi,:,:) = net.w(b.net.idx.rh_ih, net.idx.rh_ih);
+    an.inter.weights.lh(bi,:,:) = net.w(b.net.idx.lh_cc, net.idx.lh_cc);
+    an.inter.weights.rh(bi,:,:) = net.w(b.net.idx.rh_cc, net.idx.rh_cc);
     
     %% Error values
     an.intra.intact.err(bi,1:size(data.E_pat,1)) = squeeze(mean(mean(data.E_pat(:,pats.idx.intra,:),3),2))';

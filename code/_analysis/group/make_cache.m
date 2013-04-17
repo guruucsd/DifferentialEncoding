@@ -19,7 +19,7 @@ function make_cache(dirs, cache_file);
   % Force loading of relevant cache data
   for di=1:length(dirs)
     fprintf('%s\n', dirs{di}); 
-    get_cache_data(dirs{di}, true); 
+    get_cache_data(dirs{di}, cache_file); 
   end;
 
   save(cache_file, 'g_data_cache','g_dir_cache');
