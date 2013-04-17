@@ -1,4 +1,5 @@
 clear globals variables;
+if ~exist('r_looper','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
 
 dirs = {};
 
@@ -27,12 +28,13 @@ for axon_noise = [0 2E-3]
     end;
 
     % Run it
-    looper(net);
+    r_looper(net);
 end;
 end;
 end;
 end;
 
+error('Making cache won''t work like this any more.  Need to update code!');
 dirs
 cd ../../runs
 make_cache(dirs, [mfilename '_cache_file']);

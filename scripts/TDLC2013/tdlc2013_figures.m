@@ -1,27 +1,47 @@
-function fs=tdlc2013_figures(data_dir, plots, intype, etype,cache_file)
+function fs=tdlc2013_figures(data_dir, plots, intype, etype, cache_file)
 % intype: all, inter, intra
 % etype : clserr, err (sse)
 %
 
+% add paths
+if ~exist('r_out_path',     'file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
+if ~exist('guru_getOptPath','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','..','_lib'))); end;
+
+% default vars
+if ~exist('plots','var'),  plots     = [ 0 1 ]; end;
 if ~exist('intype','var'), intype = 'all'; end;
 if ~exist('etype', 'var'), etype  = 'clserr'; end;
+if ~exist('cache_file','var'), cache_file = ''; end;
 
-% paths
-if ~exist('mfe_split','file'), addpath(genpath(fullfile(fileparts(mfilename), '..','..','code'))); end;
-
-% Defaults & scrubbing input
-if ~exist('data_dir', 'var'),  
-    data_dir = fullfile(r_out_path('cache'), 'tdlc2013'); 
+% cache file with no dir data; fake it!
+if exist(data_dir,'file') && isempty(cache_file)
+    cache_file = data_dir;
+    data_dir = tempname;
+    mkdir(data_dir);
+    load(cache_file); 
+    global g_data_cache; g_data_cache = data_cache;
+    global g_dir_cache;  g_dir_cache  = dir_cache;
+    for di=1:length(g_dir_cache)
+        g_dir_cache{di} = fullfile(data_dir, guru_fileparts(g_dir_cache{di}, 'name'));
+        mkdir(g_dir_cache{di});
+    end;
+    clear('data_cache','dir_cache');
+    
+% Fix path  
 elseif ~exist(data_dir,'dir') && exist(fullfile(r_out_path('cache'), data_dir), 'dir')
+    keyboard
     data_dir = fullfile(r_out_path('cache'), data_dir);
+    
 end;
-if ~exist('plots','var'),      plots     = [ 0 ]; end;
-if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'), 'tdlc2013_cache.mat'); end;
-
+    %if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'), 'tdlc2013_cache.mat'); end;
+keyboard
 [data, nts, noise, delay] = collect_data_looped(data_dir, cache_file);
 if    isempty(data),               error('No data found at %s', data_dir);
-elseif ~exist(cache_file, 'file'), save_cache_data(cache_file); 
-end;
+elseif ~exist(cache_file, 'file'), save_cache_data(cache_file); end;
+data = data(nts<75);
+noise = noise(nts<75);
+delay = delay(nts<75);
+nts   = nts(nts<75);
 
 
 ts = data{1}.ts;
@@ -39,9 +59,10 @@ unoises = unique(noise)';
 %% Learning trajectory (raw)
 if any(0<=plots & plots<1)
     for d=udelays
-        % Raw learning; delay=10 (classification error)
-        lt_cdata = struct('intact', guru_getfield(data(noise==0 & delay==d), [intype '.intact.' etype]), 'lesion', guru_getfield(data(noise==0 & delay==10), [intype '.lesion.' etype]));
-        lt_ndata = struct('intact', guru_getfield(data(noise==1 & delay==d), [intype '.intact.' etype]), 'lesion', guru_getfield(data(noise==1 & delay==10), [intype '.lesion.' etype]));
+        lt_cdata = get_sub_data(data, noise==0 & delay==d, {[intype '.intact.' etype], [intype '.lesion.' etype]});
+        lt_ndata = get_sub_data(data, noise==1 & delay==d, {[intype '.intact.' etype], [intype '.lesion.' etype]});
+
+        % Raw learning; delay=d
         if ismember(0, plots) || ismember(0.0, plots), fs(end+1) = plot_raw_learning0(lt_cdata,lt_ndata,ts,sprintf('err=%s (delay=%d)',etype,d)); end;
         if ismember(0, plots) || ismember(0.1, plots), fs(end+1) = plot_raw_learning1(lt_cdata,lt_ndata,ts,sprintf('err=%s (delay=%d)',etype,d)); end;
         if ismember(0, plots) || ismember(0.2, plots), fs(end+1) = plot_raw_learning2(lt_cdata,lt_ndata,ts,sprintf('err=%s (delay=%d)',etype,d)); end;
@@ -53,15 +74,43 @@ if any(1<=plots & plots<2)
         lt_nts       = nts(noise==n & delay==udelays(end));
 
         % Raw learning; delay=10 (classification error)
-        lt_data_fast = struct('intact', guru_getfield(data(noise==n & delay==udelays(1)),   [intype '.intact.' etype]), 'lesion', guru_getfield(data(noise==0 & delay==10), [intype '.lesion.' etype]));
-        lt_data_slow = struct('intact', guru_getfield(data(noise==n & delay==udelays(end)), [intype '.intact.' etype]), 'lesion', guru_getfield(data(noise==1 & delay==10), [intype '.lesion.' etype]));
+        lt_data_fast = get_sub_data(data, noise==n & delay==udelays(1),   {[intype '.intact.' etype], [intype '.lesion.' etype]});
+        lt_data_slow = get_sub_data(data, noise==n & delay==udelays(end), {[intype '.intact.' etype], [intype '.lesion.' etype]});
         if ismember(1, plots) || ismember(1.1, plots), fs(end+1) = plot_ringo_curves(lt_data_fast, lt_data_slow,ts,lt_nts,sprintf('err=%s (%s, noise=%d)',etype,intype,n)); end;
     end;
 end;
 
+% 
+% if any(2<=plots & plots<3)
+%     for n=unoises
+%         lt_nts       = nts(noise==n & delay==udelays(end));
+% 
+%         % Raw learning; delay=10 (classification error)
+%         lt_data_fast = get_sub_data(data, noise==n & delay==udelays(1),   {[intype '.intact.' etype], [intype '.lesion.' etype]});
+%         lt_data_slow = get_sub_data(data, noise==n & delay==udelays(end), {[intype '.intact.' etype], [intype '.lesion.' etype]});
+%         if ismember(2, plots) || ismember(2.1, plots), fs(end+1) = plot_ringo_curves_normd(lt_data_fast, lt_data_slow,ts,lt_nts,sprintf('err=%s (%s, noise=%d)',etype,intype,n)); end;
+%     end;
+% end;
 
 
+function [d] = get_sub_data(data, idx, propname)
+  if ~iscell(propname), propname={propname}; end;
+  
+  args = cell(1, 2*numel(propname));
+  
+  for pi=1:length(propname)
+      parts = mfe_split('.',propname{pi});
+      args{2*pi-1} = parts{2};
+      args{2*pi}   = guru_getfield(data(idx), propname{pi});
 
+%      if isempty(vals{pi})
+%          error('Couldn''t find property: %s', propname{pi});
+%      end;
+  end;
+
+  d = struct(args{:});
+  
+  
 function [les_mean,int_mean,les_std,int_std] = data2surf(data,ts)
 
     les_mean = zeros(length(ts.all), 10);
@@ -191,14 +240,14 @@ function fr = plot_ringo_curves(data_fast, data_slow, ts,nts,type)
     [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
     
     lei_fastm = les_fastm(:,end)-int_fastm(:,end);
-    lei_fasts = les_fasts(:,end)+int_fasts(:,end);
+    lei_fasts = les_fasts(:,end)+int_fasts(:,end)/2;
     lei_slowm = les_slowm(:,end)-int_slowm(:,end);
     lei_slows = (les_slows(:,end)+int_slows(:,end))/2;
 
     fr = figure; set(gca, 'fontsize', 16);
     hold on;
     errorbar(nts, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
-    errorbar(nts, -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
     
     %
     plot(nts, int_fastm(:,end), 'b-');
@@ -213,6 +262,35 @@ function fr = plot_ringo_curves(data_fast, data_slow, ts,nts,type)
     hold on;
     
     legend([hf hs], guru_csprintf(['%s ' type ')'], {'fast','slow'}), 'Location', 'NorthEast');
+ 
+    
+function fr = plot_ringo_curves_normd(data_fast, data_slow, ts,nts,type)
+    [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
+    [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
+
+%    lei_fastm = 1 - (les_fastm(:,end)-int_fastm(:,end))./(1-int_slowm(:,end));
+%    lei_fasts = (les_fasts(:,end)+int_fasts(:,end))/2./(1-int_fastm(:,end));
+%    lei_slowm = 1 - (les_slowm(:,end)-int_slowm(:,end))./(1-int_slowm(:,end));
+%    lei_slows = (les_slows(:,end)+int_slows(:,end))/2./(1-int_slowm(:,end));
+
+    lei_fastm = 1-(les_fastm(:,end)-int_fastm(:,end));
+    lei_fasts = les_fasts(:,end)+int_fasts(:,end)/2/sqrt(10);
+    lei_slowm = 1-(les_slowm(:,end)-int_slowm(:,end));
+    lei_slows = (les_slows(:,end)+int_slows(:,end))/2/sqrt(10);
+
+    fr = figure; set(gca, 'fontsize', 16);
+    hold on;
+    errorbar(nts, lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
+    errorbar(nts,   lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+    
+    
+    %
+    hf = plot(nts, lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
+    hfs= plot(nts+8,   lei_fastm, '--b', 'LineWidth', 2);
+    hs = plot(nts,   lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
+    hold on;
+    
+    legend([hf hs], guru_csprintf(['%s ' type ')'], {'fast', 'fast (shifted)', 'slow'}), 'Location', 'NorthEast');
  
     
  

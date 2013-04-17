@@ -3,9 +3,9 @@ addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
 
-tsteps =20;
+tsteps =35;
 Idel = 1;
-Idur = 6;%tsteps-Idel;
+Idur = 15;%tsteps-Idel;
 Sdel = 1; %start measuring output right when it goes off 
 Sdur = 1;  %measure for 5 time-steps
 
@@ -14,7 +14,7 @@ net.sets.rseed = 290;
 %training parameters
 net.sets.niters          = 1000;
 net.sets.online          = false;
-net.sets.ncc             = 3;
+net.sets.ncc             = 2;
 net.sets.cc_wt_lim       = inf*[-1 1];
 net.sets.W_LIM           = inf*[-5 5];
 net.sets.train_criterion = 0.5; 
@@ -46,7 +46,7 @@ net.sets.alpha_w         = 0.5;       %momentum
 
 net.sets.grad_pow        = 3;
 
-net.sets.nhidden_per      = 15;
+net.sets.nhidden_per      = 10;
 %net.sets.autoencoder      = false;
 %net.sets.duplicate_output = false; % :( :( :(
 %net.sets.noise_init       = 0;%1;

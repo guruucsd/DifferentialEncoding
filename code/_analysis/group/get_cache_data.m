@@ -22,9 +22,18 @@ function [data,ts] = get_cache_data(dirnames, cache_file)
           cache = load(cache_file);
 
           % $TODO: merge old cache and current cache
-          g_dir_cache = cache.dir_cache;
-          g_data_cache = cache.data_cache;
-          g_cache_file = cache_file;
+          if isfield(cache,'g_dir_cache'), cache.dir_cache = cache.g_dir_cache; end;
+          if isfield(cache,'g_data_cache'), cache.data_cache = cache.g_data_cache; end;
+          
+          if ~isempty(g_dir_cache)
+              g_dir_cache = [g_dir_cache cache.dir_cache];
+              g_data_cache = [g_data_cache cache.data_cache];
+              g_cache_file = cache_file;
+          else
+              g_dir_cache = cache.dir_cache;
+              g_data_cache = cache.data_cache;
+              g_cache_file = cache_file;
+          end;
           
         % could do something...
         else
