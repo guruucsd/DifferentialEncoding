@@ -9,9 +9,15 @@ function [an] = collect_data(dirname, resave)
   
   % Load all data
   warning('off','MATLAB:dispatcher:UnresolvedFunctionHandle');
-  blobs = cell(an.n,1);
+  blobs = {};%cell(an.n,1);
   for fi=1:an.n
-      b = load(fullfile(dirname, files(fi).name));
+      try
+         b = load(fullfile(dirname, files(fi).name));
+      catch
+        lasterr,
+        fprintf('Skipping %s\n', fullfile(dirname, files(fi).name));
+        continue;
+      end;
 
       b.data.E_pat = b.data.E_pat/b.net.sets.dt;
       
@@ -59,7 +65,8 @@ function [an] = collect_data(dirname, resave)
               clear('net', 'pats', 'data');
           end;
       end;
-      blobs{fi} = b;
+%fprintf('%d ', fi);
+      blobs{end+1} = b;
   end;
   
   % Useful constants

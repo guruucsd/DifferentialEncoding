@@ -3,6 +3,10 @@ function fs=tdlc2013_figures(data_dir, plots, intype, etype,cache_file)
 % etype : clserr, err (sse)
 %
 
+if ~exist('r_out_path','file'), addpath(genpath('../../code')); end;
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','..','_lib')));
+
+
 if ~exist('intype','var'), intype = 'all'; end;
 if ~exist('etype', 'var'), etype  = 'clserr'; end;
 

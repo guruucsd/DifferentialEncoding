@@ -4,6 +4,7 @@ if ~exist('dirname','var'),    dirname    = 'runs'; end;
 if ~exist('cache_file','var'), cache_file = ''; end; % no caching
 
 folders = dir(fullfile(dirname,'tdlc*'));
+folders = folders([folders.isdir]);
 
 %ts = [15:5:50 75];
 %noise = [1 0];
