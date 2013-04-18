@@ -17,7 +17,7 @@ function [h] = allometric_plot1(x,y,p,fns,fh,type,col,mark)
     
     if ~exist('fh',  'var') || isempty(fh), fh = figure; end;
     if ~exist('col', 'var'), col='brgymcbrgymcbrgymcbrgymc'; end;
-    if ~exist('mark','var'), mark='.ovtsd><p.ovtsd><p.ovtsd><p.ovtsd><p'; end;
+    if ~exist('mark','var'), mark='.ov^sd><p.ovtsd><p.ov^sd><p.ov^sd><p'; end;
     if ~exist('type','var'), type='loglog'; 
     elseif islogical(type) && type, type = 'loglog';
     elseif islogical(type) && ~type, type='linear'; 
@@ -51,8 +51,8 @@ function [h] = allometric_plot1(x,y,p,fns,fh,type,col,mark)
             
         else
             % Scatter points
-            if strcmp(type, 'loglog'), h(ci) = loglog(x{ci}, y{ci}, 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
-            else,                      h(ci) = plot(fns{1}(ci).xxform(x{ci}), fns{1}.yxform(y{ci}), 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
+            if strcmp(type, 'loglog'), h(ci) = loglog(x{ci}, y{ci}, [mark(ci) col(ci)], 'LineWidth', 1.5);
+            else,                      h(ci) = plot(fns{1}(ci).xxform(x{ci}), fns{1}.yxform(y{ci}), [mark(ci) col(ci)], 'LineWidth', 1.5);
             end;
             
             %regression

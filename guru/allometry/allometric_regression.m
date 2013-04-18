@@ -1,4 +1,4 @@
-function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
+function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
 %function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
 %
 % x: 
@@ -80,7 +80,8 @@ function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
                 f = figure; 
                 set(f, 'Position', [16         297        1247         387]);
                 subplot(1,2,1); allometric_plot1(x,y,p,    fns,    f,all(strcmp(xform,'log')));
-                subplot(1,2,2); allometric_plot1(x,y,p_flp,fns_flp,f,all(strcmp(xform,'log')));
+                subplot(1,2,2); allometric_plot1(y,x,p_flp,fns_flp,f,all(strcmp(xform,'log')));
+                subplot(1,2,1); %get back to first subplot
             else
                 f = figure;
                 allometric_plot1(x,y,p,fns,[],all(strcmp(xform,'log')));
@@ -97,6 +98,12 @@ function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
         otherwise, error('Unknown figtype: %s', figtype);
     end;
 
+    
+    % compute residuals
+    resid = cell(size(x));
+    for ci=1:length(x)
+        resid{ci} = y{ci} - fns.y(x{ci});
+    end;
     
     
     

@@ -15,7 +15,7 @@ end;
 figure(fh);
 
 %
-xvsteps = linspace(min(xvals)*.5, max(xvals)*1.5, 100);
+xvsteps = linspace(min(xvals)*0.75, max(xvals)*1.25, 100);
 
 for si=1:nsubs
     subplot(1,nsubs,si); set(gca, 'FontSize', 16);
@@ -45,3 +45,5 @@ for si=1:nsubs
             
     end;
 end;
+
+subplot(1,nsubs,1);

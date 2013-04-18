@@ -1,4 +1,12 @@
 function dates = str2date(txt, species, type)
+%function dates = str2date(txt, species, type)
+%
+% take a date (E56, P122), and converts it
+%   to a date since some landmark (by default, conception)
+
+
+
+
   % Should be static globals
   species_keys = {'cat','macaque'};
   species_birthdate = [150 156];

@@ -14,6 +14,9 @@ function carr = guru_csprintf(fmt, cells, delim)
   if (~exist('delim','var') || isempty(delim))
     delim = '|||';
   end;
+  if isnumeric(cells)
+      cells = num2cell(cells);
+  end;
   
   %
   if (exist('fmt','var') && ~isempty(fmt))
