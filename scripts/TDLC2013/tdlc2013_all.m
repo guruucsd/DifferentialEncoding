@@ -49,12 +49,12 @@ net.sets.activity_dependent = true;
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
-net.sets.rseed            = 289;
-net.sets.n_nets           = 25;
-
 sets= net.sets;
 
 
+chunk_size = guru_iff(exist('matlabpool','file'), matlabpool('size'), 1);
+
+for rseed=(289-1+[1:chunk_size:25])
   for tsteps=[15:5:50 75]
     for delay=[2 10]
       for noise=[2E-2/delay 0] % 1% activation
@@ -76,13 +76,14 @@ sets= net.sets;
 
           net.sets.axon_noise       = noise;%1E-5;%0.0005; % constant level of noise
           
+          net.sets.rseed = rseed;
           net.sets.dirname = dirname;
           
-          r_looper(net);
+          r_looper(net, chunk_size);
       end;
     end;
   end;
-
+end;
   % Make into one giant cache
   cache_dir         = guru_fileparts(fileparts(net.sets.dirname), 'name');
   cache_file        = fullfile(cache_dir, [mfilename '.mat']);
