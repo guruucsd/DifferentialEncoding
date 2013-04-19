@@ -3,14 +3,15 @@ function dates = str2date(txt, species, type)
 %
 % take a date (E56, P122), and converts it
 %   to a date since some landmark (by default, conception)
-
-
+%
+% gestation, lifespan: http://pin.primate.wisc.edu/factsheets/entry/chimpanzee
+% sexual maturity: http://animaldiversity.ummz.umich.edu/accounts/Pan_troglodytes/
 
 
   % Should be static globals
-  species_keys = {'cat','macaque'};
-  species_birthdate = [150 156];
-  species_adult = [365*2.5 365*4];
+  species_keys      = {'cat',  'macaque','chimp','human'};
+  species_birthdate = [150     156       240     270];
+  species_adult = 365*[2.5     4         8       15]; %sexual maturity
   
   % 
   if ~exist('type','var'), type='postconception'; end;
