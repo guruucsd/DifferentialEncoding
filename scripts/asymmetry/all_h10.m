@@ -28,8 +28,8 @@ end;
 
 
   % Make into one giant cache
-  cache_dir     = '~/_cache/ringo/asymmetry/all_h10';
-  cache_file    = fullfile(cache_dir, 'all_h10_cache.mat');
+%  cache_dir     = '~/_cache/ringo/asymmetry/all_h10';
+%  cache_file    = fullfile(cache_dir, 'all_h10_cache.mat');
   cache_dir     = guru_fileparts(fileparts(net.sets.dirname), 'name');
   cache_file    = fullfile(cache_dir, [mfilename '_cache.mat']);
   [~,~,folders] = collect_data_looped( cache_dir, '', '' );
