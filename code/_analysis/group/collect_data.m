@@ -1,4 +1,4 @@
-function [an] = collect_data(dirname, resave)
+function [an,sets] = collect_data(dirname, resave)
 %
 
   if ~exist('resave','var'), resave = false; end;
@@ -10,6 +10,7 @@ function [an] = collect_data(dirname, resave)
   % Load all data
   warning('off','MATLAB:dispatcher:UnresolvedFunctionHandle');
   blobs = {};%cell(an.n,1);
+  sets  = {};
   for fi=1:an.n
       try
          b = load(fullfile(dirname, files(fi).name));
@@ -96,7 +97,8 @@ function [an] = collect_data(dirname, resave)
   % Loop and fill in data
   for bi=1:length(blobs)
     data = blobs{bi}.data; pats = blobs{bi}.pats; net = blobs{bi}.net;
-
+    sets{end+1} = net.sets;
+    
     %% Weights
     an.intra.weights.lh(bi,:,:) = net.w(b.net.idx.lh_ih, net.idx.lh_ih);
     an.intra.weights.rh(bi,:,:) = net.w(b.net.idx.rh_ih, net.idx.rh_ih);
@@ -214,3 +216,5 @@ function [an] = collect_data(dirname, resave)
     end;
   end;
  
+ % convert cell array to struct array
+ sets = [sets{:}];

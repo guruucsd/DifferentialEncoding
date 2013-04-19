@@ -11,7 +11,6 @@ Sdel = 0; %start measuring output right when it goes off
 Sdur = 1;  %measure for 5 time-steps
 
 net.sets.rseed = 289;
-net.sets.n_nets = 10;
 
 %training parameters
 net.sets.niters          = 1000; %training iterations

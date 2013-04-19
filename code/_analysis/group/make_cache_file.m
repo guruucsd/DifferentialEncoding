@@ -1,4 +1,4 @@
-function [data_cache,dir_cache] = make_cache_file(dirnames, cache_file)
+function [data_cache,dir_cache,sets_cache] = make_cache_file(dirnames, cache_file)
 %function make_cache(dirnames, cache_file)
 %
 % Take a set of dirnames, and save a cache file of their summary data to disk.
@@ -8,7 +8,7 @@ function [data_cache,dir_cache] = make_cache_file(dirnames, cache_file)
 %
 %
 
-  global g_dir_cache g_data_cache
+  global g_dir_cache g_data_cache g_sets_cache
 
   if ~exist('cache_file','var') || isempty(cache_file), cache_file = 'cache_file.mat'; end;
   if ~exist('dirnames','var') || isempty(dirnames)
@@ -29,6 +29,7 @@ function [data_cache,dir_cache] = make_cache_file(dirnames, cache_file)
             cellfun(@(s) sprintf('%s\n',s), setdiff(dirnames, dir_cache), 'UniformOutput', false));
   end;
   data_cache      = g_data_cache(idx);
+  sets_cache      = g_sets_cache(idx);
 
-  save(cache_file, 'data_cache','dir_cache');
+  save(cache_file, 'data_cache','dir_cache', 'sets_cache');
 

@@ -27,7 +27,7 @@ elseif ~exist(data_dir,'dir') && exist(fullfile(r_out_path('cache'), data_dir), 
 end;
     %if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'), 'tdlc2013_cache.mat'); end;
 
-[data, nts, noise, delay] = collect_data_looped(data_dir, cache_file);
+[data, nts, noise, delay] = collect_data_looped_tdlc(data_dir, cache_file);
 if    isempty(data),               error('No data found at %s', data_dir);
 elseif ~exist(cache_file, 'file'), save_cache_data(cache_file); end;
 data = data(nts<75);
