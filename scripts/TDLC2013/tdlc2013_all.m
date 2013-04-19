@@ -1,3 +1,5 @@
+% Run with 1% noise
+
 clear globals variables;
 addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
@@ -42,6 +44,13 @@ net.sets.grad_pow        = 3;
 net.sets.nhidden_per      = 15;% 15;
 
 
+net.sets.activity_dependent = true;
+net.sets.noise_init       = 0;%.001;%1;
+net.sets.noise_input      = 1E-6;%.001;%001;%1;
+
+net.sets.rseed            = 289;
+net.sets.n_nets           = 25;
+
 sets= net.sets;
 
 
@@ -51,19 +60,16 @@ if matlabpool('size')<2
 %    matlabpool open 4;
 end;
 
-for s=(288+[1:25])
   for tsteps=[15:5:50 75]
     for delay=[2 10]
-      for noise=[2E-2/delay 0]
-          dirname = fullfile(guru_getOutPath('cache'), 'ringo', sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
+      for noise=[2E-2/delay 0] % 1% activation
+          dirname = fullfile(guru_getOutPath('cache'), 'ringo', 'tdlc', sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
           if ~exist(dirname,'dir'), mkdir(dirname); end;
 
           % Make sure not to reuse networks!
           clear 'net';
           net.sets = sets;
         
-          net.sets.rseed = s;
-    
           net.sets.tstart = 0;
           net.sets.tsteps = tsteps  ;%we'll add another hidden layer, so measure output at one step later
           net.sets.tstop  = net.sets.tsteps * net.sets.dt;
@@ -72,29 +78,12 @@ for s=(288+[1:25])
     
           net.sets.D_CC_INIT(1,:,:) = delay*[1 1; 1 1];             %early; l->r and r->l
           net.sets.D_CC_INIT(2,:,:) = net.sets.D_CC_INIT(1,:,:); %late;  l->r and r->l
-          
+
           net.sets.axon_noise       = noise;%1E-5;%0.0005; % constant level of noise
-          net.sets.activity_dependent = true;
-          net.sets.noise_init       = 0;%.001;%1;
-          net.sets.noise_input      = 1E-6;%.001;%001;%1;
           
-
-          matfile = fullfile(dirname, getfield(getfield(r_massage_params(net), 'sets'),'matfile'));
-          if exist(matfile, 'file')
-            fprintf('Skipping %s\n', matfile);
-            continue; 
-          end; % don't re-run
-
-          try
-            [net,pats,data]          = r_main(net);
-            [data.an]                = r_analyze(net, pats, data);
-            unix(['mv ' net.sets.matfile ' ' dirname]);
-          catch
-            fprintf(lasterr);
-          end;
+          r_looper(net);
       end;
     end;
   end;
-end;
 
 matlabpool close

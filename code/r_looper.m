@@ -1,9 +1,15 @@
-function looper(net);
+function r_looper(net, n_nets);
+
+if ~exist('n_nets','var')
+  if isfield(net.sets,'n_nets'), n_nets = net.sets.n_nets;
+  else                           n_nets = 10;
+  end;
+end;
 
 min_rseed = net.sets.rseed;
 sets= net.sets;
 
-for s=(min_rseed-1+[1:net.sets.n_nets])
+for s=(min_rseed-1+[1:n_nets])
 
    % Make sure not to reuse networks!
    clear 'net';
@@ -25,8 +31,9 @@ for s=(min_rseed-1+[1:net.sets.n_nets])
      [net,pats,data]          = r_main(net);
      [data.an]                = r_analyze(net, pats, data);
      %unix(['mv ' net.sets.matfile ' ./' net.sets.dirname]);
-   catch
+   catch err
      fprintf(lasterr);
+     err.stack.file
    end;
 end;
 

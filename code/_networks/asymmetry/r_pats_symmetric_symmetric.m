@@ -6,5 +6,5 @@ function [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_symmetric_symm
 %
 % Note: this is the Ringo et al. (1994) case
 
-    [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_lewis_elman(sets, 'symmetric_symmetric');
+    [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_lewis_elman(sets, 'symmetric-symmetric');
 

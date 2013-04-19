@@ -75,14 +75,14 @@ function [in_pats, out_pats, pat_cls, pat_lbls, idx] = r_pats_lewis_elman(sets, 
         
     % choose options
     switch opt
-        case 'asymmetric-symmetric'  % this is the lewis&elman setup
+        case {'asymmetric-symmetric' 'asymmetric_symmetric'}  % this is the lewis&elman setup
             ;
             
             idx.inter = 1:size(pats,1)/2;
             idx.intra = (idx.inter(end)+1):size(pats,1);
             
         % Reversal of lewis & elman setup
-        case 'symmetric-asymmetric'
+        case {'symmetric-asymmetric' 'symmetric_asymmetric'}
             pats(:,[idx.lh.out idx.lh.in  idx.rh.out idx.rh.in]) = ...
             pats(:,[idx.lh.in  idx.lh.out idx.rh.in  idx.rh.out]);
 
@@ -90,7 +90,7 @@ function [in_pats, out_pats, pat_cls, pat_lbls, idx] = r_pats_lewis_elman(sets, 
             idx.intra = (idx.inter(end)+1):size(pats,1);
 
         % Reverse lewis & elman, then make outputs the same.
-        case 'symmetric-symmetric'
+        case {'symmetric-symmetric' 'symmetric_symmetric'}
             pats(:,[idx.lh.out idx.lh.in  idx.rh.out idx.rh.in]) = ...
             pats(:,[idx.lh.in  idx.lh.out idx.rh.in  idx.rh.out]);
             
@@ -101,11 +101,14 @@ function [in_pats, out_pats, pat_cls, pat_lbls, idx] = r_pats_lewis_elman(sets, 
             
         % Randomize outputs.  Now, Inputs are 4-way ambiguous,
         %   but hemisphere outputs will not be
-        case 'asymmetric-asymmetric'
+        case {'asymmetric-asymmetric' 'asymmetric_asymmetric'}
             pats(:,idx.lh.out) = pats((randperm(32)),idx.lh.out);
             
             idx.inter = 1:size(pats,1)/2;
             idx.intra = (idx.inter(end)+1):size(pats,1);
+
+        otherwise
+            error('Unknown stimulus option: %s', opt);
     end;
     
     

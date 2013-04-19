@@ -50,36 +50,16 @@ net.sets.grad_pow        = 3;
 %net.sets.duplicate_output = false; % :( :( :(
 net.sets.nhidden_per      = 15;% 15;
 
-net.sets.axon_noise       = [linspace(.5, 1,250) linspace(1,0.1,500) 0*linspace(0.1,0.0,1250) ]*1E-2/net.sets.D_CC_INIT(1);%1E-5;%0.0005;
+net.sets.axon_noise       = (4*2/2.31)*1E-2*[linspace(.5, 1,250) linspace(1,0.1,500) 0*linspace(0.1,0.0,1250) ]./net.sets.D_CC_INIT(1);%1E-5;%0.0005;
 %net.sets.activity_dependent = true;
 net.sets.iteration_dependent = true;
 
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
-dirname = mfilename();
-sets= net.sets;
+net.sets.dirname = fullfile(guru_getOutPath('cache'), 'ringo', 'development', mfilename());
 
-if ~exist(dirname,'dir'), mkdir(dirname); end;
-for s=(288+[1:25])
-   % Make sure not to reuse networks!
-   clear 'net';
-   net.sets = sets;
+r_looper(net, 25); % run 25 network instances
 
-   net.sets.rseed = s;
-
-    matfile = fullfile(dirname, getfield(getfield(r_massage_params(net), 'sets'),'matfile'));
-    if exist(matfile, 'file')
-    fprintf('Skipping %s\n', matfile);
-        continue; 
-    end; % don't re-run
-%   try
-     [net,pats,data]          = r_main(net);
-     [data.an]                = r_analyze(net, pats, data);
-     unix(['mv ' net.sets.matfile ' ./' dirname]);
-%   catch
-%     fprintf(lasterr);
-%   end;
-end;
 
 

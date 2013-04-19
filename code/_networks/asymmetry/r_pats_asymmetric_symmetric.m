@@ -4,4 +4,4 @@ function [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_asymmetric_sym
 %
 % Note: this is the Lewis & Elman (2008) case
 
-    [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_lewis_elman(sets, 'asymmetric_symmetric');
+    [in_pats, out_pats, pat_cls, pat_lbls, pat_idx] = r_pats_lewis_elman(sets, 'asymmetric-symmetric');

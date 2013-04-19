@@ -8,7 +8,7 @@ for axon_noise = [0 1E-3]
   for dataset = {'asymmetric_symmetric', 'asymmetric_asymmetric', 'symmetric_asymmetric', 'symmetric_symmetric'}
   
     net = common_args();
-    net.sets.dirname     = strrep(net.sets.dirname, 'all_10', sprintf('%s_%s_n%d', dataset{1}, iff(axon_noise==0, 'nonoise', 'noise'), ncc));
+    net.sets.dirname     = fullfile(net.sets.dirname, mfilename(), sprintf('%s_%s_n%d', dataset{1}, guru_iff(axon_noise==0, 'nonoise', 'noise'), ncc));
 
     net.sets.dataset     = dataset{1};
     net.sets.axon_noise  = axon_noise;

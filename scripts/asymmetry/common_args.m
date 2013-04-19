@@ -56,5 +56,4 @@ net.sets.axon_noise       = 0;
 net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
-net.sets.dirname          = fullfile('..','..','runs',getfield(dbstack(1), 'name'));
-
+net.sets.dirname          = fullfile(guru_getOutPath('cache'), 'ringo', 'asymmetry');

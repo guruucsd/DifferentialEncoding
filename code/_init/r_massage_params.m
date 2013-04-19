@@ -193,6 +193,10 @@ function [str] = r_dump_sets(sets)
     str = '';
     a = fields(sets);
     for ai=1:length(a)
+        % Skip settings that we know will break across machines
+        if any(strcmp(a{ai}, {'dirname', 'matfile'})), continue; end;
+        if any(strcmp(a{ai}, {'n_nets'})), continue; end;
+        
         v = sets.(a{ai});
         str = [str '%s: ' a{ai}]; 
         if (isnumeric(v))

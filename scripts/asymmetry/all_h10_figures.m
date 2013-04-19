@@ -1,10 +1,10 @@
 if ~exist('cogsci2013_figures','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
 
-evo_cache = fullfile(r_out_path('cache'),'evolution');
-evo_cache_file = fullfile(evo_cache, 'all_10_cache_file.mat');
-h10_dir = fullfile(evo_cache, 'all_h10');
+asymm_cache = fullfile(r_out_path('cache'),'asymmetry');
+asymm_cache_file = fullfile(asymm_cache, 'all_10_cache_file.mat');
+h10_dir = fullfile(asymm_cache, 'all_h10');
 
-if exist(evo_cache_file, 'file'), load(evo_cache_file); end;
+if exist(asymm_cache_file, 'file'), load(asymm_cache_file); end;
 
 
 %% Preliminary tests
@@ -19,7 +19,7 @@ for d1=1:length(datasets)
     nonoise_dir = fullfile(h10_dir,sprintf('%s_nonoise_n2',datasets{d1}));
 
     for fignum=[0.4]
-        cogsci2013_figures(noise_dir, nonoise_dir, fignum, evo_cache_file);
+        cogsci2013_figures(noise_dir, nonoise_dir, fignum, asymm_cache_file);
         [~,~,oh] = legend();
         title(sprintf('Effects of noise (within a dataset) (%s, ncc=2)', plot_escape(datasets{d1})));
     end;
