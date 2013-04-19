@@ -1,4 +1,5 @@
 if ~exist('cogsci2013_figures','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
+if ~exist('guru_getOutPath',   'file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','..', '_lib'))); end;
 
 asymm_cache = fullfile(r_out_path('cache'),'asymmetry');
 asymm_cache_file = fullfile(asymm_cache, 'all_10_cache_file.mat');

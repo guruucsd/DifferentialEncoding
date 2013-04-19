@@ -1,77 +1,92 @@
-function [data,ts] = get_cache_data(dirnames, cache_file)
+function [data,ts] = get_cache_data(dirnames, cache_file, force_load)
+%function [data,ts] = get_cache_data(dirnames, cache_file, force_load)
 %
-    global g_data_cache g_dir_cache g_cache_file;
-    
-    if ~exist('guru_file_parts','file'), addpath(genpath('code')); end;
-    if ~exist('cache_file','var'), 
-        cache_file = 'cache_file.mat'; %local directory
-        force_load = false;
-    else
-        force_load = isempty(cache_file);
-    end;
-    if ~strcmp('.mat', guru_fileparts(cache_file, 'ext'))
-        cache_file = [cache_file '.mat'];
-    end;
-    
-   % first time, didn't exist
-    if exist(cache_file,'file')
-        if ~strcmp(g_cache_file, cache_file)
+% Returns summarized data from the given directory.  It can come from 3
+%   places, searched in this order:
+%
+% 1. If ~force_load: The global cache (g_data_cache)
+% 2. The specified cache file (cache_file)
+% 3. From disk (searching the actual directory naem)
+%
+%
+% If no cache file is specified, then step 2 is skipped.
+%
+%
+% Dirnames: string, or cell array of strings.
+% cache_file: 
+%
+%
+% data: summarized data blob
+% ts : info about timesteps
 
-          %tmp = load(cache_file);
-          %g_data_cache = tmp.g_data_cache;
-          cache = load(cache_file);
-
-          % $TODO: merge old cache and current cache
-          if isfield(cache,'g_dir_cache'), cache.dir_cache = cache.g_dir_cache; end;
-          if isfield(cache,'g_data_cache'), cache.data_cache = cache.g_data_cache; end;
-          
-          if ~isempty(g_dir_cache)
-              g_dir_cache = [g_dir_cache cache.dir_cache];
-              g_data_cache = [g_data_cache cache.data_cache];
-              g_cache_file = cache_file;
-          else
-              g_dir_cache = cache.dir_cache;
-              g_data_cache = cache.data_cache;
-              g_cache_file = cache_file;
-          end;
-          
-        % could do something...
-        else
-            ;
-        end;
-        
-    elseif isnumeric(g_dir_cache), 
-
+    global g_data_cache g_dir_cache;
+    if isnumeric(g_dir_cache) % initialize kindly :)
       g_dir_cache={}; 
       g_data_cache={}; 
     end;
     
+    % Default loading
+    if ~exist('cache_file','var'), cache_file = ''; end;
+    if ~exist('force_load','var'), force_load = false; end;
     if ischar(dirnames), dirnames = {dirnames}; end;
-
-    % Purge old dataset from cache
-    if force_load
-        warning('Forcing to load all from scratch');
-        [~,idx] = ismember(dirnames, g_dir_cache);
-        goodidx = setdiff(1:length(g_dir_cache),idx);
-        g_data_cache = g_data_cache(goodidx);
-        g_dir_cache  = g_dir_cache(goodidx);
+    
+    % get just the directory name, eliminate any path
+    dirnames = cellfun(@(d) guru_fileparts(d,'name'), dirnames, 'UniformOutput',false); 
+    
+    % Add extension to the cache file
+    if ~isempty(cache_file) && ~strcmp('.mat', guru_fileparts(cache_file, 'ext'))
+        cache_file = [cache_file '.mat'];
     end;
 
-    % Add missing dataset(s) to (giant) cache
-    for di=1:length(dirnames)
-      dn = dirnames{di};
-      if ~exist(dn,'file') && exist(fullfile(r_out_path('cache'), dirnames{di}),'file')
-          dn = fullfile(r_out_path('cache'), dirnames{di});
-      end;
-      
-      if ~ismember(dirnames{di}, g_dir_cache)
-          g_data_cache{end+1} = collect_data(dn);
-          g_dir_cache{end+1}  = dirnames{di}; 
-      end;
-    end;
+    
+    % Get all data into global cache
+    remain_dirs = dirnames;
+    mi=1;
+    while ~isempty(remain_dirs) && mi<=4
+        switch mi
+            
+            case 1 % from global cache
+                if ~force_load
+                    [cur_found_dirs] = intersect(g_dir_cache, dirnames);
+                end;
+                
+            case 2  % Look inside the cache file
+                if ~exist(cache_file,'file'), error('Couldn''t find cache file: %s', cache_file); end;
 
-    % Select the current datasets
+                % Cache exists; either load it and merge.
+                load_global_cache(cache_file, true);
+
+                [cur_found_dirs] = intersect(g_dir_cache, dirnames);
+                
+                
+            case 3 % Summarize directly from disk
+                
+                for di=1:length(remain_dirs)
+                  % Get the approriate directory
+                  dn = remain_dirs{di};
+                  if ~exist(dn,'dir') && exist(fullfile(r_out_path('cache'), remain_dirs{di}),'dir')
+                      dn = fullfile(r_out_path('cache'), remain_dirs{di});
+                  end;
+
+                  % Load the data
+                  g_data_cache{end+1} = collect_data(dn);
+                  g_dir_cache{end+1}  = remain_dirs{di}; 
+                end;
+
+        end;
+
+        remain_dirs = setdiff(remain_dirs, cur_found_dirs);
+        mi = mi+1;
+    end;
+    fprintf('Completed search with method = %d\n', mi-1);
+    
+    % Didn't find all
+    if ~isempty(remain_dirs)
+        error('Couldn''t find some data in global cache, cache file, nor at speicfied location: %s', cellfun(@(s) sprintf('%s\n',s), remain_dirs, 'UniformOutput', false));
+    end;
+    
+
+    % Found all & loaded into global cache; extract & return!
     [~,idx] = ismember(dirnames, g_dir_cache);
-
     data = g_data_cache(idx);
     ts = g_data_cache{idx(1)}.ts;

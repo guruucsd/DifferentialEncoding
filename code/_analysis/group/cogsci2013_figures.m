@@ -5,7 +5,6 @@ function fs = cogsci2013_figures(clean_dir, noise_dir, plots, cache_file)
 %if ~exist('noise_dir', 'var'), noise_dir = 'noise.10.1'; end;
 if ~exist('plots','var'),      plots     = [ 0.25 ]; end;
 if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'),'cs2013_cache.mat'); end;
-
 if ~exist(clean_dir,'dir')
   if exist(fullfile(r_out_path('cache'),clean_dir),'dir'), clean_dir = fullfile(r_out_path('cache'),clean_dir);
   else error('Cannot find clean_dir=%s', clean_dir);

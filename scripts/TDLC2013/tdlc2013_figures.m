@@ -12,19 +12,12 @@ if ~exist('intype','var'), intype = 'all'; end;
 if ~exist('etype', 'var'), etype  = 'clserr'; end;
 if ~exist('cache_file','var'), cache_file = ''; end;
 
-% cache file with no dir data; fake it!
-if exist(data_dir,'file') && isempty(cache_file)
+% cache file with no dir data; set dir_data to empty
+%   so that looper will know to load data from cache file
+if strcmp('.mat', guru_fileparts(data_dir,'ext')) && isempty(cache_file)
     cache_file = data_dir;
-    data_dir = tempname;
-    mkdir(data_dir);
-    load(cache_file); 
-    global g_data_cache; g_data_cache = data_cache;
-    global g_dir_cache;  g_dir_cache  = dir_cache;
-    for di=1:length(g_dir_cache)
-        g_dir_cache{di} = fullfile(data_dir, guru_fileparts(g_dir_cache{di}, 'name'));
-        mkdir(g_dir_cache{di});
-    end;
-    clear('data_cache','dir_cache');
+    if ~exist(data_dir,'file'), error('Could not find cache file: %s', cache_file); end;
+    data_dir = [];
     
 % Fix path  
 elseif ~exist(data_dir,'dir') && exist(fullfile(r_out_path('cache'), data_dir), 'dir')
@@ -33,7 +26,7 @@ elseif ~exist(data_dir,'dir') && exist(fullfile(r_out_path('cache'), data_dir), 
     
 end;
     %if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'), 'tdlc2013_cache.mat'); end;
-keyboard
+
 [data, nts, noise, delay] = collect_data_looped(data_dir, cache_file);
 if    isempty(data),               error('No data found at %s', data_dir);
 elseif ~exist(cache_file, 'file'), save_cache_data(cache_file); end;

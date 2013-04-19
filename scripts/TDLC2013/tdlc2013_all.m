@@ -1,6 +1,7 @@
 % Run with 1% noise
 
 clear globals variables;
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', '..', '_lib')));
 addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
 dbstop if error;
 %dbstop if warning;
@@ -54,16 +55,10 @@ net.sets.n_nets           = 25;
 sets= net.sets;
 
 
-
-%iff=@(c,y,n) (cast((c~=0).*y + (c==0).*n,class(y)));
-if matlabpool('size')<2
-%    matlabpool open 4;
-end;
-
   for tsteps=[15:5:50 75]
     for delay=[2 10]
       for noise=[2E-2/delay 0] % 1% activation
-          dirname = fullfile(guru_getOutPath('cache'), 'ringo', 'tdlc', sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
+          dirname = fullfile(guru_getOutPath('cache'), 'ringo', 'tdlc2013', sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
           if ~exist(dirname,'dir'), mkdir(dirname); end;
 
           % Make sure not to reuse networks!
@@ -81,9 +76,17 @@ end;
 
           net.sets.axon_noise       = noise;%1E-5;%0.0005; % constant level of noise
           
+          net.sets.dirname = dirname;
+          
           r_looper(net);
       end;
     end;
   end;
 
-matlabpool close
+  % Make into one giant cache
+  cache_dir         = guru_fileparts(fileparts(net.sets.dirname), 'name');
+  cache_file        = fullfile(cache_dir, [mfilename '.mat']);
+  [~,~,~,~,folders] = collect_data_looped( cache_dir );
+  
+  make_cache_file(folders, cache_file);
+

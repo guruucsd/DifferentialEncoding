@@ -34,7 +34,4 @@ end;
 end;
 end;
 
-error('Making cache won''t work like this any more.  Need to update code!');
-dirs
-cd ../../runs
-make_cache(dirs, [mfilename '_cache_file']);
+make_cache_file(dirs, [mfilename '_cache_file']);
