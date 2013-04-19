@@ -5,16 +5,6 @@ function fs = cogsci2013_figures(clean_dir, noise_dir, plots, cache_file)
 %if ~exist('noise_dir', 'var'), noise_dir = 'noise.10.1'; end;
 if ~exist('plots','var'),      plots     = [ 0.25 ]; end;
 if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'),'cs2013_cache.mat'); end;
-if ~exist(clean_dir,'dir')
-  if exist(fullfile(r_out_path('cache'),clean_dir),'dir'), clean_dir = fullfile(r_out_path('cache'),clean_dir);
-  else error('Cannot find clean_dir=%s', clean_dir);
-  end;
-end;
-if ~exist(noise_dir,'dir')
-  if exist(fullfile(r_out_path('cache'),noise_dir),'dir'), noise_dir = fullfile(r_out_path('cache'),noise_dir);
-  else error('Cannot find noise_dir=%s', noise_dir);
-  end;
-end;
 
 [cdata,ts] = get_cache_data(clean_dir, cache_file);
 [ndata]    = get_cache_data(noise_dir, cache_file);
@@ -25,32 +15,32 @@ fs = []; % output figure handles
 %% Learning trajectory (raw)
 if any(0<=plots & plots<1)
     % All
-    lt_cdata = struct('intact', cdata{1}.all.intact.clserr, 'lesion', cdata{1}.all.lesion.clserr);
-    lt_ndata = struct('intact', ndata{1}.all.intact.clserr, 'lesion', ndata{1}.all.lesion.clserr);
+    lt_cdata = struct('intact', cdata.all.intact.clserr, 'lesion', cdata.all.lesion.clserr);
+    lt_ndata = struct('intact', ndata.all.intact.clserr, 'lesion', ndata.all.lesion.clserr);
     if ismember(0, plots) || ismember(0.1, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'bce'); end;
     if ismember(0, plots) || ismember(0.3, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'bce', true); end; %overlay on single axes
     
-    lt_cdata = struct('intact', cdata{1}.all.intact.err, 'lesion', cdata{1}.all.lesion.err);
-    lt_ndata = struct('intact', ndata{1}.all.intact.err, 'lesion', ndata{1}.all.lesion.err);
+    lt_cdata = struct('intact', cdata.all.intact.err, 'lesion', cdata.all.lesion.err);
+    lt_ndata = struct('intact', ndata.all.intact.err, 'lesion', ndata.all.lesion.err);
     if ismember(0, plots) || ismember(0.2, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'sse'); end;
     if ismember(0, plots) || ismember(0.4, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'sse', true); end;%overlay on single axes
 
     % Intra
-    lt_cdata = struct('intact', cdata{1}.intra.intact.clserr, 'lesion', cdata{1}.intra.lesion.clserr);
-    lt_ndata = struct('intact', ndata{1}.intra.intact.clserr, 'lesion', ndata{1}.intra.lesion.clserr);
+    lt_cdata = struct('intact', cdata.intra.intact.clserr, 'lesion', cdata.intra.lesion.clserr);
+    lt_ndata = struct('intact', ndata.intra.intact.clserr, 'lesion', ndata.intra.lesion.clserr);
     if ismember(0, plots) || ismember(0.5, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'bce', true); title([get(get(gca,'Title'),'String') '(intra)']); end; %overlay on single axes
     
-    lt_cdata = struct('intact', cdata{1}.intra.intact.err, 'lesion', cdata{1}.intra.lesion.err);
-    lt_ndata = struct('intact', ndata{1}.intra.intact.err, 'lesion', ndata{1}.intra.lesion.err);
+    lt_cdata = struct('intact', cdata.intra.intact.err, 'lesion', cdata.intra.lesion.err);
+    lt_ndata = struct('intact', ndata.intra.intact.err, 'lesion', ndata.intra.lesion.err);
     if ismember(0, plots) || ismember(0.6, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'sse', true); title([get(get(gca,'Title'),'String') '(intra)']); end; %overlay on single axes
 
     % Inter
-    lt_cdata = struct('intact', cdata{1}.inter.intact.clserr, 'lesion', cdata{1}.inter.lesion.clserr);
-    lt_ndata = struct('intact', ndata{1}.inter.intact.clserr, 'lesion', ndata{1}.inter.lesion.clserr);
+    lt_cdata = struct('intact', cdata.inter.intact.clserr, 'lesion', cdata.inter.lesion.clserr);
+    lt_ndata = struct('intact', ndata.inter.intact.clserr, 'lesion', ndata.inter.lesion.clserr);
     if ismember(0, plots) || ismember(0.7, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'bce', true); title([get(get(gca,'Title'),'String') '(inter)']);  end; %overlay on single axes
     
-    lt_cdata = struct('intact', cdata{1}.inter.intact.err, 'lesion', cdata{1}.inter.lesion.err);
-    lt_ndata = struct('intact', ndata{1}.inter.intact.err, 'lesion', ndata{1}.inter.lesion.err);
+    lt_cdata = struct('intact', cdata.inter.intact.err, 'lesion', cdata.inter.lesion.err);
+    lt_ndata = struct('intact', ndata.inter.intact.err, 'lesion', ndata.inter.lesion.err);
     if ismember(0, plots) || ismember(0.8, plots), fs(end+1) = plot_raw_learning(lt_cdata,lt_ndata,ts,'sse', true); title([get(get(gca,'Title'),'String') '(inter)']);  end; %overlay on single axes
     
     clear('lt_cdata', 'lt_ndata');
@@ -59,30 +49,30 @@ end;
 %% Learning trajectory (diff)
 if any(1<=plots & plots<2)
     % All
-    lt_cdata = struct('mean', cdata{1}.all.lei.clsmean, 'std', cdata{1}.all.lei.clsstd);
-    lt_ndata = struct('mean', ndata{1}.all.lei.clsmean, 'std', ndata{1}.all.lei.clsstd);
+    lt_cdata = struct('mean', cdata.all.lei.clsmean, 'std', cdata.all.lei.clsstd);
+    lt_ndata = struct('mean', ndata.all.lei.clsmean, 'std', ndata.all.lei.clsstd);
     if ismember(1, plots) || ismember(1.3, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'bce'); end;
     
-    lt_cdata = struct('mean', cdata{1}.all.lei.errmean, 'std', cdata{1}.all.lei.errstd);
-    lt_ndata = struct('mean', ndata{1}.all.lei.errmean, 'std', ndata{1}.all.lei.errstd);
+    lt_cdata = struct('mean', cdata.all.lei.errmean, 'std', cdata.all.lei.errstd);
+    lt_ndata = struct('mean', ndata.all.lei.errmean, 'std', ndata.all.lei.errstd);
     if ismember(1, plots) || ismember(1.4, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'sse'); end;
 
     % Intra
-    lt_cdata = struct('mean', mean(cdata{1}.intra.lei.cls,1), 'std', std(cdata{1}.intra.lei.cls,[],1));
-    lt_ndata = struct('mean', mean(ndata{1}.intra.lei.cls,1), 'std', std(ndata{1}.intra.lei.cls,[],1));
+    lt_cdata = struct('mean', mean(cdata.intra.lei.cls,1), 'std', std(cdata.intra.lei.cls,[],1));
+    lt_ndata = struct('mean', mean(ndata.intra.lei.cls,1), 'std', std(ndata.intra.lei.cls,[],1));
     if ismember(1, plots) || ismember(1.5, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'bce'); end;
     
-    lt_cdata = struct('mean', mean(cdata{1}.intra.lei.err,1), 'std', std(cdata{1}.intra.lei.err,[],1));
-    lt_ndata = struct('mean', mean(ndata{1}.intra.lei.err,1), 'std', std(ndata{1}.intra.lei.err,[],1));
+    lt_cdata = struct('mean', mean(cdata.intra.lei.err,1), 'std', std(cdata.intra.lei.err,[],1));
+    lt_ndata = struct('mean', mean(ndata.intra.lei.err,1), 'std', std(ndata.intra.lei.err,[],1));
     if ismember(1, plots) || ismember(1.6, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'sse'); end;
 
     % Inter
-    lt_cdata = struct('mean', mean(cdata{1}.inter.lei.cls,1), 'std', std(cdata{1}.inter.lei.cls,[],1));
-    lt_ndata = struct('mean', mean(ndata{1}.inter.lei.cls,1), 'std', std(ndata{1}.inter.lei.cls,[],1));
+    lt_cdata = struct('mean', mean(cdata.inter.lei.cls,1), 'std', std(cdata.inter.lei.cls,[],1));
+    lt_ndata = struct('mean', mean(ndata.inter.lei.cls,1), 'std', std(ndata.inter.lei.cls,[],1));
     if ismember(1, plots) || ismember(1.7, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'bce'); end;
     
-    lt_cdata = struct('mean', mean(cdata{1}.inter.lei.err,1), 'std', std(cdata{1}.inter.lei.err,[],1));
-    lt_ndata = struct('mean', mean(ndata{1}.inter.lei.err,1), 'std', std(ndata{1}.inter.lei.err,[],1));
+    lt_cdata = struct('mean', mean(cdata.inter.lei.err,1), 'std', std(cdata.inter.lei.err,[],1));
+    lt_ndata = struct('mean', mean(ndata.inter.lei.err,1), 'std', std(ndata.inter.lei.err,[],1));
     if ismember(1, plots) || ismember(1.8, plots), fs(end+1) = plot_raw_lei(lt_cdata,lt_ndata,ts,'sse'); end;
 
     clear('lt_cdata', 'lt_ndata');
@@ -91,12 +81,12 @@ end;
 
 %% Raw plot of lesion induced errors
 if any(2<=plots & plots<3)
-    lei_cdata = struct('intra', cdata{1}.intra.lei.cls, 'inter', cdata{1}.inter.lei.cls);
-    lei_ndata = struct('intra', ndata{1}.intra.lei.cls, 'inter', ndata{1}.inter.lei.cls);
+    lei_cdata = struct('intra', cdata.intra.lei.cls, 'inter', cdata.inter.lei.cls);
+    lei_ndata = struct('intra', ndata.intra.lei.cls, 'inter', ndata.inter.lei.cls);
     if ismember(2, plots) || ismember(2.1, plots), fs(end+1) = plot_lei_split(lei_cdata,lei_ndata,ts,'bce'); end;
     
-    lei_cdata = struct('intra', cdata{1}.intra.lei.err, 'inter', cdata{1}.inter.lei.err);
-    lei_ndata = struct('intra', ndata{1}.intra.lei.err, 'inter', ndata{1}.inter.lei.err);
+    lei_cdata = struct('intra', cdata.intra.lei.err, 'inter', cdata.inter.lei.err);
+    lei_ndata = struct('intra', ndata.intra.lei.err, 'inter', ndata.inter.lei.err);
     if ismember(2, plots) || ismember(2.2, plots), fs(end+1) = plot_lei_split(lei_cdata,lei_ndata,ts,'sse'); end;
 end;
     
@@ -104,9 +94,9 @@ end;
 %% Similarity matrix
 if any(3<=plots & plots<4)
     keyboard
-    if ismember(3, plots) || ismember(3.1, plots), fs(end+1) = plot_hu_sim(cdata{1}.all,ndata{1}.all); end;
-    if ismember(3, plots) || ismember(3.2, plots), fs(end+1) = plot_hu_sim(cdata{1}.intra,ndata{1}.intra); end;
-    if ismember(3, plots) || ismember(3.3, plots), fs(end+1) = plot_hu_sim(cdata{1}.inter,ndata{1}.inter); end;
+    if ismember(3, plots) || ismember(3.1, plots), fs(end+1) = plot_hu_sim(cdata.all,ndata.all); end;
+    if ismember(3, plots) || ismember(3.2, plots), fs(end+1) = plot_hu_sim(cdata.intra,ndata.intra); end;
+    if ismember(3, plots) || ismember(3.3, plots), fs(end+1) = plot_hu_sim(cdata.inter,ndata.inter); end;
 end;
 
 
