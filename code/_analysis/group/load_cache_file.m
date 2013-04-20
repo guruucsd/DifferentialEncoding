@@ -1,7 +1,9 @@
-function loaded_dirs = load_global_cache(cache_file, merge)
+function loaded_dirs = load_cache_file(cache_file, merge)
 
     global g_dir_cache g_data_cache g_sets_cache
-    
+ 
+    if ~exist('merge','var'), merge = true; end;
+   
     cache = load(cache_file);
 
     % old saved cache used to have different variable names 

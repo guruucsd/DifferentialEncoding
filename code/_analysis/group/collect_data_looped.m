@@ -7,7 +7,7 @@ if ~exist('prefix','var'),     prefix='tdlc'; end;
 
 % Get all subfolders with given prefix
 if isempty(dirname)
-    paths = load_global_cache(cache_file, true);
+    paths = load_cache_file(cache_file);
     folders = cellfun(@(d) guru_fileparts(d,'name'), paths, 'UniformOutput', false);
 else
     folders = dir(fullfile(dirname,[prefix '*']));

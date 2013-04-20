@@ -58,7 +58,7 @@ function [data,ts,sets] = get_cache_data(dirs, cache_file, force_load)
                 if ~exist(cache_file,'file'), error('Couldn''t find cache file: %s', cache_file); end;
 
                 % Cache exists; either load it and merge.
-                load_global_cache(cache_file, true);
+                load_cache_file(cache_file);
 
                 [~,idx] = intersect(dirnames(remain_dirs), g_dir_cache);
                 cur_found_dirs = remain_dirs(idx);
