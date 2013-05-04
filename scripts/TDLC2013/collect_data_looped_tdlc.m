@@ -5,7 +5,7 @@ if ~exist('dirname','var'),    dirname    = 'runs'; end;
 if ~exist('cache_file','var'), cache_file = ''; end; % no caching
 if ~exist('prefix','var'), prefix='tdlc'; end;
 
-[d,folders] = collect_data_looped(dirname, cache_file, prefix);
+[d,~,folders] = collect_data_looped(dirname, cache_file, prefix);
 
 for foi=1:length(folders)
     

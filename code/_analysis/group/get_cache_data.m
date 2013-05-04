@@ -18,6 +18,7 @@ function [data,ts,sets] = get_cache_data(dirs, cache_file, force_load)
 %
 % data: summarized data blob
 % ts : info about timesteps
+% sets: settings cache
 
     global g_data_cache g_dir_cache g_sets_cache;
     if isnumeric(g_dir_cache) % initialize kindly :)

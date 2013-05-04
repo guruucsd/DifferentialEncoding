@@ -45,8 +45,8 @@ ts.all = unique(nts);
 %nidx = (noise==1);
 
 fs = []; % output figure handles
-udelays = unique(delay)';
-unoises = unique(noise)';
+udelays = unique(delay);
+unoises = unique(noise);
 
 %% Learning trajectory (raw)
 if any(0<=plots & plots<1)
@@ -68,7 +68,8 @@ if any(1<=plots & plots<2)
         % Raw learning; delay=10 (classification error)
         lt_data_fast = get_sub_data(data, noise==n & delay==udelays(1),   {[intype '.intact.' etype], [intype '.lesion.' etype]});
         lt_data_slow = get_sub_data(data, noise==n & delay==udelays(end), {[intype '.intact.' etype], [intype '.lesion.' etype]});
-        if ismember(1, plots) || ismember(1.1, plots), fs(end+1) = plot_ringo_curves(lt_data_fast, lt_data_slow,ts,lt_nts,sprintf('err=%s (%s, noise=%d)',etype,intype,n)); end;
+        if ismember(1, plots) || ismember(1.1, plots), fs(end+1) = plot_ringo_curves1(lt_data_fast, lt_data_slow,ts,lt_nts,sprintf('err=%s (%s, noise=%d)',etype,intype,n)); end;
+        if ismember(1, plots) || ismember(1.2, plots), fs(end+1) = plot_ringo_curves2(lt_data_fast, lt_data_slow,ts,lt_nts,sprintf('err=%s (%s, noise=%d)',etype,intype,n)); end;
     end;
 end;
 
@@ -227,7 +228,7 @@ function f2 = plot_raw_learning2(cdata, ndata, ts, type)
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
 
     
-function fr = plot_ringo_curves(data_fast, data_slow, ts,nts,type)
+function fr = plot_ringo_curves1(data_fast, data_slow, ts,nts,type)
     [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
     [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
     
@@ -255,7 +256,44 @@ function fr = plot_ringo_curves(data_fast, data_slow, ts,nts,type)
     
     legend([hf hs], guru_csprintf(['%s ' type ')'], {'fast','slow'}), 'Location', 'NorthEast');
  
+
+function fr = plot_ringo_curves2(data_fast, data_slow, ts,nts,type)
+
+    % hack the type
+    tdata = sscanf(type, 'err=%s (%5s, noise=%d');
+    noise = tdata(end);
+    errtype = char(tdata(1:end-6)');
     
+    [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
+    [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
+    
+    lei_fastm = les_fastm(:,end)-int_fastm(:,end);
+    lei_fasts = les_fasts(:,end)+int_fasts(:,end)/2;
+    lei_slowm = les_slowm(:,end)-int_slowm(:,end);
+    lei_slows = (les_slows(:,end)+int_slows(:,end))/2;
+
+    fr = figure('Position', [57   237   998   447]);
+    
+    subplot(1,2,1); set(gca, 'FontSize', 14);
+    hf = plot(nts, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
+    hold on;
+    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
+    errorbar(nts, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
+    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+    legend([hf hs], guru_csprintf(sprintf('%%s (noise=%d)', noise), {'D=2','D=10'}), 'Location', 'NorthEast');
+    xlabel('timesteps'); ylabel(sprintf('\\Delta %s', errtype));
+    title('Original', 'FontSize', 16);
+
+    subplot(1,2,2); set(gca, 'FontSize', 14);
+    hf = plot(nts+8, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
+    hold on;
+    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
+    errorbar(nts+8, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
+    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+    set(gca, 'xlim', [10 
+    xlabel('timesteps');
+    title('Shifted', 'FontSize', 16);
+        
 function fr = plot_ringo_curves_normd(data_fast, data_slow, ts,nts,type)
     [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
     [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
