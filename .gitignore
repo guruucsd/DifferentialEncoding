@@ -1,3 +1,5 @@
-.mat
+*.mat
 nohup.out
 *.m~
+*.fig
+*.png
