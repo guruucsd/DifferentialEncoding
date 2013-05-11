@@ -72,8 +72,8 @@
   end;
   
   %
-  scaling = max(std_mean(:)); % make the scaling look close to 1
-  max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]);
+  scaling = max(std_mean(:)); % Rescale over all sigmas, such that the scale of response isn't a factor
+  max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
   %max_std = avg_mean;
   ns_mean = std_mean./max_std;
   ns_std  = std_std./sqrt(max_std);
