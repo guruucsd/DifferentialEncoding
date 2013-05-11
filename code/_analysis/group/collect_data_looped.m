@@ -1,5 +1,8 @@
 function [d,s,folders] = collect_data_looped(dirname, cache_file, prefix)
 %
+% d: data
+% s: settings
+% folders: 
 
 if ~exist('dirname','var'),    dirname    = 'runs'; end;
 if ~exist('cache_file','var'), cache_file = ''; end; % no caching
