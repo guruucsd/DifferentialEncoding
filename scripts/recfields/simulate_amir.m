@@ -11,7 +11,7 @@ switch expt
         sigmas = [1 2 4 8 16 32 64 128];%
         cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
         nconns = ceil(2*linspace(5,25, length(sigmas))); %[1 1 1 1 1  1  1  1]*10;
-        nsamps = 2;
+        nsamps = 50;
 end;
 
 % get paths
