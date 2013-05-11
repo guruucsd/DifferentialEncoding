@@ -1,11 +1,11 @@
 function [data_cache,dir_cache,sets_cache] = make_cache_file(dirnames, cache_file)
-%function make_cache(dirnames, cache_file)
+%function make_cache(dirname(s), cache_file)
 %
 % Take a set of dirnames, and save a cache file of their summary data to disk.
 %
-% dirnames: names of cached data to save
+% dirname(s): names of folders with data to save
 %   if not specified, then it uses the entire cache
-%
+%   if specified and the cache is empty, loads a cache from that location
 %
 
   global g_dir_cache g_data_cache g_sets_cache
@@ -14,7 +14,11 @@ function [data_cache,dir_cache,sets_cache] = make_cache_file(dirnames, cache_fil
   if ~exist('dirnames','var') || isempty(dirnames)
     dirnames = g_dir_cache;
   elseif ischar(dirnames)
-    dirnames = {dirnames};
+    if ~isempty(g_dir_cache)
+      dirnames = {dirnames};
+    else
+      [~,~,dirnames] = collect_data_looped( dirnames, '', '' );
+    end;
   elseif ~iscell(dirnames)
     error('dirnames input var must be a string or a cell array of strings');
   % get just the directory name, eliminate any path
