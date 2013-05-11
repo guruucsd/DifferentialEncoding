@@ -8,9 +8,19 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
 
   % Whatever we have, we output.
   args = varargin;
+  
+  
+  % Take some args and expand them out.
+  if ismember('spacing', aKeys)
+      spacing = guru_getopt(args, 'spacing');
+      aKeys{end+1} = 'sigma';
+      args(end+1:end+2) = {'sigma', de_GetSigmasFromSpacing(spacing)};
+      fprintf('Computed sigmas from spacing: [%s ]\n', sprintf(' %d', args{end}))
+  end;
 
   % Whatever we don't have, add!
-
+  
+  
   % Run parameters
   if (~ismember('parallel',         aKeys)), args(end+1:end+2) = {'parallel', false}; end;
 
