@@ -45,6 +45,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
         if (isfield(model.ac, 'randState'))
             rand('seed', model.ac.randState);
             randn('seed', model.ac.randState);
+            fprintf('random seed: %d\n', model.ac.randState);
         end;
 
         %%%%%%%%%%%%%%%%%
@@ -62,8 +63,8 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
 
         switch(model.dataset)
             case {'c' 'cafe'    'young_bion_1981'},     [~, ws.train, ws.test] = de_MakeDataset('young_bion_1981',     '', '', mSets.data.opt);
-            case {'n' 'natimg'  'vanhateren'},          [~, ws.train, ws.test] = de_MakeDataset('vanhateren',          '', '', mSets.data.opt);
-            case {'s' 'sergent' 'sergent_1982'},        [~, ws.train, ws.test] = de_MakeDataset('sergent_1982',        '', '', mSets.data.opt);
+            case {'n' 'natimg'  'vanhateren'},          [~, ws.train, ws.test] = de_MakeDataset('vanhateren',          '100', '', mSets.data.opt);
+            case {'s' 'sergent' 'sergent_1982'},        [~, ws.train, ws.test] = de_MakeDataset('sergent_1982',        'sergent', '', mSets.data.opt);
             case {    'sf'      'christman_etal_1991'}, [~, ws.train, ws.test] = de_MakeDataset('christman_etal_1991', '', '', mSets.data.opt);
             case {'u' 'uber'},                          [~, ws.train, ws.test] = de_MakeDataset('uber',                'original', '', mSets.data.opt);
             case {'f' 'gratings'},                      [~, ws.train, ws.test] = de_MakeDataset('gratings',            '', '', mSets.data.opt);
