@@ -1,0 +1,5 @@
+What I see:
+- with "just enough" computational power, or overtraining, trend towards LH
+- with "way too much" computational power, or not enough training, no trend
+- with intermediate, consistent asymmetry.
+
