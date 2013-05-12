@@ -116,7 +116,7 @@ for szi=1:length(sigmas)
     end;
     dff = (mean(p{szi}(1).nn_dist)-mean(p{szi}(end).nn_dist))/((mean(p{szi}(1).nn_dist)+mean(p{szi}(end).nn_dist))/2);
     
-    fprintf('\tActual difference: %5.2f%% difference.\n', dff)
+    fprintf('\tActual difference: %5.2f%% difference.\n', 100*abs(dff));
 
 
     % non-normalized: scale to peak frequency (irrespective)

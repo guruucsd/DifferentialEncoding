@@ -1,8 +1,12 @@
-function mean_nn_dist = de_calc_nn_dist(cxn_matrix)
+function [mean_nn_dist,min_nn_dist,unique_nn_dist] = de_calc_nn_dist(cx,cy)
 % Given a
 %
 
-[cy,cx] = find(cxn_matrix);
+if numel(cx)~=length(cx) && ~exist('cy','var')
+    cxn_matrix = cx;
+    [cy,cx] = find(cxn_matrix);
+end;
+
 nn_dist = nan(length(cx));
 for ci=1:length(cx)%  For each connected unit
   for di=(ci+1):length(cx)% Manual search for nearest neighbor
@@ -13,5 +17,6 @@ for ci=1:length(cx)%  For each connected unit
   end;
 end;
 
-mean_nn_dist = mean(min(nn_dist));
-  
+unique_nn_dist = nn_dist(triu(nn_dist,1)~=0);  
+min_nn_dist = min(nn_dist);
+mean_nn_dist = mean(min_nn_dist);
