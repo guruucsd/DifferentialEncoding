@@ -146,20 +146,9 @@ function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(var
   p.avg_dist = dist_fn(:)' * (wts_mean(:)/sum(wts_mean(:)));
   
   % Calculate nearest-neighbor distance
+  p.nn_dist = zeros(size(raw_wts,1), 1);
   for mi=1:size(raw_wts,1)
-
-    [cy,cx] = find(squeeze(raw_wts(mi,:,:)));
-    nn_dist = nan(length(cx));
-    for ci=1:length(cx)%  For each connected unit
-      for di=(ci+1):length(cx)% Manual search for nearest neighbor
-    
-        % Interpatch distance
-        nn_dist(ci,di) = sqrt( (cx(ci)-cx(di)).^2 + (cy(ci)-cy(di)).^2);
-        nn_dist(di,ci) = nn_dist(ci,di); % must include this, for the min below to work.
-      end;
-    end;
-    
-    p.nn_dist(mi) = mean(min(nn_dist));
+    p.nn_dist(mi) = de_calc_nn_dist(squeeze(raw_wts(mi,:,:))~=0);
   end;
   
   
