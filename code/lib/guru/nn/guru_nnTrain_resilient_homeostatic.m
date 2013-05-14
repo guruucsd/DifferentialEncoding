@@ -1,4 +1,4 @@
-function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
+function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 % Train with basic backprop, in batch mode
 
   nInputs   = size(X,1)-1;
@@ -118,6 +118,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
 
+        % mean activity from previous time; time window
         if ~exist('avgact','var'), avgact = zeros(size(meanact)); end;
         avgact = model.bc*meanact+(1-model.bc)*avgact;
         actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
@@ -127,8 +128,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);    
         model.Weights(huidx,1:(nInputs+1)) = model.Weights(huidx,1:(nInputs+1)) ./ repmat(actnorm,[1 nInputs+1]);
         %keyboard
-        
-
 
 
     elseif isfield(model, 'meanwt')
@@ -147,6 +146,26 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         huidx = huidx(totwt~=0);
         totwt = totwt(totwt~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.totwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(totwt,[1 nInputs+1]);
+        
+    elseif isfield(model, 'stdact')
+        inidx = [1:nInputs];
+        huidx = nInputs+1+[1:nHidden];
+        inacts = opc(inidx,:);
+        huacts = opc(huidx,:);
+        std_inact = std(abs(inacts),[],2);
+        std_huact = std(abs(huacts),[],2);
+
+        % exponential decay
+        if ~exist('stdact','var'), stdact = zeros(size(std_huact)); end;
+        stdact = model.bc*std_huact+(1-model.bc)*stdact;
+        stdnorm = 1+model.bn*(stdact - model.stdact)./model.stdact;
+        fprintf('current_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
+        %keyboard
+        %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
+        %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);    
+        model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1000.*model.Conn(huidx,inidx).*((stdnorm-mean(stdnorm))*-1*(std_inact-mean(std_inact))'); %neg for too small
+        %keyboard
+        
     end;
     guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))
