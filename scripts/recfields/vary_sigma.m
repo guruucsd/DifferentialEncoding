@@ -66,7 +66,7 @@
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
-  ylabel('output activity (linear xfer fn)');
+  ylabel('output variance');
   legend(lbls, 'Location', 'best', 'FontSize',16);
   
   % normalized
@@ -77,7 +77,7 @@
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
-  ylabel('output activity (normalized)');
+  ylabel('output variance (normalized)');
   legend(lbls, 'Location', 'best', 'FontSize',14);
   
   %figure;
