@@ -4,17 +4,17 @@ cogsci_dir = fullfile(r_out_path('cache'), 'cogsci2013');
 cache_file = fullfile(cogsci_dir, 'cogsci2013_cache.mat');
 
 %% Noise dependence: 10 time-steps
-for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_10'), fullfile(cogsci_dir, 'noise_10_1'), [0.3 0.4 0.5 0.6 0.7 0.8])
+for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_10'), fullfile(cogsci_dir, 'noise_10_1'), [0.3 0.4 0.5 0.6 0.7 0.8], cache_file)
     figure(fi);
     title('Learning Trajectory (delay=10 time-steps)');
 %    [~,~,oh] = legend();
 %    legend(oh, {'Intact (1 time-step)', 'Lesioned (1 time-step)', 'Intact (10 time-steps)', 'Lesioned (10 time-steps)'});
 end;
-
+return
 
 
 %% Noise dependence: 2 time-steps
-for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_2'), fullfile(cogsci_dir, 'noise_2_1'), [0.4 0.8])
+for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_2'), fullfile(cogsci_dir, 'noise_2_1'), [0.4 0.8], cache_file)
     figure(fi);
     title('Learning Trajectory (delay=2 time-steps)');
 %    [~,~,oh] = legend();
@@ -24,7 +24,7 @@ end;
 %% Time dependence: control
 
 % % wrongly classified
-for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_2'), fullfile(cogsci_dir, 'nonoise_10'), [0.4 0.8])
+for fi=cogsci2013_figures(fullfile(cogsci_dir, 'nonoise_2'), fullfile(cogsci_dir, 'nonoise_10'), [0.4 0.8], cache_file)
     figure(fi);
     [~,~,oh] = legend();
     title('Learning Trajectory (control)');
@@ -34,7 +34,7 @@ end;
 %% Time dependence: noise
 
 % % wrongly classified
-for fi=cogsci2013_figures(fullfile(cogsci_dir, 'noise_2_1'), fullfile(cogsci_dir, 'noise_10_1'), [0.4 0.8])
+for fi=cogsci2013_figures(fullfile(cogsci_dir, 'noise_2_1'), fullfile(cogsci_dir, 'noise_10_1'), [0.4 0.8], cache_file)
     figure(fi);
     title('Learning Trajectory (noise)');
     [~,~,oh] = legend();

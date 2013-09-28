@@ -68,7 +68,7 @@ function [an,sets] = collect_data(dirname, resave)
 %fprintf('%d ', fi);
       blobs{end+1} = b;
   end;
-  
+  keyboard
   % Useful constants
   an.ts.niters = b.net.sets.niters;
   an.ts.lesion = [100:100:an.ts.niters];

@@ -30,7 +30,7 @@ function [fh] = asymmetry_figures(cache_file, plots)
         end;
     end;
 
-    keyboard
+    %keyboard
 % 
 %     %% Show the effect of #cc within a dataset
 %     for d1=1:length(datasets)

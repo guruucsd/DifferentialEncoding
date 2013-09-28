@@ -1,7 +1,9 @@
-function fs=tdlc2013_figures(data_dir, plots, intype, etype, cache_file)
+function fs=tdlc2013_figures(data_path, plots, intype, etype, cache_file)
+% data_path: directory of all raw data.  OR, a pointer to the cache file.
 % intype: all, inter, intra
 % etype : clserr, err (sse)
-%
+% cache_file: a pointer to the cache file; use IFF data_dir is not empty.
+%     Otherwise, specify the cache_file as the data_path (see above)
 
 if ~exist('r_out_path',     'file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','code'))); end;
 if ~exist('guru_getOptPath','file'), addpath(genpath(fullfile(fileparts(which(mfilename)), '..','..','..','_lib'))); end;
@@ -12,18 +14,21 @@ if ~exist('intype','var'), intype = 'all'; end;
 if ~exist('etype', 'var'), etype  = 'clserr'; end;
 if ~exist('cache_file','var'), cache_file = ''; end;
 
+% Determine the data directory, based on the setting of the data_path and cache_file
+
 % cache file with no dir data; set dir_data to empty
 %   so that looper will know to load data from cache file
-if strcmp('.mat', guru_fileparts(data_dir,'ext')) && isempty(cache_file)
-    cache_file = data_dir;
-    if ~exist(data_dir,'file'), error('Could not find cache file: %s', cache_file); end;
+if strcmp('.mat', guru_fileparts(data_path,'ext')) && isempty(cache_file)
+    cache_file = data_path;
+    if ~exist(cache_file,'file'), error('Could not find cache file: %s', cache_file); end;
     data_dir = [];
     
 % Fix path  
-elseif ~exist(data_dir,'dir') && exist(fullfile(r_out_path('cache'), data_dir), 'dir')
-    keyboard
-    data_dir = fullfile(r_out_path('cache'), data_dir);
-    
+elseif ~exist(data_path,'dir') && exist(fullfile(r_out_path('cache'), data_path), 'dir')
+    data_dir = fullfile(r_out_path('cache'), data_path);
+
+else
+    data_dir = data_path
 end;
     %if ~exist('cache_file', 'var'),cache_file= fullfile(r_out_path('cache'), 'tdlc2013_cache.mat'); end;
 
@@ -120,22 +125,26 @@ function [les_mean,int_mean,les_std,int_std] = data2surf(data,ts)
 function f0 = plot_raw_learning0(cdata, ndata, ts, type)
 % Plot a surface of training error (z) vs epoch (x), and how that
 % relates to time-step (y1)
+%
+% Added meshgrid and transpose because that works better for plot3 (I
+% sometimes switch!)
 
     % Plot clean data first
     [les_surf,int_surf] = data2surf(cdata,ts);
-    
+    [Xin,Yin] = meshgrid(ts.intact, ts.all);
     % Figure 0: Raw plots
     f0=figure('position', [37          33        1154         651]);
     subplot(2,2,1); caxis(get(gca,'zlim')); 
     set(gca, 'FontSize', 14);
-    surf(ts.intact, ts.all, int_surf); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
+    surf(Xin', Yin', int_surf'); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
     xlabel('training epoch');     set(gca,'xlim', [min(ts.intact) max(ts.intact)]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Intact (control (no noise); %s)',type));
     
     subplot(2,2,2); caxis(get(gca,'zlim')); 
     set(gca, 'FontSize', 14);
-    surf(ts.lesion, ts.all, les_surf); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
+    [Xles,Yles] = meshgrid(ts.lesion, ts.all);
+    surf(Xles', Yles', les_surf'); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
     xlabel('training epoch');     set(gca,'xlim', [min(ts.lesion) max(ts.lesion)]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Lesion (control (no noise); %s)', type));
@@ -148,14 +157,16 @@ function f0 = plot_raw_learning0(cdata, ndata, ts, type)
     figure(f0);
     subplot(2,2,3);
     set(gca, 'FontSize', 14);
-    surf(ts.intact, ts.all, int_surf); set(gca,'zlim', [0 0.8]);  view(54.5,18);  caxis(get(gca,'zlim'));
+    [Xin,Xin] = meshgrid(ts.intact, ts.all);
+    surf(Xin', Yin', int_surf'); set(gca,'zlim', [0 0.8]);  view(54.5,18);  caxis(get(gca,'zlim'));
     xlabel('training epoch');     set(gca,'xlim', [min(ts.intact) max(ts.intact)]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Intact (expt (noise); %s)', type));
     
     subplot(2,2,4); 
     set(gca, 'FontSize', 14);
-    surf(ts.lesion, ts.all, les_surf); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
+    [Xles,Yles] = meshgrid(ts.lesion, ts.all);
+    surf(Xles', Yles', les_surf'); set(gca,'zlim', [0 0.8]); view(54.5,18); caxis(get(gca,'zlim'));
     xlabel('training epoch');     set(gca,'xlim', [min(ts.intact) max(ts.intact)]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Lesion (expt (noise); %s)', type));
@@ -169,8 +180,10 @@ function f1 = plot_raw_learning1(cdata, ndata, ts, type)
     f1 = figure('Position', [57         245        1054         439]);
     subplot(1,2,1); set(gca, 'FontSize', 14);
     hold on; view(54.5,18); set(gca,'zlim', [0 0.8]);  caxis(get(gca,'zlim'));
-    surf(ts.intact, ts.all, int_surf); 
-    surf(ts.lesion, ts.all, les_surf);
+    [Xin,Yin]   = meshgrid(ts.intact, ts.all);
+    [Xles,Yles] = meshgrid(ts.lesion, ts.all);
+    plot3(Xin', Yin', int_surf'); 
+    plot3(Xles', Yles', les_surf');
     xlabel('training epoch');     set(gca,'xlim', [min([ts.intact ts.lesion]) max([ts.intact ts.lesion]) ]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Control (no noise); %s)', type));
@@ -184,8 +197,10 @@ function f1 = plot_raw_learning1(cdata, ndata, ts, type)
     subplot(1,2,2);
     set(gca, 'FontSize', 14);
     hold on; view(54.5,18);  set(gca,'zlim', [0 0.8]);  caxis(get(gca,'zlim'));
-    surf(ts.intact, ts.all, int_surf);
-    surf(ts.lesion, ts.all, les_surf);
+    [Xin,Yin]   = meshgrid(ts.intact, ts.all);
+    [Xles,Yles] = meshgrid(ts.lesion, ts.all);
+    surf(Xin', Yin', int_surf');
+    surf(Xles', Yles', les_surf');
     xlabel('training epoch');     set(gca,'xlim', [min([ts.intact ts.lesion]) max([ts.intact ts.lesion]) ]);
     ylabel('model time_{total}'); set(gca,'ylim', [min(ts.all) max(ts.all)]);
     hold on; title(sprintf('Expt (noise); %s)', type));
@@ -257,43 +272,9 @@ function fr = plot_ringo_curves1(data_fast, data_slow, ts,nts,type)
     legend([hf hs], guru_csprintf(['%s ' type ')'], {'fast','slow'}), 'Location', 'NorthEast');
  
 
-function fr = plot_ringo_curves2(data_fast, data_slow, ts,nts,type)
 
-    % hack the type
-    tdata = sscanf(type, 'err=%s (%5s, noise=%d');
-    noise = tdata(end);
-    errtype = char(tdata(1:end-6)');
-    
-    [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
-    [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
-    
-    lei_fastm = les_fastm(:,end)-int_fastm(:,end);
-    lei_fasts = les_fasts(:,end)+int_fasts(:,end)/2;
-    lei_slowm = les_slowm(:,end)-int_slowm(:,end);
-    lei_slows = (les_slows(:,end)+int_slows(:,end))/2;
 
-    fr = figure('Position', [57   237   998   447]);
-    
-    subplot(1,2,1); set(gca, 'FontSize', 14);
-    hf = plot(nts, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
-    hold on;
-    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
-    errorbar(nts, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
-    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
-    legend([hf hs], guru_csprintf(sprintf('%%s (noise=%d)', noise), {'D=2','D=10'}), 'Location', 'NorthEast');
-    xlabel('timesteps'); ylabel(sprintf('\\Delta %s', errtype));
-    title('Original', 'FontSize', 16);
 
-    subplot(1,2,2); set(gca, 'FontSize', 14);
-    hf = plot(nts+8, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
-    hold on;
-    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
-    errorbar(nts+8, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
-    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
-    set(gca, 'xlim', [10 
-    xlabel('timesteps');
-    title('Shifted', 'FontSize', 16);
-        
 function fr = plot_ringo_curves_normd(data_fast, data_slow, ts,nts,type)
     [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
     [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
@@ -351,6 +332,44 @@ function fr = plot_ringo_curves_together(data_fast, data_slow, ts,nts,type)
     hold on;
     
     legend([hf hs], guru_csprintf(['%s ' type ')'], {'fast','slow'}), 'Location', 'NorthEast');
+    
+  
+  function fr = plot_ringo_curves2(data_fast, data_slow, ts,nts,type)
+
+    % hack the type
+    tdata = regexp(type, 'err=(.*) \((.*), noise=(\d+)\)', 'tokens');
+    noise = str2double(tdata{1}{end});
+    errtype = char(tdata(1:end-6)');
+    
+    [les_fastm,int_fastm,les_fasts,int_fasts] = data2surf(data_fast, ts);
+    [les_slowm,int_slowm,les_slows,int_slows] = data2surf(data_slow, ts);
+    
+    lei_fastm = les_fastm(:,end)-int_fastm(:,end);
+    lei_fasts = les_fasts(:,end)+int_fasts(:,end)/2;
+    lei_slowm = les_slowm(:,end)-int_slowm(:,end);
+    lei_slows = (les_slows(:,end)+int_slows(:,end))/2;
+
+    fr = figure('Position', [57   237   998   447]);
+    
+    subplot(1,2,1); set(gca, 'FontSize', 14);
+    hf = plot(nts, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
+    hold on;
+    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
+    errorbar(nts, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
+    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+    legend([hf hs], guru_csprintf(sprintf('%%s (noise=%d)', noise), {'D=2','D=10'}), 'Location', 'NorthEast');
+    xlabel('timesteps'); ylabel(sprintf('\\Delta %s', errtype));
+    title('Original', 'FontSize', 16);
+
+    subplot(1,2,2); set(gca, 'FontSize', 14);
+    hf = plot(nts+8, -lei_fastm, 'v-b', 'MarkerFaceColor', 'b', 'MarkerSize', 10, 'LineWidth', 3);
+    hold on;
+    hs = plot(nts, -lei_slowm, 'o-r', 'MarkerFaceColor', 'r', 'MarkerSize', 10, 'LineWidth', 3);
+    errorbar(nts+8, -lei_fastm, lei_fasts, '.k', 'LineWidth', 2);
+    errorbar(nts,   -lei_slowm, lei_slows, '.k', 'LineWidth', 2);
+%    set(gca, 'xlim', [10 
+    xlabel('timesteps');
+    title('Shifted', 'FontSize', 16);
  
     
  
