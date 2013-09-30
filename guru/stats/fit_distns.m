@@ -25,19 +25,19 @@ function [params] = fit_distns(X,Y,fit_type,frac)
             %sigmafn(bi_fig9_unmyelinated_mean, bi_fig9_unmyelinated_var)';];
 
             % But we're going to fit these functions numerically.
-            pmffn = @(x,p1,p2) cdf2pmf(@logncdf, x, p1, p2);
+            pmffn = @(x,p) cdf2pmf(@logncdf, x,p);
             pdffn = @lognpdf;
     %        fitfn = @(d,b) fitpdf(pdffn,d,b,[-0.3 0.1]);
             fitfn = @(d,b) fitpmf(pmffn,d,b,[-0.3 0.1]);
 
         case 'IUBD'
-            pmffn = @(x,p1,p2) cdf2pmf(@IUBDcdf, x, p1, p2);
+            pmffn = @(x,p) cdf2pmf(@IUBDcdf, x, p);
             pdffn = @IUBDpdf;
     %        fitfn = @(d,b) fitpdf(pdffn,d,b,[1 1]);
             fitfn = @(d,b) fitpmf(pmffn,d,b,[1 1]);
 
         case 'gamma'
-            pmffn = @(x,p1,p2) cdf2pmf(@gamcdf, x, p1, p2);
+            pmffn = @(x,p) cdf2pmf(@gamcdf, x, p);
             pdffn = @gampdf;
     %        fitfn = @(d,b) fitpdf(pdffn,d,b,[6 0.1]);
             fitfn = @(d,b) fitpmf(pmffn,d,b,[6 0.1]);

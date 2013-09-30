@@ -17,37 +17,33 @@ if ~exist('showplot','var'), showplot = false; end;
 
 s = rand(sz);
 pnorm = p(:)/sum(p);
-p_be = [0;cumsum(pnorm);inf]; % bin edges
-[c,xi] = histc(s(:),p_be);
+p_be = [0;cumsum(pnorm)]; % bin edges
+[c,xi] = histc(s(:),p_be); % generate dummy samples, true bins
 
-if showplot
-    figure; 
-    subplot(1,2,1); bar(p, 1); hold on; title('original');
-    subplot(1,2,2); bar(c/sum(c(:)), 'histc'); hold on; title('actual');
-end;
-
+% generate real samples
 if nargout==2
     if ~exist('be','var'), error('need bin edges to sample actual values!'); end;
     
-    %diff(be([xi xi+1]),[],2);
-    dbe = diff(be(1:2));
-    x = be(xi)' + dbe.*(s(:)-p_be(xi))./pnorm(xi);
-    
+    % Distribute values uniformly over values within a bin
+    dbe = diff(be(1:2)); % assume bin edges are equally spaced
+    x = be(xi)' - dbe.*(s(:)-p_be(xi))./pnorm(xi);
     x = reshape(x,sz);
-    [c,xi] = histc(x(:),[be(1:end)]);
 
-    if showplot
-        figure; 
-        subplot(1,2,1); set(gca, 'FontSize', 14);
-        bar(be, p./sum(p(:)), 1);           hold on; 
-        set(gca, 'xlim', be([1,end])); 
-        title('original', 'FontSize', 16);
-        
-        subplot(1,2,2); set(gca, 'FontSize', 14);
-        bar(be, c/sum(c(:)), 'histc'); hold on; 
-        set(gca, 'xlim', be([1,end])); 
-        title('actual', 'FontSize', 16);
-    end;
+    [c,xi] = guru_hist(x, be);
+end;
+
+
+if showplot
+    figure; 
+    subplot(1,2,1); set(gca, 'FontSize', 14);
+    bar(be, p./sum(p(:)), 1); hold on; 
+    set(gca, 'xlim', be([1,end])); 
+    title('Original', 'FontSize', 16);
+
+    subplot(1,2,2); set(gca, 'FontSize', 14);
+    bar(be, c/sum(c(:)), 1); hold on; 
+    set(gca, 'xlim', be([1,end])); 
+    title('Actual', 'FontSize', 16);
 end;
 
 xi = reshape(xi,sz);

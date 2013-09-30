@@ -4,7 +4,7 @@ function [h] = allometric_plot1(x,y,p,fns,fh,type,col,mark)
 %
 % p and fn can be number/functions, or they can be arrays (different
 % regressions for each class)
-
+type = 'loglog';
     if ~iscell(x), x=num2cell(x,1); end;
     if ~iscell(y), y=num2cell(y,1); end;
     if ~exist('fns','var')
@@ -32,13 +32,15 @@ function [h] = allometric_plot1(x,y,p,fns,fh,type,col,mark)
         % Determine the extent of the regression line
         if length(fns) == length(x) % per-class limit
             % Scatter points
-%                        
+
+            
+           % keyboard
             if strcmp(type, 'loglog'), h(ci) = scatter(x{ci}, y{ci}, 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
             else,                      h(ci) = scatter(fns{ci}.xxform(x{ci}), fns{ci}.yxform(y{ci}), 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
             end;
             
             if length(x{ci})==1, continue; end;
-            xvals = sort(x{ci});
+            xvals  = linspace(min(x{ci}), max(x{ci}), 100);
             xtvals = fns{ci}.xxform(xvals);
             rtvals = fns{ci}.reg(xvals); %
             rvals  = fns{ci}.yinv(rtvals);
@@ -57,7 +59,7 @@ function [h] = allometric_plot1(x,y,p,fns,fh,type,col,mark)
             
             %regression
             if ci==length(x)
-                xvals = sort([x{:}]);
+                xvals  = linspace(min([x{:}]), max([x{:}]), 100);
                 xtvals = fns{1}.xxform(xvals);
                 rtvals = fns{1}.reg(xvals);
                 rvals  = fns{1}.yinv(rtvals);

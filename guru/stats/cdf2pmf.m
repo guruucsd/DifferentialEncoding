@@ -1,4 +1,4 @@
-function d = cdf2pmf(cdf,x,varargin)
+function d = cdf2pmf(cdf,x,p)
 %function d = cdf2pmf(cdf,x,p1,p2)
 %
 % Takes a cdf and bin edges x, along with cdf parameters.
@@ -10,4 +10,5 @@ function d = cdf2pmf(cdf,x,varargin)
 %
 % d : outputs for each of the bin edges.
 
-  d = (diff([0 cdf([x(1:end-1) inf], varargin{:})]));
+  pcell = num2cell(p);
+  d = (diff([0 cdf([x(1:end-1) inf], pcell{:})]));

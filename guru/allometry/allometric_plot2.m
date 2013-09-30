@@ -1,10 +1,11 @@
 function fh = allometric_plot2(xvals,yvals,pplt,gplt,type,fh)
+%function fh = allometric_plot2(xvals,yvals,pplt,gplt,type,fh)
 %
 
 %
 if ~exist('type','var'), type={'loglog','linear'}; end;
 if ~iscell(type), type={type}; end;
-nsubs = numel(type);
+nsubs = numel(type); % # sub-plots
 
 %
 if ~exist('fh','var'), 
@@ -18,14 +19,19 @@ figure(fh);
 xvsteps = linspace(min(xvals)*0.75, max(xvals)*1.25, 100);
 
 for si=1:nsubs
-    subplot(1,nsubs,si); set(gca, 'FontSize', 16);
+    if (nsubs>1), subplot(1,nsubs,si); end;
+    set(gca, 'FontSize', 16);
     
     switch type{si}
         case {'linear', ''}
             plot(xvals, yvals, 'ro', 'MarkerSize', 10, 'LineWidth', 5);
             hold on;
             plot(xvsteps, gplt.y(xvsteps), 'LineWidth', 5);
-            legend({' Original Data', sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1))}, 'Location', 'NorthWest');
+            if pplt(1)==1
+                legend({' Original Data', sprintf(' %4.3fx', pplt(2))}, 'Location', 'NorthWest');
+            else
+                legend({' Original Data', sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1))}, 'Location', 'NorthWest');
+            end;
             axis square; axis tight;
 
         case {'log','loglog'}
@@ -46,4 +52,4 @@ for si=1:nsubs
     end;
 end;
 
-subplot(1,nsubs,1);
+if (nsubs>1), subplot(1,nsubs,1); end;

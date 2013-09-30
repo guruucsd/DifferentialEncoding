@@ -3,7 +3,9 @@ function [part] = guru_fileparts(filename, partName)
 %
 % Like MATLAB fileparts, but you specify the part you want. 
 % Allows better inlining / succinctness of code
-
+  
+  if ~exist('partName','var'), partName = 'path'; end;
+  
   [pathstr, name, ext] = fileparts(filename);
   
   switch (partName)

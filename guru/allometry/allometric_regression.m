@@ -69,7 +69,7 @@ function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
     %legend({'Orig data',sprintf('regression [m=%f]', p(1)
     
     if flip==true
-        [p_flp,fns_flp] = allometric_regression(y,x,xform,order,false,'');
+        [p_flp,fns_flp] = allometric_regression(y,x,xform(end:-1:1),order,false,'');
         p_inv = [1./p_flp(:,1) -p_flp(:,2)./p_flp(:,1)] % show algebraic derivation of coeffs from inverse regression
     end;
 
@@ -93,7 +93,7 @@ function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
         %
         case '3', allometric_plot2(x{1},y{1},p,fns,{'linear','loglog'});
             
-        case '', ;
+        case '', ; % show no figure
 
         otherwise, error('Unknown figtype: %s', figtype);
     end;
@@ -113,7 +113,8 @@ function dt = xformfn(d,type,inv)
 
     if ~inv
         switch type
-            case 'log', dt = log10(d);
+            case 'log',    dt = log10(d);
+            case 'loglog', dt = log10(log10(d)); dt(imag(dt)~=0) = nan;
             case 'linear', dt=d;
             otherwise, error('?');
         end;
@@ -121,6 +122,7 @@ function dt = xformfn(d,type,inv)
     else
         switch type
             case 'log', dt = 10.^(d);
+            case 'loglog', dt = 10.^(10.^(d));
             case 'linear', dt=d;
             otherwise, error('?');
         end;
