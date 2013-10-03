@@ -244,12 +244,11 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [ST, STIM, TIDX, TT] = de_applyOptions(opt, X, ST, STIM, TALL, TIDX, TT, idx)
+  function [X, ST, TIDX, TT] = de_applyOptions(opt, X, ST, STIM, TALL, TIDX, TT, idx)
   %
   % Take a weighted stimulus training set, and apply some options to
   % shuffle inputs
 
-    keyboard;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [T]         = de_createTargets(taskType, ST, TT, idx)
