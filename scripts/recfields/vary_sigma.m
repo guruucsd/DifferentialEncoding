@@ -107,7 +107,7 @@
       ylabel('output activity (linear xfer fn)');
       legend(lbls, 'Location', 'best', 'FontSize',16);
       title('Non-normalized std (divided by global mean)');
-  
+
   end;
 
   % normalized
