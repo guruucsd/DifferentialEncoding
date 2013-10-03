@@ -155,15 +155,17 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         std_inact = std(abs(inacts),[],2);
         std_huact = std(abs(huacts),[],2);
 
+        model.bc = 0.5;
+        model.bn=1;
         % exponential decay
         if ~exist('stdact','var'), stdact = zeros(size(std_huact)); end;
         stdact = model.bc*std_huact+(1-model.bc)*stdact;
         stdnorm = 1+model.bn*(stdact - model.stdact)./model.stdact;
-        fprintf('current_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
+        fprintf('\tcurrent_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
         %keyboard
         %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
         %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);    
-        model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1000.*model.Conn(huidx,inidx).*((stdnorm-mean(stdnorm))*-1*(std_inact-mean(std_inact))'); %neg for too small
+        model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1E-5.*model.Conn(huidx,inidx).*((stdnorm)*(std_inact-mean(std_inact))'./mean(std_inact)); %neg for too small
         %keyboard
         
     end;

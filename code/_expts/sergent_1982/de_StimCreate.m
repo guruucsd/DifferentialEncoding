@@ -249,7 +249,8 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   % Take a weighted stimulus training set, and apply some options to
   % shuffle inputs
 
-
+    keyboard
+    
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [T]         = de_createTargets(taskType, ST, TT, idx)
