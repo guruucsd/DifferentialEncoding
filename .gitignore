@@ -3,3 +3,5 @@ nohup.out
 *.m~
 *.fig
 *.png
+*.txt
+*.log
