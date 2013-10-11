@@ -2,9 +2,10 @@ function [model] = de_DE_Multi(model)
 %function [model] = de_DE_Multi(model)
 %
 % Train differential encoder.
-%  Train the autoencoder normally.
-%  Construct the p network to be like 'stacked'.
-%  But while training the p, also train the autoencoder
+%    First: train the autoencoder with different connectivity.
+%    Then: train a 4-layer classification network, with inputs from pixels, and 
+%      input->hidden1 weights from the autoencoder network.
+%      While training the classifier, also continue training the autoencoder
 %
 % Inputs:
 % model      : see de_model for details
