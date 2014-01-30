@@ -31,7 +31,7 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
   if (isfield(mSets.data, 'test')),
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       mSets.data.test, mSets.data.test.X(1:end-1,:));
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'model', stc, 'de_StatsFFTs',       mSets.data.test, stats.images.test);
-      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
+      [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals',  stc, 'de_StatsFFTs_TTest',  stats.ffts);
   else,
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'orig',  stc, 'de_StatsFFTs',       mSets.data.train, mSets.data.train.X(1:end-1,:));
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'model', stc, 'de_StatsFFTs',       mSets.data.train,  stats.images.train);

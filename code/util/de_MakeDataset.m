@@ -89,7 +89,6 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 % dset_to_match is for any options that can take parameters from another dataset
 %   (so that they use the same information)
 %
-
     dset = de_StimApplyFiltering(dset, opts);
 
     dset = de_StimApplyTransform(dset, opts);

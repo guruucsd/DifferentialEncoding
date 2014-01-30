@@ -23,26 +23,27 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
   end;
 
   % Reconstitute to merge old with new!
-	ffts = struct('smoothing_sigmas', ffts.orig.smoothing_sigmas, ...
-				  'freqs_1D',         ffts.orig.freqs_1D, ...
-				  'fftSz',            ffts.orig.fftsz, ...
-				  'padfactor',        ffts.orig.padfactor, ...
-				  'orig1D',           struct('power', ffts.orig.power1D{1}), ...
-				  'model1D',          struct('power', {ffts.model.power1D}), ...
-				  'orig2D',           ffts.orig.ffts, ...
-				  'model2D',          {ffts.model.ffts}, ...
-				  'pals',             ffts.pals ...
-				 );
+    ffts = struct('smoothing_sigmas', ffts.orig.smoothing_sigmas, ...
+                  'freqs_1D',         ffts.orig.freqs_1D, ...
+                  'fftSz',            ffts.orig.fftsz, ...
+                  'padfactor',        ffts.orig.padfactor, ...
+                  'orig1D',           struct('power', ffts.orig.power1D.mean{1}, 'std', ffts.orig.power1D.std{1}), ...
+                  'model1D',          struct('power', {ffts.model.power1D.mean}, 'std', {ffts.orig.power1D.std}), ...
+                  'orig2D',           ffts.orig.ffts, ...
+                  'model2D',          {ffts.model.ffts}, ...
+                  'pals',             ffts.pals ...
+                 );
 
   RH_IDX = 1; LH_IDX = length(ffts.model2D);
 
   % For convenience
-  unsmoothed_idx    = find(ffts.smoothing_sigmas==0.0);
-  avgPowerOrig_1D   = reshape(     ffts.orig1D.power          (unsmoothed_idx,:,:),    size(ffts.freqs_1D));
+  unsmoothed_idx     = find(ffts.smoothing_sigmas==0.0);
+  avgPowerOrig_1D    = reshape(     ffts.orig1D.power         (unsmoothed_idx,:,:),    size(ffts.freqs_1D));
+  avgPowerOrig_1D_std= reshape(     ffts.orig1D.std           (unsmoothed_idx,:,:),    size(ffts.freqs_1D));
   avgPowerModelRH_1D = reshape(mean(ffts.model1D.power{RH_IDX}(unsmoothed_idx,:,:),2), size(ffts.freqs_1D));
   avgPowerModelLH_1D = reshape(mean(ffts.model1D.power{LH_IDX}(unsmoothed_idx,:,:),2), size(ffts.freqs_1D));
 
-  avgPowerOrig_2D   = (reshape(     mean(ffts.orig2D          .*conj(ffts.orig2D),       2),     ffts.fftSz));
+  avgPowerOrig_2D    = (reshape(     mean(ffts.orig2D         .*conj(ffts.orig2D),       2),     ffts.fftSz));
   avgPowerModelRH_2D = (reshape(mean(mean(ffts.model2D{RH_IDX}.*conj(ffts.model2D{RH_IDX}),   2), 1), ffts.fftSz));
   avgPowerModelLH_2D = (reshape(mean(mean(ffts.model2D{LH_IDX}.*conj(ffts.model2D{LH_IDX}), 2), 1), ffts.fftSz));
 
@@ -69,11 +70,18 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
       %%%%%%%%%%%%%%%%%%%
       % Log-power (1D; models vs orig) 
       if (strcmp(ftp{fi}, 'fft-1D-log'))
+          subplot(2,1,2);
+          %semilogy(ffts.freqs_1D, log10(1+[avgPowerOrig_1D_std]))
+          %set(gca,'xlim', ffts.freqs_1D([1 end]));
+          %legend('Orig'); xlabel('spatial frequency (cycles)'); ylabel('std(Power) (log_{10} scale)');
+          %title('1D frequency spectrum STD (log(power+1))');
+
+          subplot(2,1,1);
           semilogy(ffts.freqs_1D, log10(1+[avgPowerModelRH_1D; avgPowerModelLH_1D; avgPowerOrig_1D]))
-          
           set(gca,'xlim', ffts.freqs_1D([1 end]));
           legend(lgnd{:}, 'Orig'); xlabel('spatial frequency (cycles)'); ylabel('Power (log_{10} scale)');
           title('1D frequency spectrum (log(power+1))');
+
       end;
           
       
