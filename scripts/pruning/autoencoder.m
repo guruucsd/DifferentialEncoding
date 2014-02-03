@@ -295,8 +295,8 @@ function [s,fs] = do_analysis(model, ws)
   
   % Test set error
   fprintf('\nTest set error: %7.3e [vs. training error %7.3e]\n', ...
-      sum(sum(emo_nnError(model.errorType, Y_test  - s.rimgs.test)))/numel(Y_train), ...
-      sum(sum(emo_nnError(model.errorType, Y_train - s.rimgs.train)))/numel(Y_train));
+      sum(sum(emo_nnError(model.errorType, Y_test, s.rimgs.test)))/numel(Y_train), ...
+      sum(sum(emo_nnError(model.errorType, Y_train, s.rimgs.train)))/numel(Y_train));
   clear('o_p');
 
   
