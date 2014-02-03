@@ -1,5 +1,5 @@
-function [args,opts] = uber_sergent_args(varargin)
-%
+function [args,opts] = discovery_sergent_args(varargin)
+% These args are for exploring the parameter space.
 
   % Get shared args
   addpath('..');

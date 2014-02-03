@@ -23,7 +23,7 @@ function [train,test] = create_dataset(ws, model, ii)
 
 	switch(ws.dataset_train.name)
 		case {'c' 'cafe'},   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '', opts);
-		case {'n' 'natimg'}, [~, train, test] = de_MakeDataset('vanhateren',          'orig',    '', opts);
+		case {'n' 'natimg'}, [~, train, test] = de_MakeDataset('vanhateren',          '250',     '', opts);
 		case {'s' 'sf'},     [~, train, test] = de_MakeDataset('sf',                  'vertonly','', opts);
 		case {'r' 'ch'},     [~, train, test] = de_MakeDataset('christman_etal_1991', 'all_freq','', opts);
                 case {'e' 'sergent'},[~, train, test] = de_MakeDataset('sergent_1982',        'sergent_1982','', opts);

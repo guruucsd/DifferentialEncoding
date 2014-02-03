@@ -1,3 +1,5 @@
+% This script is for exploring parameters
+
 clear all variables; clear all globals;
 
 stats = {'images','ffts'};

@@ -1,4 +1,5 @@
-function [cargs, opts] = common_args(varargin)
+function [cargs, opts] = discovery_args(varargin)
+% These args are for exploring the parameter space.
 
   % Add absolute path to code
   if (exist('de_GetBaseDir')~=2)
