@@ -31,23 +31,28 @@ figure;
 
 
 % Show original image
-subplot(2,3,1);
+subplot(2,3,1); set(gca,'xtick',[],'ytick',[]);
 colormap('gray');
 imagesc(img);
+xlabel('Full fidelity')
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
 % Show frequency spectrum power, as image (brightness component removed)
-subplot(2,3,4);
+subplot(2,3,4); set(gca,'xtick',[],'ytick',[]);
 colormap('jet');
 fq(1,1)=0;
 imagesc(fftshift(fq.*conj(fq)));
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
 
 % Show low-frequency components of image
-subplot(2,3,2);
+subplot(2,3,2); set(gca,'xtick',[],'ytick',[]);
 colormap('gray');
 imagesc(img_lsf);
+xlabel('Low Frequency (low-pass)')
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
 % Show frequency spectrum power, as image (brightness component removed)
@@ -55,19 +60,23 @@ subplot(2,3,5);
 colormap('jet');
 fq_lsf(1,1)=0;
 imagesc(fftshift(fq_lsf.*conj(fq_lsf)));
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
 
 % Show high-frequency components of image
-subplot(2,3,3);
+subplot(2,3,3); set(gca,'xtick',[],'ytick',[]);
 colormap('gray');
 imagesc(img_hsf);
+xlabel('High Frequency (high-pass)')
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
-subplot(2,3,6);
+subplot(2,3,6); set(gca,'xtick',[],'ytick',[]);
 colormap('jet');
 fq_hsf(1,1)=0;
 imagesc(fftshift(fq_hsf.*conj(fq_hsf)));
+set(gca,'xtick',[],'ytick',[]);
 mfe_freezeColors;
 
 mfe_unfreezeColors;
