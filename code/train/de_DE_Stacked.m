@@ -64,7 +64,8 @@ function [model] = de_DE_Stacked(model)
   if (isfield(model, 'p'))
 
       if (~model.p.cached)
-keyboard
+        error('stacked classifier NYI');
+
         good_train = ~isnan(sum(model.data.train.T,1));
         nTrain    = sum(good_train); % count the # of trials with no NaN anywhere in them
 

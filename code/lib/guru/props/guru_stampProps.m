@@ -1,21 +1,20 @@
 function mSets = guru_stampProps(varargin)
+%
 
   % No input, can only return empty output
   if (isempty(varargin))
     mSets = struct();
     error('No input arguments')
-  end;
 
   % Odd # of inputs; grab original object, and expect strings at every second input
-  if (1==mod(length(varargin),2))
-    if (isstruct(varargin{1}))
-      mSets = varargin{1};
-      varargin = varargin(2:end);
-    elseif (ischar(varargin{1}))
-      error('Must pass in arg/val pairs; found odd # of input args');
-    else
-      error('First arg must be an object (to stamp props on) or a string (prop name for next value)');
-    end;
+  elseif isstruct(varargin{1})
+    if 0==mod(length(varargin),2), error('You have an odd number of args [first arg is the object]'); end;
+
+    mSets = varargin{1};
+    varargin = varargin(2:end);
+  
+  elseif 1==mod(length(varargin),2), error('Must pass in arg/val pairs; found odd # of input args');
+  elseif ~ischar(varargin{1}),       error('First arg must be an object (to stamp props on) or a string (prop name for next value)');
 
   % Even # of inputs; start with emtpy object
   else

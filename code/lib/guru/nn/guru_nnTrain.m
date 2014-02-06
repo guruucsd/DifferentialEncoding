@@ -38,6 +38,10 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
         if (nargout<2), [model]     = guru_nnTrain_resilient(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_resilient(model,X,Y); end;
 
+      case 'resilient-homeostatic'
+        if (nargout<2), [model]     = guru_nnTrain_resilient_homeostatic(model,X,Y);
+        else,           [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y); end;
+
       case 'bptt'
         if (nargout<2), [model]     = guru_nnTrain_bptt_batch(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_bptt_batch(model,X,Y); end;
