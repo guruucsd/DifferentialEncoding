@@ -3,7 +3,7 @@ function stats = de_StatsBasicsHL(mSets, mss, verbose)
 %
 
   % These stats are only meaningful if the classifier has been run.
-  if (~isfield(mSets, 'p')), stats = struct(); return; end;
+  if (~isfield(mSets, 'p') || ~isfield(mSets.data.train, 'T')), stats = struct(); return; end;
 
   if (~exist('verbose','var')), verbose = false; end;
 

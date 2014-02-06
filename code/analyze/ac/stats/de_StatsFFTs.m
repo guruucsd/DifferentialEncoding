@@ -1,7 +1,12 @@
-function [stats_fft] = de_StatsFFTs(images, nInput)
+function [stats_fft] = de_StatsFFTs(dset, images)
 
-    if (~iscell(images)), images = {images}; end; % next two "massages" allow original image set
-	switch length(size(images{1}))
+    nInput = dset.nInput;
+    guru_assert(length(nInput)==2, 'FFT stats can only be run for 2D simulations.');
+
+    % next two "massages" allow original image set
+    if (~iscell(images)), images = {images}; end; 
+    
+	switch ndims(images{1})
 		case 2          %     and reconstructed image sets to be processed by the same code
 			for ii=1:length(images)
 				images{ii} = reshape(images{ii}, [1 nInput, size(images{ii}, length(size(images{ii})))]);
@@ -12,13 +17,21 @@ function [stats_fft] = de_StatsFFTs(images, nInput)
 			end;
 	end;
 
-    nInput  = size(images{1});
-    nInput  = nInput(2:end-1); %first dim=model instances; last dim=# images
-    
-    if (length(nInput)~=2)
-        error('FFT stats can only be run for 2D simulations.');
-    end;
 
+    % Next, convert any polar images back to rectangular.
+    if guru_hasopt(dset.opt, 'img2pol')
+        for si=1:length(images)
+            for mi=1:size(images{si},1)
+                images{si}(mi,:,:,:) = de_pol2img(squeeze(images{si}(mi,:,:,:)), guru_getopt(dset.opt,'location','CVF'),dset.nInput);
+            end;
+            guru_assert(~any(isnan(images{si}(:))));
+            guru_assert(all(isreal(images{si}(:))));
+            guru_assert(isempty(dset.minmax) || (dset.minmax(1) <= all(images{si}(:))));
+            guru_assert(isempty(dset.minmax) || (dset.minmax(2) >= all(images{si}(:))));
+        end;
+    end;
+    
+    % Continue processing
     ffts      = cell(length(images),1);
     power1D   = cell(length(images),1 );
     phase1D   = cell(length(images),1 );

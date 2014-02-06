@@ -1,4 +1,4 @@
-function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
+function [train,test] = de_StimCreate(stimSet, taskType, opt)
 %Input:
 %  stimSet  : a string specifying which INPUT sets to train autoencoder on
 %               orig     => original images
@@ -32,13 +32,14 @@ function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
   if (~exist('force','var'))     force    = 0;      end;
-
+  
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % With this info, create our X and TT vectors
-  [X, nInput, XLAB, DS] = stim2D(stimSet, 'train', taskType);
+  [X, nInput, XLAB, DS] = stim2D(stimSet, taskType);
 
   % Now index and apply options, including input weightings.
   [X, nInput]          = de_applyOptions(opt, X, nInput);
@@ -110,29 +111,32 @@ function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,XLBL,dataset]= stim2D(set, tot, taskType)
+  function [X,nInput,XLBL,dataset]= stim2D(stimSet, taskType)
   %
   %
   %
   %
+    nimgs_in   = sscanf(stimSet, '%d');
 
     indir = fullfile(de_GetOutPath([], 'datasets'), 'vanhateren');
     if (~exist(indir, 'dir')), error('van Hateren raw images do not exist at expected location: %s', indir); end;
 
     fs       = dir(fullfile(indir, '*.iml'));
-    nimgs_in = 100;%length(fs);
     if (length(fs)<nimgs_in), error('Expected %d van Hateren images; only found %d at %s.', nimgs_in, length(fs), indir); end;
 
     nInput_In  = [1024 1536]; %y,x
-
+    if ischar(nimgs_in), error('stimSet must be an integer'); end;
+    
     % Read each image
     nInput_Out = [135  100]; % y,x
     nimgs_out  = 2*nimgs_in;
     X = zeros(prod(nInput_Out), nimgs_out);
 
+    imgnum = zeros(nimgs_in,1);
     for fi=1:nimgs_in
         img = mfe_readIML(fullfile(indir, fs(fi).name));
-
+        imgnum(fi) = sscanf(fs(fi).name, 'imk%d.iml');
+        
         % Select the middle portion of the image
         cpt      = round(nInput_In)/2;
         pixrange = round([(cpt(1)  -nInput_Out(1)/2)   (cpt(2)  -nInput_Out(2)) ; ...
@@ -154,8 +158,8 @@ function [train,test] = de_StimCreateNatImg(stimSet, taskType, opt)
 
     % Divide into datasets
     XLBL = cell(nimgs_out,1);
-    XLBL(1:2:end-1) = {'left'};
-    XLBL(2:2:end)   = {'right_rev'};
+    XLBL(1:2:end-1) = guru_csprintf('left-%d',     num2cell(imgnum));
+    XLBL(2:2:end)   = guru_csprintf('right_rev-%d',num2cell(imgnum));
 
     dataset  = cell(nimgs_out,1);
     dataset(1:floor(nimgs_out/2))     = {'1'};

@@ -31,8 +31,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   %----------------
   for ss=1:length(mSets.sigma)
     ms = mss{ss};
-
-    % Plot the
+% Plot the
     if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages_)) ];
     elseif ismember('images',mSets.plots), warning('Must get images in stats to run plots.'); end;
 

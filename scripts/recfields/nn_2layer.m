@@ -6,6 +6,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 
     p = struct( 'seed', rand(1), ...
                 'sz', [20 20], ... %image size
+                'img2pol', false, ...
                 'nbatches', 20, ... %
                 'nsamps', 5, ...
                 'a_mode', 'mean', ... % activation mode
@@ -14,14 +15,18 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'distn', 'norme2', ...
                 'thresh', 0.001, ...
                 'dfromcent', 3, ...
+                'disp',false,...
                 'nin', 177, .... %round(177*.0);%round( prod(sz) * (0/100) ); %177 max
                 'nphases', 8, ...
                 'norients', 8, ...
                 'niters', 1, ...  % # times to feed output back to input
-                'freqs', 0.01 * [ 1.5 3 6 12 18 24 30 36 42 48 54] ...    %freqs = 0.015 * [ 6 9 12 15];
+                'cpi', [0.5 1 2 4 8 16 32] ...% freqs', 0.01 * [ 1.5 3 6 12 18 24 30 36 42 48 54] ...    %freqs = 0.015 * [ 6 9 12 15];
               );
     p = guru_stampProps(p, varargin{:});
 
+    if isfield(p, 'freqs'), error('freqs should not be set. please set cpi!'); end;
+    p.freqs = p.cpi./max(p.sz); %cycles
+        
     % Set param values that are dependent on other param values
     if (~isfield(p, 'mu')),     p.mu     = p.sz/2; end;
     if (~isfield(p, 'Sigma')),  p.Sigma  = [2*p.sz(1) 0; 0 0.5*p.sz(2)]; end;
@@ -71,7 +76,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                   %imagesc(w_pdf1-0.5*w_pdf2); colorbar;
                 otherwise, error('unknown weight mode: %s', p.w_mode);
             end;
-            w = w / max(abs(sum(w(:))), 1); %p.nin; %sum(abs(w(:))); %implicitly dividing by p_in
+            %w = w / max(abs(sum(w(:))), 1); %p.nin; %sum(abs(w(:))); %implicitly dividing by p_in
             wts(sampnum, :,:) = w;
 
             %
@@ -84,11 +89,20 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 
                 % Find the best fit orientation and phase
                 for oi = 1:p.norients
-                    orient = pi*oi/p.norients;
+                    orient = 2*pi*oi/p.norients; % oi starts at 1, so essentially [0 to pi)
                     for phsi=1:p.nphases
-                        phase = 2*pi*phsi/p.nphases;
+                        phase = 2*pi*phsi/p.nphases; %pi starts at 1, so essentially [0 to 2pi)
 
                         x = 0.5+mfe_grating2d( p.freqs(fi), phase, orient, 0.5, p.sz(1), p.sz(2));
+                        if p.img2pol, x = mfe_img2pol(x); end;
+                        if ismember(1, p.disp) && oi==1 && phsi==1 && jj==1 && ii==1
+                            if fi==1, f=figure; [nrows,ncols] = guru_optSubplots(length(p.freqs));
+                            else, figure(f); end;
+                            subplot(nrows,ncols,fi);
+                            imshow(x); xlabel(sprintf('frq=%.4f',p.freqs(fi)));
+                        end;
+                        
+                        % Calculate output node response
                         resp = x(:)/sum(x(:));
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));

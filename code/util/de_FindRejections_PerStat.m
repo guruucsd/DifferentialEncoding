@@ -42,14 +42,11 @@
       end; %switch
     end;
     
-    if (any(rejectTypes(:)))
-        if (sum(rejectTypes(:))>20)
-            warning(sprintf('Large number of rejections')); 
-        elseif (any(all(rejectTypes(:))))
-          warning('Rejected all models');
-        end;
+    pctRejected = nnz(sum(rejectTypes,2))/size(rejectTypes,1);
+    if  pctRejected >= 0.25
+        warning(sprintf('Large number of rejections: %.1f%%', 100*pctRejected)); 
     end;
-    
+        
     rejectTypes = sum(rejectTypes,2) + isnan(stats);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

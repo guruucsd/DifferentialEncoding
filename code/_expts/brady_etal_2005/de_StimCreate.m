@@ -252,13 +252,11 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
           % Hacks
           if (strcmp(parts{1},'040') && strcmp(parts{2}, 'n5'))
-%            keyboard; % need to verify
             dataset{i} = '1';
           end;
 
         case 'emot'
-          error('emot task NYI');
-          keyboard; %nyi
+          error('emotion recognition task NYI');
 
         otherwise, error('Unknown task: ', taskType);
       end;
@@ -308,15 +306,15 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function makeChimeric(indir, outdir, side)
-    fprintf('This is only for when you do not detect orig & chimeric pgm files.  They should be there!\n');
-    keyboard
+    warning('This is only for when you do not detect orig & chimeric pgm files.  They should be there!\n');
+
       % make all files chimeric, then save out
     fs = dir(fullfile(indir, '*.pgm'));
     fmt = 'pgm';
 
     for i=1:length(fs)
       f = fs(i);
-      %keyboard
+
       outfile = sprintf('%s_%s', guru_fileparts(f.name, 'name'), side);
 
       if (~strcmp(side, 'orig'))

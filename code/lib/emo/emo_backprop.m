@@ -60,9 +60,10 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
   % run forward pass
   hididx = (nInput+1):(nTotal-nOutput);
   outidx = (nTotal-nOutput+1):nTotal;
-
+  multilayer = (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1);
+  
   % More than 1 hidden layer
-  if (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1)
+  if (multilayer)
       for j = nInput+1:nTotal-nOutput % loop is slow?
           z(j,:) = W(j,:)*Out;
           [Out(j,:), h1(j,:)] = emo_trnsfr( Trn(j-nInput), z(j,:) );
@@ -76,21 +77,29 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
   [Out(outidx,:), h1(outidx,:)] = emo_trnsfr( Trn(outidx(1)-nInput), z(outidx,:) );
 
 
-  % compute residuals (desired minus actual outputs)
-  d_a = Y - Out(idxOutput,:);
-
+  % Compute error and error derivative
+  %d_a = Y - Out(idxOutput,:);   % compute residuals (desired minus actual outputs)
+  [Err, Errp] = emo_nnError(Ern, Y, Out(idxOutput,:));
+  
   % initialize backward pass
-  d(idxOutput,:) = - (d_a).^(Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
+  d(idxOutput,:) = - (Errp.^Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
 
-  % run backward pass
-  for j = nTotal-nOutput:-1:nInput+1
+  % run backward pass over hidden units, one-by-one
+  if multilayer
+    for j = nTotal-nOutput:-1:nInput+1
       d(j,:) = h1(j,:) .* (W(:,j)'*d);
-  end
+    end
+  else
+    j = hididx;
+    d(j,:) = h1(j,:) .* (W(:,j)'*d);
+  end;
+  
+  % Run backwards pass from Hidden->Input
+  %j = 1:nInput;
+  %d(j,:) = h1(j,:) .* (W(:,j)'*d);
 
-  % compute error and gradient
-%  Err = sum(sum(d_a.^2))/ 2;
-  Err  = sum(emo_nnError(Ern, d_a, Out(idxOutput,:), Y), 1);
-
+  % Output error (across all output nodes) and gradient
+  Err  = sum(Err, 1); %  Err = sum(sum(d_a.^2))/ 2;
   Grad = (d*Out') .* Con;
 
 

@@ -9,6 +9,8 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 %   * filtering: 'lowpass','highpass','bandpass'
 %   * 
 
+    if ~exist('opt','var'), opt = {}; end;
+
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
@@ -88,9 +90,11 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 %   (so that they use the same information)
 %
 
-    dset = de_StimApplyResizing(dset, opts);
-
     dset = de_StimApplyFiltering(dset, opts);
+
+    dset = de_StimApplyTransform(dset, opts);
+    
+    dset = de_StimApplyResizing(dset, opts);
 
     if (exist('dset_to_match','var'))
         dset = de_StimApplyWhitening(dset, opts, dset_to_match);
@@ -99,7 +103,54 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
     end;
     
 
-function dset = de_StimApplyResizing(dset, opts, dset_to_match)
+function dset = de_StimApplyTransform(dset, opts)
+
+    % Convert all images into polar coordinates, like Plaut & Behrmann 2011
+    if guru_hasopt(opts, 'img2pol')
+        %de_visualizeData(dset);
+
+        dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(dset); % just for now
+        
+        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        %de_visualizeData(junk); % just for now
+    end;
+ 
+    if guru_hasopt(opts, 'contrast')
+      clevel = guru_getopt(opts, 'contrast', []);
+      keyboard
+      
+      % But we want the target data to be the original image!
+      dset.Y = dset.X;
+      
+      % First apply the image change
+      % Taken from http://maksim.sorokin.dk/it/2010/11/08/brightness-and-contrast-in-matlab/
+      for ii=1:size(dset.X,2)
+          img = reshape(dset.X(:,ii), dset.nInput);
+          img_range = [min(img(:)) max(img(:))];
+          sigmoid   = @(x) 1./(1+exp(-x));
+          switch clevel
+            case 'low', 
+                mir = mean(img_range);
+                caimg = imadjust(img, img_range, [img_range(1)+mir/2 img_range(2)-mir/2], 0.5);
+            case 'high'
+                simg = sigmoid(img); 
+                caimg = imadjust(simg, [min(simg(:)) max(simg(:))], [0 1]);
+            otherwise, error('Unknown contrast level: %s', clevel);
+          end;
+          caimg = caimg - mean(caimg(:)) + mean(img(:));
+          caimg(caimg>img_range(2)) = img_range(2);
+          caimg(caimg<img_range(1)) = img_range(1);
+
+          %subplot(1,2,1); imshow(img, [0 1]); subplot(1,2,2); imshow(caimg, [0 1]);
+          
+          dset.X(:,ii) = caimg(:);
+      end;      
+      
+    end;
+
+    
+function dset = de_StimApplyResizing(dset, opts)
 %
 
     % Resizing--this should be last
@@ -159,8 +210,8 @@ function dset = de_StimApplyResizing(dset, opts, dset_to_match)
 function dset = de_StimApplyFiltering(dset, opts)
 
     % Blurring
-    blurring = guru_getopt(opts, 'blurring', 1);
-    if (blurring > 1)
+    blurring = guru_getopt(opts, 'blurring', 0);
+    if (blurring > 0)
         for ii=1:size(dset.X,2)
            dset.X(:,ii) = reshape( imfilter(reshape(dset.X(:,ii), dset.nInput(1:2)), ...
                                             fspecial('gaussian', [blurring blurring], 4), ...
@@ -238,8 +289,9 @@ function figs = de_visualizeData(dset)
 
   % View some sample images
   figs(end+1) = de_NewFig('data', '__img', [34 25], nImages);
-  im2show     = randperm(size(dset.X,2));
-  im2show     = sort(im2show(1:nImages));
+  im2show     = de_SelectImages(dset, nImages);
+  %randperm(size(dset.X,2));
+  %im2show     = sort(im2show(1:nImages));
 
   for ii=1:nImages
           subplot(4,4,ii);
