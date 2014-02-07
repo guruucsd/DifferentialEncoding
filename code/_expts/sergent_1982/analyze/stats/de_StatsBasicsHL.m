@@ -42,7 +42,10 @@ function stats = de_StatsBasicsHL(mSets, mss, verbose)
   %%%%%%%%%%%%%%%%%%
 
   % Can't do stats with a single sigma
-  if (length(stats.ls)<2),  return; end;
+  if (length(stats.ls)~=2),  return;
+  elseif any(cellfun(@isempty,stats.ls)), return; end;
+
+  
   ls = stats.ls([1 end]);
 
     % variable 'ls' is a cell array.  cells represent DE models

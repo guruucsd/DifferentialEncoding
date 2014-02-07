@@ -27,7 +27,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
   model.nOutput = prod(model.nInput);
   
   % These parameters are large resources
-  if (~isfield(model, 'distn')),                model.distn                = {'normem2'}; end;
+  if (~isfield(model, 'distn')),                model.distn                = {'norme2'}; end;
   if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
   if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
   if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
@@ -78,11 +78,11 @@ function [model,ws,s,fs] = autoencoder(model, ws)
       model.XferFn  = [6 1];              % 1.73 * tanh
       model.useBias = 1;
     case 'resilient'
-      model.Pow     = 1;              % gradient power; Err = (y-y_hat).^(Pow+1)
-      model.EtaInit = 2E-2;          % Learning rate (to start)
+      model.Pow     = 3;              % gradient power; Err = (y-y_hat).^(Pow+1)
+      model.EtaInit = 1E-3;          % Learning rate (to start)
       model.Acc     = 5E-5;          % (1+Acc) Multiplicative increase to eta (when training good)
       model.Dec     = 0.25;            % (1-Dec) Multiplicative decrease to eta (when training goes bad)
-      model.XferFn  = [6 6];              % 1.73 * tanh
+      model.XferFn  = [6 1];              % 1.73 * tanh
       model.useBias = 1;
   end;
   
@@ -126,7 +126,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
     %   * these values are not equal (no pruning requsted; sometimes done for comparison)
     %   * in the last iteration of the loop (train a bit without pruning)
     if (ii<ws.nloops && model.nConnPerHidden_End~=model.nConnPerHidden_Start)
-      model = do_pruning(model, ws, o_p, ii);
+      model = do_pruning(model, ws, X, o_p, ii);
     end;
 
   end; % for nloops (of pruning)
@@ -142,7 +142,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
 
 
 
-function model = do_pruning(model, ws, o_p, ii)
+function model = do_pruning(model, ws, X, o_p, ii)
 
     % Determine how many connections must go
     nConnCurr      = (nnz(model.Conn)-model.nHidden-model.nOutput);
@@ -151,40 +151,61 @@ function model = do_pruning(model, ws, o_p, ii)
     
                 nout = round( (1-reductRate) * nConnPerHidden * model.nHidden * 2 );
     nout = nout - mod(nout,2); % must be even, so as we remove hidden->input and hidden->output pairs
+    if ismember(11,model.debug), fprintf('\n (nout=%d, reductRate=%f, nConnPerHidden=%f,nConnCurr=%d)', nout, 1-reductRate, nConnPerHidden, nConnCurr); end;
     guru_assert( (nConnCurr-nout)>=model.nConnPerHidden_End*model.nHidden*2, 'Don''t remove too many connections!!');
             
     % Select connections to query
     switch (ws.prune_loc)
       case 'input'
-        in2hu_c  = model.Conn   (ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden connection matrix
-        in2hu_w  = model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden weight matrix
+        pix2hu_c  = model.Conn   (ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden connection matrix
+        pix2hu_w  = model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix); %input->hidden weight matrix
       
       case 'output'
-        in2hu_c  = model.Conn   (ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %input->hidden connection matrix
-        in2hu_w  = model.Weights(ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %input->hidden weight matrix
+        pix2hu_c  = model.Conn   (ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %hidden->output connection matrix
+        pix2hu_w  = model.Weights(ws.inPix+1+model.nHidden+[1:ws.inPix], ws.inPix+1+[1:model.nHidden])'; %hidden->output weight matrix
 
       otherwise, error('unknown pruning location: %s', prune_loc);
     end;
   
     % Create some metric for selecting weights
     switch (ws.prune_strategy)
-      case 'weights'
-        in2hu_a = in2hu_w;
+      case 'weights' %raw weight
+        pix2hu_a = pix2hu_w;
 
-      case 'weighted_weights' % weight size, relative to total weights
-        total_w  = sum(in2hu_w,1);                                 % Normalize weights by 
-        in2hu_a  = in2hu_w ./ repmat(total_w, [model.nHidden 1]);   % total weight to that input position
+      case 'weighted_weights' % weight size, relative to total weights at that hidden unit
+        total_w   = sum(pix2hu_w,1);                                 % Normalize weights by
+        pix2hu_a  = pix2hu_w ./ repmat(total_w, [model.nHidden 1]);  % total weight to that pixel
 
-      case 'activity'	
+      case 'activity' %most active connections (input*weight)
         avg_inp = mean(abs(squeeze(o_p(end,1:ws.inPix,:))),2);
-        in2hu_a = in2hu_w.*repmat(avg_inp', [model.nHidden 1]);
-        
+
+        pix2hu_a = pix2hu_w.*repmat(avg_inp', [model.nHidden 1]);
+
+      case 'pctactivation' %[hu act]*[hu wt]/[sum[hu_act]*[hu_wt]] : % output activity from this connection
+        huacts = mean(squeeze(o_p(end,(ws.inPix+1)+[1:model.nHidden],:)),2);
+        cxnacts = repmat(huacts,[1 ws.inPix]).*pix2hu_w;
+        wtd_sum = sum(cxnacts,1);
+        %outacts = mean(squeeze(o_p(end,ws.inPix+1+model.nHidden+[1:ws.inPix],:)),2);
+
+        pctact= abs(cxnacts ./ repmat(wtd_sum, [model.nHidden 1]));
+        %pctact(1,:) %all outputs activated by hidden unit 1
+        pix2hu_a = pctact;
+
+      case 'ltd' % remove connections least similar to the output activation
+        huacts = squeeze(o_p(end,(ws.inPix+1)+[1:model.nHidden],:));
+        cxnacts = repmat(full(huacts)',[1 1 ws.inPix]).*permute(repmat(full(pix2hu_w), [1 1 100]),[3 1 2]);
+        %outacts = squeeze(o_p(end,ws.inPix+1+model.nHidden+[1:ws.inPix],:));
+        inacts = X(1:ws.inPix,:);%squeeze(o_p(end,1:ws.inPix,:)); % input activations; we want to prune based on DESIRED outputs (which are the inputs!)
+
+        diff_per_img = (emo_trnsfr(model.XferFn(end),cxnacts)-permute(repmat(inacts,[1 1 model.nHidden]), [2 3 1])); % must be abs; we care about magnitude of difference only.  And we need 1/#, because small difference is desirable, and we remove smallest things
+        pix2hu_a = squeeze(1./sum(abs(diff_per_img),1)) .* in2hu_c; %we'll get answers for all connections (even ones that don't exist, but 'should' be contributing)
+
       otherwise, error('unknown pruning strategy: %s', prune_strategy);
     end;
     
     % Now actually select the weights to remove
-    nzai     = find(in2hu_a);                                           %find actual connections
-    nza      = in2hu_a(nzai);                                           %find actual weights
+    nzai     = find(pix2hu_a);                                          %find actual connections
+    nza      = pix2hu_a(nzai);                                          %find actual weights
     [a,aidx] = sort(abs(nza));                                          %get weight values and indices, smallest first.  Indices are into nzwi vector
     bcil     = aidx(1:(nout/2));                                        % "bad connections" indices (in "local" vector of non-zero connections)
     tv       = a(nout/2);                                               % threshhold value to remove HALF the connections (because the other half are on the output)
@@ -195,21 +216,21 @@ function model = do_pruning(model, ws, o_p, ii)
       itot = randperm(length(taf));                                   %   "sort" sorts indices as well (for equivalent values), 
       bcil((end-length(tal)+1):end) = taf(itot(1:length(tal)));       %   so we're biased to prune weights on earlier hidden units this code re-randomizes, to avoid this.
     end;
-    clear('in2hu_a','nza','a','aidx');
+    clear('pix2hu_a','nza','a','aidx');
     clear('itot','tal','taf');
     
     % Remove the weights!
-    in2hu_c(nzai(bcil)) = false;                                          %
+    pix2hu_c(nzai(bcil)) = false;                                          %
     
 
     % Push the information back into the original
     %   connection and weight matrices
-    model.Conn(ws.inPix+1+[1:model.nHidden], 1:ws.inPix) = in2hu_c;     % apply to models' input->hidden connections
-    model.Conn(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]) = in2hu_c'; %apply to model's hidden->output connections
+    model.Conn(ws.inPix+1+[1:model.nHidden], 1:ws.inPix) = pix2hu_c;     % apply to models' input->hidden connections
+    model.Conn(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]) = pix2hu_c'; %apply to model's hidden->output connections
 
-    model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix) = in2hu_c .* model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix);
-    model.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]) = in2hu_c' .* model.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]);
-    clear('in2hu_c');
+    model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix) = pix2hu_c .* pix2hu_w;%model.Weights(ws.inPix+1+[1:model.nHidden], 1:ws.inPix);
+    model.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]) = pix2hu_c' .* pix2hu_w';%model.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]);
+    clear('pix2hu_c');
   
     model.nConns = round( (nConnCurr-nout)/model.nHidden/2 ); 		% Re-estimate the current # of connections per hidden unit
 
@@ -217,25 +238,23 @@ function model = do_pruning(model, ws, o_p, ii)
     % Validate that the input & output layers are symmetric
     cc_in  = full(model.Conn(ws.inPix+1              +[1:model.nHidden],          1:ws.inPix));
     cc_out = full(model.Conn(ws.inPix+1+model.nHidden+[1:ws.inPix],   ws.inPix+1+[1:model.nHidden]));
-    guru_assert(~any(diff(sum(cc_in,2)' - sum(cc_out,1))));
-    clear('cc_in', 'cc_out');
+    guru_assert(~any(any(cc_in-cc_out')));
+    clear('cc_in');
 
 
     % Report the maximum weight size removed
-    w_out = in2hu_w(nzai(bcil));
+    w_out = pix2hu_w(nzai(bcil));
     max_w_out = max(abs(w_out(:)));
     clear('w_out');
-    clear('in2hu_w','nzai','bcil');
+    clear('pix2hu_w','nzai','bcil');
       
     % Report on how many non-zero connections have been introduced
-    alllyrs = squeeze(sum(reshape(full(model.Conn(ws.inPix+1+[1:model.nHidden], 1:ws.inPix)), [model.nHidden model.nInput])));
-    n_zero_conns = length(find(alllyrs==0));
-    clear('alllyrs');
-      
+    n_zero_c2p = sum(sum(cc_out,2)==0); % # output pixels with no connections
+    n_zero_c2h = sum(sum(cc_out,1)==0); % # hidden units with no connections %length(find(alllyrs==0));
       
     % Report on all at once
-    fprintf('\ntv=%5.4e, max_w_out=%5.4e, n_zero_conns=%5d', full(tv), full(max_w_out), full(n_zero_conns));
-    clear('tv','max_w_out','n_zero_conns')
+    fprintf('\ntv=%5.4e, max_w_out=%5.4e, orphaned_pixels=%5d, orphaned_hus=%5d', full(tv), full(max_w_out), n_zero_c2p, n_zero_c2h);
+    clear('tv','max_w_out','n_zero_c2p', 'n_zero_c2h')
     
     
     % Report on whether there are no weird biases in where we're pruning

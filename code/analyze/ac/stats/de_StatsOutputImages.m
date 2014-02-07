@@ -18,6 +18,8 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
   images = cell(size(mss));
   for mi=1:length(mss)
     models = mss{mi};
+    if isempty(models), continue; end;
+
     images{mi} = zeros([length(models), models(1).nInput, nImages]);
 
     for ii=1:length(models)
@@ -31,13 +33,3 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
       images{mi}(ii,:,:,:)  = reshape(o, [dset.nInput nImages]);
     end;
   end;
-
-%  % Capture labels
-%  for ii=1:length(dset.XLAB)
-%    if (isfield(dset, 'TLAB'))
-%      lbls{ii} = sprintf('%s: (%s)', dset.XLAB{ii}, dset.TLAB{ii});
-%    else
-%      lbls{ii} = dset.XLAB{ii};
-%    end;
-%  end;
-

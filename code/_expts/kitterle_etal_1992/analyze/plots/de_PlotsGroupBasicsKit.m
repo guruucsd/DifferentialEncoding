@@ -1,33 +1,39 @@
-function stats = de_PlotsGroupBasicsKit( mSets, ms, ss )
+function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
 
-  ds = 'test';
+  figs = de_NewFig('dummy');
 
-  % Get mean and std for each hemi in each task
-  means = [ mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,1)) ...
-            mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,2)) ; ...
-            mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,1)) ...
-            mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,2)) ];
+  dss = {'train','test'};
+  for dsi=1:length(dss)
+      ds = dss{dsi};
 
-perf = log10(means'); %means are rows=task,cols=hemi; perf is opposite
+      % Get mean and std for each hemi in each task
+      means = [ mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,1)) ...
+                mean(ss.group.anova.(ds).X(1:ss.group.anova.(ds).nRepeats,2)) ; ...
+                mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,1)) ...
+                mean(ss.group.anova.(ds).X((1+ss.group.anova.(ds).nRepeats):end,2)) ];
 
-hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
-              sprintf('LH (\\sigma=%3.1f)', mSets.sigma(2))};
-task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
+      perf = log10(means'); %means are rows=task,cols=hemi; perf is opposite
 
-figure; hold on;
+      hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
+                    sprintf('LH (\\sigma=%3.1f)', mSets.sigma(2))};
+      task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
 
-plot(1, perf(1,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
-plot(1, perf(1,1), 'ko', 'MarkerSize', 15.0);
-plot(2, perf(2,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
-plot(2, perf(2,1), 'ko', 'MarkerSize', 15.0);
-plot([1 2], perf(:,1), 'k', 'LineWidth', 2.0);
-plot([1 2], perf(:,2), 'k', 'LineWidth', 2.0);
+      figs(end+1) = de_NewFig(ds);
+      hold on;
 
-xlim([0.45 2.75+.8]);
-set(gca, 'FontSize', 18.0, 'xtick', [1 2], 'xticklabel', task_lbls);
-%legend(hemi_lbls, 'Location', 'NorthEast');
-text(2.125, perf(2,1), hemi_lbls{1}, 'FontSize', 18)
-text(2.125, perf(2,2), hemi_lbls{2}, 'FontSize', 18)
-ylabel('log_{10}(Mean Square Error)');
+      plot(1, perf(1,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
+      plot(1, perf(1,1), 'ko', 'MarkerSize', 15.0);
+      plot(2, perf(2,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
+      plot(2, perf(2,1), 'ko', 'MarkerSize', 15.0);
+      plot([1 2], perf(:,1), 'k', 'LineWidth', 2.0);
+      plot([1 2], perf(:,2), 'k', 'LineWidth', 2.0);
 
-print(gcf, '-dpng', 'test');
+      xlim([0.45 2.75+.8]);
+      set(gca, 'FontSize', 18.0, 'xtick', [1 2], 'xticklabel', task_lbls);
+      %legend(hemi_lbls, 'Location', 'NorthEast');
+      text(2.125, perf(2,1), hemi_lbls{1}, 'FontSize', 18)
+      text(2.125, perf(2,2), hemi_lbls{2}, 'FontSize', 18)
+      ylabel('log_{10}(Mean Square Error)');
+
+      print(gcf, '-dpng', ['kitterle-' ds]);
+  end;
