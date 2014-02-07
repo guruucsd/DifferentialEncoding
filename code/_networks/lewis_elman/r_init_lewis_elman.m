@@ -71,11 +71,6 @@ function [net] = r_init_lewis_elman(net, pats)
     
     % Create weights
     net.w  = net.sets.W_INIT(1)+diff(net.sets.W_INIT)*rand(size(net.cC));
-    net.T  = net.sets.T_INIT(1)+diff(net.sets.T_INIT)*rand(net.nunits,1);
-    net.D  = net.sets.D_INIT(1) + diff(net.sets.D_INIT)*randi(net.sets.D_INIT, size(net.cC)); %random CC connections
-    
-    
-
 
     % "Fan-in" weights (p. 339)
     net.fan_in   = (sum(net.cC,1)-1)*net.sets.tsteps; %inputs over all time
@@ -86,14 +81,19 @@ function [net] = r_init_lewis_elman(net, pats)
     net.w = net.w.*net.cC;
     
     % Create delays
-    net.D(~net.cC) = 1; %dummy ones for all NON-connections
-    
+    net.D  = net.sets.D_INIT(1) + diff(net.sets.D_INIT)*randi(net.sets.D_INIT, size(net.cC)); %random delays, from a given distribution.  Will redo 
+
+    % Intrahemispheric
+    net.D(net.idx.lh_ih,net.idx.rh_ih) = net.sets.D_IH_INIT(1,1,1) + diff(net.sets.D_IH_INIT(1,1,:))*randi(net.sets.D_IH_INIT(1,1,:), size(net.D(net.idx.lh_ih,net.idx.rh_ih))); %random ih connections; %early callosal
+    net.D(net.idx.rh_ih,net.idx.lh_ih) = net.sets.D_IH_INIT(1,2,1) + diff(net.sets.D_IH_INIT(1,2,:))*randi(net.sets.D_IH_INIT(1,2,:), size(net.D(net.idx.rh_ih,net.idx.lh_ih))); %random CC connections; %early callosal
     % Interhemispheric
     net.D(net.idx.lh_cc,net.idx.rh_cc) = randi(net.sets.D_CC_INIT(1,1,:), size(net.D(net.idx.lh_cc,net.idx.rh_cc))); %random CC connections; %early callosal
     net.D(net.idx.rh_cc,net.idx.lh_cc) = randi(net.sets.D_CC_INIT(1,2,:), size(net.D(net.idx.rh_cc,net.idx.lh_cc))); %random CC connections; %early callosal
 
     net.Df = double(net.D);
 
+
+    net.T  = net.sets.T_INIT(1)+diff(net.sets.T_INIT)*rand(net.nunits,1);
 
     % By default, all existing quantities are changeable.
     net.wC  = net.cC;
