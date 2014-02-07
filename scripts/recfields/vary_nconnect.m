@@ -46,6 +46,7 @@ function vary_nconnect()
   figure; plot(cpi, avg_mean', '.-');
   legend(lbls);
   xlabel('frequency (cycles per image)');
+  ylabel('average activity');
 
   % non-normalized
   figure; 
@@ -55,7 +56,7 @@ function vary_nconnect()
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
-  ylabel('output activity (linear xfer fn)');
+  ylabel('variance in output activity (linear xfer fn)');
   legend(lbls, 'Location', 'best', 'FontSize',16);
   
   % normalized
@@ -66,7 +67,7 @@ function vary_nconnect()
   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
   set(gca, 'FontSize', 16);
   xlabel('frequency (cycles per image)');
-  ylabel('output activity (normalized)');
+  ylabel('variance in output activity (normalized)');
   legend(lbls, 'Location', 'best', 'FontSize',14);
   
   %figure;

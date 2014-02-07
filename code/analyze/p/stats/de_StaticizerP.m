@@ -15,4 +15,4 @@ function [stats] = de_StaticizerP(mSets, mss, stats, stc)
   if (~isfield(mSets.data, 'tt')),  [stats] = de_DoStat([], stats, 'tt',  stc, 'de_StatsTrainTimeP',  mss); end;
   if (~isfield(mSets.data, 'ti')),  [stats] = de_DoStat([], stats, 'ti',  stc, 'de_StatsTrainItersP', mss); end;
   
-  if (~isfield(mSets.data, 'weights')),  [stats] = de_DoStat('weights', stats, 'weights',  stc, 'de_StatsWeights', mss); end;
+  %if (~isfield(mSets.data, 'weights')),  [stats] = de_DoStat('weights', stats, 'weights',  stc, 'de_StatsWeights', mss); end;

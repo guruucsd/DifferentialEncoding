@@ -24,7 +24,7 @@ function [stats_fft] = de_StatsFFTs(images, nInput)
     phase1D   = cell(length(images),1 );
 
     padfactor = 2;
-    sigmas    = [0.0 0.5 3.0];
+    sm_sigmas = [0.0 0.5 3.0];
  
     nImages = size(images{1},4);
     npad    = padfactor*nInput; %padding for fft
@@ -51,7 +51,7 @@ function [stats_fft] = de_StatsFFTs(images, nInput)
     	
         % Declare variables
         ffts{ii}      = zeros([nModels nImages fftSz]);
-        power1D{ii}   = zeros(length(sigmas), nModels, length(freqs_1D));
+        power1D{ii}   = zeros(length(sm_sigmas), nModels, length(freqs_1D));
         phase1D{ii}   = zeros(nModels, length(freqs_1D));
     
 		%%%%%%%%%%%%%%%%%%
@@ -83,15 +83,15 @@ function [stats_fft] = de_StatsFFTs(images, nInput)
         [pwr1D]            = guru_fft2to1( fftshift(pwr), fftSz );
         
         fprintf('[1D freqs] ');
-        for si=1:length(sigmas)
+        for si=1:length(sm_sigmas)
         
-            if (sigmas(si)==0.0)
+            if (sm_sigmas(si)==0.0)
                 power1D{ii}(si, :, :) = pwr1D;
         
             % Smooth the power
             else
                 for fi=1:length(freqs_1D)
-                    g = normpdf(freqs_1D, freqs_1D(fi), sigmas(si)); % find gaussian at all points, centered around current
+                    g = normpdf(freqs_1D, freqs_1D(fi), sm_sigmas(si)); % find gaussian at all points, centered around current
                     g = g/sum(g); % normalize weights to sum to 1
                     power1D{ii}(si, :, fi)  = sum(pwr1D .* repmat(g, [nModels 1]), 2);
                 end;
@@ -110,7 +110,7 @@ function [stats_fft] = de_StatsFFTs(images, nInput)
     
     % Normalize freqs
     stats_fft.freqs_1D = freqs_1D/(padfactor+1);
-    stats_fft.smoothing_sigmas = sigmas;
+    stats_fft.smoothing_sigmas = sm_sigmas;
     stats_fft.fftsz    = fftSz;
     
     stats_fft.power1D = power1D;

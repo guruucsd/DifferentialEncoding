@@ -18,8 +18,10 @@ function [model] = de_DE(model)
   % Create and train the autoencoder
   %--------------------------------%
 
-  if (~model.ac.cached)
+  if (model.ac.cached)
+    fprintf('| (cached)');
 
+  else
     % Set up input/output pairs
     X = model.data.train.X;
     Y = model.data.train.X(1:end-1,:);
@@ -48,8 +50,6 @@ function [model] = de_DE(model)
     model = de_LoadProps(model, 'ac', 'Weights');
     model.ac.Conn = (model.ac.Weights~=0);
 
-    fprintf('| (cached)');
-
     [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
     [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
   end;
@@ -61,8 +61,8 @@ function [model] = de_DE(model)
   if (isfield(model, 'p'))
 
       if (~model.p.cached)
-        goodTrials = ~isnan(sum(model.data.train.T,1));
-        nTrials    = sum(goodTrials); % count the # of trials with no NaN anywhere in them
+        good_train = ~isnan(sum(model.data.train.T,1));
+        nTrials    = sum(good_train); % count the # of trials with no NaN anywhere in them
 
         % Use hidden unit encodings as inputs
         X_train    = model.ac.hu.train;
@@ -73,10 +73,14 @@ function [model] = de_DE(model)
 
         % Add bias
         if (model.p.useBias)
-            biasArray=ones(1,nTrials);
+            biasVal = mean(abs(X_train(:)));
+            biasArray=biasVal*ones(1,nTrials);
             X_train     = [X_train;biasArray];  %bias is last input
             clear('biasArray');
         end;
+
+        Y_train = model.data.train.T;
+
 
         % Set up connectivity matrix:
         % 1:size(X,1) : inputs units (& bias?) to p
@@ -92,22 +96,24 @@ function [model] = de_DE(model)
 
             model.p.Conn(pInputs+[1:pHidden],          [1:pInputs])=true; %input->hidden
             model.p.Conn(pInputs+pHidden+[1:pOutputs], pInputs+[1:pHidden])=true; %hidden->output
+            model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
         end;
-         
+
+
         % Train
-        [model.p] = guru_nnTrain(model.p,X_train,reshape(model.data.train.T(:,goodTrials),[pOutputs nTrials]));
+        [model.p] = guru_nnTrain(model.p, X_train(:,good_train), Y_train(:, good_train));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
         fprintf(' | e_p(%5d): %4.3e',size(model.p.err,1),avgErr);
         if (isfield(model.p, 'Weights'))
-            fprintf(' wts=[%5.2f %5.2f]', min(model.p.Weights(:)), max(model.p.Weights(:)))
+            fprintf(' wts=[%5.2f %5.2f]', full(min(model.p.Weights(:))), full(max(model.p.Weights(:))))
         end;
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.train = guru_nnExec(model.p, X_train, model.data.train.T );
+        model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(:,good_train) );
         
       
         % TEST
@@ -125,13 +131,16 @@ function [model] = de_DE(model)
         
         % Add bias
         if (model.p.useBias)
-            biasArray=ones(1,nTest);
+            biasArray=biasVal*ones(1,nTrials);
             X_test     = [X_test;biasArray];  %bias is last input
             clear('biasArray');
         end;
 
+        Y_test = model.data.test.T;
+
+
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.test = guru_nnExec(model.p, X_test, model.data.test.T );
+        model.p.output.test = guru_nnExec(model.p, X_test(:,good_test), Y_test(:,good_test) );
       end;
   end;
 

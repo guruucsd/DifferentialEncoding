@@ -1,9 +1,9 @@
 function stats = de_StatsGroupBasicsKit( mSets, ms, ss )
 
-  for dsi=1:2
-      if (dsi==1), ds = 'train';
-      else, ds = 'test';
-      end;
+  dss = {'train','test'};
+  for dsi=1:length(dss)
+      ds = dss{dsi};
+
 
       %%%%%%%%
       % Must match # of instances across both experiments

@@ -13,6 +13,7 @@ function [te, pval] = de_StatsTrainErrorP(models)
   te = cell(length(models), 1);
   
   for s=1:length(models)
+      if isempty(models{s}), continue; end;
       p  = [models{s}.p];
       te{s}  = [p.trainingError]';
   end;

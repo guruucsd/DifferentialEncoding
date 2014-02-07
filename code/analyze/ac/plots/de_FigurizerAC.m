@@ -18,8 +18,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   figs = [ figs de_DoPlot('train-error',   'de_PlotTrainErrorAC',   mSets, mSets, stats) ];
   figs = [ figs de_DoPlot('train-time',    'de_PlotTrainTimeAC',    mSets, mSets, stats) ];
   figs = [ figs de_DoPlot('train-iters',   'de_PlotTrainItersAC',   mSets, mSets, stats) ];
-  figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity', mSets, mSets, mss) ];
-%  figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity_Avg2Dto1D', mSets, mSets, mss) ];
+  %figs = [ figs de_DoPlot('connectivity',  'de_PlotConnectivity', mSets, mSets, stats.rej.ac.connectivity) ];
   figs = [ figs de_DoPlot('ffts',          'de_PlotFFTs',         mSets, mSets, stats.rej.ac.ffts) ];
   figs = [ figs de_DoPlot('distns',        'de_PlotDistributions',mSets, mSets, stats.rej.ac.distns) ];
 
@@ -35,7 +34,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
 
     % Plot the
     if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages_)) ];
-    else, warning('Must get images in stats to run plots.'); end;
+    elseif ismember('images',mSets.plots), warning('Must get images in stats to run plots.'); end;
 
 %    if (isfield(mSets.data, 'test')), figs = [ figs de_DoPlot('image-diffs', 'de_PlotOutputImageDiffs', mSets, ms, mSets.data.test) ];
 %    else,                             figs = [ figs de_DoPlot('image-diffs', 'de_PlotOutputImageDiffs', mSets, ms, mSets.data.train) ]; end;
@@ -45,10 +44,14 @@ function figs = de_FigurizerAC(mSets, mss, stats)
 %    else,                              figs = [ figs de_DoPlot('image-threshd', 'de_PlotOutputImagesThreshd', mSets, ms, mSets.data.train) ]; end;
 
     if (~isempty(stats.rej.ac.huencs.(ds))),  figs = [ figs de_DoPlot('hu-encodings', 'de_PlotHUEncoding', mSets, ms, stats.rej.ac.huencs.(ds){ss}) ];
-    else, warning('Must get hu encodings in stats to run plots.');
+    elseif ismember('hu-encodings', mSets.plots), warning('Must get hu encodings in stats to run plots.');
     end;
 
     if (~isempty(stats.rej.ac.huouts.(ds))),  figs = [ figs de_DoPlot('hu-output', 'de_PlotHUOutput', mSets, ms, stats.rej.ac.huouts.(ds){ss}) ];
-    else, warning('Must get hu outputs in stats to run plots.'); end;
+    elseif ismember('hu-output', mSets.plots), warning('Must get hu outputs in stats to run plots.'); end;
+
+    if (~isempty(stats.rej.ac.sta)),  figs = [ figs de_DoPlot('sta', 'de_PlotSTA', mSets, ms, stats.rej.ac.sta{ss}) ];
+    elseif ismember('sta', mSets.plots), warning('Must get sta in stats to run plots.'); end;
+
   end;  %ss
 

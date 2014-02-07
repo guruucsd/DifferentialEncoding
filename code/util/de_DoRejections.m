@@ -14,7 +14,6 @@ function [mss] = de_DoRejections(mss, rejectTypes, verbose)
 % models
   if (~exist('verbose','var')), verbose = false; end;
   if (~iscell(mss)),            mss = num2cell(mss, 1); end;
-
   nSigmas = length(mss);
   
   % Do the rejections
