@@ -41,7 +41,7 @@ if (~net.sets.continue)
     net.sets.S_LIM  = net.sets.tstop -net.sets.dt*(Sdel +[Sdur 0]);  % min & max time to consider error
 
     net.sets.D_INIT           = 1*[1 1];%*[1 1; 1 1]; %early lh&rh; late lh&rh
-    net.sets.D_IH_INIT(1,:,:) = 1*[1 1; 1 1];             %lh;    early->late and late->early
+    net.sets.D_IH_INIT(1,:,:) = 1*[2 2; 2 2];             %lh;    early->late and late->early
     net.sets.D_IH_INIT(2,:,:) = net.sets.D_IH_INIT(1,:,:); %rh;    early->late and late->early
     net.sets.D_CC_INIT(1,:,:) = 1*[1 1; 1 1];             %early; l->r and r->l
     net.sets.D_CC_INIT(2,:,:) = 4*[1 1; 1 1]; %late;  l->r and r->l
@@ -58,8 +58,12 @@ if (~net.sets.continue)
     net.sets.nhidden_per      = 25;% 15;
     net.sets.noise_init       = 0;%1;
     net.sets.noise_input      = 0;%001;%1;
+    
+    if ~isfield(net.sets,'run'), net.sets.run = true; end;
 end;
 
 %
-[net,pats,data]          = r_main(net);
-[data.an]                = r_analyze(net, pats, data);
+if net.sets.run
+    [net,pats,data]          = r_main(net);
+    [data.an]                = r_analyze(net, pats, data);
+end;
