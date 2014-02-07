@@ -141,8 +141,7 @@ function [s,f] = expt_histograms( models, ws, s_in )
     % Show the difference between LH and RH differences
     subplot(ws.nkernels+1,3,3*(ws.nkernels+1) + [-1 0]); % last row of three
     bar(s.bins, s.d_f{end}-s.d_f{1});
-
-
+save
 
 %%%%%%%%%%%%%%%%%%%%%%
 function [ipd, fs] = expt_ipd( models, ws )
@@ -165,8 +164,10 @@ function [ipd, fs] = expt_ipd( models, ws )
             100*diff(ipd.top25.from_center_mean)     /mean(ipd.top25.from_center_mean));
     
 
-    if (ws.nkernels~=2)
+    if (true || ws.nkernels~=2)
         f = [];
+        ipd = []; 
+        fs = [];
     
     else
         % Similar map, showing difference in mean ipd
@@ -535,8 +536,8 @@ function [s, f] = expt_sf( models, wss )
       s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
       figs = [figs de_PlotOutputImages(mSets, s.(testsets{ti}).rimgs{ri}, test.XLAB)];
     end;
-    s.(testsets{ti}).orig  = de_StatsFFTs( test.X(1:ws.inPix,:), test.nInput);  % original images
-		s.(testsets{ti}).model = de_StatsFFTs( s.(testsets{ti}).rimgs );
+    s.(testsets{ti}).orig  = de_StatsFFTs( test, test.X(1:ws.inPix,:));  % original images
+		s.(testsets{ti}).model = de_StatsFFTs( test, s.(testsets{ti}).rimgs );
 		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
 		
 		% Plot the results
@@ -597,8 +598,8 @@ function [s, f] = expt_trn( models, ws, kernel )
 	%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
 	%
 	s.rimgs = de_StatsOutputImages(models, de_NormalizeDataset(ws.test, struct('ac',models{1}(1))), 1:size(ws.test.X,2)); 
-	s.orig  = de_StatsFFTs( ws.test.X, ws.test.nInput);  % original images
-	s.model = de_StatsFFTs( s.rimgs );
+	s.orig  = de_StatsFFTs( ws.test, ws.test.X);  % original images
+	s.model = de_StatsFFTs( ws.test, s.rimgs );
 	s.pals  = de_StatsFFTs_TTest( s );
 	
 	% Plot the results

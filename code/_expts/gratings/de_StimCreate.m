@@ -32,12 +32,26 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   % With this info, create our X and TT vectors
   [train.X, train.XLAB] = stim2D(stimSet, train.nInput, train.freqs, train.phases, train.thetas);
 
-  % Train & test sets are the same, EXCEPT that the phases change.
+  [train] = applyOptions(opt, train);
+
+ % Train & test sets are the same, EXCEPT that the phases change.
   test = train;
   if length(train.phases)>1
     test.phases = train.phases + mean(diff(train.phases))/2;
   end;
   [test.X, test.XLAB] = stim2D(stimSet, test.nInput, test.freqs, test.phases, test.thetas);
+  [test] = applyOptions(opt, test);
+
+  function [dset] = applyOptions(opts, dset)
+    if guru_hasopt(opts,'square')
+      dset.X(dset.X<=0) = -1; 
+      dset.X(dset.X>0)  = 1;
+      guru_assert(dset.X==-1 | dset.X==1, 'make sure all values are -1 or 1');
+      dset.type='square';
+    else
+      dset.type='sin';
+    end;
+
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,8 +59,8 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
 
     % Filter the gratings based on teh stimulus set
     switch stimSet
-        case 'vertonly', thetas=pi/2;
-        case 'horzonly', thetas=0;
+        case 'vertonly', thetas=0;
+        case 'horzonly', thetas=pi/2;
         case {'','all'}, ;
         otherwise, error('unknown stimSet');
     end;

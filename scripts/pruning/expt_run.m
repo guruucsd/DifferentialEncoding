@@ -7,12 +7,12 @@ addpath(genpath('../../code'));
 de_SetupExptPaths('sergent_1982');
 
 sigma                =    1*[  10];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
-nConnPerHidden_Start =    1*[  36];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[  12];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
-hpl                  =    1*[   2];%   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 408];% 111 425 425 425 425 425 425 425 425 425 102 102];
+nConnPerHidden_Start =    1*[  30];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[  15];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+hpl                  =    1*[   1];%   1   1   1   2   1   1   1   1   1   1   2   1];
+nHidden              = hpl.*[ 850];% 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        =      repmat({'n'}, size(sigma));
-lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
+lambdas              = 0.01*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
 zscore               = 0.05*ones(size(sigma));
 AvgError             = 1E-4*ones(size(sigma));
@@ -20,18 +20,21 @@ sz                   = repmat({'small'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'weights'},size(sigma)); %weights, weighted_weights, or activity
 
-N                    = 24*ones(size(sigma));
-tag                  = repmat( {'testing'}, size(sigma) );
+N                    = 8*ones(size(sigma));
+tag                  = repmat( {'natimg-limitedlambda'}, size(sigma) );
 
+iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sigma) );
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
 %iters_per            = repmat( {[20 1]; [20 1]}, size(sigma) );
 %iters_per            = repmat( {[4*ones(1,10) 1]; [4*ones(1,10) 1]}, size(sigma) );
-iters_per            = repmat( {[4*ones(1,10) 50]; [1*ones(1,5) 7*ones(1,5) 50]}, size(sigma) );
-kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(1.5,20,5) zeros(1,5) 0]}, size(sigma) );
+%iters_per            = repmat( {[4*ones(1,10) 50]; [1*ones(1,5) 7*ones(1,5) 50]}, size(sigma) );
+%kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(1.5,20,5) zeros(1,5) 0]}, size(sigma) );
 %kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(-20,-1.5,10) 0]}, size(sigma) );
 %kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
+kernels              = repmat( {[8 8 8 8 0]; [0 0 0 0 0]}, size(sigma) );
+
 klabs                = cell(size(kernels));
 
 for ii=1:size(kernels,2)

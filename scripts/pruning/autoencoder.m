@@ -27,7 +27,7 @@ function [model,ws,s,fs] = autoencoder(model, ws)
   model.nOutput = prod(model.nInput);
   
   % These parameters are large resources
-  if (~isfield(model, 'distn')),                model.distn                = {'norme2'}; end;
+  if (~isfield(model, 'distn')),                model.distn                = {'normem2'}; end;
   if (~isfield(model, 'mu')),                   model.mu                   = 0; end;
   if (~isfield(model, 'nHidden')),              model.nHidden              = 2*680; end;%425;                         % # hidden units in autoencoder  
   if (~isfield(model, 'hpl')),                  model.hpl                  = 2;     end;
