@@ -1,4 +1,4 @@
-function [net,pats,data,f,sets] = r_main(net,pats)
+function [net,pats,data,f,sets] = r_main(net,pats,data)
 %
 
     % Validate & set defaults
@@ -19,12 +19,17 @@ function [net,pats,data,f,sets] = r_main(net,pats)
     fprintf('Training [autoencoder=%d] network with tsteps=%d, max_del=%d, to tc=%4.2f\n', ...
              (isfield(net.sets, 'autoencoder') && net.sets.autoencoder), ...
              net.sets.tsteps, max(net.sets.D_CC_INIT(:)), net.sets.train_criterion);
-    [net,data] = net.fn.train(net,pats.train);
+    if ~exist('data','var')
+      [net,data] = net.fn.train(net,pats.train);
+    else
+      [net,data] = net.fn.train(net,pats.train,data);
+    end;
 
-    % Test/analyze
+    % analyze
     [data]     = r_test(net,pats,data); %regular test
 %    [data.an]  = r_analyze(net, pats, data);
     
     % Save result
-    save(net.sets.matfile,'net','pats','data');
+    if ~exist(net.sets.dirname), mkdir(net.sets.dirname); end;
+    save(fullfile(net.sets.dirname, net.sets.matfile),'net','pats','data');
     

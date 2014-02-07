@@ -136,7 +136,9 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'grad_pow')),  sets.grad_pow    = 1;          end;
     if (~isfield(sets,'rseed')),     sets.rseed       = randi(1E3), end;
 
-%    if (isfield(sets, 'autoencoder') && ~sets.autoencoder)
+    if (~isfield(sets, 'axon_noise')), sets.axon_noise=0; 
+    elseif numel(sets.axon_noise)>1, guru_assert(sets.niters==numel(sets.axon_noise), 'axon_noise must be scalar, or size must match niters'); end;
+    %    if (isfield(sets, 'autoencoder') && ~sets.autoencoder)
 %        if (~isfield(sets,'ac')), sets.ac = sets; end;
         
         
@@ -164,6 +166,8 @@ function [net] = r_massage_params(net)
     fn.train   = str2func(['r_train_'   sets.train_type]);
     fn.analyze = str2func(['r_analyze_' sets.dataset]);
     
+    if ~isfield(sets, 'dirname'), sets.dirname = '.'; end;
+
     % Make a filename for saving
     if (~isfield(sets,'matfile'))
         sets.matfile = sprintf('%s_t%d_d%d_r%d_%s',sets.dataset,sets.tsteps,max(sets.D_CC_INIT(:)),sets.rseed, r_get_hash(sets));
@@ -189,6 +193,10 @@ function [str] = r_dump_sets(sets)
     str = '';
     a = fields(sets);
     for ai=1:length(a)
+        % Skip settings that we know will break across machines
+        if any(strcmp(a{ai}, {'dirname', 'matfile'})), continue; end;
+        if any(strcmp(a{ai}, {'n_nets'})), continue; end;
+        
         v = sets.(a{ai});
         str = [str '%s: ' a{ai}]; 
         if (isnumeric(v))

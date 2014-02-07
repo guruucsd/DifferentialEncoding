@@ -12,7 +12,7 @@ function [net] = r_init_lewis_elman(net, pats)
     net.nunits  = 1+net.ninput+net.nhidden+net.noutput;    % Includes bias node (index=0)
 
     % Compute indices to different types of units
-    net.idx.lh_input       = 1                         + [1:net.ninput/2];
+    net.idx.lh_input       = 1                         + [1:net.ninput/2]; % 1 is bias
     net.idx.rh_input       = net.idx.lh_input(end)     + [1:net.ninput/2];
     net.idx.lh_hu          = net.idx.rh_input(end)     + [1:net.nhidden/2];
     net.idx.rh_hu          = net.idx.lh_hu(end)        + [1:net.nhidden/2];
@@ -27,7 +27,7 @@ function [net] = r_init_lewis_elman(net, pats)
 
     net.idx.input  = [net.idx.lh_input  net.idx.rh_input ];
     net.idx.output = [net.idx.lh_output net.idx.rh_output];
-    net.idx.hidden = setdiff(1:net.nunits, [net.idx.input net.idx.output]);
+    net.idx.hidden = setdiff(2:net.nunits, [net.idx.input net.idx.output]); %1 is bias
     net.idx.cc    = sort([net.idx.lh_cc net.idx.rh_cc]);
     
 
@@ -89,8 +89,8 @@ function [net] = r_init_lewis_elman(net, pats)
     net.D(~net.cC) = 1; %dummy ones for all NON-connections
     
     % Interhemispheric
-    net.D(net.idx.lh_cc,net.idx.rh_cc) = net.sets.D_CC_INIT(1,1,1) + diff(net.sets.D_CC_INIT(1,1,:))*randi(net.sets.D_CC_INIT(1,1,:), size(net.D(net.idx.lh_cc,net.idx.rh_cc))); %random CC connections; %early callosal
-    net.D(net.idx.rh_cc,net.idx.lh_cc) = net.sets.D_CC_INIT(1,2,1) + diff(net.sets.D_CC_INIT(1,2,:))*randi(net.sets.D_CC_INIT(1,2,:), size(net.D(net.idx.rh_cc,net.idx.lh_cc))); %random CC connections; %early callosal
+    net.D(net.idx.lh_cc,net.idx.rh_cc) = randi(net.sets.D_CC_INIT(1,1,:), size(net.D(net.idx.lh_cc,net.idx.rh_cc))); %random CC connections; %early callosal
+    net.D(net.idx.rh_cc,net.idx.lh_cc) = randi(net.sets.D_CC_INIT(1,2,:), size(net.D(net.idx.rh_cc,net.idx.lh_cc))); %random CC connections; %early callosal
 
     net.Df = double(net.D);
 

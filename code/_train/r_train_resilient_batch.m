@@ -1,15 +1,18 @@
-function [net,data] = r_train_resilient_batch(net,pats)
+function [net,data] = r_train_resilient_batch(net,pats,data)
     ns = net.sets;
             
     %%%%%%%%%%%%%%
     % Initialization
     %%%%%%%%%%%%%%
-    
+    if exist('data','var'), warning('overwriting previous data...'); end;
+   
     % Error
     data.good_update = true(ns.niters,1);
     E               = zeros(ns.niters,pats.npat,pats.tsteps,net.noutput, 'single');
     data.E_pat      = zeros(ns.niters,pats.npat,net.noutput, 'single');           % error
+    data.hu_pat     = zeros(ns.niters,pats.npat,net.nhidden, 'single');           % error
     data.E_lesion   = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.noutput, 'single');           % error
+    data.hu_lesion  = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.nhidden, 'single');           % error
     data.E_iter     = zeros(ns.niters,1, 'single');
     data.learncurve = zeros(ns.niters,pats.npat,net.noutput,'single');
     data.actcurve   = zeros(pats.tsteps,pats.npat,net.noutput,'single');
@@ -70,6 +73,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
     %%%%%%%%%%%%%%
     % Main Loop
     %%%%%%%%%%%%%%
+    last_measure_ts = find(sum(sum(pats.s,3),2),1,'last'); % keep an index of the last measurement point
 
     if (ns.verbose), r_printPats(data); end;
 
@@ -112,21 +116,36 @@ function [net,data] = r_train_resilient_batch(net,pats)
             % x(ti-1) and x(ti) should ref y(ti)
             % Use most efficient time-indexing function to compute x(t)
             y_d         = y(bi).*(ti>=(D_repd));
-            axon_noise  = (D_repd>1) .* D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % local has no noise, version
-            %axon_noise  = D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); all delays, including local, has noise
-            %axon_noise  = 1      .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); static amount of noise on all cxns
-             %(1-net.sets.reliability).*(1./(1+2*exp(-D_repd)));
-            if iter==25 && ti==10 && net.sets.axon_noise, max(abs(axon_noise(:))); end;
-            if iter==25 && ti==10 && net.sets.axon_noise, 
-
-                actidx = y~=0;
-                avg_axon_noise = sum(abs(axon_noise(actidx(:)))) / pats.npat / length(net.idx.cc);
-                avg_act = mean(abs(y(actidx(:))));
+            if any(net.sets.axon_noise)
+                if length(net.sets.axon_noise)>1
+                  axon_noise = net.sets.axon_noise(iter);
+                  if axon_noise
+                    axon_noise=(D_repd>1) .* D_repd .* (axon_noise) .* 2.*(rand(size(D_repd))-0.5);
+                  end;
+                elseif isfield(net.sets,'activity_dependent') && net.sets.activity_dependent
+                  axon_noise  = (D_repd>1) .* D_repd .* repmat(squeeze(y(ti,:,:)),[1 1 size(net.w,2)]) .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % [-1 1] local has no noise, version % should be activity-dependent
+                else
+                  axon_noise  = (D_repd>1) .* D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); % [-1 1] local has no noise, version % should be activity-dependent
+                end;
+                %axon_noise  = D_repd .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); all delays, including local, has noise
+                %axon_noise  = 1      .* (net.sets.axon_noise) .* 2.*(rand(size(D_repd))-0.5); static amount of noise on all cxns
+                 %(1-net.sets.reliability).*(1./(1+2*exp(-D_repd)));
+                if iter==25 && ti==10 
+    
+%                    actidx = y(ti,:,:)~=0; % use the current timestep
+%                    avg_act = mean(abs(y(actidx(:))));
+                    cc_act = y(ti,:,net.idx.cc);
+                    avg_cc_act = sum(abs(cc_act(:))) / nnz(cc_act); %sum(sum(abs(y(ti,:,net.idx.cc)),3),2) / nnz(;
+                    cc_axon_noise = axon_noise(:,:,net.idx.cc);
+                    avg_axon_noise = sum(abs(cc_axon_noise(:))) / nnz(cc_axon_noise);%pats.npat / length(net.idx.cc);
+                    fprintf('Average noise per pattern per synapse: %.2e, or %.2f%% of cc activation\n',  avg_axon_noise, 100 * avg_axon_noise / avg_cc_act);
+                end;
                 
-                fprintf('Average noise per pattern per synapse: %.2e, or %.2f%% of activation\n',  avg_axon_noise, 100 * avg_axon_noise / avg_act);
-             end;
+                x(ti,:,:)   = sum(w_repd .* (y_d+axon_noise), 2);
+            else
+                x(ti,:,:)   = sum(w_repd .* y_d, 2);
+            end;
 
-            x(ti,:,:)   = sum(w_repd .* (y_d+axon_noise), 2);
             fx(ti,:,:)  = net.fn.f (x(ti,:,:));
             fpx(ti,:,:) = net.fn.fp(x(ti,:,:), fx(ti,:,:)); %send x and fx for efficiency of computation
             
@@ -156,8 +175,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
         end;
 
         % Save some stats
-        data.E_pat(iter,:,:)      = ns.dt*sum(E(iter,:,:,:),3);
-        data.learncurve(iter,:,:) = y(end,:,outidx);
+        data.E_pat(iter,:,:)      = ns.dt*sum(E(iter,:,:,:),3); % E took net.s into account already
+        data.hu_pat(iter,:,:)     = y(last_measure_ts,:,net.idx.hidden);
+        data.learncurve(iter,:,:) = y(last_measure_ts,:,outidx);
         data.actcurve             = y(:,:,[outidx]);
         data.cccurve              = y(:,:,net.idx.cc);
     
@@ -248,8 +268,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
         if (mod(iter,ns.test_freq)==0)
             nl = r_lesion_cc(net);
             td = r_forwardpass(nl,pats,data);
-
-            data.E_lesion(round(iter/ns.test_freq),:,:) = td.E(find(sum(sum(pats.s,3),2),1,'last'),:,:);
+            lesion_iter = round(iter/ns.test_freq);
+            data.E_lesion(lesion_iter,:,:) = td.E(last_measure_ts,:,:); 
+            data.hu_lesion(lesion_iter,:,:) = td.y(last_measure_ts,:,net.idx.hidden);
             clear('nl','td');
         end;
 
@@ -266,10 +287,10 @@ function [net,data] = r_train_resilient_batch(net,pats)
             
         % We trained to criterion; break out!
         if (sum(bits_cor(:)) == bits_set)
-            fprintf('\n\tHey!  Done early!\n');
+            fprintf('\n\tHey!  Done early! [%4d]\n', iter);
             if (net.sets.noise_input > 0)
                 % We should test here on non-noisy patterns
-                fprintf('\t[note; Due to noise, we may not have trained to 100% for the non-noisy patterns...]\n');
+                fprintf('\t[note; Due to noise, we may not have trained to 100%% for the non-noisy patterns...]\n');
             end;
             data.niters = iter;
             break;
@@ -334,7 +355,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
         few_bad_delay_changes  = length(find(etaD_toch)) <= (ns.bad_pct_D)*numel(v_D);
 
         data.good_update(iter) = less_error && 1<=sum(few_bad_weight_changes + few_bad_tc_changes + few_bad_delay_changes);
-        
+       % if ~data.good_update(iter), keyboard; end;
         % 
         if (~data.good_update(iter))
             fprintf(' *** ');
@@ -411,6 +432,12 @@ function [net,data] = r_train_resilient_batch(net,pats)
         net.Df  = net.Df - (1-ns.alpha_D).*ns.eta_D.*net.DC.*dDi;
         net.Df  = net.Df -    ns.alpha_D .*ns.eta_D.*net.DC.*dDir; 
         net.Df  = min(max(net.Df,ns.D_LIM(1)),ns.D_LIM(2));
+       % net.Df  = min(max(net.Df(net.idx.lh_cc,net.idx.cc),ns.D_CC_LIM(1,1,:
+        if any(net.D(:)-round(net.Df(:)))
+            change_idx = find(net.D(:)-round(net.Df(:)));
+            fprintf('\t[%3d]Changing delay from [%s ] to [%s ]; now %2d cxns>1\n', iter, sprintf(' %2d', net.D(change_idx)), sprintf(' %2d', round(net.Df(change_idx))), nnz(round(net.Df)>1));
+        end;
+
         net.D   = round(net.Df); %
 
 

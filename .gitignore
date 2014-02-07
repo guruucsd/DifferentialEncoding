@@ -1,2 +1,5 @@
 *.m~
 *.mat
+*.out
+*.log
+*.png
