@@ -23,7 +23,7 @@ prune_strategy       = repmat({'weights'},size(sigma)); %weights, weighted_weigh
 N                    = 20*ones(size(sigma));
 tag                  = repmat( {'natimg'}, size(sigma) );
 
-iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sigma) );
+iters_per            = repmat( {[7*ones(1,6) 50]; [ 7*ones(1,6) 50]}, size(sigma) );
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
 %iters_per            = repmat( {[20 1]; [20 1]}, size(sigma) );
 %iters_per            = repmat( {[4*ones(1,10) 1]; [4*ones(1,10) 1]}, size(sigma) );
@@ -33,7 +33,7 @@ iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sig
 %kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
-kernels              = repmat( {[8 8 8 8 0]; [0 0 0 0 0]}, size(sigma) );
+kernels              = repmat( {[8 6 4 2 1 0 0]; [4 2 1 0 0 0 0]}, size(sigma) );
 
 klabs                = cell(size(kernels));
 plot_formats         = {'png', 'fig'};
@@ -75,8 +75,8 @@ for si=1:length(lambdas)
 	ws.scriptdir   = guru_fileparts(pwd,'name');
 	ws.desc        = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
 	[~,ws.homedir] = unix('echo $HOME'); ws.homedir = strtrim(ws.homedir);
-    ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
-	ws.plotdir     = fullfile('plots', ws.tag, ws.desc); %sprintf('plots-%s', ws.desc);
+        ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
+	ws.pngdir      = fullfile('png', ws.tag, ws.desc); %sprintf('png-%s', ws.desc);
 
 
 
@@ -113,6 +113,7 @@ for si=1:length(lambdas)
 
 		[curmodel,wss{mi},s,fs] = autoencoder(curmodel, wss{mi}, plot_formats);      % run the script
 		close all;        % close figures
+
 
 		% Move output
 		if (~exist(wss{mi}.matdir,'dir')), mkdir(wss{mi}.matdir); end;
@@ -167,7 +168,7 @@ for si=1:length(lambdas)
 
 	% Save off results
 	if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
-	save(fullfile(ws.matdir, 'expt_sf'));
+	save(fullfile(ws.matdir, 'expt_sf_sched'));
 
   expt_analyze( models, wss, s );
   close all;

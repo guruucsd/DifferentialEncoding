@@ -6,3 +6,4 @@ nohup.out
 /results
 *.log
 *.out
+plots/
