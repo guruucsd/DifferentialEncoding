@@ -3,6 +3,17 @@
 addpath('../sergent_1982');
 clear all variables; clear all globals;
 
+<<<<<<< HEAD
+stats = {'images', 'ffts', 'distns'};
+plts = {'ls-bars', stats{:}};
+
+[args,opts]  = uber_sergent_args('plots',plts,'stats',stats,'runs',2, ... 
+                                 'distn', {'norme2'}, ...% normem2', ...
+                                 'nHidden', 0, 'hpl', 0, 'ac.XferFn', [1], 'p.nHidden', 25, 'p.dropout', .5);
+
+% Run sergent task by training on all images
+[trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent',         opts, args);
+=======
 stats = {};%'images', 'ffts'};
 plts = {'ls-bars', stats{:}};
 
@@ -11,3 +22,4 @@ plts = {'ls-bars', stats{:}};
 
                              % Run sergent task by training on all images
 [trn, tst] = de_SimulatorUber('vanhateren/100', 'sergent_1982/de',         opts, args);
+>>>>>>> 5d556d065733a52b03fe9939fd800365973c9e65
