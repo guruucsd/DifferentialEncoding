@@ -11,7 +11,7 @@ nConnPerHidden_Start =    1*[  30];%   6  15  10  15  15  60  20  15  10  10  60
 nConnPerHidden_End   =    1*[  15];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
 hpl                  =    1*[   1];%   1   1   1   2   1   1   1   1   1   1   2   1];
 nHidden              = hpl.*[ 850];% 111 425 425 425 425 425 425 425 425 425 102 102];
-dataset_train        =      repmat({'n'}, size(sigma));
+dataset_train        = repmat({'n'}, size(sigma));
 lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
 zscore               = 0.05*ones(size(sigma));
@@ -63,7 +63,7 @@ for si=1:length(lambdas)
 	mSets.AvgError             = AvgError(si);
 	mSets.zscore               = zscore(si);
 
-	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si)}});
+	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si), 'img2pol'}});
   ws.N         = N(si);
   ws.iters_per = iters_per(:,si);
   ws.tag       = tag{si};

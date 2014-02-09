@@ -33,7 +33,7 @@ iters_per            = repmat( {[7*ones(1,6) 50]; [ 7*ones(1,6) 50]}, size(sigma
 %kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
-kernels              = repmat( {[8 6 4 2 1 0 0]; [4 2 1 0 0 0 0]}, size(sigma) );
+kernels              = repmat( {[3 5 6.5 11 16 NaN NaN]; [6.5 11 16 NaN NaN NaN NaN]}, size(sigma) );
 
 klabs                = cell(size(kernels));
 plot_formats         = {'png', 'fig'};
