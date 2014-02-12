@@ -438,9 +438,8 @@ function [s,fs] = do_analysis(model, ws, exts)
       fs{end} = sprintf('%s.mat', tempname());
   end;
 
-  keyboard;
   for pfi=1:length(exts)
-      ext = exts{pfi}
+      ext = exts{pfi};
       saveas(rcf, fs{3 * (pfi - 1) + 1}, ext);
       saveas(cnf, fs{3 * (pfi - 1) + 2}, ext);
       saveas(hsf, fs{3 * (pfi - 1) + 3}, ext);

@@ -12,16 +12,16 @@ nConnPerHidden_End   =    1*[  15];%   3  10   5   8   8   5  10  10   5   5   5
 hpl                  =    1*[   1];%   1   1   1   2   1   1   1   1   1   1   2   1];
 nHidden              = hpl.*[ 850];% 111 425 425 425 425 425 425 425 425 425 102 102];
 dataset_train        = repmat({'n'}, size(sigma));
-lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
+lambdas              = 0.0499*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
 zscore               = 0.05*ones(size(sigma));
-AvgError             = 1E-4*ones(size(sigma));
+AvgError             = 0.999E-4*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'weights'},size(sigma)); %weights, weighted_weights, or activity
 
 N                    = 20*ones(size(sigma));
-tag                  = repmat( {'natimg'}, size(sigma) );
+tag                  = repmat( {'natimg-img2pol'}, size(sigma) );
 
 iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sigma) );
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
@@ -33,7 +33,7 @@ iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sig
 %kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
-kernels              = repmat( {[8 8 8 8 0]; [0 0 0 0 0]}, size(sigma) );
+kernels              = repmat( {[8 8 8 8 NaN]; [NaN NaN NaN NaN NaN]}, size(sigma) );
 
 klabs                = cell(size(kernels));
 plot_formats         = {'png', 'fig'};
@@ -169,7 +169,7 @@ for si=1:length(lambdas)
 	if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
 	save(fullfile(ws.matdir, 'expt_sf'));
 
-  expt_analyze( models, wss, s );
+  expt_analyze( models, wss, s, plot_formats );
   close all;
 
   toc
