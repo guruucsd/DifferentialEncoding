@@ -31,11 +31,11 @@ function expt_analyze(models, wss, s, exts, force)
     end;
 
     % Collect stats on shapes
-    if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_shape_*.png')))==0)
-      [s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
-      if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
-      saveas_multiformat(f.shp,  fullfile(ws.plotdir, 'f_shape_map'), exts);
-    end;
+    %if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_shape_*.png')))==0)
+    %  [s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
+    %  if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    %  saveas_multiformat(f.shp,  fullfile(ws.plotdir, 'f_shape_map'), exts);
+    %end;
 
     % Collect spatial frequency info
     if (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_sf_*.png')))==0)
@@ -47,13 +47,13 @@ function expt_analyze(models, wss, s, exts, force)
     end;
 
     % Collect
-    if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_trn_*.png')))==0)
-      [s.trn,  f.trn ] = expt_trn( models, ws );
-      if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
-      for ii=1:length(f.trn)
-        saveas_multiformat(f.trn(ii).handle, fullfile(ws.plotdir, ['f_trn_' f.sf(ii).name]), exts);
-      end;
-    end;
+    %if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_trn_*.png')))==0)
+    %  [s.trn,  f.trn ] = expt_trn( models, ws );
+    %  if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    %  for ii=1:length(f.trn)
+    %    saveas_multiformat(f.trn(ii).handle, fullfile(ws.plotdir, ['f_trn_' f.sf(ii).name]), exts);
+    %  end;
+    %end;
 
     %[s.cxn,  f.cxn ] = expt_connections( models, ws, s.shp );
     %if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
@@ -68,7 +68,7 @@ function saveas_multiformat(h, fn, exts)
 
     for ei = 1:length(exts)
         ext = exts{ei};
-        saveas(h, fn, exts)
+        saveas(h, [fn '.' ext], ext)
     end;
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -239,7 +239,7 @@ function [ipd, fs] = expt_ipd( models, ws )
             if (isfield(ipd,'bins'))
                 ipd_hists(fi,:) = hist(d, ipd.bins)/length(d);
             else
-            	[ipd_hists(fi,:),ipd.bins] = hist(d, ipd.nbins)/length(d);
+                [ipd_hists(fi,:),ipd.bins] = hist(d, ipd.nbins)/length(d);
             end;
         end;
 
@@ -250,20 +250,20 @@ function [ipd, fs] = expt_ipd( models, ws )
         yl = [0 .5];
         xl = [ipd.bins(1)-0.5 ipd.bins(end)+0.5];
         for fi=1:nkernels
-			subplot(1,nkernels+1,fi);
-			bar(ipd.bins,ipd_hists(fi,:));
-			set(gca,'ylim',yl,'xlim',xl);
-			xlabel('inter-patch distance');
-			ylabel('proportion cxns');
-			title(sprintf('k(%d)',fi));
+            subplot(1,nkernels+1,fi);
+            bar(ipd.bins,ipd_hists(fi,:));
+            set(gca,'ylim',yl,'xlim',xl);
+            xlabel('inter-patch distance');
+            ylabel('proportion cxns');
+            title(sprintf('k(%d)',fi));
         end;
 
-		subplot(1,nkernels+1,nkernels+1);
-		bar(ipd.bins,ipd_hists(end,:)-ipd_hists(1,:));
-		set(gca,'xlim',xl);
-		xlabel('inter-patch distance');
-		ylabel('proportion cxns');
-		title('diff [k(end) - k(1)]');
+        subplot(1,nkernels+1,nkernels+1);
+        bar(ipd.bins,ipd_hists(end,:)-ipd_hists(1,:));
+        set(gca,'xlim',xl);
+        xlabel('inter-patch distance');
+        ylabel('proportion cxns');
+        title('diff [k(end) - k(1)]');
 
     end;
 
@@ -514,48 +514,48 @@ function [s, f] = expt_sf( models, wss )
 % NOTE: even though the networks were trained on different kernels,
 %   they are tested on images with the same kernel here.
 %
-  if (~exist('kernel','var')),   kernel = 0; end; %blurring kernel for test images
-  if (~exist('testsets','var')), testsets = {'natimg','sergent','cafe'}; end;
+    if (~exist('kernel','var')),   kernel = 0; end; %blurring kernel for test images
+    if (~exist('testsets','var')), testsets = {'natimg','sergent','cafe'}; end;
 
-  f = de_NewFig('dummy');
+    f = de_NewFig('dummy');
 
-  %
-  ws = wss{1}(1);
-  ws.kernels(end) = kernel;
+    %
+    ws = wss{1}(1);
+    ws.kernels(end) = kernel;
 
-  %
-  mSets    = models{end}(end);
-  for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
+    %
+    mSets    = models{end}(end);
+    for ii=1:length(models), mSets.sigma(ii) = models{ii}(1).sigma; end;
 
-  %
-  for ti=1:length(testsets)
-		fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
-      figs = de_NewFig('dummy');
-    ws.dataset_train.name = testsets{ti}; ws.dataset_test.name = testsets{ti};%ws.dataset_train;
-    [train,test] = create_dataset(ws, mSets, ws.nloops); % use the final
+    %
+    for ti=1:length(testsets)
+        fprintf('\nTesting datset %s on kernel[%dpx]:\n', testsets{ti}, kernel);
+        figs = de_NewFig('dummy');
+        ws.dataset_train.name = testsets{ti}; ws.dataset_test.name = testsets{ti};%ws.dataset_train;
+        [train, test] = create_dataset(ws, mSets, ws.nloops); % use the final
 
-		% Save the reconstructed images and frequency stats
-		%
-		%  NOTE: the models must be reversed.  Or... should they?  lol...
-		%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
-		%
-    s.(testsets{ti}).rimgs = cell(size(wss));
-    %selimg = round(linspace(1,size(test.X,2),16));
-    for ri=1:length(wss)
-      s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
-      figs = [figs de_PlotOutputImages(mSets, s.(testsets{ti}).rimgs{ri}, test.XLAB)];
+        % Save the reconstructed images and frequency stats
+        %
+        %  NOTE: the models must be reversed.  Or... should they?  lol...
+        %    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
+        %
+        s.(testsets{ti}).rimgs = cell(size(wss));
+        %selimg = round(linspace(1,size(test.X,2),16));
+        for ri=1:length(wss)
+            s.(testsets{ti}).rimgs(ri) = de_StatsOutputImages(models(ri), test, 1:size(test.X,2));
+            figs = [figs de_PlotOutputImages(mSets, s.(testsets{ti}).rimgs{ri}, test.XLAB)];
+        end;
+        s.(testsets{ti}).orig  = de_StatsFFTs( test, test.X(1:ws.inPix,:));  % original images
+        s.(testsets{ti}).model = de_StatsFFTs( test, s.(testsets{ti}).rimgs );
+        s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
+
+        % Plot the results
+        figs = [figs de_PlotFFTs(mSets, s.(testsets{ti}))];
+        for ii=1:length(figs) % rename figures so that figures across different datasets have differen tnames
+            figs(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, figs(ii).name);
+        end;
+        f = [f figs];
     end;
-    s.(testsets{ti}).orig  = de_StatsFFTs( test, test.X(1:ws.inPix,:));  % original images
-		s.(testsets{ti}).model = de_StatsFFTs( test, s.(testsets{ti}).rimgs );
-		s.(testsets{ti}).pals  = de_StatsFFTs_TTest( s.(testsets{ti}) );
-
-		% Plot the results
-		figs = [figs de_PlotFFTs(mSets, s.(testsets{ti}))];
-		for ii=1:length(figs) % rename figures so that figures across different datasets have differen tnames
-			figs(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, figs(ii).name);
-		end;
-		f = [f figs];
-  end;
 
 %%%%%%%%%%%%%%%%%%%%%%
 function [s, f] = expt_trn( models, ws, kernel )
@@ -571,10 +571,10 @@ function [s, f] = expt_trn( models, ws, kernel )
 
     if (~exist('kernel','var')), kernel = 1; end; %blurring kernel for test images
 
-    f = zeros(size(ws.train.X));
+    f = zeros(size(ws.fullfidel.X));
     G = fspecial('gaussian', [kernel kernel], 4);
     for ii=1:size(f,2)
-        fc      = reshape(ws.train.X(:,ii), ws.train.nInput);
+        fc      = reshape(ws.fullfidel.X(:,ii), ws.fullfidel.nInput);
         fc      = imfilter(fc,G,'same');
         f(:,ii) = reshape(fc, size(f(:,ii)));
     end;
@@ -586,36 +586,36 @@ function [s, f] = expt_trn( models, ws, kernel )
             model.Conn = model.ac.Conn;
             model.Weights = model.ac.Weights;
 
-            guru_assert(isfield(model,'absmean'));
-            guru_assert(isfield(model,'minmax'));
+            %guru_assert(isfield(model,'absmean'));
+            %guru_assert(isfield(model,'minmax'));
 
-			dset                = de_NormalizeDataset(struct('X', f), struct('ac',models{1}(1)));
-			X                   = dset.X;               % Input vectors;  [pixels examples]
-			X(end,:)            = dset.bias;            % Keep same bias value
-			Y                   = dset.X(1:end-1,:);    % everything but the bias
-			%dset = []; % parfor 'clear'
+            dset                = de_NormalizeDataset(struct('X', f), struct('ac',models{1}(1)));
+            X                   = dset.X;               % Input vectors;  [pixels examples]
+            X(end,:)            = dset.bias;            % Keep same bias value
+            Y                   = dset.X(1:end-1,:);    % everything but the bias
+            %dset = []; % parfor 'clear'
 
-		    mss{mi}             = guru_nnTrain(model, X, Y); %structure changes... so need to roll with that!
-		end;
-		models{ki} = [ mss{:} ];
+            mss{mi}             = guru_nnTrain(model, X, Y); %structure changes... so need to roll with that!
+        end;
+        models{ki} = [ mss{:} ];
     end;
 
 
-	% Save the reconstructed images and frequency stats
-	%
-	%  NOTE: the models must be reversed.  Or... should they?  lol...
-	%    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
-	%
-	s.rimgs = de_StatsOutputImages(models, de_NormalizeDataset(ws.test, struct('ac',models{1}(1))), 1:size(ws.test.X,2));
-	s.orig  = de_StatsFFTs( ws.test, ws.test.X);  % original images
-	s.model = de_StatsFFTs( ws.test, s.rimgs );
-	s.pals  = de_StatsFFTs_TTest( s );
+    % Save the reconstructed images and frequency stats
+    %
+    %  NOTE: the models must be reversed.  Or... should they?  lol...
+    %    [RH LH]... and we have [lsf hsf]... so ... no reversal, right?
+    %
+    s.rimgs = de_StatsOutputImages(models, de_NormalizeDataset(ws.test, struct('ac',models{1}(1))), 1:size(ws.test.X,2));
+    s.orig  = de_StatsFFTs( ws.test, ws.test.X);  % original images
+    s.model = de_StatsFFTs( ws.test, s.rimgs );
+    s.pals  = de_StatsFFTs_TTest( s );
 
-	% Plot the results
-	f = de_PlotFFTs(mSets, s);
-	for ii=1:length(f)
-		f(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, f_new(ii).name);
-	end;
+    % Plot the results
+    f = de_PlotFFTs(mSets, s);
+    for ii=1:length(f)
+        f(ii).name = sprintf('%s[%dpx]-%s', testsets{ti}, kernel, f_new(ii).name);
+    end;
 
 
 %%%%%%%%%%%%%%%%%%%%%%

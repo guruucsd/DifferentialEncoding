@@ -5,7 +5,7 @@ function [train,test] = create_dataset(ws, model, ii)
 
   % Full fidelity is 0
   if exist('ii','var') && ws.kernels(ii) ~= 0
-    if ws.kernels(ii)>0
+    if ws.kernels(ii) > 0 || isnan(ws.kernels(ii))
       opts = {ws.dataset_train.opts{:}, 'lowpass', ws.kernels(ii)};
     else
       opts = {ws.dataset_train.opts{:}, 'highpass', -ws.kernels(ii)};
