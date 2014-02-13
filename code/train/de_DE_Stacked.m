@@ -2,9 +2,11 @@ function [model] = de_DE_Stacked(model)
 %function [model] = de_DE_Stacked(model)
 %
 % Train differential encoder.
-%   Train autoencoder normally
-%   Train classifier with 4 layers, WITH modifiable weights on the input=>hidden layer of the autoencoder
-% Layers: autoencoder input, autoencoder hidden, p hidden, p Outputs
+%   First: train the autoencoder (with connectivity differences)
+%   Then: train a 4-layer classifier network:
+%      last 3 layers are normal (autoencoder hidden, classifier hidden, classifier output)
+%      first layer is the input layer of the autoencoder, with modifiable weights.
+%      Layers: autoencoder input, autoencoder hidden, p hidden, p Outputs
 %
 % Inputs:
 % model      : see de_model for details

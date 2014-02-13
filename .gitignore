@@ -1,3 +1,10 @@
-.mat
+*.mat
 nohup.out
+*.log
 *.m~
+*.fig
+*.png
+/results
+*.log
+*.out
+plots/

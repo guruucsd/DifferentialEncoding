@@ -1,3 +1,5 @@
+% This script is for determining connections and initial weights based on the developmental / pruning procedure
+
 clear all variables; clear all globals;
 addpath('..');
 

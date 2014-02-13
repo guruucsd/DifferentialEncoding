@@ -28,7 +28,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
-
   if (isfield(model, 'noise_input'))
     X_orig = X;
   end;
@@ -38,7 +37,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
         X      = X_orig + model.noise_input*(randn(size(X))); % mean 0 noise
-        % note: noise exists on bias as well?
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 
@@ -103,13 +101,13 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     if (ismember(10, model.debug)), fprintf('[%4d]: err = %6.4e\n', ip, currErr/numel(Y)); end;
 
     % Adjust the weights
-    guru_assert(~any(isnan(grad(:))));
+    %guru_assert(~any(isnan(grad(:))));
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
         %keyboard
         model.Weights = model.Weights .* (1-model.lambda);
     end;
-    guru_assert(~any(isnan(model.Weights(:))));
+    %guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))
         over_wts = abs(model.Weights)>model.wmax;
         model.Weights(over_wts) = sign(model.Weights(over_wts)) .* model.wmax;

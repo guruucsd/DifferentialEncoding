@@ -31,6 +31,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
   if (isfield(model, 'noise_input'))
     X_orig = X;
   end;
+
   for ip = 1:model.MaxIterations
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
@@ -130,8 +131,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);    
         model.Weights(huidx,1:(nInputs+1)) = model.Weights(huidx,1:(nInputs+1)) ./ repmat(actnorm,[1 nInputs+1]);
         %keyboard
-        
-
 
 
     elseif isfield(model, 'meanwt')
@@ -150,6 +149,28 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         huidx = huidx(totwt~=0);
         totwt = totwt(totwt~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.totwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(totwt,[1 nInputs+1]);
+        
+    elseif isfield(model, 'stdact')
+        inidx = [1:nInputs];
+        huidx = nInputs+1+[1:nHidden];
+        inacts = opc(inidx,:);
+        huacts = opc(huidx,:);
+        std_inact = std(abs(inacts),[],2);
+        std_huact = std(abs(huacts),[],2);
+
+        model.bc = 0.5;
+        model.bn=1;
+        % exponential decay
+        if ~exist('stdact','var'), stdact = zeros(size(std_huact)); end;
+        stdact = model.bc*std_huact+(1-model.bc)*stdact;
+        stdnorm = 1+model.bn*(stdact - model.stdact)./model.stdact;
+        fprintf('\tcurrent_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
+        %keyboard
+        %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
+        %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);    
+        model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1E-5.*model.Conn(huidx,inidx).*((stdnorm)*(std_inact-mean(std_inact))'./mean(std_inact)); %neg for too small
+        %keyboard
+        
     end;
     guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))

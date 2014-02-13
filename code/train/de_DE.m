@@ -1,7 +1,9 @@
 function [model] = de_DE(model)
 %function [model] = de_DE(model)
 %
-% Train differential encoder.
+% Train differential encoder
+%   first: train the autoencoder with connectivity differences
+%   then: train the classification network
 %
 % Inputs:
 % model      : see de_model for details
@@ -31,7 +33,6 @@ function [model] = de_DE(model)
         [model.ac.Conn, model.ac.Weights]    = de_connector(model);
     end;
 
-    model.nHidden
 
     % Train the model
     [model.ac] = guru_nnTrainAC(model.ac,X);
