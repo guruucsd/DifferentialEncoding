@@ -30,7 +30,7 @@ function [mSets,models,stats] = de_Simulator(expt, stimSet, taskType, opt, varar
 
   % Log the mapping between settings and integer to a text file,
   %   so we can easily look for this mapping later
-  %de_LogSettingsMap(mSets);
+  de_LogSettingsMap(mSets);
 
 
   % Train autoencoders

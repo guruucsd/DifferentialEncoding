@@ -17,17 +17,15 @@ function [success,mSets] = de_SaveAll(mSets, models, stats, figs)
   % Set up output location; always
   % create a new directory.
   if (~isfield(mSets.out, 'runspath')),    mSets.out.runspath    = repmat({'.'}, size(mSets.sigma)); end;
-  if (~isfield(mSets.out, 'resultspath')), mSets.out.resultspath = repmat({'.'}, size(mSets.sigma)); end;
-  if (~isfield(mSets.out, 'summarypath')), mSets.out.summarypath = '.'; end;
+  if (~isfield(mSets.out, 'resultspath')), mSets.out.resultspath = '.'; end;
   if (~isfield(mSets.out, 'files')),       mSets.out.files       = {}; end;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % Make sure output paths exist
-  if (~exist(mSets.out.summarypath, 'dir')), mkdir(mSets.out.summarypath); end;
+  if (~exist(mSets.out.resultspath, 'dir')), mkdir(mSets.out.resultspath); end;
   for si=1:length(mSets.sigma)
       if (~exist(mSets.out.runspath{si},    'dir')), mkdir(mSets.out.runspath{si}); end;
-      if (~exist(mSets.out.resultspath{si}, 'dir')), mkdir(mSets.out.resultspath{si}); end;
   end;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +40,7 @@ function [success,mSets] = de_SaveAll(mSets, models, stats, figs)
   % Save the stats
   if (exist('stats','var') && ~stats.cached)
     if (ismember(11, mSets.debug)), fprintf('Saving stats...'); end;
-    [mSets.out] = de_SaveSummaryStats(mSets, stats);
+    [mSets.out] = de_SaveStats(mSets, stats);
     if (ismember(11, mSets.debug)), fprintf('done.\n'); end;
   end;
 

@@ -24,8 +24,6 @@ function mSets = de_CreateModelSettings(varargin)
 
     mSets.out.dirstem = {};
     mSets.out.runspath = {};
-    mSets.out.resultspath = {};
-    mSets.out.summarypath = fullfile(base_resultspath, 'summary');
 
     if length(mSets.nHidden) == 1, mSets.nHidden = repmat(mSets.nHidden, size(mSets.sigma)); end;
     if length(mSets.nConns)  == 1, mSets.nConns  = repmat(mSets.nConns, size(mSets.sigma)); end;
@@ -44,9 +42,17 @@ function mSets = de_CreateModelSettings(varargin)
 
       % Append
         mSets.out.runspath{si}    = fullfile(base_runspath, mSets.out.dirstem{si});
-        mSets.out.resultspath{si} = fullfile(base_resultspath, mSets.out.dirstem{si});
     end;
 
+    % Put results 
+    unique_dirstems = unique(mSets.out.dirstem);
+    if length(unique_dirstems) == 1
+        mSets.out.resultspath = fullfile(base_resultspath, unique_dirstems{1});
+    else
+        mSets.out.resultspath = fullfile(base_resultspath, 'mixed_network_comparison');
+    end;
+    
+    %
     mSets.data.train = de_NormalizeDataset(mSets.data.train, mSets);
     mSets.data.test.bias = mSets.data.train.bias; %total hack... but otherwise, bias is different between train & test! :(
     mSets.data.test  = de_NormalizeDataset(mSets.data.test,  mSets);
