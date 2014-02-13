@@ -1,4 +1,4 @@
-function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt)
+function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs)
 % Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return 
 %   the filename and the dataset.
 %
@@ -10,6 +10,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 %   * 
 
     if ~exist('opt','var'), opt = {}; end;
+    if ~exist('show_figs', 'var'), show_figs = true; end;
 
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
@@ -60,21 +61,25 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 		[test]  = de_StimApplyOptions(test, opt, train);
 
 		% Visualize datasets
-		tr_figs = de_visualizeData(train);
-		te_figs = de_visualizeData(test);
-
+        if show_figs
+            tr_figs = de_visualizeData(train);
+            te_figs = de_visualizeData(test);
+        end;
+        
 		% Output everything (including images)
 		if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
 		  mkdir(guru_fileparts(dataFile,'pathstr'));
 		end;
 
-		figpath = guru_fileparts(dataFile,'path');
-		prefix  = guru_fileparts(dataFile, 'name');
-		for fi=1:length(tr_figs)
-		    saveas(tr_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-train.png']), 'png');
-		    saveas(te_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-test.png']), 'png');
-		end;
-
+        if show_figs
+            figpath = guru_fileparts(dataFile,'path');
+            prefix  = guru_fileparts(dataFile, 'name');
+            for fi=1:length(tr_figs)
+                saveas(tr_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-train.png']), 'png');
+                saveas(te_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-test.png']), 'png');
+            end;
+        end;
+        
 		save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
     end;
 
@@ -89,7 +94,6 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
 % dset_to_match is for any options that can take parameters from another dataset
 %   (so that they use the same information)
 %
-
     dset = de_StimApplyFiltering(dset, opts);
 
     dset = de_StimApplyTransform(dset, opts);
@@ -214,7 +218,7 @@ function dset = de_StimApplyFiltering(dset, opts)
     if (blurring > 0)
         for ii=1:size(dset.X,2)
            dset.X(:,ii) = reshape( imfilter(reshape(dset.X(:,ii), dset.nInput(1:2)), ...
-                                            fspecial('gaussian', [blurring blurring], 4), ...
+                                            fspecial('gaussian', 3*blurring*[1 1], blurring), ...
                                             'same'), ...
                                    [size(dset.X,1) 1] );
 

@@ -89,8 +89,8 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if (~isempty(taskType))
 	  [train.TIDX, train.TT]                    = de_indexStim(TALL, train.ST, idx);
 	  [train.ST, STIM, train.TIDX, train.TT]    = de_selectTask(taskType, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
-	  [train.ST, STIM, train.TIDX, train.TT]    = de_applyOptions(opt,    train.ST, STIM, TALL, train.TIDX, train.TT, idx);
 	  [train.X, train.ST, train.TIDX, train.TT] = de_createTrainingSets(stimSet, train.X, train.ST, TALL, train.TIDX, idx);
+	  [train.X, train.ST, train.TIDX, train.TT] = de_applyOptions(opt, train.X, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
 
 	  % Nail down targets for each taskdb
 	  [train.T]         = de_createTargets(taskType, train.ST, train.TT, idx);
@@ -244,11 +244,10 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [ST, STIM, TIDX, TT] = de_applyOptions(opt, ST, STIM, TALL, TIDX, TT, idx)
+  function [X, ST, TIDX, TT] = de_applyOptions(opt, X, ST, STIM, TALL, TIDX, TT, idx)
   %
   % Take a weighted stimulus training set, and apply some options to
   % shuffle inputs
-
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -4,4 +4,7 @@ nohup.out
 *.m~
 *.fig
 *.png
-results*
+/results
+*.log
+*.out
+plots/

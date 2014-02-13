@@ -6,16 +6,16 @@ function [stats_fft] = de_StatsFFTs(dset, images)
     % next two "massages" allow original image set
     if (~iscell(images)), images = {images}; end; 
     
-	switch ndims(images{1})
-		case 2          %     and reconstructed image sets to be processed by the same code
-			for ii=1:length(images)
-				images{ii} = reshape(images{ii}, [1 nInput, size(images{ii}, length(size(images{ii})))]);
-			end;
-		case 3
-			for ii=1:length(images)
-				images{ii} = reshape(images{ii}, [1 size(images{ii})]);
-			end;
-	end;
+    switch ndims(images{1})
+        case 2          %     and reconstructed image sets to be processed by the same code
+            for ii=1:length(images)
+                images{ii} = reshape(images{ii}, [1 nInput, size(images{ii}, length(size(images{ii})))]);
+            end;
+        case 3
+            for ii=1:length(images)
+                images{ii} = reshape(images{ii}, [1 size(images{ii})]);
+            end;
+    end;
 
 
     % Next, convert any polar images back to rectangular.
@@ -49,7 +49,7 @@ function [stats_fft] = de_StatsFFTs(dset, images)
     % Eeeverything, for original images
     %%%%%%%%%%%%%%%%%%
 
-	freqs_1D = guru_freq2to1(fftSz);
+    freqs_1D = guru_freq2to1(fftSz);
   
 
 
@@ -60,16 +60,16 @@ function [stats_fft] = de_StatsFFTs(dset, images)
     for ii=1:length(images)
         fprintf('\n\t[model instances]: ');
         
-    	nModels = size(images{ii},1);
-    	
+        nModels = size(images{ii},1);
+        
         % Declare variables
         ffts{ii}      = zeros([nModels nImages fftSz]);
         power1D{ii}   = zeros(length(sm_sigmas), nModels, length(freqs_1D));
         phase1D{ii}   = zeros(nModels, length(freqs_1D));
     
-		%%%%%%%%%%%%%%%%%%
-		% 2D Processing
-		%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%
+        % 2D Processing
+        %%%%%%%%%%%%%%%%%%
             
         for mi=1:size(images{ii}, 1)
             fprintf( '%d ', mi);
@@ -89,24 +89,30 @@ function [stats_fft] = de_StatsFFTs(dset, images)
         % 1D Processing
         %%%%%%%%%%%%%%%%%%
         
-        pwr = reshape( mean(     ffts{ii} .*conj(ffts{ii}),2), [nModels fftSz] );
-        phs = reshape( mean(real(ffts{ii})./imag(ffts{ii}),2), [nModels fftSz] );
-    
-        [phase1D{ii}] = guru_fft2to1( fftshift(phs), fftSz );
-        [pwr1D]            = guru_fft2to1( fftshift(pwr), fftSz );
+        mean_pwr = reshape( mean(     ffts{ii} .*conj(ffts{ii}),2), [nModels fftSz] );
+        mean_phs = reshape( mean(real(ffts{ii})./imag(ffts{ii}),2), [nModels fftSz] );
+        std_pwr  = reshape( std(      ffts{ii} .*conj(ffts{ii}),[], 2), [nModels fftSz] );
+        std_phs  = reshape( std( real(ffts{ii})./imag(ffts{ii}),[], 2), [nModels fftSz] );
+
+        [mean_pwr1D]       = guru_fft2to1( fftshift(mean_pwr), fftSz );
+        [mean_phase1D{ii}] = guru_fft2to1( fftshift(mean_phs), fftSz );
+        [std_pwr1D]        = guru_fft2to1( fftshift(std_pwr), fftSz );
+        [std_phase1D{ii}]  = guru_fft2to1( fftshift(std_phs), fftSz );
         
         fprintf('[1D freqs] ');
         for si=1:length(sm_sigmas)
         
             if (sm_sigmas(si)==0.0)
-                power1D{ii}(si, :, :) = pwr1D;
-        
+                mean_power1D{ii}(si, :, :) = mean_pwr1D;
+                std_power1D{ii}(si, :, :)  = std_pwr1D;
+
             % Smooth the power
             else
                 for fi=1:length(freqs_1D)
                     g = normpdf(freqs_1D, freqs_1D(fi), sm_sigmas(si)); % find gaussian at all points, centered around current
                     g = g/sum(g); % normalize weights to sum to 1
-                    power1D{ii}(si, :, fi)  = sum(pwr1D .* repmat(g, [nModels 1]), 2);
+                    mean_power1D{ii}(si, :, fi)  = sum(mean_pwr1D .* repmat(g, [nModels 1]), 2);
+                    std_power1D{ii}(si, :, fi)   = sum(std_pwr1D  .* repmat(g, [nModels 1]), 2);
                 end;
             end;
         end;
@@ -125,7 +131,9 @@ function [stats_fft] = de_StatsFFTs(dset, images)
     stats_fft.freqs_1D = freqs_1D/(padfactor+1);
     stats_fft.smoothing_sigmas = sm_sigmas;
     stats_fft.fftsz    = fftSz;
-    
-    stats_fft.power1D = power1D;
-    stats_fft.phase1D = phase1D;
+
+    stats_fft.power1D.mean = mean_power1D;
+    stats_fft.power1D.std  = std_power1D;
+    stats_fft.phase1D.mean = mean_phase1D;
+    stats_fft.phase1D.std  = std_phase1D;
     

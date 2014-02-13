@@ -28,6 +28,16 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
        hpl = 1;
     end;
     
+    % Connect input to output directly (zero hidden units)
+    %   by pretending there are sI hidden units, then
+    %   using those connections (at the bottom) to connect input->output
+    fake_zero = (sH==0);
+    if fake_zero
+       guru_assert(hpl==0);
+       sH = prod(sI);
+       hpl = 1;
+    end;
+    
     %
     parts       = mfe_split('-',distn);
     distn_name  = parts{1}; opts = parts(2:end); clear('parts');
@@ -268,6 +278,13 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         end;
     end;
      
+    if fake_zero
+        Con2 = zeros(2*inPix);
+        Con2(inPix+[1:inPix],1:inPix) = Con(inPix+[1:inPix],1:inPix);
+        Con2 = Con;
+        mu = [];
+    end;
+    
     if fake_zero
         Con2 = zeros(2*inPix);
         Con2(inPix+[1:inPix],1:inPix) = Con(inPix+[1:inPix],1:inPix);

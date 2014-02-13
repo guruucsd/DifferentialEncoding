@@ -8,25 +8,25 @@ function [pals] = de_StatsFFTs(stats)
     %   power spectrum according to the current Gaussian kernel,
     %   we need to do a statistical test at each frequency.
     %
-    if (length(stats.model.power1D)~=2)
+    if (length(stats.model.power1D.mean)~=2)
       pals = [];
       return;
     end;
     
-    nSig    = size(stats.model.power1D{1},1);
-    nModels = min( size(stats.model.power1D{1},2), size(stats.model.power1D{end},2) ); %match sample sizes
+    nSig    = size(stats.model.power1D.mean{1},1);
+    nModels = min( size(stats.model.power1D.mean{1},2), size(stats.model.power1D.mean{end},2) ); %match sample sizes
     
     %% 1D stats
-    nFreq1D    = size(stats.model.power1D{1},3);
+    nFreq1D    = size(stats.model.power1D.mean{1},3);
     pals.tt1D  = zeros(nSig,nFreq1D,1); sals = cell(nSig,nFreq1D,1);
 
     % Calc stats separately for each frequency
     for si=1:nSig
         for fi=1:nFreq1D
-            dta = [reshape(stats.model.power1D{1}  (si,1:nModels,fi), [nModels 1]), ...
-                   reshape(stats.model.power1D{end}(si,1:nModels,fi), [nModels 1]) ];
+            dta = [reshape(stats.model.power1D.mean{1}  (si,1:nModels,fi), [nModels 1]), ...
+                   reshape(stats.model.power1D.mean{end}(si,1:nModels,fi), [nModels 1]) ];
                    
-            dta = abs(dta - repmat( stats.orig.power1D{1}(si,1,fi), [nModels 2] ));
+            dta = abs(dta - repmat( stats.orig.power1D.mean{1}(si,1,fi), [nModels 2] ));
             
             [pals.an1D(si,fi)] =anova1( dta, {'rh','lh'}, 'off');
         end;

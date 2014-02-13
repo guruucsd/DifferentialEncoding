@@ -7,32 +7,37 @@ addpath(genpath('../../code'));
 de_SetupExptPaths('sergent_1982');
 
 sigma                =    1*[  10];%   6   6  15  15  15  30  20  20   2  30  10  10  10]; % Width of gaussian
-nConnPerHidden_Start =    1*[  36];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
-nConnPerHidden_End   =    1*[  12];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
-hpl                  =    1*[   2];%   1   1   1   2   1   1   1   1   1   1   2   1];
-nHidden              = hpl.*[ 408];% 111 425 425 425 425 425 425 425 425 425 102 102];
-dataset_train        =      repmat({'n'}, size(sigma));
-lambdas              = 0.05*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
+nConnPerHidden_Start =    1*[  30];%   6  15  10  15  15  60  20  15  10  10  60  10  20]; % # initial random connections to input (& output), per hidden unit
+nConnPerHidden_End   =    1*[  15];%   3  10   5   8   8   5  10  10   5   5   5   5  10]; % # post-pruning random connections to input (& output), per hidden unit
+hpl                  =    1*[   1];%   1   1   1   2   1   1   1   1   1   1   2   1];
+nHidden              = hpl.*[ 850];% 111 425 425 425 425 425 425 425 425 425 102 102];
+dataset_train        = repmat({'n'}, size(sigma));
+lambdas              = 0.0499*ones(size(sigma)); % Weight decay const[weights=(1-lambda)*weights]
 dnw                  =   false(size(sigma));
 zscore               = 0.05*ones(size(sigma));
-AvgError             = 1E-4*ones(size(sigma));
+AvgError             = 0.999E-4*ones(size(sigma));
 sz                   = repmat({'small'}, size(sigma));
 prune_loc            = repmat({'input'}, size(sigma)); %input or output
 prune_strategy       = repmat({'weights'},size(sigma)); %weights, weighted_weights, or activity
 
-N                    = 24*ones(size(sigma));
-tag                  = repmat( {'testing'}, size(sigma) );
+N                    = 20*ones(size(sigma));
+tag                  = repmat( {'natimg-img2pol'}, size(sigma) );
 
+iters_per            = repmat( {[10*ones(1,4) 25]; [ 10*ones(1,4) 25]}, size(sigma) );
 %iters_per            = repmat( {[10*ones(1,4) 25]; [ 5 5 5 5 25]}, size(sigma) );
 %iters_per            = repmat( {[20 1]; [20 1]}, size(sigma) );
 %iters_per            = repmat( {[4*ones(1,10) 1]; [4*ones(1,10) 1]}, size(sigma) );
-iters_per            = repmat( {[4*ones(1,10) 50]; [1*ones(1,5) 7*ones(1,5) 50]}, size(sigma) );
-kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(1.5,20,5) zeros(1,5) 0]}, size(sigma) );
+%iters_per            = repmat( {[4*ones(1,10) 50]; [1*ones(1,5) 7*ones(1,5) 50]}, size(sigma) );
+%kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(1.5,20,5) zeros(1,5) 0]}, size(sigma) );
 %kernels              = repmat( {[linspace(1.5,20,10) 0]; [linspace(-20,-1.5,10) 0]}, size(sigma) );
 %kernels              = repmat( {[linspace(1.5,10,10) 0]; [zeros(1,10) 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 0]; [0 0]}, size(sigma) );
 %kernels              = repmat( {[1.5 3 6 12 0];[0 0 0 0 0]}, size(sigma) );
+kernels              = repmat( {[8 8 8 8 NaN]; [NaN NaN NaN NaN NaN]}, size(sigma) );
+
 klabs                = cell(size(kernels));
+plot_formats         = {'png', 'fig'};
+
 
 for ii=1:size(kernels,2)
     nkernels(ii)     = size(kernels,1);
@@ -49,8 +54,8 @@ mSets.lrrev          = false;
 
 for si=1:length(lambdas)
 
-	mSets.sigma                = sigma(si);  
-	mSets.nConnPerHidden_Start = nConnPerHidden_Start(si);  
+	mSets.sigma                = sigma(si);
+	mSets.nConnPerHidden_Start = nConnPerHidden_Start(si);
 	mSets.nConnPerHidden_End   = nConnPerHidden_End(si);
 	mSets.lambda               = lambdas(si);
 	mSets.hpl                  = hpl(si);
@@ -58,7 +63,7 @@ for si=1:length(lambdas)
 	mSets.AvgError             = AvgError(si);
 	mSets.zscore               = zscore(si);
 
-	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si)}});
+	ws.dataset_train = struct('name', dataset_train{si}, 'opts', {{sz{si} 'dnw', dnw(si), 'img2pol'}});
   ws.N         = N(si);
   ws.iters_per = iters_per(:,si);
   ws.tag       = tag{si};
@@ -70,15 +75,15 @@ for si=1:length(lambdas)
 	ws.scriptdir   = guru_fileparts(pwd,'name');
 	ws.desc        = sprintf('%s.sig%02dc%02dto%02dnH%04dx%d.%s', sz{si}, round(mSets.sigma), mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.nHidden/mSets.hpl, mSets.hpl, dataset_train{si});
 	[~,ws.homedir] = unix('echo $HOME'); ws.homedir = strtrim(ws.homedir);
-        ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
-	ws.pngdir      = fullfile('png', ws.tag, ws.desc); %sprintf('png-%s', ws.desc);
-		
-	
+    ws.matdir      = fullfile(ws.homedir, '_cache/scripts', ws.scriptdir, 'runs', dataset_train{si}, ws.tag, ws.desc);
+	ws.plotdir     = fullfile('plots', ws.tag, ws.desc); %sprintf('plots-%s', ws.desc);
+
+
 
 	%%%%%%%%%%%%%%%%%
 	% Run simulations & collect data
 	%%%%%%%%%%%%%%%%%
-	
+
 	fns = cell(ws.N,ws.nkernels);
         wss = cell(ws.N, ws.nkernels);
         fi=0; ni=0;
@@ -88,7 +93,7 @@ for si=1:length(lambdas)
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
 	%parallel
-        parfor mi=1:ws.nkernels*ws.N %lsf,msf,hsf	
+        for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
             fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
             wss{mi} = ws;
@@ -100,24 +105,29 @@ for si=1:length(lambdas)
 		end;
 
                 wss{mi}.kernels   = kernels{fi,si};
-	        wss{mi}.iters_per = iters_per{fi,si};	
+	        wss{mi}.iters_per = iters_per{fi,si};
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
 		curmodel.ni       = ni;
 		curmodel.randSeed = ni;
-		
-		[curmodel,wss{mi},s,fs] = autoencoder(curmodel, wss{mi});      % run the script
+
+		[curmodel,wss{mi},s,fs] = autoencoder(curmodel, wss{mi}, plot_formats);      % run the script
 		close all;        % close figures
+
 		% Move output
 		if (~exist(wss{mi}.matdir,'dir')), mkdir(wss{mi}.matdir); end;
-		unix( ['mv "' fs{4} '" "' fns{mi} '"'] );
-	
-		if (~exist(wss{mi}.pngdir,'dir')), mkdir(wss{mi}.pngdir); end;
-		unix( ['mv "' fs{1} '" "' fullfile(wss{mi}.pngdir, sprintf('z_recon-%s-%d.png', wss{mi}.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{2} '" "' fullfile(wss{mi}.pngdir, sprintf('z_conn-%s-%d.png',  wss{mi}.klabs{fi}, ni)) '"'] );
-		unix( ['mv "' fs{3} '" "' fullfile(wss{mi}.pngdir, sprintf('z_hist-%s-%d.png',  wss{mi}.klabs{fi}, ni)) '"'] );
+		unix( ['mv "' fs{end} '" "' fns{mi} '"'] );
+
+		if (~exist(wss{mi}.plotdir,'dir')), mkdir(wss{mi}.plotdir); end;
+        for pfi=1:length(plot_formats)
+            fmt = plot_formats{pfi};
+
+            unix( ['mv "' fs{3 * (pfi - 1) + 1} '" "' fullfile(wss{mi}.plotdir, sprintf('z_recon-%s-%d.%s', wss{mi}.klabs{fi}, ni)) '"'] );
+            unix( ['mv "' fs{3 * (pfi - 1) + 2} '" "' fullfile(wss{mi}.plotdir, sprintf('z_conn-%s-%d.%s',  wss{mi}.klabs{fi}, ni)) '"'] );
+            unix( ['mv "' fs{3 * (pfi - 1) + 3} '" "' fullfile(wss{mi}.plotdir, sprintf('z_hist-%s-%d.%s',  wss{mi}.klabs{fi}, ni)) '"'] );
+        end;
 	end;
-	
+
 	% Collect stats
 	s.dist_orig_full = cell(ws.nkernels,ws.N);
 	s.dist_end_full  = cell(ws.nkernels,ws.N);
@@ -127,27 +137,27 @@ for si=1:length(lambdas)
 
 	for fi=1:ws.nkernels
 		for ni=1:ws.N
-			ld = load(fns{ni,fi}, 'model', 's', 'ws'); 
+			ld = load(fns{ni,fi}, 'model', 's', 'ws');
 
             		model                   = ld.model;
 			s.dist_orig_full{fi,ni} = vertcat(ld.s.dist_orig{:});
 			s.dist_end_full {fi,ni} = vertcat(ld.s.dist_end{:});
-			
+
 			model.debug = mSets.debug;
-			
+
 			% Hacky fix-up on load
 			if (~isfield(model, 'lrrev')),      model.lrrev = false; end;
 			if (~isfield(model, 'randSeed')),   model.randSeed = ni; end;
 			if (isfield(model, 'reductRate')),  model = rmfield(model, 'reductRate'); end;
-			
+
 			% Massage model
 			model.ac.Weights   = model.Weights;  model = rmfield(model, 'Weights');
 			model.ac.Conn      = model.Conn;     model = rmfield(model, 'Conn');
 			model.ac.errorType = model.errorType;
 			model.ac.XferFn    = model.XferFn;
 			%fprintf('Loaded results from %s\n', fns{ni,fi});
-	
-			
+
+
 			models        {fi}    = [models{fi} model];
       wss{fi} = [wss{fi} ld.ws];
       %s.model{fi} = [s.model{fi} ld.s.model];
@@ -159,9 +169,9 @@ for si=1:length(lambdas)
 	if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
 	save(fullfile(ws.matdir, 'expt_sf'));
 
-  expt_analyze( models, wss, s );
+  expt_analyze( models, wss, s, plot_formats );
   close all;
-    
+
   toc
   fprintf('\n\n');
 end;
