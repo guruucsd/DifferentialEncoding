@@ -1,6 +1,6 @@
-function stats = de_LoadStats(mSets, mss)
+function stats = de_LoadSummaryStats(mSets, mss)
 
-  if (~exist(de_GetOutFile(mSets, 'stats', mSets.runs), 'file'))
+  if (~exist(de_GetOutFile(mSets, 'summary-stats', mSets.runs), 'file'))
       stats = [];
 
   else
@@ -20,7 +20,7 @@ function stats = de_LoadStats(mSets, mss)
       else
           fprintf('Loading cached stats...\n');
           
-          load( de_GetOutFile(mSets, 'stats'), 'stats' );
+          load( de_GetOutFile(mSets, 'summary-stats'), 'stats' );
       
 		  % Invalidate any stats that are marked
 		  if (~all_ac), 

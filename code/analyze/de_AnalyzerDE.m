@@ -6,7 +6,7 @@ function [stats, figs, mss]  = de_AnalyzerDE(mSets, mss, rej)
   mss = num2cell(mss, 1);
 
   % Load cached if they exist; only non-present stats will be rerun
-  stats = de_LoadStats( mSets, mss );
+  stats = de_LoadSummaryStats( mSets, mss );
   figs  = de_LoadFigs( mSets, stats ); % currently always fails to find cached figs
   
   
