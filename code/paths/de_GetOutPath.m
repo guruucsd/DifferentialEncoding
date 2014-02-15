@@ -70,24 +70,16 @@ function outdir = de_GetOutPath(model, dirType)
     % Top-level output directory for trained models and analysis stats.
     %   sub-directories will be more specific
     case {'runs'}
-      % NOTE: this may now break, as dirstem may have
-      % multiple values.
       if (isempty(model))
           outdir = fullfile(de_GetOutPath(model, 'cache'), 'runs');
-      elseif (~guru_findstr(model.out.dirstem, model.out.runspath))
-        outdir = fullfile(model.out.runspath, model.out.dirstem);
       else
         outdir = model.out.runspath;
       end;
 
     % Main output directory for analysis summaries and plots (i.e. human-readable!)
     case {'results', 'plot', 'summary', 'stats', 'settings-map'}
-      % NOTE: this may now break, as dirstem may have
-      % multiple values.
       if (isempty(model))
           outdir = fullfile(de_GetBaseDir(), 'results');
-      elseif (~guru_findstr(model.out.dirstem, model.out.resultspath))
-        outdir = fullfile(model.out.resultspath, model.out.dirstem);
       else
         outdir = model.out.resultspath;
       end;

@@ -93,12 +93,16 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
       warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
       keyboard
       break;
+
+    elseif any(isnan(grad(:)))
+        warning(sprintf('Gradient had nan values on iteration %d; have to exit!', ip));
+        break;
     end;
 
+    %guru_assert(~any(isnan(grad(:))), 'Gradient should never contain nan');
     if (ismember(10, model.debug)), fprintf('[%4d]: err = %6.4e\n', ip, currErr/numel(Y)); end;
 
     % Adjust the weights
-    guru_assert(~any(isnan(grad(:))));
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
         model.Weights = model.Weights .* (1-model.lambda);
@@ -107,7 +111,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
-        
+
         huidx = huidx(meanact~=0);
         meanact = meanact(meanact~=0);
         keyboard;
@@ -123,9 +127,9 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         avgact = model.bc*meanact+(1-model.bc)*avgact;
         actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
         %fprintf('avgact=%f, actnorm=%f\n',mean(avgact(find(avgact))), mean(actnorm(find(avgact))));
-        
+
         %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
-        huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);    
+        huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.Weights(huidx,1:(nInputs+1)) ./ repmat(actnorm,[1 nInputs+1]);
         %keyboard
 
@@ -146,7 +150,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         huidx = huidx(totwt~=0);
         totwt = totwt(totwt~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.totwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(totwt,[1 nInputs+1]);
-        
+
     elseif isfield(model, 'stdact')
         inidx = [1:nInputs];
         huidx = nInputs+1+[1:nHidden];
@@ -164,12 +168,12 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         fprintf('\tcurrent_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
         %keyboard
         %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
-        %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);    
+        %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);
         model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1E-5.*model.Conn(huidx,inidx).*((stdnorm)*(std_inact-mean(std_inact))'./mean(std_inact)); %neg for too small
         %keyboard
-        
+
     end;
-    guru_assert(~any(isnan(model.Weights(:))));
+    guru_assert(~any(isnan(model.Weights(:))), 'None of the weights should ever be nan');
     if (isfield(model, 'wmax'))
         over_wts = abs(model.Weights)>model.wmax;
         model.Weights(over_wts) = sign(model.Weights(over_wts)) .* model.wmax;
