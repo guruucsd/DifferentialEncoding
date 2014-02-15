@@ -1,10 +1,15 @@
 % Demo of 1D frequency filtering on 2D image
 
-addpath(genpath('../../code'))
+addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
+
+CAFE_dir = '~/datasets/CAFE/raw';
+if ~exist(CAFE_dir, 'dir'),
+    error('You must have the CAFE dataset available at %s', CAFE_dir);
+end;
 
 % Load a face & compute fft
 cutoff_freq = 10;
-img = mfe_getpgmraw('~/datasets/CAFE/raw/032_s2.pgm');
+img = mfe_getpgmraw(fullfile(CAFE_dir, '032_s2.pgm'));
 fq  = fft2(img);
 
 [f1D,f1D_map] = guru_freq2to1(size(img));

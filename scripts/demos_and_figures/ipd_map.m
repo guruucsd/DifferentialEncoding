@@ -1,4 +1,4 @@
-% Create a 3D surface plot that shows ipd as a function of sigma and nconn
+%% Create a 3D surface plot that shows ipd as a function of sigma and nconn
 
 fc_map = [];
 nn_map = [];
@@ -28,6 +28,10 @@ for si=1:length(sigmas)
     end;
 end;
 
+lin100 = [1.05 5; 2.2 10; 3.3 15; 4.1 20; 5 25; 6.2 30; 7.25 35; 8 40; 8.9 45; 9 50];
+lin150 = [2.2 5; 4.9 10; 7.1 15; 9.1 20; 11.5 25; 13.5 30; 15.9 35; 18 40; 20 45];
+lin182 = [3.5 5; 7 10; 10.5 15; 14 20; 17 25; 20 30];
+
 figure('Position', [115         396        1128         382]);
 
 [X, Y] = meshgrid( nconns, sigmas );
@@ -45,4 +49,5 @@ surf(X, Y, nn_map);
 xlabel('nconn')
 ylabel('sigma')
 zlabel('average iter-point distance');
+
 
