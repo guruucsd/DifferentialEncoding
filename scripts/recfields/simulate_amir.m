@@ -11,25 +11,28 @@ switch expt
         sigmas = [1 2 4 8 16 32 64 128];%
         cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
         nconns = ceil(2*linspace(5,25, length(sigmas))); %[1 1 1 1 1  1  1  1]*10;
-        nsamps = 50;
+        nsamps = 1;
     case {2, '2'}, 
         sz = [35 35];
         sigmas = [1 2 4 8 16 32 64 128];%
         cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
         nconns = ceil(2*linspace(5,5, length(sigmas))); %[1 1 1 1 1  1  1  1]*10;
-        nsamps = 50;
+        nsamps = 2;
+    otherwise, error('Unknown expt: %d', expt)
 end;
 
 % get paths
 cur_dir = fileparts(which(mfilename));
 matfile = fullfile(cur_dir, sprintf('%s-%d.mat', mfilename(), expt));
 
-% Add path
-if ~exist('guru_csprintf','file'), addpath(genpath(fullfile(cur_dir, '../../../'))); end;
+% Add paths
+if ~exist('guru_csprintf','file'), addpath(genpath(fullfile(cur_dir, '../../../_lib'))); end;
+if ~exist('de_calc_nn_dist','file'), addpath(genpath(fullfile(cur_dir, '../../code'))); end;
 
 
 % Load a cached result
 if exist(matfile, 'file')
+    fprintf('Loading previous results from %s\n', matfile);
     load(matfile);
 end;
 
@@ -113,7 +116,7 @@ for szi=1:length(sigmas)
     end;
     dff = (mean(p{szi}(1).nn_dist)-mean(p{szi}(end).nn_dist))/((mean(p{szi}(1).nn_dist)+mean(p{szi}(end).nn_dist))/2);
     
-    fprintf('\tActual difference: %5.2f%% difference.\n', dff)
+    fprintf('\tActual difference: %5.2f%% difference.\n', 100*abs(dff));
 
 
     % non-normalized: scale to peak frequency (irrespective)
