@@ -43,15 +43,16 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
     end;
 
     % Show the surface
-    subplot(3,1,si);
+    subplot(3, 1, 1 + (si > 1));
     de_PlotDistributions1D_subplot(squeeze(distn_img(si,:,:)), dist1D, bins, datalbl);
   end;
 
   subplot(3,1,3);
-  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)), dist1D, bins, datalbl);
+  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img([1 end], :, :),1)), dist1D, bins, datalbl);
+
 
 function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
-
+%
   imagesc(distn_img, [-0.5 0.5]);
   ylabel(sprintf('P(%s)', datalbl)); xlabel('distance');
   set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(bins(get(gca,'ytick')))));
@@ -67,9 +68,9 @@ function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
   data_hist2  = histc(data{end}(:), bins)/numel(data{end});
   data_hist_diff = data_hist1-data_hist2;
 
-  subplot(1,3,1);bar(bins, data_hist1);
-  subplot(1,3,2);bar(bins, data_hist2);
-  subplot(1,3,3);bar(bins, data_hist_diff);
+  subplot(1,3,1); bar(bins, data_hist1);
+  subplot(1,3,2); bar(bins, data_hist2);
+  subplot(1,3,3); bar(bins, data_hist_diff);
 
 
 function fig = de_PlotMeanDistributions2D(mSets, data, figname)

@@ -10,13 +10,13 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
           return;
       else
           ftp = {'fft-1D-log' ...                   % original 1d curves
-                 'fft-1D-err-diff' ...
-                 'fft-2D-log-diff-orig' ...         % 2D, each difference from original images
-                 'fft-2D-log-diff-pct' ...          % 2D, difference from each other
+                 ...'fft-1D-err-diff' ...
+                 ...'fft-2D-log-diff-orig' ...         % 2D, each difference from original images
+                 ...'fft-2D-log-diff-pct' ...          % 2D, difference from each other
                  'fft-1D-log-diff-pct-smoothed' ...
-                 'fft-1D-log-diff-smoothed-stats' ...
-                 'fft-1D-statsig-freq-imgs-smooth-rh' ...
-                 'fft-1D-statsig-freq-imgs-smooth-lh' ...
+                 ...'fft-1D-log-diff-smoothed-stats' ...
+                 ...'fft-1D-statsig-freq-imgs-smooth-rh' ...
+                 ...'fft-1D-statsig-freq-imgs-smooth-lh' ...
                  'fft-2D-statsig-recon' ...
                  'fft-2D-log-diff-statsig' };
       end;
@@ -70,13 +70,6 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
       %%%%%%%%%%%%%%%%%%%
       % Log-power (1D; models vs orig)
       if (strcmp(ftp{fi}, 'fft-1D-log'))
-          subplot(2,1,2);
-          %semilogy(ffts.freqs_1D, log10(1+[avgPowerOrig_1D_std]))
-          %set(gca,'xlim', ffts.freqs_1D([1 end]));
-          %legend('Orig'); xlabel('spatial frequency (cycles)'); ylabel('std(Power) (log_{10} scale)');
-          %title('1D frequency spectrum STD (log(power+1))');
-
-          subplot(2,1,1);
           semilogy(ffts.freqs_1D, log10(1+[avgPowerModelRH_1D; avgPowerModelLH_1D; avgPowerOrig_1D]))
           set(gca,'xlim', ffts.freqs_1D([1 end]));
           legend(lgnd{:}, 'Orig'); xlabel('spatial frequency (cycles)'); ylabel('Power (log_{10} scale)');
@@ -345,10 +338,14 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
               % Calculate the mean diff,
               %   up and down 1 sd as well
               %
+              nModels = [size(ffts.model1D.power{1}, 2), size(ffts.model1D.power{end}, 2)];
               pMean2 = [reshape(mean(ffts.model1D.power{1}(si,:,:),2), size(ffts.freqs_1D)); ...
                         reshape(mean(ffts.model1D.power{end}(si,:,:),2), size(ffts.freqs_1D))]; %average over models
-              pStd2  =  reshape(std (ffts.model1D.power{1}(si,:,:),0,2), size(ffts.freqs_1D)) ...
-                      + reshape(std (ffts.model1D.power{end}(si,:,:),0,2), size(ffts.freqs_1D)); %std
+              % Standard deviation of the mean
+              pStd2  =  sqrt( ...
+                  reshape(std (ffts.model1D.power{1}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(1) ...
+                  + reshape(std (ffts.model1D.power{end}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(2) ...  %std
+              );
 
               % Follow the logic:
               %   This is ERROR, so SMALLER IS BETTER.
@@ -358,18 +355,14 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
               d_o        = [ pMean2(1,:) - reshape(ffts.orig1D.power(si,:,:), size(ffts.freqs_1D));   % RH
                              pMean2(2,:) - reshape(ffts.orig1D.power(si,:,:), size(ffts.freqs_1D)) ]; % LH
               pm2d_o     =   abs(d_o(2,:)) - abs(d_o(1,:));   % LH_err-RH_err => pos means LESS ERROR/better job by RH!
-              pm2d_up1_o = pm2d_o+pStd2;
-              pm2d_dn1_o = pm2d_o-pStd2;
+              %pm2d_up1_o = pm2d_o+pStd2;% / sqrt(mean(nModels));
+              %pm2d_dn1_o = pm2d_o-pStd2;% / sqrt(mean(nModels));
 
-              pm2d = pm2d_o; pm2d_up1 = pm2d_up1_o; pm2d_dn1 = pm2d_dn1_o;
+              %pm2d = pm2d_o; pm2d_up1 = pm2d_up1_o; pm2d_dn1 = pm2d_dn1_o;
 
-              %pm2d    (abs(pm2d_o)<1)=1;     % any difference that's small, just call it zero,
-              %pm2d_up1(abs(pm2d_up1_o)<1)=1; %   so we don't have to deal with sign flipping
-              %pm2d_dn1(abs(pm2d_dn1_o)<1)=1;
-
-              pm2d     = sign(pm2d)    .*log10(1+abs(pm2d));
-              pm2d_up1 = sign(pm2d_up1).*log10(1+abs(pm2d_up1));
-              pm2d_dn1 = sign(pm2d_dn1).*log10(1+abs(pm2d_dn1));
+              %pm2d     = sign(pm2d)    .*log10(1+abs(pm2d));
+              %pm2d_up1 = sign(pm2d_up1).*log10(1+abs(pm2d_up1));
+              %pm2d_dn1 = sign(pm2d_dn1).*log10(1+abs(pm2d_dn1));
 
               %%%%%%%%%%%%%%%%%%%
               % Log-power (difference between models)
@@ -424,25 +417,18 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
                     end;
                   end;
 
-                  % can put orig here as well
-                  pm2d_pct = pm2d_o ./ smoothed_power_orig; % this needs to be smoothed!
-                  pm2d_up1_pct = pm2d_up1_o ./ smoothed_power_orig;
-                  pm2d_dn1_pct = pm2d_dn1_o ./ smoothed_power_orig;
+                  guru_std_plot( ...
+                      ffts.freqs_1D,        ... %x
+                      100 * pm2d_o ./ smoothed_power_orig, ...  % ymean
+                      100 * pStd2 ./ smoothed_power_orig,  ...  %ystd
+                      ffts.pals.an1D(si,:), ...  % xstats
+                      0.05,                 ...  %thresh
+                      'log10p1'             ...  % log10(1+) xform
+                  );
 
-                  h = []; %to pass to legend
-
-                  plot(ffts.freqs_1D, zeros(size(ffts.freqs_1D)), 'k', 'LineWidth', 2.0);
-                  h(end+1) = plot(ffts.freqs_1D, pm2d_pct, 'b', 'LineWidth', 4.0);
-                  h(end+1) = plot(ffts.freqs_1D, pm2d_up1_pct, 'r--', 'LineWidth', 2.0);
-                             plot(ffts.freqs_1D, pm2d_dn1_pct, 'r--', 'LineWidth', 2.0);
-
-                  legend(h, {'mean', 'std'}, 'Location', 'NorthEast');
                   title(sprintf('RH (\\sigma=%3.2f) - LH (\\sigma=%3.2f) (smooth_{\\sigma}=%3.2f)', mSets.sigma(1), mSets.sigma(end), sig));
                   xlabel('spatial frequency (cycles/image)');
                   ylabel('% greater log(power+1) encoded');
-
-                  yl = [-1 1] * max([abs(min(pm2d_dn1_pct)), abs(max(pm2d_up1_pct))]);
-                  set(gca,'xlim', ffts.freqs_1D([1 end]), 'ylim',yl);
               end;
 
 
@@ -452,101 +438,18 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
                   figures(end+1) = de_NewFig( sprintf('%s-%3.2f', ftp{fi}, sig) );
                   hold on;
 
-                  % Now that we've done the statistical tests,
-                  %   select only the frequencies that show a "significant"
-                  %   difference.
-                  good_idx = ffts.pals.an1D(si,:)<=0.05;
-                  bad_idx  = ffts.pals.an1D(si,:)>0.05;
+                  guru_std_plot( ...
+                      ffts.freqs_1D,        ... %x
+                      pm2d_o,               ...  % ymean
+                      pStd2,                ...  %ystd
+                      ffts.pals.an1D(si,:), ...  % xstats
+                      0.05,                 ...  %thresh
+                      'log10p1'             ...  % log10(1+) xform
+                  );
 
-                  % In order to visualize the stats, we want to highlight
-                  %   bands of statistically significant frequencies
-                  %   all within the same polygon.
-                  %
-                  % This code figures out the x-range of each of those polygons,
-                  %   and then the (x,y) coordinates of each point that makes
-                  %   up that polygon
-                  %
-                  last_zero = 0;
-                  for i=1:length(good_idx)
-                    if i<length(good_idx) && ...
-                       good_idx(i)==1, continue; end;
-
-                    % we're at a zero.
-
-                    % if previous idx=1, then we need to draw polygon
-                    if (i>1 && good_idx(i-1)==1)
-                      if (last_zero==0), drawidx = [1:i];
-                      else,              drawidx = [last_zero:i];
-                      end;
-                      fr = ffts.freqs_1D(drawidx);
-                      up = pm2d_up1(drawidx);
-                      dn = pm2d_dn1(drawidx);
-
-                      % This is right-shifted; we need to center if possible.
-                      if (last_zero>0)
-                        fr = [mean(fr(1:2)) fr(2:end)];
-                        up = [mean(up(1:2)) up(2:end)];
-                        dn = [mean(dn(1:2)) dn(2:end)];
-                      end;
-                      if (i<length(good_idx))
-                        fr = [fr(1:end-1) mean(fr(end-1:end))];
-                        up = [up(1:end-1) mean(up(end-1:end))];
-                        dn = [dn(1:end-1) mean(dn(end-1:end))];
-                      else
-                        fr = fr(1:end-1);
-                        up = up(1:end-1);
-                        dn = dn(1:end-1);
-                      end;
-
-                      fill( [fr fr(end:-1:1)], [up dn(end:-1:1)], 'y' );
-                    end;
-
-                    last_zero = i;
-                  end;
-
-                  h = []; %to pass to legend
-
-                  plot(ffts.freqs_1D, zeros(size(ffts.freqs_1D)), 'k', 'LineWidth', 2.0);
-                  h(end+1) = plot(ffts.freqs_1D, pm2d, 'b', 'LineWidth', 4.0);
-                  h(end+1) = plot(ffts.freqs_1D, pm2d_up1, 'r--', 'LineWidth', 2.0);
-                             plot(ffts.freqs_1D, pm2d_dn1, 'r--', 'LineWidth', 2.0);
-
-                  legend(h, {'mean', 'std'}, 'Location', 'NorthEast');
                   title(sprintf('RH (\\sigma=%3.2f) - LH (\\sigma=%3.2f) (smooth_{\\sigma}=%3.2f)', mSets.sigma(1), mSets.sigma(end), sig));
                   xlabel('spatial frequency (cycles/image)');
                   ylabel('Difference of log_{10}(power+1) encoded');
-
-                  yl = [min(pm2d_dn1) max(pm2d_up1)];
-                  if (~any(yl)), yl=eps*[-1 1]; end;
-                  set(gca,'xlim', ffts.freqs_1D([1 end]), 'ylim',yl);
-              end;
-
-
-              %%%%%%%%%%%%%%%%%%%
-              % Plot 1D diff, with stats highlighted
-              if (strcmp(ftp{fi}, 'fft-1D-ratio-smoothed'))
-                  figures(end+1) = de_NewFig( sprintf('%s-%3.2f', ftp{fi}, sig) );
-                  hold on;
-error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and negative, so RH and LH ratio can be on the same scale.');
-                  r    = abs(d_o(1,:)./d_o(2,:));
-                  %r    = abs(d_o(2,:)) - abs(d_o(1,:)); %LH_err-RH_err; + means better RH
-                  %rstd = reshape(std (ffts.model1D.power{1}(si,:,:)./ffts.model1D.power{end}(si,:,:),0,2), size(ffts.freqs_1D)); %std
-                  h = []; %to pass to legend
-
-                  plot(ffts.freqs_1D, ones(size(ffts.freqs_1D)), 'k', 'LineWidth', 2.0);
-                  h(end+1) = plot(ffts.freqs_1D, r, 'b', 'LineWidth', 4.0);
-                  %h(end+1) = plot(ffts.freqs_1D, r+rstd, 'r--', 'LineWidth', 2.0);
-                  %           plot(ffts.freqs_1D, r-rstd, 'r--', 'LineWidth', 2.0);
-
-                  legend(h, {'mean'}, 'Location', 'NorthEast');
-                  title(sprintf('RH (\\sigma=%3.2f) - LH (\\sigma=%3.2f) (smooth_{\\sigma}=%3.2f)', mSets.sigma(1), mSets.sigma(end), sig));
-                  xlabel('spatial frequency (cycles/image)');
-                  ylabel('Ratio of log_{10}(power+1) encoded');
-
-                  yl = max( [min(abs(r)) max(abs(r))] ); yl = [-yl yl];
-                  %yl = [0 2];%max(abs(1-[min(r) max(r)])); yl = [1-yl 1+yl];
-                  if (diff(yl)==0), yl=[1-eps 1+eps]; end;
-                  set(gca,'xlim', ffts.freqs_1D([1 end]), 'ylim',yl);
               end;
 
 
@@ -626,3 +529,87 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
       end;   % if member
 
     end; % looping
+
+
+function guru_std_plot(x, ymean, ystd, xstats, thresh, xform)
+    if ~exist('xform', 'var'), xform = ''; end;
+
+    %
+    switch xform
+        case 'log10p1', xformfn = @(val) sign(val).*log10(1+abs(val));
+        case '',        xformfn = @(val) val;
+       otherwise,       error('Unknown xform type: %s', xform);
+    end;
+
+    ymean_dn = xformfn(ymean - ystd);
+    ymean_up = xformfn(ymean + ystd);
+    ymean = xformfn(ymean);
+
+    % Now that we've done the statistical tests,
+    %   select only the frequencies that show a "significant"
+    %   difference.
+    good_idx = xstats<=thresh;
+    bad_idx  = xstats>thresh;
+
+    % In order to visualize the stats, we want to highlight
+    %   bands of statistically significant frequencies
+    %   all within the same polygon.
+    %
+    % This code figures out the x-range of each of those polygons,
+    %   and then the (x,y) coordinates of each point that makes
+    %   up that polygon
+    %
+    last_zero = 0;
+    for i=1:length(good_idx)
+        if i<length(good_idx) && good_idx(i)==1, continue; end;
+
+        % we're at a zero.
+
+        % if previous idx=1, then we need to draw polygon
+        if (i>1 && good_idx(i-1)==1)
+
+            if (last_zero==0), drawidx = [1:i];
+            else,              drawidx = [last_zero:i];
+            end;
+
+            fr = x(drawidx);
+            up = ymean_up(drawidx);
+            dn = ymean_dn(drawidx);
+
+            % This is right-shifted; we need to center if possible.
+            if (last_zero>0)
+                fr = [mean(fr(1:2)) fr(2:end)];
+                up = [mean(up(1:2)) up(2:end)];
+                dn = [mean(dn(1:2)) dn(2:end)];
+            end;
+            if (i<length(good_idx))
+                fr = [fr(1:end-1) mean(fr(end-1:end))];
+                up = [up(1:end-1) mean(up(end-1:end))];
+                dn = [dn(1:end-1) mean(dn(end-1:end))];
+            else
+                fr = fr(1:end-1);
+                up = up(1:end-1);
+                dn = dn(1:end-1);
+            end;
+
+            fill( [fr fr(end:-1:1)], [up dn(end:-1:1)], 'y' );
+        end;
+
+        last_zero = i;
+    end;
+
+    h = []; %to pass to legend
+
+    % x axis
+    plot(x, zeros(size(x)), 'k', 'LineWidth', 2.0);
+
+    % Mean & std
+    h(end+1) = plot(x, ymean, 'b', 'LineWidth', 4.0);
+    h(end+1) = plot(x, ymean_up, 'r--', 'LineWidth', 2.0);
+               plot(x, ymean_dn, 'r--', 'LineWidth', 2.0);
+
+    legend(h, {'mean', 'std'}, 'Location', 'NorthEast');
+    yl = [min(ymean_dn) max(ymean_up)];
+    if (~any(yl)), yl=eps*[-1 1]; end;
+    set(gca,'xlim', x([1 end]), 'ylim',yl);
+

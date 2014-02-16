@@ -40,18 +40,32 @@ function mSets = de_CreateModelSettings(varargin)
             '' ...     %specify relative (empty) base path
         );
 
-      % Append
+        % Append
         mSets.out.runspath{si}    = fullfile(base_runspath, mSets.out.dirstem{si});
     end;
 
-    % Put results 
-    unique_dirstems = unique(mSets.out.dirstem);
-    if length(unique_dirstems) == 1
-        mSets.out.resultspath = fullfile(base_resultspath, unique_dirstems{1});
-    else
-        mSets.out.resultspath = fullfile(base_resultspath, 'mixed_network_comparison');
-    end;
-    
+        mSets.out.shared_dirstem = de_GetDataFile( ...
+            mSets.expt, ...
+            mSets.data.stimSet, ...
+            mSets.data.taskType, ...
+            mSets.data.opt, ...
+            'mixed', ...
+            'dir', ...
+            '' ...
+        );
+
+        % Append
+        mSets.out.resultspath    = fullfile(base_resultspath, mSets.out.shared_dirstem);
+
+    % Put results
+    %unique_dirstems = unique(mSets.out.dirstem);
+    %if length(unique_dirstems) == 1
+    %    mSets.out.resultspath = fullfile(base_resultspath, unique_dirstems{1});
+    %else
+    %    keyboard;
+    %    mSets.out.resultspath = fullfile(base_resultspath, 'mixed_network_comparison');
+    %end;
+
     %
     mSets.data.train = de_NormalizeDataset(mSets.data.train, mSets);
     mSets.data.test.bias = mSets.data.train.bias; %total hack... but otherwise, bias is different between train & test! :(
