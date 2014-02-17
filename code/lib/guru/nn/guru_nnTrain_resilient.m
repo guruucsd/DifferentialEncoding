@@ -28,6 +28,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
+<<<<<<< HEAD
   if (isfield(model, 'noise_input'))
     X_orig = X;
   end;
@@ -35,7 +36,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   for ip = 1:model.MaxIterations
       
     % Inject noise into the input
-    if (isfield(model, 'noise_input'))
+    if (isfield(model, 'noise_input') && any(model.noise_input))
         X      = X_orig + model.noise_input*(randn(size(X))); % mean 0 noise
         % Note: don't change Y!!  We don't want to model the noise...
     end;

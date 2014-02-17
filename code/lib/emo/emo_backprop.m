@@ -57,7 +57,7 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   % initialize forward pass
   Out(1:nInput,:) = X;
 
-  % run forward pass
+  %% run forward pass
   hididx = (nInput+1):(nTotal-nOutput);
   outidx = (nTotal-nOutput+1):nTotal;
   multilayer = (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1);
