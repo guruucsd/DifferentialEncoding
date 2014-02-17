@@ -28,11 +28,11 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
+        X_orig = X;
 
   for ip = 1:model.MaxIterations
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
-        X_orig = X;
         X      = X_orig + model.noise_input*(randn(size(X)));
 
         % Note: don't change Y!!  We don't want to model the noise...
