@@ -34,10 +34,17 @@ function [o, h1] = emo_trnsfr( Trn, z )
       if nargout>1, h1 = 1.7159*2/3*(1 - (o/1.7159).^2); end;
 
   case 7,
+      z
       exps  = exp(z);
-      sexps = repmat(sum(exps,2), [1, size(z,2)]);
+      sexps = repmat(sum(exps,2), [1, size(z,2)])
       o     = exps./sexps;
-      if nargout>1, h1 = (sexps+1)./(sexps.^2); end;
+      error('Softmax is broken.');
+      %sxs = sum(z.*exps, 2) ./ sexps;
+      %h1 = o .* (1 + (z - sxs));
+      h1 = sum(-o'*o, 2)' + o;%  .* (1 - o)
+      if nargout>1, h1 = (o - o.^2); end;
+%      keyboard
+      %if nargout>1, h1 = (sexps+1)./(sexps.^2); end;
 
   otherwise,
       error('Unknown transfer function type');

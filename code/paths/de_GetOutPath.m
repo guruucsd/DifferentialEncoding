@@ -31,12 +31,12 @@ function outdir = de_GetOutPath(model, dirType)
     %   NOTHING about how it will be used after the pruned connections are established
     case 'conn_base'
         % Make sure to select one of the settings given
-        if isfield(model, 'hemi') && iscell(model.iters_per), 
+        if isfield(model, 'hemi') && iscell(model.iters_per),
             model.iters_per = model.iters_per{model.hemi};
             model.steps     = model.steps{model.hemi};
             model.sigma = model.sigma(model.hemi);
         end;
-        
+
         origString = '';
 
         % Add conn-specific model settings
@@ -58,10 +58,10 @@ function outdir = de_GetOutPath(model, dirType)
                        sprintf('NK=%d,',   model.ac.nzc_ok), ...
                        sprintf('OP=%s',    guru_cell2str(model.data.opt, '.')), ...
                      ];
-                     
-                     
+
+
             hash       = hash_path(origString);
-            outdir     = hash;          
+            outdir     = hash;
 
     case {'conn'}
             outdir = fullfile(de_GetOutPath(model, 'cache'), 'conn', de_GetOutPath(model, 'conn_base'));
@@ -69,22 +69,17 @@ function outdir = de_GetOutPath(model, dirType)
 
     % Top-level output directory for trained models and analysis stats.
     %   sub-directories will be more specific
-    case {'runs','stats'},
+    case {'runs'}
       if (isempty(model))
           outdir = fullfile(de_GetOutPath(model, 'cache'), 'runs');
-      elseif (~guru_findstr(model.out.dirstem, model.out.runspath))
-        outdir = fullfile(model.out.runspath, model.out.dirstem);
       else
         outdir = model.out.runspath;
       end;
 
-
     % Main output directory for analysis summaries and plots (i.e. human-readable!)
-    case {'results', 'plot', 'summary', 'settings-map'}
+    case {'results', 'plot', 'summary', 'stats', 'settings-map'}
       if (isempty(model))
           outdir = fullfile(de_GetBaseDir(), 'results');
-      elseif (~guru_findstr(model.out.dirstem, model.out.resultspath))
-        outdir = fullfile(model.out.resultspath, model.out.dirstem);
       else
         outdir = model.out.resultspath;
       end;
@@ -131,8 +126,8 @@ function outdir = de_GetOutPath(model, dirType)
           %origString = guru_fileparts(model.dataFile, 'filename'); %
 
           origString = [ 'opt=' guru_cell2str(model.data.opt, '.')];
-          %origString = ''; % options should be pasted on 
-          
+          %origString = ''; % options should be pasted on
+
           origString = [ origString ... % add on base model settings
                          sprintf('UBER=%d', isfield(model, 'uberpath')), ...
                          sprintf('DN=%s', sprintf('%s-', model.distn{:})), ... %if we call in based on a "full" mSets,
@@ -170,9 +165,9 @@ function outdir = de_GetOutPath(model, dirType)
 
               % need to select
               if ~isfield(model.ac.ct, 'hemi') && isfield(model, 'hemi')
-                  model.ac.ct.hemi = model.hemi;               
+                  model.ac.ct.hemi = model.hemi;
               end;
-              
+
               origString = [origString ...
                             sprintf('CT=%s', de_GetOutPath(model.ac.ct, 'conn_base')) ...
                            ];
@@ -195,8 +190,8 @@ function outdir = de_GetOutPath(model, dirType)
   if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
     outdir = fullfile(de_GetBaseDir(), outdir);
   end;
-  
-  
+
+
 function hp = hash_path(p)
   hv = round( sum(p.*[1:5:5*length(p)]) );
   guru_assert(hv<1E10, 'hash cannot be too big')

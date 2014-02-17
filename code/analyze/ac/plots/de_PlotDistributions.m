@@ -43,15 +43,16 @@ function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
     end;
 
     % Show the surface
-    subplot(3,1,si);
+    subplot(3, 1, 1 + (si > 1));
     de_PlotDistributions1D_subplot(squeeze(distn_img(si,:,:)), dist1D, bins, datalbl);
   end;
-  
+
   subplot(3,1,3);
-  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img,1)), dist1D, bins, datalbl);
+  de_PlotDistributions1D_subplot(-squeeze(diff(distn_img([1 end], :, :),1)), dist1D, bins, datalbl);
+
 
 function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
-
+%
   imagesc(distn_img, [-0.5 0.5]);
   ylabel(sprintf('P(%s)', datalbl)); xlabel('distance');
   set(gca, 'yticklabel', guru_csprintf('%3.2f', num2cell(bins(get(gca,'ytick')))));
@@ -60,29 +61,32 @@ function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
 
 
 function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
-% Probability of a connection or 
+% Probability of a connection or
   fig = de_NewFig(figname);
 
   data_hist1  = histc(data{1}(:), bins)/numel(data{1});
   data_hist2  = histc(data{end}(:), bins)/numel(data{end});
   data_hist_diff = data_hist1-data_hist2;
-  
-  subplot(1,3,1);bar(bins, data_hist1);
-  subplot(1,3,2);bar(bins, data_hist2);
-  subplot(1,3,3);bar(bins, data_hist_diff);
+
+  subplot(1,3,1); bar(bins, data_hist1);
+  subplot(1,3,2); bar(bins, data_hist2);
+  subplot(1,3,3); bar(bins, data_hist_diff);
 
 
 function fig = de_PlotMeanDistributions2D(mSets, data, figname)
 %
 
   fig = de_NewFig(figname);
-  max1 = max(data{1}(:));
-  max2 = max(data{end}(:));
+
+  % Normalize to make these comparable histograms
+  data1 = data{1};% / sum(data{1}(:));
+  data2 = data{end};% / sum(data{end}(:));
+
+  max1 = max(data1(:));
+  max2 = max(data2(:));
 
   % Defaults
   clim = max(max1,max2)*[-1 1];
-  d1 = data{1};
-  d2 = data{2};
 
   % When the distribution is norme2,
   %   there is a single location with an extreme value;
@@ -91,35 +95,35 @@ function fig = de_PlotMeanDistributions2D(mSets, data, figname)
   if nnz(data{1}>=max1/2)==1 ...
     && nnz(data{2}>=max2/2)==1
 
-    maxidx1 = find(d1>=max1);
-    maxidx2 = find(d2>=max2);
+    maxidx1 = find(data1>=max1);
+    maxidx2 = find(data2>=max2);
 
-    d1(maxidx1) = 0;%-d1(d1>=max1);
-    d2(maxidx2) = 0;%-d2(d2>=max2);
+    data1(maxidx1) = 0;%-data1(data1>=max1);
+    data2(maxidx2) = 0;%-data2(data2>=max2);
 
-    max1 = max(d1(:));
-    max2 = max(d2(:));
+    max1 = max(data1(:));
+    max2 = max(data2(:));
     clim = max(max1, max2) * [-1 1];
 
-    d1(maxidx1) = max1;
-    d2(maxidx2) = max2;
+    data1(maxidx1) = max1;
+    data2(maxidx2) = max2;
   end;
 
   % compute difference
-  dff = d1-d2;
+  dff = data1 - data2;
   clim_dff = max(abs(dff(:))) * [-1 1];
 
   % zoom in on center of image
-  xidx = round(size(d1,1)/4 + [1:mSets.nInput(1)]);
-  yidx = round(size(d1,2)/4 + [1:mSets.nInput(2)]);
+  xidx = round(size(data1,1)/4 + [1:mSets.nInput(1)]);
+  yidx = round(size(data1,2)/4 + [1:mSets.nInput(2)]);
 
   subplot(1,3,1);
-  imagesc(d1(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
-  title('LSF (RH)', 'FontSize', 16);
+  imagesc(data1(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
+  title(mSets.out.titles{1}, 'FontSize', 16);
 
   subplot(1,3,2);
-  imagesc(d2(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
-  title('Full-fidelity (LH)', 'FontSize', 16);
+  imagesc(data2(xidx,yidx), clim); set(gca, 'xtick', [], 'ytick', []);
+  title(mSets.out.titles{end}, 'FontSize', 16);
 
   subplot(1,3,3);
   imagesc(dff(xidx,yidx), clim_dff); set(gca, 'xtick', [], 'ytick', []);
