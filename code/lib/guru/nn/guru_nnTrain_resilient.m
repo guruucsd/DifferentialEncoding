@@ -28,7 +28,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
-<<<<<<< HEAD
   if (isfield(model, 'noise_input'))
     X_orig = X;
   end;

@@ -77,15 +77,9 @@ function fig = de_PlotMeanDistributions1D(mSets, data, nbins, figname)
   end;
   data_hist_diff = data_hist1-data_hist2;
 
-<<<<<<< HEAD
-  subplot(1,3,1);bar(bins, data_hist1);
-  subplot(1,3,2);bar(bins, data_hist2);
-  subplot(1,3,3);bar(bins, data_hist_diff);
-=======
   subplot(1,3,1); bar(bins, data_hist1);
   subplot(1,3,2); bar(bins, data_hist2);
   subplot(1,3,3); bar(bins, data_hist_diff);
->>>>>>> 58f2077f22e7a2a1cd20991965715c8d83bf8a3c
 
 
 function fig = de_PlotMeanDistributions2D(mSets, data, figname)
