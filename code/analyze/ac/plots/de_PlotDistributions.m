@@ -14,10 +14,10 @@ function figs = de_PlotDistributions(mSets, stats)
   connection_bins = linspace(0,0.10,25);
 
   % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
-  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
-  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_out, connection_bins, 'cxns_out_distn', 'cxn');
-  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_in, weight_bins, 'weights_in_distn', 'weight');
-  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
+  %figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
+  %figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_out, connection_bins, 'cxns_out_distn', 'cxn');
+  %figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_in, weight_bins, 'weights_in_distn', 'weight');
+  %figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
 
   % Plot distribution of weights
   n_dist_bins = 25;
@@ -62,11 +62,11 @@ function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
 
 
 function fig = de_PlotMeanDistributions1D(mSets, data, nbins, figname)
-% Probability of a connection or 
+% Probability of a connection or
   fig = de_NewFig(figname);
 
   [dist1D,rho] = guru_pixeldist(size(data{1}));
-  bins = linspace(0, dist1D(end), nbins);
+  bins = linspace(0, dist1D(end)/3, nbins);  % divide max by 3 to increase visibility
 
   [~,idx] = histc(rho, bins);
   data_hist1 = zeros(size(bins));
@@ -77,9 +77,24 @@ function fig = de_PlotMeanDistributions1D(mSets, data, nbins, figname)
   end;
   data_hist_diff = data_hist1-data_hist2;
 
+  %set(gcf, 'Position');
+
   subplot(1,3,1); bar(bins, data_hist1);
+  set(gca, 'xlim', bins([1 end]));
+  %set(gca, 'ylim', [0 max([max(data_hist1) max(data_hist2)])]);
+  set(gca, 'ylim', [0 0.25]);
+  xlabel('Distance (pixels)')
+
   subplot(1,3,2); bar(bins, data_hist2);
+  set(gca, 'xlim', bins([1 end]));
+  %set(gca, 'ylim', [0 max([max(data_hist1) max(data_hist2)])]);
+  set(gca, 'ylim', [0 0.25]);
+  xlabel('Distance (pixels)')
+
   subplot(1,3,3); bar(bins, data_hist_diff);
+  set(gca, 'xlim', bins([1 end]));
+  %set(gca, 'ylim', [min(data_hist_diff) max(data_hist_diff)]);
+  xlabel('Distance (pixels)')
 
 
 function fig = de_PlotMeanDistributions2D(mSets, data, figname)

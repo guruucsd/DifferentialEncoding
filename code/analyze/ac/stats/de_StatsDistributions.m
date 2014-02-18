@@ -43,5 +43,5 @@ function [stats] = de_StatsDistributions(mss)
           end;
       end;
     end;
-    fprintf('Total connection weight (%d %d %d): %f\n', mSets.nHidden, mSets.hpl, mSets.nConns, sum(abs(stats.cxns_out{si}(:))));
+    %fprintf('Total connection weight (%d %d %d): %f\n', mSets.nHidden, mSets.hpl, mSets.nConns, sum(abs(stats.cxns_out{si}(:))));
   end;

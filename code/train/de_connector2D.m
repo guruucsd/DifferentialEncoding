@@ -51,8 +51,8 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         prbdistn_cache = zeros(nLoc,inPix);
     end;
     if (isempty(weight_factor))
-		lg            = @(x) (2/(1+exp(-(x.^2)/8))-1); %logistic, range [-1 1], cross at 0
-		weight_factor = eps+lg(numCon*nLoc*sqrt(hpl)/inPix - 1); %sqrt(hpl) because sparse connections per layer => spread out hus => need more "damping" of pdf for nodes we already connected to
+        lg            = @(x) (2/(1+exp(-(x.^2)/8))-1); %logistic, range [-1 1], cross at 0
+        weight_factor = eps+lg(numCon*nLoc*sqrt(hpl)/inPix - 1); %sqrt(hpl) because sparse connections per layer => spread out hus => need more "damping" of pdf for nodes we already connected to
     end;
     guru_assert(weight_factor>0, '"weight factor" must be >0');
 
@@ -60,7 +60,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         case {'gam','gamma','game','gammae'}
           k = rds^2/sig;
           theta = sig/rds;
-        case {'norm','norme','norme2','normem2','normn', 'normeh'}
+        case {'norm','norme','norme2','normem2','normn', 'normeh', 'normepK', 'normemK'}
           if (rds ~= 0.0) && ~isnan(rds), warning('Ignoring non-zero rds=%4.1f', rds); end;
         case {'normr', 'normre'}
         case {'full','fulle'}, opts={'nofill'};
@@ -72,8 +72,8 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     % Could batch-generate these points
     alllyr = zeros(sI);
     w      = ones(inPix,1);
-	  [X1,X2] = meshgrid(1:sI(1),1:sI(2));
-  	pts     = [X1(:) X2(:)];
+      [X1,X2] = meshgrid(1:sI(1),1:sI(2));
+      pts     = [X1(:) X2(:)];
 
     for h=1:hpl %loop over # of units per locust
       if (false && h>1)
@@ -144,6 +144,25 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                           [~,mp] = max(pdn);
                           pdn(mp) = 0; % never connects to its own position
                         end;
+
+                    case {'normepK', 'normemK'}
+                        theta = 2*pi*rand; %really just need pi (half circle is enough; distn's are symmetric), but ...
+                        rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
+
+                        mn    = mupos(mi,:);
+                        cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
+                        pdn   = mvnpdf(X, mn, cv);
+
+                        % Tweak with an asymmetric shape:
+                        %   like a T rotated 90 degrees counterclockwise,
+                        %   with an intersection point at the center of the distribution
+                        coeff = 1 - 2*strcmp(distn_name, 'normemK');
+                        pdn2D = reshape(pdn, [sI(2) sI(1)]);
+                        [~,mp] = max(pdn);
+                        [y,x] = ind2sub([sI(2) sI(1)], mp);
+                        pdn2D(max(1, y-3):min(end, y+3), x) = pdn2D(max(1, y-3):min(end, y+3), x) * 2.^(coeff);
+                        pdn2D(y, x:min(end, x+3)) = pdn2D(y, x:min(end, x+3)) * 2.^(coeff);
+                        pdn = reshape(pdn2D, size(pdn));
 
                     case {'normn'} %norme, but always the same orientation
                         theta = pi/2;
@@ -248,10 +267,10 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     Con(inPix+1:inPix+sH,1:inPix)=halfCon; %input -> hidden connections
     Con(inPix+sH+1:end,inPix+1:inPix+sH)=halfCon'; %hidden->output connections
 
-	if (ismember(15,dbg))
-		weight_factor
-		alllyr(alllyr==0) = -100
-	end;
+    if (ismember(15,dbg))
+        weight_factor
+        alllyr(alllyr==0) = -100
+    end;
 
 
     % See if any inputs/outputs are NOT connected
