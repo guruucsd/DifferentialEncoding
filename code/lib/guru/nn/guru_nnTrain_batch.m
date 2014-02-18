@@ -24,14 +24,16 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
   currErr   = inf;
   grad      = zeros(size(model.Conn)); 
 
+  if (isfield(model, 'noise_input'))
+        X_orig = X;
+  end;
+
   % first loop just assesses the current state of the network; no gradient update
   for ip = 0:model.MaxIterations
 
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
-        X_orig = X;
         X      = X_orig + model.noise_input*(randn(size(X)));
-
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 

@@ -62,7 +62,7 @@ function [models] = de_TrainAllAC_parallel(m)
             new_model.ac.randState = randState;
             if isfield(new_model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
             rand ('state',new_model.ac.randState);
-            fprintf('xxx randState: %d\n', new_model.ac.randState);
+            fprintf('randState: %d\n', new_model.ac.randState);
             
             % Parse out ACTUAL model settings
             if length(mSets.mu)==1,  new_model.mu = mSets.mu;

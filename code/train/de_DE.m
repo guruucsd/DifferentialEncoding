@@ -33,9 +33,11 @@ function [model] = de_DE(model)
         [model.ac.Conn, model.ac.Weights]    = de_connector(model);
     end;
 
+
     % Train the model
     [model.ac] = guru_nnTrainAC(model.ac,X);
     clear('X', 'Y');
+
 
     % report results to screen
     fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));

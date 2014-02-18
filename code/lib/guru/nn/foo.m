@@ -28,16 +28,28 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
-  if (isfield(model, 'noise_input'))
-    X_orig = X;
-  end;
 
+  X_orig = X;
   for ip = 1:model.MaxIterations
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
         X      = X_orig + model.noise_input*(randn(size(X)));
+
         % Note: don't change Y!!  We don't want to model the noise...
     end;
+
+    avg_noise = mean(abs(X_orig(:) - X(:)));
+    pct_noise = avg_noise / mean(abs(X_orig(:)));
+
+    fprintf('avg noise %4.2e pct noise %4.2e any bad %d mean eta %4.2e std eta %4.2e min eta %4.2e max eta %4.2e\n', ...
+        avg_noise, pct_noise, ...
+        full(any(isnan(model.Eta(:)))), ...
+        full(mean(abs(model.Eta(:)))), ...
+        full(std(abs(model.Eta(:)))), ...
+        full(min(model.Eta(:))), ...
+        full(max(model.Eta(:))) ...
+    );
+
 
     %% Determine model error based on that update
     if isfield(model,'dropout') && model.dropout>0
@@ -106,9 +118,11 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
     % Adjust the weights
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
+        fprintf('Weight reduction, as %f < %f\n', currErr, lastErr);
         model.Weights = model.Weights .* (1-model.lambda);
     end;
     if isfield(model, 'avgact2')
+        error('AvgAct2 NYI');
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
@@ -118,14 +132,13 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         keyboard;
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
         %keyboard
-        
-    % see eqn 4&5
     elseif isfield(model, 'avgact') %Sullivan & de sa (2006)
+        warning('AvgAct needs to be monitored for correctness');
         huidx = nInputs+1+[1:nHidden];
         huacts = opc(huidx,:);
         meanact = mean(abs(huacts),2);
 
-        % Normalize each unit's activity
+        % mean activity from previous time; time window
         if ~exist('avgact','var'), avgact = zeros(size(meanact)); end;
         avgact = model.bc*meanact+(1-model.bc)*avgact;
         actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
@@ -138,6 +151,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
 
     elseif isfield(model, 'meanwt')
+        warning('meanwt needs to be monitored for correctness.');
         huidx = nInputs+1+[1:nHidden];
         huwts = model.Weights(huidx,1:(nInputs+1));
         meanwt = mean(abs(huwts),2);
@@ -146,6 +160,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         meanwt = meanwt(meanwt~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.meanwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanwt,[1 nInputs+1]);
     elseif isfield(model, 'totwt')
+        warning('totwt needs to be monitored for correctness.');
         huidx = nInputs+1+[1:nHidden];
         huwts = model.Weights(huidx,1:(nInputs+1));
         totwt = sum(abs(huwts),2);
@@ -155,6 +170,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         model.Weights(huidx,1:(nInputs+1)) = model.totwt * model.Weights(huidx,1:(nInputs+1)) ./ repmat(totwt,[1 nInputs+1]);
 
     elseif isfield(model, 'stdact')
+        warning('stdact needs to be monitored for correctness.');
         inidx = [1:nInputs];
         huidx = nInputs+1+[1:nHidden];
         inacts = opc(inidx,:);

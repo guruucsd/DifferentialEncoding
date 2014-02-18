@@ -11,7 +11,7 @@ function figs = de_PlotDistributions(mSets, stats)
   figs(end+1) = de_PlotMeanDistributions2D(mSets, stats.weights_out, 'weights_out_mean2D');
 
   weight_bins = linspace(-2,2,10);
-  connection_bins = linspace(0,0.15,10);
+  connection_bins = linspace(0,0.10,25);
 
   % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
   figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
@@ -20,7 +20,8 @@ function figs = de_PlotDistributions(mSets, stats)
   figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
 
   % Plot distribution of weights
-  figs(end+1) = de_PlotMeanDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_hist');
+  n_dist_bins = 25;
+  figs(end+1) = de_PlotMeanDistributions1D(mSets, stats.cxns_in, n_dist_bins, 'cxns_in_hist');
 
 
 function fig = de_PlotDistributions1D(mSets, data, bins, figname, datalbl)
@@ -60,12 +61,20 @@ function de_PlotDistributions1D_subplot(distn_img, dist1D, bins, datalbl)
 
 
 
-function fig = de_PlotMeanDistributions1D(mSets, data, bins, figname)
-% Probability of a connection or
+function fig = de_PlotMeanDistributions1D(mSets, data, nbins, figname)
+% Probability of a connection or 
   fig = de_NewFig(figname);
 
-  data_hist1  = histc(data{1}(:), bins)/numel(data{1});
-  data_hist2  = histc(data{end}(:), bins)/numel(data{end});
+  [dist1D,rho] = guru_pixeldist(size(data{1}));
+  bins = linspace(0, dist1D(end), nbins);
+
+  [~,idx] = histc(rho, bins);
+  data_hist1 = zeros(size(bins));
+  data_hist2 = zeros(size(bins));
+  for bi=1:nbins
+    data_hist1(bi) = sum(data{1}(idx(:)==bi));
+    data_hist2(bi) = sum(data{end}(idx(:)==bi));
+  end;
   data_hist_diff = data_hist1-data_hist2;
 
   subplot(1,3,1); bar(bins, data_hist1);
