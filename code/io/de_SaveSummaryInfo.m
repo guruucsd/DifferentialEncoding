@@ -3,9 +3,9 @@
   %
     [fh, fmsg] = fopen(fn, 'w');
     fprintf(fh, 'Differential Encoder: %dD\n', length(mSets.nInput));
-    
+
     fprintf(fh, '\tRuns:       %-4d\n',   mSets.runs);
-    fprintf(fh, '\tDist''n: %10s\n',      mSets.distn{:});
+    fprintf(fh, '\tDist''n: %10s\n',      guru_cell2str(mSets.distn));
     fprintf(fh, '\tMu:         %-4.1f\n', mSets.mu);
     fprintf(fh, '\tSigma:      %-4.1f\n', mSets.sigma);
     fprintf(fh, '\tnConns:     %-4d\n',   mSets.nConns);
@@ -15,7 +15,7 @@
     fprintf(fh, '\tError Type: %d\n',     mSets.errorType);
     fprintf(fh, '\tData File:  %s\n',     mSets.dataFile);
     fprintf(fh, '\n\n');
-    
+
     fprintf(fh, 'AutoEncoder:\n');
     fprintf(fh, '\tRandState:      %-5d\n',   mSets.ac.randState);
     fprintf(fh, '\tTolerance:      %-5.4f\n', mSets.ac.tol);
@@ -32,7 +32,7 @@
     fprintf(fh, '\tWeightInitType: %s\n',     mSets.ac.WeightInitType);
     fprintf(fh, '\tNoise_input:    %f\n',     mSets.ac.noise_input);
     fprintf(fh, '\n\n');
-    
+
     if (isfield(mSets, 'p'))
         fprintf(fh, 'Perceptron:\n');
         fprintf(fh, '\tnHidden:        %-5d\n',   mSets.p.nHidden);
@@ -62,13 +62,13 @@
         fprintf(fh, '\tp  Rejection Type:  %s\n',    mSets.p.rej.type{:});
         fprintf(fh, '\n\n');
     end;
-    
+
     % count rejections
     rcounts = [];
     if (isfield(stats.raw, 'r')),
         for i=1:length(stats.raw.r), rcounts(end+1) = length(find(stats.raw.r{i})); end;
     end;
-    
+
     fprintf(fh, 'Summary:\n');
     fprintf(fh, '\tRejections (ordered by Sigma): %d\n', rcounts(:));
 %    if (isfield(mSets.data, 'TLBL'))
@@ -84,4 +84,4 @@
     fprintf(fh, '\n\n');
 
     fclose(fh);
-    
+

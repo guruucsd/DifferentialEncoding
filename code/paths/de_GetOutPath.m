@@ -130,7 +130,7 @@ function outdir = de_GetOutPath(model, dirType)
 
           origString = [ origString ... % add on base model settings
                          sprintf('UBER=%d', isfield(model, 'uberpath')), ...
-                         sprintf('DN=%s', sprintf('%s-', model.distn{:})), ... %if we call in based on a "full" mSets,
+                         sprintf('DN=%s', sprintf('%s-', model.distn)), ... %if we call in based on a "full" mSets,
                          sprintf('MU=%s', sprintf('%f-', model.mu(:))), ...    %  this will be DIFFERENT than if we
                          sprintf('SG=%s', sprintf('%f-', model.sigma(:))), ... %  call in on a trained model (with one sigma)
                          sprintf('NH=%d', model.nHidden), ... % These are stamped elsewhere,

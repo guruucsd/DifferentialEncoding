@@ -1,4 +1,4 @@
-function [freqs1D, rho, x, y  ] = guru_distfromcenter(sz2D)
+function [freqs1D, rho, x, y  ] = guru_pixeldist(sz2D)
 %
 % Takes a 2D fft, and converts it to a 1D FFT
 
