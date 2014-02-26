@@ -34,19 +34,17 @@ if length([imgidx{:}]) ~= npix, error('failed to find some pixels'); end;
 rtcoeff = spalloc(npix,npix,round(npix*npix)*0.01);
 for ti=1:nt
     for ri=1:nr
-        
+
         %tsb(ti+1)-tsb(ti)
         error_vector  = sqrt( (R(imgidx{ti,ri})-rsb(ri+1)).^2 + (TH(imgidx{ti,ri})-tsb(ti+1)).^2 );
         maxerr_vector = sqrt( (rsb(ri+1)-rsb(ri)).^2        + (tsb(ti+1)-tsb(ti)).^2 );
         qt            = error_vector./maxerr_vector;
         coeff         = 1.01 - qt./sum(qt);
         coeff2        = coeff./sum(coeff);
-        if any(isnan(coeff2)), keyboard;
-        elseif sum(coeff2) ==0, coeff2=inf; end;
-%        elseif sum(coeff2) ~= 1, keyboard; end;
- %       rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}) = coeff2;%1/length(imgidx{ti,ri});
+
+        guru_assert(~any(isnan(coeff2)));
+        if sum(coeff2) ==0, coeff2=inf; end;
         rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}) = 1/length(imgidx{ti,ri});
-%            if any(isnan( rtcoeff(sub2ind(imgsz,ti,ri), imgidx{ti,ri}))), keyboard; end;
     end;
 end;
 
@@ -61,7 +59,7 @@ for ti=1:nt
         if (ri>1), neighbors{ti,ri} = [neighbors{ti,ri} sub2ind([nt nr], ti,  ri-1)]; end;
         if (ri<nr),neighbors{ti,ri} = [neighbors{ti,ri} sub2ind([nt nr], ti,  ri+1)]; end;
         nneighbors(ti,ri) = length(neighbors{ti,ri});
-        
+
         touched(ti,ri) = ~isempty(imgidx{ti,ri});
     end;
 end;
@@ -74,24 +72,24 @@ while ~isempty(allpix)
         cpix = allpix(pi);
         pct_neighbors_on(pi) = mean(touched(neighbors{cpix}));
     end;
-    
+
     % For those with 4 neighbors, spread
     surrounded = find(pct_neighbors_on==max(pct_neighbors_on));
     for si=1:length(surrounded)
         cpix = allpix(surrounded(si));
         [ti,ri] = ind2sub(imgsz, cpix);
         cnb  = neighbors{cpix}(touched(neighbors{cpix}));
-        
+
         error_vector  = sqrt( (R(cnb)-rsb(ri)).^2    + (TH(cnb)-tsb(ti)).^2 );
         maxerr_vector = sqrt( (rsb(ri+1)-rsb(ri)).^2 + (tsb(ti+1)-tsb(ti)).^2 );
         coeff = exp(1*error_vector./maxerr_vector);
         norm_coeff = coeff/sum(coeff);
-        
+
         rtcoeff(cpix, :) = norm_coeff * rtcoeff(cnb,:);%mean(rtcoeff(cnb,:),1); % weighted coefficients of previous dude's pixels
         %rtcoeff(cpix, :) = mean(rtcoeff(cnb,:),1); % weighted coefficients of previous dude's pixels
         touched(cpix) = true;
     end;
-    
+
     % Reduce the number of untouched
     allpix = setdiff(allpix, allpix(surrounded));
     if any(touched(allpix)), error('?'); end;

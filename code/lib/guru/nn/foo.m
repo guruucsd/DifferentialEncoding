@@ -95,7 +95,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
 
     elseif (currErr <= model.Error)
-      %keyboard
       if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
@@ -104,7 +103,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
     % We're precisely the same; quit!
     elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
       warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
-      keyboard
       break;
 
     elseif any(isnan(grad(:)))
@@ -129,9 +127,8 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
         huidx = huidx(meanact~=0);
         meanact = meanact(meanact~=0);
-        keyboard;
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
-        %keyboard
+
     elseif isfield(model, 'avgact') %Sullivan & de sa (2006)
         warning('AvgAct needs to be monitored for correctness');
         huidx = nInputs+1+[1:nHidden];
@@ -144,10 +141,8 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         actnorm = 1+model.bn*(avgact - model.avgact)./model.avgact;
         %fprintf('avgact=%f, actnorm=%f\n',mean(avgact(find(avgact))), mean(actnorm(find(avgact))));
 
-        %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
         huidx = huidx(meanact~=0); actnorm=actnorm(meanact~=0);
         model.Weights(huidx,1:(nInputs+1)) = model.Weights(huidx,1:(nInputs+1)) ./ repmat(actnorm,[1 nInputs+1]);
-        %keyboard
 
 
     elseif isfield(model, 'meanwt')
@@ -185,11 +180,9 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         stdact = model.bc*std_huact+(1-model.bc)*stdact;
         stdnorm = 1+model.bn*(stdact - model.stdact)./model.stdact;
         fprintf('\tcurrent_std=%f, stdact=%f, stdnorm=%f\n',mean(std_inact(find(std_inact))), mean(stdact(find(stdact))), mean(stdnorm(find(stdact))));
-        %keyboard
-        %if mean(avgact(find(avgact))) > model.avgact, keyboard; end;
+
         %huidx = huidx(std_huact~=0); stdnorm=stdnorm(std_huact~=0);
         model.Weights(huidx,inidx) = model.Weights(huidx,inidx) + 1E-5.*model.Conn(huidx,inidx).*((stdnorm)*(std_inact-mean(std_inact))'./mean(std_inact)); %neg for too small
-        %keyboard
 
     end;
     guru_assert(~any(isnan(model.Weights(:))), 'None of the weights should ever be nan');

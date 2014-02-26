@@ -49,7 +49,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
     avg_resp{si}  = zeros(length(mss{si}), mSets.nHidden, length(p.freqs));
     std_resp{si}  = zeros(length(mss{si}), mSets.nHidden, length(p.freqs));
     resps{si}     = zeros(length(mss{si}), mSets.nHidden, length(p.freqs),p.norients,p.nphases);
-    
+
     for mi=1:length(mss{si})
       m = de_LoadProps(mss{si}(mi), 'ac', 'Weights');
       m.ac.Weights(m.ac.Weights ~= 0) = 0.01;
@@ -57,7 +57,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
 
       % Determine weights (abstract)
       %w     = zeros(mSets.nInput);%spatial map of weights;
-      %inidx = 
+      %inidx =
       %switch (p.w_mode)
       %    case {'fixed'},    w(inidx) = ones(size(inidx));
       %    case {'posmean'},  w(inidx) = abs(randn(size(inidx)));
@@ -135,7 +135,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
               %best_vals = std_resp(mi,:);
               [~,bestofall{si}(mi)] = max(std_resp{si}(mi,:));%max(mean(mean(resps,3),2));
 
-          case 'range', 
+          case 'range',
               rng  = max(alld') - min(alld');
               [~,bestofall(mi)] = max(rng);
 

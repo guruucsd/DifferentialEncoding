@@ -57,11 +57,9 @@ function [model] = de_DE_Deep(model)
     [smallmodel2, o_p2] = guru_nnTrain(smallmodel2, X_s2, Y);
 
     % Or now go full
-    %keyboard
     %model.ac.Weights(nooutIdx,nooutIdx) = smallmodel.Weights;
     %[model.ac2] = guru_nnTrainAC(model.ac, X);
 
-    %keyboard
     model.ac.Weights(nooutIdx,nooutIdx) = smallmodel.Weights;
     model.ac.Weights(noinIdx, noinIdx) = smallmodel2.Weights;
     clear('X', 'Y');
@@ -129,7 +127,7 @@ function [model] = de_DE_Deep(model)
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
         end;
-         
+
         % Train
         [model.p] = guru_nnTrain(model.p,X_train,reshape(model.data.train.T(:,goodTrials),[pOutputs nTrials]));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
@@ -141,8 +139,8 @@ function [model] = de_DE_Deep(model)
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         model.p.output.train = guru_nnExec(model.p, X_train, model.data.train.T );
-        
-      
+
+
         % TEST
         p_test     = model.p;
 
@@ -155,7 +153,7 @@ function [model] = de_DE_Deep(model)
         if isfield(model.p, 'zscore') && model.p.zscore>0
           X_test    = model.p.zscore * X_test ./ repmat( std(X_test, 0, 1), [size(X_test,1), 1] ); %z-score the code
         end;
-        
+
         % Add bias
         if (model.p.useBias)
             biasArray=ones(1,nTest);

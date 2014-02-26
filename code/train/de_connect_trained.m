@@ -13,7 +13,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     %%%%%%%%%%%%%%%%%
     % Set up model parameters & allocate space
     %%%%%%%%%%%%%%%%%
-    
+
     % In order for other caching to happen, all props MUST be set before
     % now.
 
@@ -21,7 +21,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     ct.iters_per = ct.iters_per{mSets.hemi};
     ct.steps = ct.steps{mSets.hemi};
     ct.sigma = ct.sigma(mSets.hemi);
-    
+
     % Combine all settings into a single model
     model    = guru_mergeStruct( mSets, ct );
     model.ac = rmfield(model.ac, 'ct');
@@ -149,7 +149,6 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
             %clear('dset','f');
 
     %if (max(abs(Y(:)))>=1), error('X unexpectedly high'); end;
-    %keyboard
             [model.ac,o_p]       = guru_nnTrain(model.ac, X, Y);
     %        model.data = dset;
     %        model = de_DE(model);
@@ -335,8 +334,6 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
         end;
         save(connFile, 'model', 'ws');
     end;
-
-    %keyboard
 
     %ipd = de_StatsInterpatchDistance({model})
 

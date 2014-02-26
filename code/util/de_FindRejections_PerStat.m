@@ -114,7 +114,6 @@
 
         % assume exgauss.  find delta to left, use as delta to right, and
         % cut anything too much more than that.
-        keyboard
         rejectTypes = rejectTypes + (2^(i-1))*((data>(m+rc*s)) + (data<(m-rc*s)));
       end;
 

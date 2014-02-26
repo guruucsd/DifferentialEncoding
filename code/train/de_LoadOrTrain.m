@@ -6,7 +6,6 @@ function model = de_LoadOrTrain(model)
 % Output model is the 'clean' version without 'heavy' props
 %
 
-% keyboard
   %% Load autoencoder weights, if they exist
   if (  ~model.ac.continue ...
      && exist(de_GetOutFile(model, 'ac'),         'file') ...

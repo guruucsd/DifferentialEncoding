@@ -86,7 +86,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
 
     elseif (currErr <= model.Error)
-      %keyboard
       if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
@@ -95,7 +94,6 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
     % We're precisely the same; quit!
     elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
       warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
-      keyboard
       break;
 
     elseif any(isnan(grad(:)))
@@ -118,9 +116,8 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
         huidx = huidx(meanact~=0);
         meanact = meanact(meanact~=0);
-        keyboard;
+        error('avgact2 homeostatic training option NYI')
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
-        %keyboard
 
     % see eqn 4&5
     elseif isfield(model, 'avgact') %Sullivan & de sa (2006)

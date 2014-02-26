@@ -33,7 +33,6 @@ function [err, errP] = emo_nnError(errorType, Y, T, RAW_ERROR)
         guru_assert(all(Y>=0 & Y<=1), 'for cross-entropy error to work, Y must be between 0 and 1')
 
         err = -(T.*log(Y) + (1-T).*log(1-Y));
-        %keyboard
         %if nnz(isnan(err)) + nnz(isinf(err)) == numel(err)
         %    error('You have %d outputs at 0 and %d outputs at 1, which is %5.1f%% of your outputs.
         err(isnan(err)) = 0; % this is what happens when you hit it exactly; 0*-inf.

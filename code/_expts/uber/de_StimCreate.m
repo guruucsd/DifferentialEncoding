@@ -11,7 +11,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
     %%%%%%%%%%%%%%%%%%%%
 
 
-    
+
     %%%%%%%%%%%%%%%%%%%%
     % Collect input images for all studies
     %%%%%%%%%%%%%%%%%%%%
@@ -127,7 +127,6 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
         case 'original'
             for ii=length(datafiles):-1:1
-                %keyboard
                 if (~guru_findstr(datafiles{ii},'young') ...
                  && ~guru_findstr(datafiles{ii},'christman') ...
                  && ~guru_findstr(datafiles{ii},'kitterle') ...
@@ -143,7 +142,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
         otherwise, error('Unknown stim set: %s', stimSet);
     end;
 
-    
+
     %%%%%%%%%%%%%%%%%%%%
     % Now, make an autoencoding dataset out of it
     %%%%%%%%%%%%%%%%%%%%
@@ -160,7 +159,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
         nTestImages(ii)  = size(tests{ii}.X,2);
     end;
 
-    
+
     % Simple, expensive, hacky way to
     %   normalize the total # of input images
     %
@@ -197,7 +196,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
             lastTestImage  = lastTestImage  + size(tests{ii}.X,2);
         end;
     end;
-    
+
 
     %%%%%%%%%%%%%%%%%%%%
     % Now, prep for return

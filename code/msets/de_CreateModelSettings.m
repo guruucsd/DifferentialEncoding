@@ -62,7 +62,6 @@ function mSets = de_CreateModelSettings(varargin)
     %if length(unique_dirstems) == 1
     %    mSets.out.resultspath = fullfile(base_resultspath, unique_dirstems{1});
     %else
-    %    keyboard;
     %    mSets.out.resultspath = fullfile(base_resultspath, 'mixed_network_comparison');
     %end;
 

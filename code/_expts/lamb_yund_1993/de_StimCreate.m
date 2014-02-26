@@ -49,4 +49,4 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-  keyboard  
+  error('Lamb_Yund contrast balancing study NYI');

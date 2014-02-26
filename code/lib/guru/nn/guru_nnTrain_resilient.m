@@ -88,7 +88,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
 
     elseif (currErr <= model.Error)
-      %keyboard
       if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
@@ -97,7 +96,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     % We're precisely the same; quit!
     elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
       warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
-      keyboard
       break;
     end;
 
@@ -107,7 +105,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     %guru_assert(~any(isnan(grad(:))));
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
-        %keyboard
         model.Weights = model.Weights .* (1-model.lambda);
     end;
     %guru_assert(~any(isnan(model.Weights(:))));

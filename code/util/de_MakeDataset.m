@@ -1,5 +1,5 @@
 function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs)
-% Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return 
+% Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return
 %   the filename and the dataset.
 %
 % expt: selects an experiment, which has a set of stimuli (stimSet) and tasks (taskType) associated with it.
@@ -7,7 +7,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 % opt: can be experiment-specific, or generic over all experiments (such as stimulus size, or filtering parameters)
 %   * size: 'mini','small','medium','large': different sizes, in pixels
 %   * filtering: 'lowpass','highpass','bandpass'
-%   * 
+%   *
 
     if ~exist('opt','var'), opt = {}; end;
     if ~exist('show_figs', 'var'), show_figs = true; end;
@@ -65,7 +65,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
             tr_figs = de_visualizeData(train);
             te_figs = de_visualizeData(test);
         end;
-        
+
 		% Output everything (including images)
 		if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
 		  mkdir(guru_fileparts(dataFile,'pathstr'));
@@ -79,7 +79,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
                 saveas(te_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-test.png']), 'png');
             end;
         end;
-        
+
 		save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
     end;
 
@@ -97,7 +97,7 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
     dset = de_StimApplyFiltering(dset, opts);
 
     dset = de_StimApplyTransform(dset, opts);
-    
+
     dset = de_StimApplyResizing(dset, opts);
 
     if (exist('dset_to_match','var'))
@@ -105,7 +105,7 @@ function dset = de_StimApplyOptions(dset, opts, dset_to_match)
     else
         dset = de_StimApplyWhitening(dset, opts);
     end;
-    
+
 
 function dset = de_StimApplyTransform(dset, opts)
 
@@ -115,18 +115,18 @@ function dset = de_StimApplyTransform(dset, opts)
 
         dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
         %de_visualizeData(dset); % just for now
-        
+
         %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
         %de_visualizeData(junk); % just for now
     end;
- 
+
     if guru_hasopt(opts, 'contrast')
       clevel = guru_getopt(opts, 'contrast', []);
-      keyboard
-      
+      error('Contrast level option NYI');
+
       % But we want the target data to be the original image!
       dset.Y = dset.X;
-      
+
       % First apply the image change
       % Taken from http://maksim.sorokin.dk/it/2010/11/08/brightness-and-contrast-in-matlab/
       for ii=1:size(dset.X,2)
@@ -134,11 +134,11 @@ function dset = de_StimApplyTransform(dset, opts)
           img_range = [min(img(:)) max(img(:))];
           sigmoid   = @(x) 1./(1+exp(-x));
           switch clevel
-            case 'low', 
+            case 'low',
                 mir = mean(img_range);
                 caimg = imadjust(img, img_range, [img_range(1)+mir/2 img_range(2)-mir/2], 0.5);
             case 'high'
-                simg = sigmoid(img); 
+                simg = sigmoid(img);
                 caimg = imadjust(simg, [min(simg(:)) max(simg(:))], [0 1]);
             otherwise, error('Unknown contrast level: %s', clevel);
           end;
@@ -147,13 +147,13 @@ function dset = de_StimApplyTransform(dset, opts)
           caimg(caimg<img_range(1)) = img_range(1);
 
           %subplot(1,2,1); imshow(img, [0 1]); subplot(1,2,2); imshow(caimg, [0 1]);
-          
+
           dset.X(:,ii) = caimg(:);
-      end;      
-      
+      end;
+
     end;
 
-    
+
 function dset = de_StimApplyResizing(dset, opts)
 %
 
@@ -209,7 +209,7 @@ function dset = de_StimApplyResizing(dset, opts)
         dset.nInput = tgtInput;
     end;
 
-    
+
 %%%%%%%%%%%%%%%%%
 function dset = de_StimApplyFiltering(dset, opts)
 
@@ -233,7 +233,7 @@ function dset = de_StimApplyFiltering(dset, opts)
         filt_images = guru_filterImages(reshape(dset.X', [num_images dset.nInput]), 'lowpass', lowpass_filter);
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
-    
+
     % Band-pass filter
     bandpass_filter = guru_getopt(opts, 'bandpass', NaN);
     if (~isnan(bandpass_filter))
@@ -242,7 +242,7 @@ function dset = de_StimApplyFiltering(dset, opts)
         filt_images = guru_filterImages(reshape(dset.X', [num_images dset.nInput]), 'bandpass', bandpass_filter);
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
-    
+
     % High-pass filter
     highpass_filter = guru_getopt(opts, 'highpass', nan);
     if (~isnan(highpass_filter))
@@ -258,12 +258,12 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
     % Whitening
     whiten = guru_getopt(opts, 'dnw', false);
     if (islogical(whiten) && whiten)
-        if (exist('dset_to_match','var') && isfield(dset_to_match,'axes')), 
+        if (exist('dset_to_match','var') && isfield(dset_to_match,'axes')),
             [dset.X, dset.axes] = guru_dnw( dset.X, dset_to_match.axes );
         else,
             [dset.X, dset.axes] = guru_dnw( dset.X );
         end;
-        
+
     % The axes were passed in directly
     elseif isnumeric(whiten)
         [dset.X, dset.axes] = guru_dnw( dset.X, whiten );
@@ -271,9 +271,9 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
     end;
 
     % specifies the dataset to whiten with
-    [xwhiten,~,idx] = guru_getopt(opts, 'xdnw', []); 
+    [xwhiten,~,idx] = guru_getopt(opts, 'xdnw', []);
     if (~isempty(xwhiten))
-    
+
         if (exist('dset_to_match','var') && isfield(dset_to_match,'axes'))
             dset.X    = guru_dnw( dset.X, dset.axes );
         else

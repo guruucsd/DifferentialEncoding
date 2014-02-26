@@ -62,7 +62,7 @@ for ti=1:nt
         if (ri>1), neighbors{ti,ri} = [neighbors{ti,ri} sub2ind([nt nr], ti,  ri-1)]; end;
         if (ri<nr),neighbors{ti,ri} = [neighbors{ti,ri} sub2ind([nt nr], ti,  ri+1)]; end;
         nneighbors(ti,ri) = length(neighbors{ti,ri});
-        
+
         touched(ti,ri) = ~isempty(imgidx{ti,ri});
     end;
 end;
@@ -75,7 +75,7 @@ while ~isempty(allpix)
         cpix = allpix(pi);
         pct_neighbors_on(pi) = mean(touched(neighbors{cpix}));
     end;
-    
+
     % For those with 4 neighbors, spread
     surrounded = find(pct_neighbors_on==max(pct_neighbors_on));
     for si=1:length(surrounded)
@@ -86,10 +86,10 @@ while ~isempty(allpix)
         touched(cpix) = true;
         abc = mean(rtcoeff(cnb,:))
     end;
-    
+
     % Reduce the number of untouched
     allpix = setdiff(allpix, allpix(surrounded));
     if any(touched(allpix)), error('?'); end;
 end;
 
-keyboard
+error('NYI');
