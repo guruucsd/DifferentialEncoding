@@ -49,7 +49,7 @@ end;
 mSets.debug          = 1:11;
 mSets.lrrev          = false;
 %mSets.linout         = true;
-
+mSets.out.titles     = {'RH ()', 'LH ()'};
 % Allow multiple loops, for simplicity's sake (hi, nohup! :D)
 
 for si=1:length(lambdas)

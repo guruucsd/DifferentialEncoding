@@ -85,7 +85,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
       xlabel('frequency (cycles per image)');
 
       % non-normalized
-      colors = @(si) (reshape(0.1 + repmat(length(sigmas)-si(:), [1 3])/numel(sigmas) * 2 .* repmat([0 1 0],[numel(si) 1]),[numel(si) 3]));
+      colors = @(si) (reshape(0.1 + repmat(length(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([0 1 0],[numel(si) 1]),[numel(si) 3]));
       figure;
       hold on;
       %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);

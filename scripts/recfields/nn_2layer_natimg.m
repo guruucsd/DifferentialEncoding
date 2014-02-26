@@ -31,7 +31,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
 
     rand('seed', p.seed);
     randn('seed', p.seed);
-    
+
     % Create grid of points for calculating images
     [X1,X2] = meshgrid([1:p.sz(1)]', [1:p.sz(2)]');
     X = [X1(:) X2(:)];
@@ -51,7 +51,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
                                           'nHidden', 1, ...
                                           'hpl',     1,...
                                           'nConns',  p.nin, ...
-                                          'distn',   {{p.distn}}, ...
+                                          'distn',   {p.distn}, ...
                                           'mu',      0,...
                                           'sigma',   p.Sigma(1),...
                                           'ac', struct('debug', 0, 'tol', 1-p.nin/prod(p.sz), 'useBias', 0, 'WeightInitScale', 0.01, 'WeightInitType', 'randn') ...
@@ -93,7 +93,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
                     dset = de_NormalizeDataset(dset, struct('ac',struct('XferFn',1,'zscore',0.05,'debug',1:15)));
                     %dset.X = dset.X - min(dset.X(:));%dset.X = dset.X(1:end-1,:);
                 end;
-                
+
                 nimages = size(dset.X,2);
                 for ci=1:nimages
                     oi = 1+floor((ci-1)/p.norients); orient=NaN;
@@ -101,7 +101,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
 
                     x = reshape(dset.X(:,1),dset.nInput);
                     resp = x(:);
-                    
+
                     for ixi=1:p.niters
                         resp = sum(resp.*w(:));
                     end;
@@ -173,7 +173,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer_natimg(varargin)
                     best_vals = std_resp(sampnum,:);
                     [~,bestofall(sampnum)] = max(std_resp(sampnum,:));%max(mean(mean(resps,3),2));
 
-                case 'range', 
+                case 'range',
                     rng  = max(alld') - min(alld');
                     [~,bestofall(sampnum)] = max(rng);
 
