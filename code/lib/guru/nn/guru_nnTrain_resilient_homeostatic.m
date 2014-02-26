@@ -36,6 +36,9 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
     % Inject noise into the input
     if (isfield(model, 'noise_input'))
         X      = X_orig + model.noise_input*(randn(size(X)));
+        if ip == 1
+            fprintf('%f noise is %f%% of activation.\n', model.noise_input, 100*model.noise_input/mean(abs(X_orig(:))));
+        end;
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 
@@ -118,7 +121,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
         keyboard;
         model.Weights(huidx,1:(nInputs+1)) = model.avgact * model.Weights(huidx,1:(nInputs+1)) ./ repmat(meanact,[1 nInputs+1]);
         %keyboard
-        
+
     % see eqn 4&5
     elseif isfield(model, 'avgact') %Sullivan & de sa (2006)
         huidx = nInputs+1+[1:nHidden];

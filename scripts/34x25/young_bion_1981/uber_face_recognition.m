@@ -1,7 +1,7 @@
 clear all variables; clear all globals;
 
-stats = {};%'ffts'};
-plts = {stats{:}};
+stats = {'default', 'ffts'};%'ffts'};
+plts = {'train-error', stats{:}};
 
 [args,opts] = uber_face_args( 'plots',plts, 'stats',stats );
 

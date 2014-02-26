@@ -161,7 +161,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                         [~,mp] = max(pdn);
                         [y,x] = ind2sub([sI(2) sI(1)], mp);
                         pdn2D(max(1, y-3):min(end, y+3), x) = pdn2D(max(1, y-3):min(end, y+3), x) * 2.^(coeff);
-                        pdn2D(y, x:min(end, x+3)) = pdn2D(y, x:min(end, x+3)) * 2.^(coeff);
+                        pdn2D(y, x:min(end, x+3)) = pdn2D(y, x:min(end, x+3)) * 2.^(-coeff);
                         pdn = reshape(pdn2D, size(pdn));
 
                     case {'normn'} %norme, but always the same orientation

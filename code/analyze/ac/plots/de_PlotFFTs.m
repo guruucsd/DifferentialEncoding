@@ -167,18 +167,24 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
 
           mv = max(abs([pd1(:);pd2(:)]));
           cl = [-mv mv];
-          subplot(1,2,1); colormap jet; hold on;
+          subplot(1,3,1); colormap jet; hold on;
           title(sprintf('LH (\\sigma=%3.2f) - orig', mSets.sigma(end)));
           imagesc(fftshift(pd2), cl); axis image;
           set(gca, 'xtick',[],'ytick',[]);
-          colorbar;
+          %colorbar;
           xlabel('color == log_{10}(power+1)');
 
-          subplot(1,2,2); colormap jet; hold on;
+          subplot(1,3,2); colormap jet; hold on;
           title( sprintf('RH (\\sigma=%3.2f) - orig', mSets.sigma(1)));
           imagesc(fftshift(pd1), cl); axis image;
           set(gca, 'xtick',[],'ytick',[]);
-          colorbar;
+          %colorbar;
+
+          subplot(1,3,3); colormap jet; hold on;
+          title( sprintf('RH - LH', mSets.sigma(1)));
+          imagesc(fftshift(pd1 - pd2), cl); axis image;
+          set(gca, 'xtick',[],'ytick',[]);
+          %colorbar;
 
           clear('pd1','pd2');
       end;

@@ -1,7 +1,7 @@
 clear all variables; clear all globals;
 
 
-stats={'ffts'}; %distns
+stats={}; %distns
 plots=stats;
 
 [args,opts] = uber_kitterle_args( 'plots',plots,'stats',stats);

@@ -80,7 +80,6 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   % Compute error and error derivative
   %d_a = T - Out(idxOutput,:);   % compute residuals (desired minus actual outputs)
   [Err, Errp] = emo_nnError(Ern, Out(idxOutput,:), T);
-
   % initialize backward pass
   d(idxOutput,:) = (Errp.^Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
 
