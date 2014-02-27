@@ -5,6 +5,9 @@ function model = de_LoadOrTrain(model)
 %   If not, loads results metadata from disk
 % Output model is the 'clean' version without 'heavy' props
 %
+% How to do attentional training:
+%   * Try to load with flags.
+%   * If that fails, then load without the flags, then pass in (how to indicate to skip first training?).
 
   %% Load autoencoder weights, if they exist
   if (  ~model.ac.continue ...
@@ -28,6 +31,16 @@ function model = de_LoadOrTrain(model)
        model.ac = guru_rmfield(model.ac,'hu');
        model.ac = guru_rmfield(model.ac,'output');
     end;
+
+  % Force the separate training of the non-task-based images
+  elseif isfield(model.ac, 'train_on_task_images') && model.ac.train_on_task_images
+      guru_assert(strcmp(model.deType, 'de'), 'train_on_task_images is only supported currently for the de training type.');
+      model.ac.train_on_task_images = false;
+      model = de_LoadOrTrain(model);
+      model.ac.train_on_task_images = true;
+      keyboard;
+      model.ac.cached = false;
+      model.ac.continue = true;
 
   elseif (isfield(model, 'uberpath'))
     error('Uberfile %s not found.', de_GetOutFile(model, 'ac'));
