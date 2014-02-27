@@ -52,10 +52,6 @@ function [models] = de_TrainAllAC(mSets)
             new_model           = de_CopyModelSettings(model, ii);
             new_model.hemi      = ii;
 
-            %
-            train_on_task_images              = new_model.ac.train_on_task_images;
-            new_model.ac.train_on_task_images = false;
-
             % Generate randState for ac
             new_model.ac.randState = randState;
             if isfield(model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
@@ -64,11 +60,6 @@ function [models] = de_TrainAllAC(mSets)
             fprintf('[%3d]',zz);
             new_model = de_Trainer(new_model);
             if (~new_model.ac.cached), fprintf('\n'); end;
-
-            % Tweak params
-            new_model.ac.train_on_task_images = train_on_task_images;
-            new_model.ac.cached = new_model.ac.cached && ~train_on_task_images;
-            new_model.ac.continue = new_model.ac.continue || train_on_task_images;
 
             % Save
             models(zz,ii) = new_model;
