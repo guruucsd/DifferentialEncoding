@@ -5,6 +5,10 @@ function [model] = de_DE(model)
 %   first: train the autoencoder with connectivity differences
 %   then: train the classification network
 %
+%   This function gets called with:
+%     1. AC and AC training data, no p (trains AC only)
+%     2. AC with P training data, and p (loads hidden unit data for P training data, trains perceptron)
+%
 % Inputs:
 % model      : see de_model for details
 %
@@ -24,23 +28,23 @@ function [model] = de_DE(model)
     fprintf('| (cached)');
 
   else
-    % Set up input/output pairs
-    X = model.data.train.X;
-    Y = model.data.train.X(1:end-1,:);
-
     % Create connectivity
     if (~model.ac.continue)
         [model.ac.Conn, model.ac.Weights]    = de_connector(model);
     end;
 
+    % Train the model on the training images
+    if ~isfield(model.ac, 'train_on_task_images') || ~model.ac.train_on_task_images
+        [model.ac] = guru_nnTrainAC(model.ac, model.data.train.X);
+        fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));
 
-    % Train the model
-    [model.ac] = guru_nnTrainAC(model.ac,X);
-    clear('X', 'Y');
-
+    % Train the model on the classification images (if requested)
+    else
+        [model.ac] = guru_nnTrainAC(model.ac, model.data.train.X);
+        fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));
+    end;
 
     % report results to screen
-    fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));
     ih_mn = 0+min(min(model.ac.Weights(nPixels+1+[1:model.nHidden], 1:nPixels+1)));
     ih_mx = 0+max(max(model.ac.Weights(nPixels+1+[1:model.nHidden], 1:nPixels+1)));
     ho_mn = 0+min(min(model.ac.Weights(nPixels+1+model.nHidden+[1:nPixels], nPixels+[1:model.nHidden])));
@@ -48,19 +52,18 @@ function [model] = de_DE(model)
     fprintf('\twts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}\n', ih_mn,ih_mx,ho_mn,ho_mx);
   end;
 
-  % Even if it's cached, we need the output characteristics
+  % Even if it`s cached, we need the output characteristics
   %   of the model.
   if (~isfield(model.ac,'hu'))
 
     try
-      error('Can''t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
+      error('Can`t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
       model = de_LoadProps(model, 'ac',{'hu','output'});
       %if size(
     catch
-
      if ismember(11, model.debug), fprintf('Failed to find hu output on disk; computing now.\n'); end;
 
-     % Make sure the autoencoder's connectivity is set.
+     % Make sure the autoencoder`s connectivity is set.
       model = de_LoadProps(model, 'ac', 'Weights');
       model.ac.Conn = (model.ac.Weights~=0);
 
@@ -74,7 +77,6 @@ function [model] = de_DE(model)
   % Create and train the perceptron
   %--------------------------------%
   if (isfield(model, 'p'))
-
       if (~model.p.cached)
         good_train = ~isnan(sum(model.data.train.T,1));
         nTrials    = sum(good_train); % count the # of trials with no NaN anywhere in them

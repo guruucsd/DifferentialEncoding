@@ -43,7 +43,6 @@ function [models] = de_TrainAllP(mSets, modelsAC)
         model.p.randState = randState;
         rand ('state',model.p.randState);
 
-
         fprintf('[%3d]',mm);
         models(mm,pd,pe,pa,pi) = de_Trainer(model);
         if (~models(mm,pd,pe,pa,pi).p.cached), fprintf('\n'); end;
