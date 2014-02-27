@@ -8,4 +8,4 @@ k=exp(-t./tau + mu./tau + sigma.^2./2./tau.^2).*normcdf((t-mu-sigma.^2./tau)./si
 k(k==Inf)=zeros(length(k(k==Inf)),1);
 if tau<0 | sigma<0,
    k=zeros(length(k),1);
-end   
+end

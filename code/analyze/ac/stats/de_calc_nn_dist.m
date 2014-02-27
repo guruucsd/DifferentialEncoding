@@ -17,6 +17,6 @@ for ci=1:length(cx)%  For each connected unit
   end;
 end;
 
-unique_nn_dist = nn_dist(triu(nn_dist,1)~=0);  
+unique_nn_dist = nn_dist(triu(nn_dist,1)~=0);
 min_nn_dist = min(nn_dist);
 mean_nn_dist = mean(min_nn_dist);

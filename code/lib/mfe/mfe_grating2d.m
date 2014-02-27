@@ -1,5 +1,5 @@
 function H=mfe_grating2d(f,phi,theta,A,height,width)
-% H=grating2d(f,phi,theta,A,height,width) 
+% H=grating2d(f,phi,theta,A,height,width)
 % function to generate a 2D grating image
 %
 % f = frequency
@@ -20,4 +20,3 @@ function H=mfe_grating2d(f,phi,theta,A,height,width)
           H(y,x)=A*cos(wx*(x-width/2)+phi+wy*(y-height/2));
       end
   end
-  

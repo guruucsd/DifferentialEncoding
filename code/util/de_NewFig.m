@@ -1,5 +1,7 @@
 function fig = de_NewFig(varargin)
+%function fig = de_NewFig(varargin)
 %
+% Initializes a new figure object with a handle, size, position, and title.
 
   % Snip off figure
   if (ischar(varargin{1}) ...
@@ -7,10 +9,10 @@ function fig = de_NewFig(varargin)
       fig = struct('handle', [], 'name', [], 'size', [], 'cached', []);
       fig = fig([]);
       return;
-      
+
   elseif (isempty(varargin))
       fig.handle = figure;
-      
+
   elseif ischar(varargin{1})
       fig.handle = figure;
 %      fig.name   = varargin{1};
@@ -18,26 +20,26 @@ function fig = de_NewFig(varargin)
       fig.handle = varargin{1};
       varargin = varargin(2:end);
   end;
-  
+
   % Parse off expected values
   figName = varargin{1};  varargin = varargin(2:end);
   if (isempty(varargin))
       figType = 'default';
   else,  figType = varargin{1}; varargin=varargin(2:end);
   end;
-  
-  
-  
+
+
+
   fig.name   = figName;
   set(gca,'FontSize',18,'FontWeight','bold');
 %  xlabel('', 'FontSize',24);
 %  ylabel('', 'FontSize', 24);
-  
+
   switch (figType)
     case 'default'
       pps = get(fig.handle,'PaperPosition');
       fig.size = pps(3:4);
-      
+
     case '__img'
       imgSize = varargin{1};
       nPlots = varargin{2};
@@ -49,7 +51,7 @@ function fig = de_NewFig(varargin)
 
     case 'hu'
       fig = de_NewFig(fig.handle, figName, '__img', varargin{2}, varargin{1});
-      
+
     case 'bars'
       [nRows,nCols] = guru_optSubplots(varargin{1});
       fig.size = [6+varargin{2}*0.4 12];
@@ -57,5 +59,5 @@ function fig = de_NewFig(varargin)
     otherwise
       error('Unknown fig type: %s', figType);
   end;
-  
+
   if (~isfield(fig, 'cached')), fig.cached = 0; end;

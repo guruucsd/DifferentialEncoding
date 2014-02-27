@@ -22,7 +22,7 @@ function is = guru_findstr(str, tomatch, startIdx,style)
     else
       is = tmp(1);
     end;
-    
+
   else
     is = zeros(size(str));
     for i=1:numel(is)
@@ -45,4 +45,4 @@ function is = guru_findstr(str, tomatch, startIdx,style)
     case 'last', is=is(end);
     otherwise, error('Unknown style parameter: %s', style);
   end;
-  
+

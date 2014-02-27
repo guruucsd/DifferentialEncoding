@@ -44,55 +44,55 @@ function [X,XLAB] = stim2D(stimSet, nInput)
 
     lets = num2cell(stimSet);
     nlets = length(lets);
-    
+
     X = zeros(prod(nInput),nlets.^2);
     XLAB = cell(nlets.^2,1);
-    
+
     fontsize = 48*(nInput(1)/135); %48pt on 135px height image works well
-    
+
     for ti=1:nlets
         for bi=1:nlets
             ii = (bi-1)*nlets+ti;
-            
+
             im = zeros(nInput(1),nInput(2),3,'uint8');%uint8(255*ind2rgb(X,map));
             midpt = 0.5*[size(im,2) size(im,1)];
 
-            %% Create the text mask 
-            % Make an image the same size and put text in it 
+            %% Create the text mask
+            % Make an image the same size and put text in it
             hf = figure('color','white','units','normalized','position',[.1 .1 .8 .8]);
-            image(ones(size(im))); 
+            image(ones(size(im)));
             set(gca,'units','pixels','position',[5 5 size(im,2)-1 size(im,1)-1],'visible','off')
 
-            % Text at arbitrary position 
-            text('units','pixels','position',[midpt(1)   midpt(2)/2],'fontsize',fontsize,'string',lets{ti},'VerticalAlignment', 'middle', 'HorizontalAlignment','center') 
-            text('units','pixels','position',[midpt(1) 3*midpt(2)/2],'fontsize',fontsize,'string',lets{bi},'VerticalAlignment', 'middle', 'HorizontalAlignment','center') 
+            % Text at arbitrary position
+            text('units','pixels','position',[midpt(1)   midpt(2)/2],'fontsize',fontsize,'string',lets{ti},'VerticalAlignment', 'middle', 'HorizontalAlignment','center')
+            text('units','pixels','position',[midpt(1) 3*midpt(2)/2],'fontsize',fontsize,'string',lets{bi},'VerticalAlignment', 'middle', 'HorizontalAlignment','center')
 
 %            for ri=1:10
-%                % Capture the text image 
+%                % Capture the text image
 %                % Note that the size will have changed by about 1 pixel
 %                figure(hf);
-%                tim = getframe(gca); 
+%                tim = getframe(gca);
 %
 %                % Extract the cdata
 %                tim2 = tim.cdata;
 %
-%                % Make a mask with the negative of the text 
-%                tmask = tim2==0; 
+%                % Make a mask with the negative of the text
+%                tmask = tim2==0;
 %
 %                if any(tmask(:)), break; end;
 %            end;
             tf = [tempname() '.tif'];
             print(hf, tf, '-dtiff');
-            close(hf) 
+            close(hf)
             tim = imread(tf);
             tim2 = tim(end-nInput(1):end,1:nInput(2));
             tmask = tim2==0;
 
             if ~any(tmask(:)), error('?'); end;
 
-            % Place white text 
-            % Replace mask pixels with UINT8 max 
-            im(tmask) = uint8(255); 
+            % Place white text
+            % Replace mask pixels with UINT8 max
+            im(tmask) = uint8(255);
             im = mean(im,3);
 
             %figure(f);
@@ -118,7 +118,7 @@ function [X,XLAB] = stim2D(stimSet, nInput)
       for bi=1:length(blurs)
           orig_img = reshape(X(:,ii), nInput);
           kernel = blurs(bi);
-          
+
           filt     = fspecial('gaussian', [kernel kernel], 4);
           blur_img = imfilter(orig_img,filt,'same');
 
@@ -127,7 +127,7 @@ function [X,XLAB] = stim2D(stimSet, nInput)
           XLAB_new{newidx} = sprintf('%s%%%dpx', XLAB{ii}, blurs(bi));
       end;
   end;
-  
+
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [T, TLAB]         = de_createTargets(taskType, X, XLAB)
@@ -137,7 +137,7 @@ function [X,XLAB] = stim2D(stimSet, nInput)
   nimg = size(X,2);
   T = zeros(1,nimg);
   TLAB = cell(nimg,1);
-  
+
   for ii=1:nimg
       tlet = XLAB{ii}(1); blet=XLAB{ii}(3);
       T(ii) = double(tlet==blet);

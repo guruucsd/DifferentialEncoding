@@ -8,23 +8,23 @@ function [Con] = de_connector(model)
 %
 % Outputs:
 % Con   : connectivity matrix
-  
+
     [Con, hpl, mu] = de_connector1D( prod(model.nInput), ...
                                   model.nHidden,...
                                   model.nConns,...
                                   model.mu,...
                                   model.sigma,...
                                   model.ac.debug);
-                                  
-                                  
+
+
  function [Con, hpl, mu] = de_connector1D(nPixels,nHidden,n_Conn,sigma,dbg)
   %
     [mu,hpl] = de_connector_positions(nHidden,dbg);
-    
+
     x=1:nPixels+1;
     Con=zeros(2*nPixels+nHidden);
     C=zeros(nHidden,nPixels);
-    
+
     for k=1:nHidden;
         y=normcdf(x,mu(k),sigma);
         Area=max(y)-min(y);
@@ -45,4 +45,3 @@ function [Con] = de_connector(model)
     end
     Con(nPixels+1:nPixels+nHidden,1:nPixels)=C;
     Con(nPixels+nHidden+1:end,nPixels+1:nPixels+nHidden)=C';%...end making the connections
-    

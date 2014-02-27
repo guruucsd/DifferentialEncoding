@@ -7,8 +7,8 @@ function [rejMats] = de_FindRejectionsAC(mss, rejSets, stats, rejMats)
   end;
 
   nSigmas = length(mss);
-  
-  % 
+
+  %
   if (~exist('rejMats','var') || isempty(rejMats))
     rejMats = cell(nSigmas,1);
     for k=1:nSigmas

@@ -33,8 +33,8 @@
 %   - Variable image compression, including lossless (pdf, eps, jpg)
 %   - Optionally append to file (pdf, tiff)
 %   - Vector formats: pdf, eps
-%   - Bitmap formats: png, tiff, jpg, bmp, export to workspace 
-%   
+%   - Bitmap formats: png, tiff, jpg, bmp, export to workspace
+%
 % This function is especially suited to exporting figures for use in
 % publications and presentations, because of the high quality and
 % portability of media produced.

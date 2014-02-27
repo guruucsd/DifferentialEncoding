@@ -1,6 +1,6 @@
 function F=MLE(p,func,t,byn)
 % MLE Objective function for maximizing likelihood
-% Syntax F=MLE(p,func,t,byn), where p is a vector of parameters to be 
+% Syntax F=MLE(p,func,t,byn), where p is a vector of parameters to be
 % passed to the function func, and t is the data vector.  The variable
 % byn, if present, signals that the likelihood should by computed only
 % for the unique values in t.

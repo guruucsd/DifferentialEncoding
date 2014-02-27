@@ -1,16 +1,16 @@
 function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
-% Takes in an array of strings, assumes they're a list of key-value pairs, 
+% Takes in an array of strings, assumes they're a list of key-value pairs,
 %   and fills in any key-value pairs that we expect but weren't specified.
-%   
+%
 
   if (mod(nargin,2)==1), error('Odd # args; must be key-value pairs (even total #)'); end;
   aKeys = varargin(1:2:end);
 
   % Whatever we have, we output.
   args = varargin;
-  
+
   % Whatever we don't have, add!
-  
+
   % Run parameters
   if (~ismember('parallel',         aKeys)), args(end+1:end+2) = {'parallel', false}; end;
 
@@ -29,11 +29,11 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   %----------------
   % DE Training Params
   %----------------
-  
+
   % de
   if (~ismember('dataFile',         aKeys)), args(end+1:end+2) = {'dataFile', de_GetDataFile(expt, stimSet, taskType, opt); }; end;
-  
-  % autoencoder  
+
+  % autoencoder
   if (~ismember('ac.randState',     aKeys)), args(end+1:end+2) = {'ac.randState',     1}; end;
   if (~ismember('ac.AvgError',      aKeys)), args(end+1:end+2) = {'ac.AvgError',      0}; end;
   if (~ismember('ac.MaxIterations', aKeys)), args(end+1:end+2) = {'ac.MaxIterations', 350}; end;
@@ -72,27 +72,27 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
       if (~ismember('p.WeightInitScale',aKeys)), args(end+1:end+2) = {'p.WeightInitScale',0.10}; end;
       if (~ismember('p.debug',          aKeys)), args(end+1:end+2) = {'p.debug',         1}; end;
       if (~ismember('p.continue',       aKeys)), args(end+1:end+2) = {'p.continue',      0}; end;
-    
+
       if (~ismember('p.nHidden',        aKeys)), args(end+1:end+2) = {'p.nHidden',       1}; end;
       if (~ismember('p.ts',             aKeys)), args(end+1:end+2) = {'p.ts',            1}; end;
       if (~ismember('p.lambda',         aKeys)), args(end+1:end+2) = {'p.lambda',        0}; end;
       if (~ismember('p.zscore',         aKeys)), args(end+1:end+2) = {'p.zscore',        false}; end;
       if (~ismember('p.ndupes',         aKeys)), args(end+1:end+2) = {'p.ndupes',        1}; end;
-    
+
       if (~ismember('p.rej.props',      aKeys)), args(end+1:end+2) = {'p.rej.props',  {'err'}}; end;
       if (~ismember('p.rej.type',       aKeys)), args(end+1:end+2) = {'p.rej.type',   {'sample_std-normd'}}; end;
       if (~ismember('p.rej.width',      aKeys)), args(end+1:end+2) = {'p.rej.width',  [3]}; end;
   end;
-  
+
   %----------------
   % DE Analysis Params
   %----------------
-  
+
   if (~ismember('errorType',        aKeys)), args(end+1:end+2) = {'errorType', 2}; end;
 
   if (~ismember('plots',            aKeys)), args(end+1:end+2) = {'plots', {'default'}}; end; %ls-bars', 'outliers'}}; end;
   if (~ismember('stats',            aKeys)), args(end+1:end+2) = {'stats', {'default'}}; end;
-  
+
   if (~ismember('out.runspath',     aKeys)), args(end+1:end+2) = {'out.runspath',    de_GetOutPath([], 'runs')}; end;
   if (~ismember('out.resultspath',  aKeys)), args(end+1:end+2) = {'out.resultspath', de_GetOutPath([], 'results')}; end;
   if (~ismember('out.data',         aKeys)), args(end+1:end+2) = {'out.data',        {'info','mat'}}; end;

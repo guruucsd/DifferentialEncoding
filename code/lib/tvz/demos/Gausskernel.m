@@ -1,6 +1,6 @@
 function k=Gausskernel(t,y,a)
 % GAUSSKERNEL The Gaussian kernel density estimate.
-% Syntax k=Gausskernel(t,y,a), where t are the time points, y is the 
+% Syntax k=Gausskernel(t,y,a), where t are the time points, y is the
 % sorted data, and a is an optional multiplicative constant for the
 % bandwidth parameter h.
 if (nargin==2)

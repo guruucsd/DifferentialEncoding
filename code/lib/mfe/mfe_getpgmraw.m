@@ -1,4 +1,4 @@
-% getpgmraw.m 
+% getpgmraw.m
 % -----------
 %
 % function  [pic,maxgray]=getpgmraw(filename)
@@ -9,7 +9,7 @@
 % PURPOSE:
 %         Reads gray scale PGM (raw) images.
 %
-% ARGUMENTS: 
+% ARGUMENTS:
 %         filename: A string containing the name of the image file to be read.
 %
 % RETURNS:
@@ -18,7 +18,7 @@
 %
 % (No dependancies)
 %
-  
+
 function [pic,maxgray]=getpgmraw(filename)
 
 
@@ -33,7 +33,7 @@ function [pic,maxgray]=getpgmraw(filename)
 %.
  code=fscanf(fid,'%s',1);
  if (code ~= 'P5')
-	error('Not a PGM (raw) image');
+    error('Not a PGM (raw) image');
  end
 
 
@@ -58,7 +58,7 @@ function [pic,maxgray]=getpgmraw(filename)
 
 %% Read actual data.
 %
- cnt=fread(fid,1);		% newline
+ cnt=fread(fid,1);        % newline
  pic=fread(fid,[width,height])'/255; %matlab images go from 0 to 1, not 0 to 255 like pgms
 
 
@@ -66,7 +66,7 @@ function [pic,maxgray]=getpgmraw(filename)
 %
  fclose(fid);
 
- 
+
 
 %%%%
 

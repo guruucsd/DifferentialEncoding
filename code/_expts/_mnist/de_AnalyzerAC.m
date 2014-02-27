@@ -7,12 +7,11 @@ function [stats, figs]  = de_AnalyzerAC(mSets, mss)
 % models   : resulting models after training
 %
 % Outputs:
-% stats      : 
-% figs       : 
+% stats      :
+% figs       :
 
   [stats,figs] = de_AnalyzerDE(mSets, mss);
   [mss]        = de_DoRejections(mss, stats.raw.r);
-  
+
   % we should be doing something here, no?
   error('mnist-specific analyses NYI');
-  

@@ -1,7 +1,7 @@
 function fetchMcmcPackages()
-    %Attempts to download dram package from 
+    %Attempts to download dram package from
     %http://www.helsinki.fi/~mjlaine/dram/dramcode.zip
-    %and Spatial Econometrics toolbox from 
+    %and Spatial Econometrics toolbox from
     %http://www.spatial-econometrics.com/html/jplv7.zip
     %Unzip it, and add to the path
     %These are required for MCMC-based error bars
@@ -12,7 +12,7 @@ function fetchMcmcPackages()
     fprintf('Fetching spatial econometrics toolbox (6MB)\n');
     mkdir([thepath '/econo']);
     unzip('http://www.spatial-econometrics.com/html/jplv7.zip',[thepath '/econo']);
-    
+
     addpath([thepath '/dram']);
     addpath([thepath '/dram/utils']);
     addpath(genpath([thepath '/econo']));

@@ -93,7 +93,7 @@ function [model] = de_DE_Stacked(model)
                                                                          model.p.WeightInitType);
             model.p.Weights(1:(pInputs+acHidden), 1:(pInputs+acHidden)) = model.ac.Weights(1:(pInputs+acHidden), 1:(pInputs+acHidden));
         end;
-         
+
         % Train
         [model.p] = guru_nnTrain(model.p, X_train(:,good_train), Y_train(:,good_train));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
@@ -105,8 +105,8 @@ function [model] = de_DE_Stacked(model)
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(good_train) );
-        
-      
+
+
         % TEST
         X_test = model.data.test.X;
         Y_test = model.data.test.X(1:end-1,:);

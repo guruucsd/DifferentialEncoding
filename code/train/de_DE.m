@@ -51,11 +51,11 @@ function [model] = de_DE(model)
   % Even if it's cached, we need the output characteristics
   %   of the model.
   if (~isfield(model.ac,'hu'))
-    
+
     try
       error('Can''t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
       model = de_LoadProps(model, 'ac',{'hu','output'});
-      %if size(  
+      %if size(
     catch
 
      if ismember(11, model.debug), fprintf('Failed to find hu output on disk; computing now.\n'); end;
@@ -133,8 +133,8 @@ function [model] = de_DE(model)
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(:,good_train) );
-        
-      
+
+
         % TEST
         p_test     = model.p;
 
@@ -152,7 +152,7 @@ function [model] = de_DE(model)
           X_test    = model.p.zscore_across * X_test ./ repmat( std(X_test, 0, 2), [1 size(X_test,2)] ); %z-score the code
         end;
         fprintf('\tP dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
-        
+
         % Add bias
         if (model.p.useBias)
             biasArray=biasVal*ones(1,nTrials);

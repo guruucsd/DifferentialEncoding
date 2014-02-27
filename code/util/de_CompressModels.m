@@ -3,7 +3,7 @@ function [models] = de_CompressModels(models)
 % Remove fields that are unnecessary
 
   % Compress the data
-  
+
   for i=1:prod(size(models))
     % AC:
     %   1. Can get connectivity matrix back later
@@ -15,11 +15,11 @@ function [models] = de_CompressModels(models)
       end;
       models(i).ac = rmfield(models(i).ac,'Conn');
     end;
-    
+
     if (isfield(models(i).ac, 'Eta'))
         models(i).ac = rmfield(models(i).ac, 'Eta');
     end;
-    
+
 
     % P:
     %   1. Can get connectivity matrix back later
@@ -36,9 +36,9 @@ function [models] = de_CompressModels(models)
         if (isfield(models(i).p, 'Eta'))
             models(i).p = rmfield(models(i).p, 'Eta');
         end;
-    end;    
-    
-    
+    end;
+
+
     % data
     %   1. train and test are big but redundant; we have the dataFile stamped
     %
@@ -46,5 +46,5 @@ function [models] = de_CompressModels(models)
     %   if (isfield(models(i).data, 'train')), models(i).data = rmfield(models(i).data,'train'); end;
     %   if (isfield(models(i).data, 'test')),  models(i).data = rmfield(models(i).data,'test');  end;
     %end;
-    
+
   end;

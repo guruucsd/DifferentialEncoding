@@ -44,7 +44,7 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
 
   function [dset] = applyOptions(opts, dset)
     if guru_hasopt(opts,'square')
-      dset.X(dset.X<=0) = -1; 
+      dset.X(dset.X<=0) = -1;
       dset.X(dset.X>0)  = 1;
       guru_assert(dset.X==-1 | dset.X==1, 'make sure all values are -1 or 1');
       dset.type='square';

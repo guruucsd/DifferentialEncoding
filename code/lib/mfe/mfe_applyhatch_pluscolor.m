@@ -16,12 +16,12 @@ function [im_hatch,colorlist] = applyhatch_pluscolor(h,patterns,CvBW,Hinvert,col
 %  discussed below will be ignored if H is an image matrix.
 %
 %  APPLYHATCH_PLUSCOLOR(H,PATTERNS,CVBW) binary value for choice of Color or Black
-%  and White plots. If color is chosen the color will match that of the 
+%  and White plots. If color is chosen the color will match that of the
 %  current fill. 1 -> Color, anything else -> BW
 %
 %  APPLYHATCH_PLUSCOLOR(H,PATTERNS,CVBW,HINVERT) binary value to invert the hatch.
 %  i.e., if it is black lines with a white background, that becomes white
-%  lines with a black background. This can either be a scalar value or a 
+%  lines with a black background. This can either be a scalar value or a
 %  1xN array equal to the length of PATTERNS. When used as an array each
 %  PATTERNS(i) will be inverted according to Hinvert(i). 1 -> Invert,
 %  anything else -> Non Inverted
@@ -75,7 +75,7 @@ function [im_hatch,colorlist] = applyhatch_pluscolor(h,patterns,CvBW,Hinvert,col
 %    im = imread( 'im.tiff', 'tiff' );
 %    [im_hatch,colorlist] = applyhatch_pluscolor(im,'\-x.');
 %    imwrite(im_hatch,'im_hatch.tiff','tiff')
-%    
+%
 %
 % Modification of APPLYHATCH to allow higher resolution output
 % Modified Brian FG Katz    8-aout-03
@@ -87,7 +87,7 @@ function [im_hatch,colorlist] = applyhatch_pluscolor(h,patterns,CvBW,Hinvert,col
 %  See also: APPLYHATCH, APPLYHATCH_PLUS, MAKEHATCH, MAKEHATCH_PLUS
 
 %  By Ben Hinkle, bhinkle@mathworks.com
-%  This code is in the public domain. 
+%  This code is in the public domain.
 
 
 if ~exist('CvBW','var'); CvBW = 0      ; end  % defaults to black and white
@@ -126,7 +126,7 @@ if numel(h) == 1 % Assume it is a figure window
   % print( '-dtiff', [ '-r' num2str(dpi) ], tn )
   % bits = uint8( imread( tn, 'TIFF' ) );
   % delete(tn)
-  
+
   set(h,'paperpositionmode',oldppmode);
   set(h,'color',oldcolor);
 elseif size(h,3) == 3 % Assume it is an image matrix
@@ -134,7 +134,7 @@ elseif size(h,3) == 3 % Assume it is an image matrix
   oldunits='pixels';
   oldpos = [ 0, 0, size(bits,2), size(bits,1) ];
   figsize = oldpos;
-else 
+else
   error( 'Bad first argument.' );
 end
 
@@ -154,7 +154,7 @@ bits = reshape(bits,[bsize,3]);
 if ~isempty(colorlist)
   % NOTE: Added "floor" below because this seems to better pick out
   % correct colors produced by "hardcopy above better than uint8 by itself
-  
+
   %colorlist = uint8(255*colorlist);
   colorlist = uint8(floor(255*colorlist));
 else
@@ -171,7 +171,7 @@ else
         C = 1:size(B,1);
         C = C(2:end-1)';
   end
-  
+
   colorlist = B( C , : );
 end
 
@@ -197,7 +197,7 @@ for k = 1:size(colorlist,1)
     pattern = patterns;
   end
   pattern = uint8(1-pattern);
-  
+
   if length(Hinvert) == 1
     invertHatch = logical(Hinvert);
   else
@@ -216,7 +216,7 @@ for k = 1:size(colorlist,1)
   if ratiow*pwidth > bwidth
     bigpattern(:,bwidth+1:end) = [];
   end
-  
+
   % Put that pattern into bits and logical values based on CvBW and Hinvert
   switch CvBW
       case 0 % BW
@@ -238,7 +238,7 @@ for k = 1:size(colorlist,1)
                 (uint8(~bigpattern(I)) * colorlist(k,3)) + uint8((bigpattern(I)) * 255)];
           end
   end
-  
+
 end
 
 % Put bits back into its normal shape

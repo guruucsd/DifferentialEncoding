@@ -268,7 +268,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
             model.ac.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]) = in2hu_c' .* model.ac.Weights(ws.inPix+1+model.nHidden+[1:model.nOutput], ws.inPix+1+[1:model.nHidden]);
             clear('in2hu_c');
 
-            model.nConns = round( (nConnCurr-nout)/model.nHidden/2 ); 		% Re-estimate the current # of connections per hidden unit
+            model.nConns = round( (nConnCurr-nout)/model.nHidden/2 );         % Re-estimate the current # of connections per hidden unit
 
 
             % Validate that the input & output layers are symmetric
@@ -320,7 +320,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
 
     % Make sure that all pruning has completed, and as expected
     nConnCurr      = (nnz(model.ac.Conn)-model.nHidden-model.nOutput);
-	guru_assert( nConnCurr==model.nConnPerHidden_End*model.nHidden*2, 'Remove exactly the right # of connections!!');
+    guru_assert( nConnCurr==model.nConnPerHidden_End*model.nHidden*2, 'Remove exactly the right # of connections!!');
 
     %%%%%%%%%%%%%%%%%
     % Analyze/verify the model

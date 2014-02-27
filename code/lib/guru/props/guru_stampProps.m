@@ -12,7 +12,7 @@ function mSets = guru_stampProps(varargin)
 
     mSets = varargin{1};
     varargin = varargin(2:end);
-  
+
   elseif 1==mod(length(varargin),2), error('Must pass in arg/val pairs; found odd # of input args');
   elseif ~ischar(varargin{1}),       error('First arg must be an object (to stamp props on) or a string (prop name for next value)');
 
@@ -25,7 +25,7 @@ function mSets = guru_stampProps(varargin)
   for pi=1:2:length(varargin)
     prop = varargin{pi};
     val  = varargin{pi+1};
-    
+
     % Make sure cell-like properties are cells
     if (~ischar(prop))
       error('arg # %d is not a prop name', pi);
@@ -37,7 +37,7 @@ function mSets = guru_stampProps(varargin)
           val = {val};
         end;
     end;
-    
+
     % set on object
     parts = mfe_split('.', prop);
     switch (length(parts))
@@ -49,4 +49,3 @@ function mSets = guru_stampProps(varargin)
         otherwise, error('parts depth too great; copy-paste more, you hack!');
     end;
   end;
-  

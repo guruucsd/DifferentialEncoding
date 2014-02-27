@@ -6,12 +6,12 @@ function [te, pval] = de_StatsTrainErrorP(models)
 % Input:
 % LS            :
 % errAutoEnc    :
-% 
+%
 % Output:
 % err           :
 
   te = cell(length(models), 1);
-  
+
   for s=1:length(models)
       if isempty(models{s}), continue; end;
       p  = [models{s}.p];

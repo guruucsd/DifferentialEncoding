@@ -34,10 +34,10 @@ function [str] = de_modelSummary(model, style)
   else
       pSummary = '';
   end;
-  
+
   str = [deSummary acSummary pSummary];
   str = regexprep(str, '\n', sprintf('\n\t')); %indent
-  
+
   switch (style)
     case 'pre-hash'
       str = regexprep(str, ', trials=[0-9]+', '');

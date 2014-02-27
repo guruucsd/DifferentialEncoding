@@ -1,4 +1,4 @@
-function figs = de_FigurizerP(mSets, mss, stats)  
+function figs = de_FigurizerP(mSets, mss, stats)
 %
 %
 
@@ -8,7 +8,7 @@ function figs = de_FigurizerP(mSets, mss, stats)
     mSets.plots = setdiff(unique({mSets.plots{:} default_plots{:}}), {'default'});
   end;
 
-  % Set up dummy struct  
+  % Set up dummy struct
   figs = de_NewFig('dummy');
 
   % Plots over the whole expt

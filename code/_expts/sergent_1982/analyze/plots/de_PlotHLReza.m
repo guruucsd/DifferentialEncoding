@@ -8,28 +8,28 @@ function [fig] = de_PlotReza(mSets, LS, errAC, sigmas)
 % LS            :
 % errAutoEnc    :
 % rmode         : (optional) rejections mode
-% dbg           : (optional) 
+% dbg           : (optional)
 %
 % Output:
 % fig             : array of handles to plots
 
   fig = de_NewFig('reza', 'images', 6);
- 
+
   % Make assigments so that reza's code works
-  rLpSm(:,1) = LS{1}(:,mSets.data.LpSm); rLpSm(:,2) = LS{2}(:,mSets.data.LpSm); 
-  rSpLm(:,1) = LS{1}(:,mSets.data.LmSp); rSpLm(:,2) = LS{2}(:,mSets.data.LmSp); 
-  rLpSp(:,1) = LS{1}(:,mSets.data.LpSp); rLpSp(:,2) = LS{2}(:,mSets.data.LpSp); 
-  rLmSm(:,1) = LS{1}(:,mSets.data.LmSm); rLmSm(:,2) = LS{2}(:,mSets.data.LmSm); 
-  
+  rLpSm(:,1) = LS{1}(:,mSets.data.LpSm); rLpSm(:,2) = LS{2}(:,mSets.data.LpSm);
+  rSpLm(:,1) = LS{1}(:,mSets.data.LmSp); rSpLm(:,2) = LS{2}(:,mSets.data.LmSp);
+  rLpSp(:,1) = LS{1}(:,mSets.data.LpSp); rLpSp(:,2) = LS{2}(:,mSets.data.LpSp);
+  rLmSm(:,1) = LS{1}(:,mSets.data.LmSm); rLmSm(:,2) = LS{2}(:,mSets.data.LmSm);
+
   BAR(1,:)=sum(rLpSm);BAR(2,:)=sum(rSpLm);
   BAR(3,:)=sum(rLpSp);BAR(4,:)=sum(rLmSm);
   BAR=BAR/size(rLpSm,1);
-  
+
   learningError = zeros(size(errAC));
   for i=1:length(errAC)
     learningError(i) = mean(errAC{i},1); %
   end;
-  
+
   % Copy/paste reza's code here!
   subplot(2,3,1)
   plot(rLpSm(:,1),'g'); hold on

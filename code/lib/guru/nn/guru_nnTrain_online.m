@@ -21,7 +21,7 @@ function [model,o_p] = guru_nnTrain_online(model,X,Y)
   model.Eta = model.EtaInit;
   lastErr   = inf;
   currErr   = inf;
-  grad      = zeros(size(model.Conn)); 
+  grad      = zeros(size(model.Conn));
 
   % first loop just assesses the current state of the network; no gradient update
   for ip = 1:model.MaxIterations
@@ -48,7 +48,7 @@ function [model,o_p] = guru_nnTrain_online(model,X,Y)
       end;
       model = m;
       currErr = currErr + c;
-      
+
       if ((ip>0) && exist('o_p','var')), o_p(ip,:,ep) = o; end;
     end;
 

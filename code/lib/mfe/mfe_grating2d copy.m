@@ -4,7 +4,7 @@ function H=grating2d(f,phi,theta,A,height,width)
 % phi = phase
 % theta = angle
 % A = amplitude
-% H=grating2d(f,phi,theta,A) 
+% H=grating2d(f,phi,theta,A)
 % size of grating
   if (~exist('height','var')), height=100; end;
   if (~exist('width','var')),  width=100; end;

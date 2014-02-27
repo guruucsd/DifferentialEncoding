@@ -9,13 +9,13 @@ function de_SetupExptPaths(expt_name)
 
   % Parse out paths
   p = mfe_split(':', path());
-  
+
   % Remove all other experiments
   base_expts_dirname = guru_fileparts(guru_fileparts(expt_dir, 'path'), 'name');
   other_expt_dirs    = p(guru_instr(p, fullfile('',base_expts_dirname,'')));
-  if (~isempty(other_expt_dirs)), 
+  if (~isempty(other_expt_dirs)),
       rmpath(other_expt_dirs{:}); % a hack about the structure of the directories here
   end;
-  
+
   % Add back THIS experiment to the top of the path
   addpath(genpath(expt_dir));

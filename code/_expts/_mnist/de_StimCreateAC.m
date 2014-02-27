@@ -19,29 +19,29 @@ function de_StimCreateAC(stimSet, opt)
 %
 %  TALL:  index containing above 8 indices
 %  TLBL : labels for all trial types, as indexed above
-%  
+%
 %  STIM : cell array containing each stimulus (usually 4: 2 targets, 2 distracters
 %
 %  train.X    : matrix containing 16 vectors, each a unique hierarchical stimulus.
 %  train.TT   : 16 indices, one for each hierarchical stimulus, taken from TALL
-%  train.ST   : vector of 16 strings, describing each unique hierarchical stimulus.  
+%  train.ST   : vector of 16 strings, describing each unique hierarchical stimulus.
 %               Tells the two stimuli and relationship that make up the hierarchical stimulus
 %  train.TIDX : ?
 %
 %  train.Y    : target vectors for autoencoder (same as X)
 %  train.T    : target vectors for perceptron (labels, based on task)
 %
-%  test.*     : same as train object, but 
+%  test.*     : same as train object, but
 
   if (~exist('stimSet', 'var')), stimSet  = 'de'; end;
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
   dim = 2;
-  
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+
   % With this info, create our X and TT vectors
   [train] = stim2D(stimSet, 'train');
   [train] = de_applyOptions(opt, train);
@@ -50,8 +50,8 @@ function de_StimCreateAC(stimSet, opt)
   [test] = de_applyOptions(opt, test);
 
   nInput = train.nInput;
-  
-  % Output everything (including images)  
+
+  % Output everything (including images)
   outFile        = de_GetDataFile(dim, stimSet, '', opt);
   if (~exist(guru_fileparts(outFile,'pathstr'), 'dir'))
     mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
@@ -60,14 +60,14 @@ function de_StimCreateAC(stimSet, opt)
 
   %de_visualizeData(outFile);
 
-    
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [dataset] = stim2D(stimSet, trainOrTest)
     switch (stimSet)
         case 'mnist'
             mnist = load( fullfile(de_GetBaseDir(), 'data', 'mnist_all.mat') );
-            
-            if (strcmp(trainOrTest, 'train')) 
+
+            if (strcmp(trainOrTest, 'train'))
                 dataset.X = vertcat(mnist.train0, ...
                             mnist.train1, ...
                             mnist.train2, ...
@@ -78,7 +78,7 @@ function de_StimCreateAC(stimSet, opt)
                             mnist.train7, ...
                             mnist.train8, ...
                             mnist.train9)';
-                        
+
                 dataset.XLAB = vertcat( repmat({'0'}, size(mnist.train0,1), 1), ...
                                repmat({'1'}, size(mnist.train1,1), 1), ...
                                repmat({'2'}, size(mnist.train2,1), 1), ...
@@ -89,7 +89,7 @@ function de_StimCreateAC(stimSet, opt)
                                repmat({'7'}, size(mnist.train7,1), 1), ...
                                repmat({'8'}, size(mnist.train8,1), 1), ...
                                repmat({'9'}, size(mnist.train9,1), 1));
-                            
+
             else
                 dataset.X = vertcat(mnist.test0, ...
                             mnist.test1, ...
@@ -112,12 +112,12 @@ function de_StimCreateAC(stimSet, opt)
                                repmat({'8'}, size(mnist.test8,1), 1), ...
                                repmat({'9'}, size(mnist.test9,1), 1));
             end;
-            
+
             dataset.X = dataset.X(:,1:250:end); %reduce size
             dataset.XLAB = dataset.XLAB(1:250:end);
-            
+
             dataset.nInput = [28 28];
-            
+
         otherwise
             % load every file in the given directory
             files = dir( fullfile(de_GetBaseDir(), 'data', stimSet) );
@@ -129,8 +129,8 @@ function de_StimCreateAC(stimSet, opt)
 %    dataset.X(isnan(dataset.X)) = 0;
 %    dataset.X = dataset.X ./ (max(max(dataset.X))-min(min(dataset.X)));
     dataset.X = double( (dataset.X - min(min(dataset.X))) / max(max(dataset.X)) ); %normalize
-    
-    
+
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [dataset] = de_applyOptions(opt, dataset)
   %
@@ -140,15 +140,15 @@ function de_StimCreateAC(stimSet, opt)
     while i<=length(opt)
         switch (opt{i})
             case 'patchSize'
-                i = i + 1; 
+                i = i + 1;
                 patchSize = opt{i};
-                
+
 %                [dataset.X, dataset.XLBL] = createPatches(dataset.X, dataset.XLBL);
         end;
         i = i + 1;
     end;
 
-    
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [X,nInput,STIM,ST] = createPatches(stimSet)
             de_GetDataFile(dim, stimSet, taskType, opt)
@@ -179,18 +179,18 @@ end;
   %
 
     load(outFile);
-    
+
     switch (length(train.TT))
       case 64, nRows = 8; nCols = 8;
       case 16, nRows = 4; nCols = 4;
       case 8,  nRows = 2; nCols = 4;
       otherwise,         [nRows,nCols] = guru_optSubplots(length(TT));
     end;
-    
+
     for objName = {'train' 'test'}
       objName = objName{1};
       obj = eval(objName);
-      
+
       obj.X = obj.X - min(min(obj.X));
       obj.X = obj.X / max(max(obj.X));
       %obj.T = round(obj.T*2);
@@ -200,26 +200,26 @@ end;
 
       figure;
       set(findobj(gcf,'Type','text'),'FontSize',6) ;
-    
+
       for i=1:length(obj.TT)
-        subplot(nRows,nCols,i); 
+        subplot(nRows,nCols,i);
         colormap(gray);
-                  
-        imagesc(reshape(obj.X(:,i), nInput)); 
-        
+
+        imagesc(reshape(obj.X(:,i), nInput));
+
         %
         set(gca, 'xtick',[],'ytick',[]);
         hold on;
         TC = num2cell(round(obj.T(:,i)));
         xlabel(sprintf('%s: %s (%s)', guru_text2label(obj.XLAB{i}), sprintf('%d', TC{:}), guru_text2label(obj.TLAB{i})));
       end;
-    
+
       %
       hold on;
       mfe_suptitle(figTitle);
-      
+
       %
       print(strrep(outFile, '.mat', sprintf('-%s.%s', objName, 'png')), '-dpng');
       close(gcf);
     end;
-    
+

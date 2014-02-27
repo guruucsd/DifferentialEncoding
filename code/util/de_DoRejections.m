@@ -15,7 +15,7 @@ function [mss] = de_DoRejections(mss, rejectTypes, verbose)
   if (~exist('verbose','var')), verbose = false; end;
   if (~iscell(mss)),            mss = num2cell(mss, 1); end;
   nSigmas = length(mss);
-  
+
   % Do the rejections
   for k=1:nSigmas
       keepers = sum(rejectTypes{k},2) == 0;
@@ -23,7 +23,7 @@ function [mss] = de_DoRejections(mss, rejectTypes, verbose)
       if (~any(keepers))
           warning('Rejected all (%d/%d) models', length(keepers), length(mss{k}));
       end;
-  
+
       mss{k}  = mss{k}(keepers);
 
       if (verbose)

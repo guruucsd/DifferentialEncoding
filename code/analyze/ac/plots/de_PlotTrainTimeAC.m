@@ -11,19 +11,19 @@ function [fig] = de_PlotTrainTimeAC(mSets, stats)
       % Calculate summary data
       means = zeros(size(data));
       stdes = zeros(size(data));
-      
+
       for ss=1:length(data)
         d = data{ss};
         means(ss) = mean(d);
         stdes(ss) = guru_stde(d);
       end;
-      
+
       % Plot results
       subplot(1, 2, plotNum);
-      
+
       guru_bar(means, stdes,  guru_csprintf('%5.1f', num2cell(mSets.sigma)));
-      hold on; 
+      hold on;
       title(sprintf('AC %s', o1{1}));
-      
+
       plotNum = plotNum + 1;
   end;

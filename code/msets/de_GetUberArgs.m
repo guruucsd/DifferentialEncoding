@@ -31,7 +31,7 @@ function [mSets] = de_GetUberArgs(obj, ac_info, p_info, opts, args)
       mSets = ac_mSets;
       return;
   end;
-  
+
 
   %%%%%%%%%%%%%%%%
   % Get classifier model settings

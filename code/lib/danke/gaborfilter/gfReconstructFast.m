@@ -63,7 +63,7 @@ errors = zeros(1, nEpoch);
 filtered_hat = cell(nFrequencies, nOrientations);
 for epoch = 1:nEpoch
     fprintf(1, 'processing epoch %d ...\n', epoch);
-    
+
     % combine the phase of the estimated image with the magnitude of the
     % original image, and do DFT on this "faked" image
     % then support enforcement
@@ -83,7 +83,7 @@ for epoch = 1:nEpoch
             filtered_hat{f,j} = response;
         end;
     end;
-    
+
     % IDFT, IGWT, then keep the real part
     img_hat = zeros(height, width);
     for f = 1:nFrequencies

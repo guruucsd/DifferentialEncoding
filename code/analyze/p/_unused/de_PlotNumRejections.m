@@ -11,6 +11,5 @@ function [fig] = de_PlotNumRejections(mSets, stats)
   end;
 
   mfe_barweb(data, zeros(size(data)), 0.9, guru_csprintf('%5.1f', num2cell(mSets.sigma)));
-  hold on; 
+  hold on;
   title(sprintf('# Rejections'));
-      

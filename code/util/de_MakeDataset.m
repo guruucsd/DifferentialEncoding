@@ -16,60 +16,60 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
     % If the file doesn't exist, then we have to create it!
-	if (~exist(dataFile,'file'))
+    if (~exist(dataFile,'file'))
 
         %% Setup path--each experiment implements a set of generic functions
         % (right, basically like a class, but through file & path manipulation--yuck).
         % So, set up the path to access this experiment's functions.
         p = path();
-	    de_SetupExptPaths(expt);
+        de_SetupExptPaths(expt);
 
         % Get the base stimuli; not every function emits an aux, and some are
         %   forceful about what dataFile they use (probably legacy code)
-		switch nargout('de_StimCreate')
-			case 2
-				[train,test] = de_StimCreate(stimSet, taskType, opt);
-				aux = [];
+        switch nargout('de_StimCreate')
+            case 2
+                [train,test] = de_StimCreate(stimSet, taskType, opt);
+                aux = [];
 
-			case 3
-				[train,test,aux] = de_StimCreate(stimSet, taskType, opt);
+            case 3
+                [train,test,aux] = de_StimCreate(stimSet, taskType, opt);
 
-			case 4
-				[train,test,aux,dataFile] = de_StimCreate(stimSet, taskType, opt);
+            case 4
+                [train,test,aux,dataFile] = de_StimCreate(stimSet, taskType, opt);
 
-			otherwise
-				error('de_StimCreate has the wrong number of output arguments!');
-		end;
+            otherwise
+                error('de_StimCreate has the wrong number of output arguments!');
+        end;
 
-		path(p); % Restore path
+        path(p); % Restore path
 
-		%%
-		% Stamp on parameters
-		train.expt = expt; train.stimSet = stimSet; train.TaskType = taskType; train.opt = opt;
-		test.expt  = expt; test.stimSet  = stimSet; test.TaskType  = taskType; test.opt  = opt;
+        %%
+        % Stamp on parameters
+        train.expt = expt; train.stimSet = stimSet; train.TaskType = taskType; train.opt = opt;
+        test.expt  = expt; test.stimSet  = stimSet; test.TaskType  = taskType; test.opt  = opt;
 
-		% Apply missing (but expected) field
-		if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
-		if (~isfield(test, 'minmax')),  test.minmax  = guru_minmax(test.X(:)); end;
+        % Apply missing (but expected) field
+        if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
+        if (~isfield(test, 'minmax')),  test.minmax  = guru_minmax(test.X(:)); end;
 
         if (~isfield(train, 'name')),   train.name   = 'train';  end;
         if (~isfield(test,  'name')),   test.name    = 'test';   end;
 
 
-		% Apply any extra common options
-		[train] = de_StimApplyOptions(train, opt);
-		[test]  = de_StimApplyOptions(test, opt, train);
+        % Apply any extra common options
+        [train] = de_StimApplyOptions(train, opt);
+        [test]  = de_StimApplyOptions(test, opt, train);
 
-		% Visualize datasets
+        % Visualize datasets
         if show_figs
             tr_figs = de_visualizeData(train);
             te_figs = de_visualizeData(test);
         end;
 
-		% Output everything (including images)
-		if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
-		  mkdir(guru_fileparts(dataFile,'pathstr'));
-		end;
+        % Output everything (including images)
+        if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
+          mkdir(guru_fileparts(dataFile,'pathstr'));
+        end;
 
         if show_figs
             figpath = guru_fileparts(dataFile,'path');
@@ -80,7 +80,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
             end;
         end;
 
-		save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
+        save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
     end;
 
     load(dataFile);

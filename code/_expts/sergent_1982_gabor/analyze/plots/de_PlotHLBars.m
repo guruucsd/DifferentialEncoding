@@ -16,7 +16,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
           mSets.data.LmSmID mSets.data.LmSmNID];
 
   fig = de_NewFig('ls-bars', 'bars', 1, length(tidx));
-    
+
   % Legend
   if (length(mSets.sigma) == 2 && length(mSets.mu)==1)
     lentries{1} = sprintf('RH net (\\mu=%4.1f; \\sigma=%4.1f)', mSets.mu(1), mSets.sigma(1));
@@ -33,7 +33,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
       lentries{i} = sprintf('\\mu=%4.1f; \\sigma=%4.1f', mu, sig);
     end;
   end;
-  
+
   mfe_barweb(stats.basics.bars(tidx, :), ...
              stats.basics.bars_stde(tidx, :), ...
              0.8, ...
@@ -44,7 +44,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
 %    bar(err(tidx, :));
 %    set(gca,'tickdir','out');
 %    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')));
-%    
+%
 %    if (length(mSets.sigma)==2)
 %      legend(lentries, 'Location','NorthWest');
 %    elseif (length(lentries)<3)

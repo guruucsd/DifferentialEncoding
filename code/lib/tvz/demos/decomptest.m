@@ -1,9 +1,9 @@
 function [plo,phi]=decomptest(t11,t12,t21,t22,rule,dep)
 % DECOMPTEST Test for decomposition rule "rule" given unordered
 % RTs from four conditions (T11,T12,T21,T22) and presumed dependency
-% "dep" (0=s.-independence or 1=p.p.s.-interdependence) between the 
-% components of Tij.  The function returns the lowest (plo) and highest 
-% (phi) p-values of the Smirnov statistic D under the hypothesis that 
+% "dep" (0=s.-independence or 1=p.p.s.-interdependence) between the
+% components of Tij.  The function returns the lowest (plo) and highest
+% (phi) p-values of the Smirnov statistic D under the hypothesis that
 % the decomposition rule is "rule."  Rule can be anything, including
 % "plus" (for addition), "min" (for minimum) or "max" (for maximum).
 %
@@ -11,14 +11,14 @@ function [plo,phi]=decomptest(t11,t12,t21,t22,rule,dep)
 % needed.
 %
 % This routine makes use of the function THETA4, the fourth theta
-% function, which provides the p-values.  It also uses EDF, which 
+% function, which provides the p-values.  It also uses EDF, which
 % computes the empirical distribution function.
-if dep==1 
+if dep==1
    t11 = sort(t11);
    t12 = sort(t12);
    t21 = sort(t21);
    t22 = sort(t22);
-end   
+end
 n1 = min(length(t11),length(t22));
 n2 = min(length(t12),length(t21));
 n=harmmean([n1,n2]);

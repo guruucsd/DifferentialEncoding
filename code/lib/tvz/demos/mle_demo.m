@@ -1,6 +1,6 @@
 function slide=mle_demo
 % This is a slideshow file for use with playshow.m and makeshow.m
-% To see it run, type 'playshow mle_demo', 
+% To see it run, type 'playshow mle_demo',
 
 % Copyright 1984-2000 The MathWorks, Inc.
 if nargout<1,

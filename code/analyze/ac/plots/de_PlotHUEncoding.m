@@ -44,7 +44,7 @@ function [fig] = de_PlotHUEncoding(models, huencs)
     mfe_suptitle(t);
 
 
-    
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function fig = de_PlotHUEncoding_Instance2D(model, huenc)
   %2d plot
@@ -70,7 +70,7 @@ function [fig] = de_PlotHUEncoding(models, huencs)
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [img,imgsize] = enc2img(enc, mupos, imgsize)
-      
+
     scalefact = imgsize(1)/imgsize(2);
     hpl = size(mupos,1); %hidden units per hidden layer
     xsz = sqrt(hpl/scalefact);
@@ -83,7 +83,7 @@ function [fig] = de_PlotHUEncoding(models, huencs)
     else
         mupos = round(mupos);
     end;
-          
+
     img = zeros(imgsize);
     mpi = sub2ind(imgsize,mupos(:,1),mupos(:,2));
     img(mpi) = enc;

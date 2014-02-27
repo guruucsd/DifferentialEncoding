@@ -16,7 +16,7 @@ function [fig] = de_PlotHLBars(mSets, stats)
           mSets.data.aux.idx.LmSmID mSets.data.aux.idx.LmSmNID];
 
   fig = de_NewFig('ls-bars', 'bars', 1, length(tidx));
-    
+
   % Legend
   if (length(mSets.sigma) == 2 && length(mSets.mu)==1)
     if (mSets.mu(1)==0)
@@ -42,30 +42,30 @@ function [fig] = de_PlotHLBars(mSets, stats)
       end;
     end;
   end;
-  
+
   mfe_barweb(stats.basics.bars(tidx, :), ...
              stats.basics.bars_stde(tidx, :), ...
              0.8, ...
              strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')),...
              [], [], [], [], [], lentries);
   hold on;
-  
-  % Crop y-axis 
+
+  % Crop y-axis
   mx = max(max(stats.basics.bars(tidx, :)+stats.basics.bars_stde(tidx, :)));
   mn = min(min(stats.basics.bars(tidx, :)-stats.basics.bars_stde(tidx, :)));
   dff = mx-mn;
-  
+
   set(gca,'ylim', [mn-dff/5, mx+2*dff/5]);
-  
+
   ylabel('Error');
-  title('Model Data');             
+  title('Model Data');
   box('on');
-  
+
 %  else
 %    bar(err(tidx, :));
 %    set(gca,'tickdir','out');
 %    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')));
-%    
+%
 %    if (length(mSets.sigma)==2)
 %      legend(lentries, 'Location','NorthWest');
 %    elseif (length(lentries)<3)

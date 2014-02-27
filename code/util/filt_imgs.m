@@ -1,5 +1,3 @@
-
-%%%%%%%%%%%%%%%%
 function fimgs = filt_imgs( imgs, sz, G )
 
     fimgs = zeros(size(imgs));

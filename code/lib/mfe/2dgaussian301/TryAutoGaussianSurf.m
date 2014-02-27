@@ -15,20 +15,20 @@ subplot(1,2,2);plot(xi(:),results.G);
 results
 
 %%
-%All curve/surface fitting functions supports 2 types of error bars. 
+%All curve/surface fitting functions supports 2 types of error bars.
 %The first is based on bootstrapping; it's expensive but straightforward
-%(ref: An Introduction to the Bootstrap, Efron & Tibshirani). 
+%(ref: An Introduction to the Bootstrap, Efron & Tibshirani).
 %
 %The second is based on MCMC (Markov-chain Monte Carlo). Specifically, the
-%idea is to assume a model for the data (y = curve + normal noise) and perform 
-%Bayesian inference on the model parameters. Because the model is 
+%idea is to assume a model for the data (y = curve + normal noise) and perform
+%Bayesian inference on the model parameters. Because the model is
 %analytically intractable, inference is done by sampling from the
 %posterior through MCMC. The MCMC method used is Delayed Rejection
 %Adaptive Metropolis (DRAM) which is adaptive and deals quite well with the
 %type of posterior involved here.
 %
 %MCMC is fast and accurate but it's more mathematically involved than
-%bootstrapping. 
+%bootstrapping.
 
 
 matlabpool open %call this once to enable parallel computing
@@ -39,7 +39,7 @@ opts.errorbars = 'bootstrap';
 tic;results = autoGaussianCurve(xi,zi,opts);toc;
 results.quantiles %Prints quantiles of the points
                   %Look at results.quantiles.key for the corresponding
-                  %probabilities. For example, 
+                  %probabilities. For example,
                   %[results.quantiles.x0(1),results.quantiles.x0(end)] is a
                   %95% confidence interval for x0, while
                   %results.quantiles.sigmax(4) is the median of sigmax
@@ -86,7 +86,7 @@ subplot(1,2,1);imagesc(xi(:),yi(:),zi);
 subplot(1,2,2);imagesc(xi(:),yi(:),results.G);
 
 %%
-%Fit a tilted Gaussian surface 
+%Fit a tilted Gaussian surface
 [xi,yi] = meshgrid(-10:10,-20:20);
 xi = xi - 3;
 yi = yi + 4;

@@ -3,12 +3,12 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
 % models : NxM matrix of models, N=rons, M=nSigmas
 %
 % LS     : the LS matrix we all know so well
-  
+
   if (~exist('errorType','var')), errorType=1; end;
 
   if (iscell(models))
     mSets = models{1}(1);
-    
+
     LS_permodel = cell(length(models),1);
     LS_mean     = cell(length(models),1);
     LS_stde     = cell(length(models),1);
@@ -16,10 +16,10 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
     for i=1:length(models)
       [LS_permodel{i}, LS_mean{i}, LS_stde{i}] = de_internalGetLS(models{i}, errorType);
     end;
-    
+
   else
     mSets = models(1);
-    
+
     LS_permodel = cell(size(models,2),1);
     LS_mean     = cell(size(models,2),1);
     LS_stde     = cell(size(models,2),1);
@@ -28,9 +28,9 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
       [LS_permodel{i}, LS_mean{i}, LS_stde{i}] = de_internalGetLS(models(:,i), errorType);
     end;
   end;
-  
-    
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [LS_permodel,LS_mean,LS_stde] = de_internalGetLS(models, errorType)
   %
     if (isempty(models))
@@ -40,13 +40,13 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
       LS_pval = [];
       return;
     end;
-    
+
     mSets = models(1);
     p     = [models.p];
     rons  = length(models);
     tmp   = de_calcPErr( vertcat(p.lastOutput), mSets.data.train.T, errorType );
 
-    % Calc ls for each model      
+    % Calc ls for each model
     LS_permodel      = zeros(rons, length(mSets.data.train.TIDX));
     for j = 1:length(mSets.data.train.TIDX)
       if (~isempty(mSets.data.train.TIDX{j}))
@@ -55,7 +55,7 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
         LS_permodel(:,j) = NaN(size(LS_permodel(:,j)));
       end;
     end;
-    
+
     % Calc mean, stde for each type
     LS_mean  = zeros(length(mSets.data.train.TIDX),1);
     LS_stde  = zeros(length(mSets.data.train.TIDX),1);
@@ -66,4 +66,3 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
       LS_stde(j) = guru_stde(x);
     end;
 
-    

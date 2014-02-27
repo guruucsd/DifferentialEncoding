@@ -32,8 +32,8 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
   if (~exist('force','var'))     force    = 0;      end;
-  
-  
+
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,7 +126,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
     nInput_In  = [1024 1536]; %y,x
     if ischar(nimgs_in), error('stimSet must be an integer'); end;
-    
+
     % Read each image
     nInput_Out = [135  100]; % y,x
     nimgs_out  = 2*nimgs_in;
@@ -136,7 +136,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     for fi=1:nimgs_in
         img = mfe_readIML(fullfile(indir, fs(fi).name));
         imgnum(fi) = sscanf(fs(fi).name, 'imk%d.iml');
-        
+
         % Select the middle portion of the image
         cpt      = round(nInput_In)/2;
         pixrange = round([(cpt(1)  -nInput_Out(1)/2)   (cpt(2)  -nInput_Out(2)) ; ...

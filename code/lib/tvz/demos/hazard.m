@@ -2,7 +2,7 @@ function [k,s]=hazard(t,y,a)
 % HAZARD The Epanechnikov hazard function estimator.
 % Syntax [k,s]=hazard(t,y,a)
 % The column vector t is the points for which the hazard function
-% is to be estimated.  The column vector y is the ordered data. 
+% is to be estimated.  The column vector y is the ordered data.
 % The constant a determines the degree of smoothing.  If output
 % argument s is specified, the estimated standard error of the
 % hazard estimate k will be returned.

@@ -1,6 +1,6 @@
 function [oact,err,huact] = guru_nnExec(model,X,Y)
 %  Run a model
-%  
+%
 %  Input:
 %  model : model object (see guru_nn_model for details)
 %  X     : input layer values: rows=input values, cols=training examples
@@ -16,8 +16,8 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   if isfield(model, 'linout'), warning('linout deprecated; use XferFn with multiple values instead.'); end;
 
   % Calc
-  nUnits = size(model.Weights,1); nIn = size(X,1)-1; nOut = size(Y,1); nHid = nUnits-nIn-nOut-1; % remove input, output, and 
-  
+  nUnits = size(model.Weights,1); nIn = size(X,1)-1; nOut = size(Y,1); nHid = nUnits-nIn-nOut-1; % remove input, output, and
+
   % Set up transfer function for each unit
   if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHid+prod(nOut)))
     model.XferFn = [model.XferFn*ones(1,nHid) ones(1,nOut)]; %linear hidden->output
@@ -34,7 +34,7 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   % Execute the model and determine the errorType
   if ~isfield(model, 'ts')
     [err,~,o]=emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType );
-  
+
   % Multiple loops
   else
     if isfield(model, 'debug') && ismember(11,model.debug)
@@ -53,7 +53,7 @@ function [oact,err,huact] = guru_nnExec(model,X,Y)
   end;
 
   oact = o(nIn+1+nHid+[1:nOut], :);
-  
+
   if (nargout>2)
     huact = o(nIn+1+[1:nHid], :);
   end;

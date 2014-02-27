@@ -4,19 +4,19 @@ function de_SaveCSV(fn, stats, delim, title)
   if (~exist('delim','var'))
     delim = '\t';
   end;
-  
+
   % open file
   [fh,msg] = fopen(guru_smartfn(fn), 'w');
   if (fh == -1), error(msg); end;
-  
+
   % print title
   if (exist('title','var'))
     fprintf(fh, [title '\n']);
   end;
-  
+
   % print header
   fprintf(fh, [delim 'L+S-' delim 'L-S+' '\n']);
-  
+
   % print data
   for s=1:length(stats.raw.basics.ls)
     ls = stats.raw.basics.ls{s};
@@ -33,5 +33,5 @@ function de_SaveCSV(fn, stats, delim, title)
                   ls(r,4));
     end;
   end;
-  
+
   fclose(fh);

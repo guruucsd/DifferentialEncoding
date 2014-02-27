@@ -3,8 +3,8 @@ function [pat,frequency,orientation,imgheight,imgwidth] = readpat(filename,resto
 %[pat frequency orientation imgheight imgwidth]=readpat(filename,restore)
 %
 %   filename: the pat file name
-%   restore: return the pat as a vector if restore=0 (default), 
-%   restore=1: as a 3D matrix of imgheight,imgwidth,frequency*orientation         
+%   restore: return the pat as a vector if restore=0 (default),
+%   restore=1: as a 3D matrix of imgheight,imgwidth,frequency*orientation
 %   restore=2: as a 4D matrix of imgheight,imgwidth,orientation,frequency
 %
 %   pat: the responses

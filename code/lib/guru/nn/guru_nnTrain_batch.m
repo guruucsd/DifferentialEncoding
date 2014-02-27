@@ -18,11 +18,11 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
     model.Error = model.AvgError*numel(Y);
   end;
   guru_assert(model.Error>=0);
-  
+
   model.Eta = model.EtaInit;
   lastErr   = inf;
   currErr   = inf;
-  grad      = zeros(size(model.Conn)); 
+  grad      = zeros(size(model.Conn));
 
   if (isfield(model, 'noise_input'))
         X_orig = X;

@@ -1,6 +1,6 @@
 function [x,s]=chi2(t,func,X,p)
 % Chi2 statistic for fit of model func with parameters X to data t.
-% Syntax [x,p]=chi2(t,func,X,p), for data t, parameters X, and percentiles p 
+% Syntax [x,p]=chi2(t,func,X,p), for data t, parameters X, and percentiles p
 % (optional).
 pts=[10:10:90];
 if nargin>3,

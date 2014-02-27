@@ -7,8 +7,8 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
 % models   : resulting models after training
 %
 % Outputs:
-% stats      : 
-% figs       : 
+% stats      :
+% figs       :
 
   [stats,figs] = de_AnalyzerDE(mSets, mss);
-  
+

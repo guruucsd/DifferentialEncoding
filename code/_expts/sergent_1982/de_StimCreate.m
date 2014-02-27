@@ -87,18 +87,18 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
   % Now index and apply options, including input weightings.
   if (~isempty(taskType))
-	  [train.TIDX, train.TT]                    = de_indexStim(TALL, train.ST, idx);
-	  [train.ST, STIM, train.TIDX, train.TT]    = de_selectTask(taskType, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
-	  [train.X, train.ST, train.TIDX, train.TT] = de_createTrainingSets(stimSet, train.X, train.ST, TALL, train.TIDX, idx);
-	  [train.X, train.ST, train.TIDX, train.TT] = de_applyOptions(opt, train.X, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
+      [train.TIDX, train.TT]                    = de_indexStim(TALL, train.ST, idx);
+      [train.ST, STIM, train.TIDX, train.TT]    = de_selectTask(taskType, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
+      [train.X, train.ST, train.TIDX, train.TT] = de_createTrainingSets(stimSet, train.X, train.ST, TALL, train.TIDX, idx);
+      [train.X, train.ST, train.TIDX, train.TT] = de_applyOptions(opt, train.X, train.ST, STIM, TALL, train.TIDX, train.TT, idx);
 
-	  % Nail down targets for each taskdb
-	  [train.T]         = de_createTargets(taskType, train.ST, train.TT, idx);
+      % Nail down targets for each taskdb
+      [train.T]         = de_createTargets(taskType, train.ST, train.TT, idx);
 
-	  train.TLAB = cell(size(train.T,2),1);
-	  for i=1:length(train.TLAB)
-		train.TLAB{i} = TLBL{train.TT(i)};
-	  end;
+      train.TLAB = cell(size(train.T,2),1);
+      for i=1:length(train.TLAB)
+        train.TLAB{i} = TLBL{train.TT(i)};
+      end;
   end;
 
   train.XLAB = cell(size(train.X,2),1);

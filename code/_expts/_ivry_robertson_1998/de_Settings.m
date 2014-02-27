@@ -4,7 +4,7 @@ function [modelSettings] = de_SettingsHL(stimSet, taskType, opt, varargin)
   dim   = 1;
   aKeys = varargin(1:2:end);
   args = varargin;
-  
+
   if (~ismember('mu',      aKeys)), args(end+1:end+2) = {'mu',      0}; end;
   if (~ismember('sigma',   aKeys)), args(end+1:end+2) = {'sigma',   [1.8 12]}; end;
   if (~ismember('deType',  aKeys)), args(end+1:end+2) = {'deType',  'de'}; end;
@@ -12,15 +12,15 @@ function [modelSettings] = de_SettingsHL(stimSet, taskType, opt, varargin)
   if (~ismember('nConns',  aKeys)), args(end+1:end+2) = {'nConns',  7}; end;
   if (~ismember('runs',    aKeys)), args(end+1:end+2) = {'runs',    68}; end;
   if (~ismember('debug',   aKeys)), args(end+1:end+2) = {'debug',   1}; end;
-  
+
   %----------------
   % DE Training Params
   %----------------
-  
+
   % de
   if (~ismember('dataFile',  aKeys)), args(end+1:end+2) = {'dataFile', de_GetDataFile(dim, stimSet, taskType, opt); }; end;
-  
-  % autoencoder  
+
+  % autoencoder
   if (~ismember('ac.randState',     aKeys)), args(end+1:end+2) = {'ac.randState', dim}; end;
   if (~ismember('ac.AvgError',      aKeys)), args(end+1:end+2) = {'ac.AvgError',      0}; end;
   if (~ismember('ac.MaxIterations', aKeys)), args(end+1:end+2) = {'ac.MaxIterations', 1000}; end;
@@ -47,7 +47,7 @@ function [modelSettings] = de_SettingsHL(stimSet, taskType, opt, varargin)
   %----------------
   % DE Analysis Params
   %----------------
-  
+
   % Analysis settings
   if (~ismember('errorType',aKeys)), args(end+1:end+2) = {'errorType', 2}; end;
   if (~ismember('rej.type',aKeys)),  args(end+1:end+2) = {'rej.types', {'maxerr', 'sample_std-normd'}}; end;
@@ -55,7 +55,7 @@ function [modelSettings] = de_SettingsHL(stimSet, taskType, opt, varargin)
 
   if (~ismember('plots',aKeys)),     args(end+1:end+2) = {'plots', {'default'}}; end; %ls-bars', 'outliers'}}; end;
   if (~ismember('stats',aKeys)),     args(end+1:end+2) = {'stats', {'default'}}; end;
-  
+
   % Reporting results
   if (~ismember('out.data',aKeys)),  args(end+1:end+2) = {'out.data',  {'cmd','info','mat'}}; end;
   if (~ismember('out.plots',aKeys)), args(end+1:end+2) = {'out.plots', {'png','fig'}}; end;
@@ -64,6 +64,6 @@ function [modelSettings] = de_SettingsHL(stimSet, taskType, opt, varargin)
   %----------------
   % Run this thing!
   %----------------
-  
+
   [modelSettings]= de_createModelSettings(args{:});
-  
+

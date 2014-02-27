@@ -1,7 +1,7 @@
 function gfFilterFolder(filelist,imagefolder,outputfolder,filtersize,normalize,frequency,orientation,type,ftype,resample)
 % gfFilterFolder applies gabor filter on images listed in a file
 %   gfFilterFolder(filelist,imagefolder,outputfolder,frequency,scale,type,ftype)
-%  
+%
 %   filelist: text file that contains all the images need to be filtered
 %   imagefolder: where to read the image files
 %   output folder: where to save the filtered patterns. they are saved as
@@ -17,8 +17,8 @@ function gfFilterFolder(filelist,imagefolder,outputfolder,filtersize,normalize,f
 %   resample: resample rate (post-processing dropping of points). default 1 (no resampling)
 
 % gabor filters are created accroding to: p7 of
-% Dailey, Matthew N. and Cottrell, Garrison W. (1999) 
-% Organization of Face and Object Recognition in Modular Neural Networks. 
+% Dailey, Matthew N. and Cottrell, Garrison W. (1999)
+% Organization of Face and Object Recognition in Modular Neural Networks.
 % Neural Networks 12(7-8):1053-1074.
 % 5 frequencies k=[1 2 3 4 5]; f=(2*pi/N)*(2^k); N is the width of the
 % filter
@@ -46,7 +46,7 @@ elseif (ischar(filelist))
         %readline
         tline = fgetl(fid);
         if ~ischar(tline), break, end
-        
+
         %get the file name (should be the first thing of the line
         [strFile tline]=strtok(tline);
         [strFile tline]=strtok(strFile,'.');
@@ -63,22 +63,22 @@ elseif (ischar(filelist))
   % filter a single image
   else
     gfFilterFolder( {filelist},imagefolder,outputfolder,filtersize,normalize,frequency,orientation,type );
-  
+
   end; %ischar(filelist)
-  
+
 elseif (~iscell(filelist))
   error('Unknown type for filelist input variable.');
-  
+
 else
 
 
   % create filters
   gaborfilters = gfCreateFilterBank(frequency, orientation, filtersize, ftype);
-  
+
   % filter each file
   for i=1:length(filelist)
     strFile = filelist{i};
-    
+
     %read the image
     % if the image cannot be read, skip it
     try
@@ -91,19 +91,19 @@ else
 
     %filter, write to the output folder
     filteredimg = gfFilterImage(img, gaborfilters, type);
-    
+
     % downsample original and filter
     if (resample ~= 1)
       img = imresize(img, resample);
-      
+
       for i=1:prod(size(filteredimg))
         filteredimg{i} = imresize(filteredimg{i}, resample);
       end;
     end;
-    
+
     s=size(img,1)*size(img,2);
     gaborpat=zeros(4+frequency*orientation*s,1);
-    
+
     % save the number of frequency and orientation of filters,
     % save the imagesize
     gaborpat(1)=frequency;
@@ -119,7 +119,7 @@ else
             end
         end
     end
-   
+
     patFile=fullfile(outputfolder, [strtok(strFile,'.') '.pat']);
     save(patFile,'gaborpat','-ASCII');
   end;

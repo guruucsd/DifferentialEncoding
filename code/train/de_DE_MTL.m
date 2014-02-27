@@ -3,7 +3,7 @@ function [model] = de_DE_Multi(model)
 %
 % Train differential encoder.
 %    First: train the autoencoder with different connectivity.
-%    Then: train a 4-layer classification network, with inputs from pixels, and 
+%    Then: train a 4-layer classification network, with inputs from pixels, and
 %      input->hidden1 weights from the autoencoder network.
 %      While training the classifier, also continue training the autoencoder
 %
@@ -95,7 +95,7 @@ function [model] = de_DE_Multi(model)
             model.p.Weights(pInputs+[1:acHidden], pInputs) = model.ac.Weights(pInputs+[1:acHidden], pInputs); %bias=>acHidden
             model.p.Weights(pInputs+acHidden+pHidden+[1:acOutputs], pInputs) = model.ac.Weights(pInputs+acHidden+[1:acOutputs], pInputs); %bias=>acHidden
         end;
-         
+
         % Train
         [model.p] = guru_nnTrain(model.p, X_train(:,good_train), Y_train(:,good_train));
         avgErr = mean(model.p.err(end,:),2)/pOutputs; %perceptron only has one output node
@@ -108,7 +108,7 @@ function [model] = de_DE_Multi(model)
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
         o_p = guru_nnExec(model.p, X_train(:,good_train), Y_train(:,good_train) );
         model.p.output.train = o_p(acOutputs+[1:pOutputs],:);
-      
+
         % TEST
         X_test = model.data.test.X;
         Y_test = [model.data.test.X(1:end-1,:); model.data.test.T];

@@ -29,7 +29,7 @@ function models = de_LoadProps(models, objname, propname)
         for i=1:length(models)
           obj{i}.Weights = guru_loadVars( de_GetOutFile(models(i), [objname '.' inPropname]), inPropname );
         end;
-     
+
         [models.(objname)] = deal(obj{:});
       end;
     end;

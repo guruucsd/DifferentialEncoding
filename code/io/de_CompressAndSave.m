@@ -100,7 +100,7 @@ function model = de_CompressAndSave(model)
     %  end;
 
       % metadata
-	p = model.p;
-	save( de_GetOutFile(model, 'p'), 'p');
-	clear('p');
+    p = model.p;
+    save( de_GetOutFile(model, 'p'), 'p');
+    clear('p');
   end;

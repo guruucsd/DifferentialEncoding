@@ -1,9 +1,11 @@
 function dset = de_NormalizeDataset(dset, mSets)
+%function dset = de_NormalizeDataset(dset, mSets)
 %
 %  Change a dataset, based on some particular model settings.
 %
 %  dset.X should come in with values in range [0 1]
 %  mSets contains the options for the dataset
+
   if (~isfield(mSets.ac, 'minmax'))
 
       if ((isfield(mSets.ac, 'linout') && mSets.ac.linout) || (length(mSets.ac.XferFn)==2 && mSets.ac.XferFn(end)==1)) % anything can happen on the output
@@ -42,7 +44,7 @@ function dset = de_NormalizeDataset(dset, mSets)
     if (islogical(mSets.ac.zscore)), % will produce mean 0, std 0.1 data at each pixel
       zs.delta_mean = mean(dset.X, 1);
       zs.delta_std  = 0.1 ./ std(dset.X);
-    elseif isnumeric(mSets.ac.zscore) 
+    elseif isnumeric(mSets.ac.zscore)
       zs.delta_mean = mean(dset.X);
       zs.delta_std  = mSets.ac.zscore ./ std(dset.X, [], 1);
     elseif isstruct(mSets.ac.zscore)
@@ -54,7 +56,7 @@ function dset = de_NormalizeDataset(dset, mSets)
     dset.X  = (dset.X - repmat(zs.delta_mean, [size(dset.X,1) 1])) .* repmat(zs.delta_std, [size(dset.X,1) 1]);
     dset.zs = zs;
 
-    
+
   % Prepare to put into minmax range by subtracting out midpoint of original [0 1] range
   elseif (~isempty(mSets.ac.minmax))
     if (isfield(dset,'minmax')), dset.X = dset.X - diff(dset.minmax)/2;
@@ -122,7 +124,7 @@ function dset = de_NormalizeDataset(dset, mSets)
       if (isfield(mSets.p, 'ndupes'))
           dset.T = repmat(dset.T, [mSets.p.ndupes 1]);
       end;
-      
+
       % validate dset
 %      guru_assert(~any(isnan(dset.T(:))), 'nan T-values');
 %      guru_assert(~any(dset.T(:)<mSets.p.minmax(1)), sprintf('T-values outside [%d %d] range', mSets.p.minmax));

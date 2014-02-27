@@ -2,9 +2,9 @@ function [a,ev]=pca(f,N)
 % [a,ev]=pca(f,N)
 %
 % INPUT:
-%   f    = matrix of images. (individual images are row vectors)  
+%   f    = matrix of images. (individual images are row vectors)
 %   N    = the number of eigenpairs to compute. [default ALL]
-% 
+%
 % OUTPUT:
 %   a   = comumn vectors of temporal principal components.
 %   ev  = PCA eigenvalues in descending order.

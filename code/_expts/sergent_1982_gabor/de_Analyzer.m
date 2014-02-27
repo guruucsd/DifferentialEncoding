@@ -7,9 +7,9 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
 % models   : resulting models after training
 %
 % Outputs:
-% stats      : 
-% figs       : 
-  
+% stats      :
+% figs       :
+
   [stats,figs] = de_AnalyzerDE(mSets, mss);
 %  [stats.raw.r] = de_FindRejectionsHL(mss, mSets.rej, stats.raw, stats.raw.r);
   [mss]        = de_DoRejections(mss, stats.raw.r);
@@ -17,4 +17,4 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
   [stats] = de_StaticizerHL(mSets, mss, stats);
   [figs]  = [figs de_FigurizerHL(mSets, mss, stats) ];
 
-  
+

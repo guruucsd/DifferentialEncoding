@@ -20,5 +20,4 @@ function [varargout] = de_DoRejectionsSF(models, varargin)%rmodes,rc)
   if (~iscell(models))
     models  = mat2cell(models, rons, ones(1,nSigmas));
   end;
- 
-  
+

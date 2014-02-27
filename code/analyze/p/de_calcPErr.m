@@ -1,5 +1,5 @@
 function err = de_calcPErr(o_p, T, errorType)
-% 
+%
 % Takes some matrix of outputs over a # of iterations
 %   and a matrix of expected outputs.
 % Computes the error over all output nodes

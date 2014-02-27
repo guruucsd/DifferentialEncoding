@@ -41,17 +41,17 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
           if (~isfield(m.ac, 'Weights'))
               m = de_LoadProps(m, 'ac', 'Weights');
           end;
-          
+
           % Run the network
           [m.ac.output]   = guru_nnExec(m.ac, dset.X(:,selectedImages), dset.X(1:end-1,selectedImages));
         end;
       end;
-      
+
       % Convert back from polar to regular image
 %      if guru_hasopt(dset.opt, 'img2pol')
 %          m.ac.output = de_pol2img(m.ac.output, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
 %      end;
-      
+
       % Store the result
       images{si}(mi,:,:,:)  = reshape(m.ac.output, [dset.nInput nImages]);
     end;

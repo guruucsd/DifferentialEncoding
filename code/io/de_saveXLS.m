@@ -13,4 +13,3 @@ function de_SaveXLS(fn, stats, title)
     xlswrite(fn, stats, title, sprintf('B%d', startNum)))
     startNum = startNum + size(stats{i},1);
   end;
-  

@@ -4,49 +4,49 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 % Used to plot average training curves per trial type
 %
 % Inputs:
-% mss : 
+% mss :
 %
 % Outputs:
 % fig : figure object
 
   nSigmas = length(mss);
   guru_assert(nSigmas == 2);
-  
-  
+
+
   %----------------
   % Loop over sigmas and trials
   %   (to collect enough samples)
   %----------------
-  
+
   for ss=1:nSigmas
     ms      = mss{ss};
     rons    = size(ms,1);
     nTrials = size(ms(1).data.train.T,2);
-    
+
     avg_eAC(ss,:,:) = zeros(ms(1).ac.MaxIterations,nTrials);
     avg_eP(ss,:,:)  = zeros(ms(1).p.MaxIterations,nTrials);
 
     for zz=1:rons
       m = ms(zz);
-      
+
       % Pad
       if (~isfield(m.ac, 'err'))
-        m.ac.err = guru_loadVars(de_GetOutFile(m, 'ac.err'), 'err');, 
+        m.ac.err = guru_loadVars(de_GetOutFile(m, 'ac.err'), 'err');,
       end;
       c_eAC = m.ac.err;
       if (size(c_eAC,1)<m.ac.MaxIterations)
         c_eAC(end+1:m.ac.MaxIterations,:) = repmat(c_eAC(end,:), ...
                                             [m.ac.MaxIterations-size(c_eAC,1) 1]);
       end;
-      
+
       % pad
       if (~isfield(m.p,'err'))
         if (~isfield(m.p, 'output'))
-          m.p.output = guru_loadVars(de_GetOutFile(m, 'p.output'), 'output');, 
+          m.p.output = guru_loadVars(de_GetOutFile(m, 'p.output'), 'output');,
         end;
         m.p.err = de_calcPErr(m.p.output, m.data.train.T, errorType);
       end;
-      
+
       c_eP = m.p.err;
       if (size(c_eP,1)<m.p.MaxIterations)
         c_eP(end+1:m.p.MaxIterations,:) = repmat(c_eP(end,:), ...
@@ -55,7 +55,7 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 
       guru_assert(isempty(find(c_eAC<0)), 'AC error should never be negative!');
       guru_assert(isempty(find(c_eP<0)),  'P error should never be negative!');
-      
+
       avg_eAC(ss,:,:) = squeeze(avg_eAC(ss,:,:)) + c_eAC;
       avg_eP(ss,:,:)  = squeeze(avg_eP(ss,:,:))  + c_eP;
     end; %rons
@@ -82,7 +82,7 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function fig = de_PlotTrainingCurves_PerTrialType_DOIT(m, avg_eAC, avg_eP)
   % do a final plot for the ss comparisons
-    nTrials = size(m.data.train.X,2);  
+    nTrials = size(m.data.train.X,2);
 
     fig.name = 'tcptt-diff';
     fig.handle = figure;

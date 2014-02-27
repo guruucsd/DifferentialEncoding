@@ -1,7 +1,7 @@
 % process images with gabor filters, image width 100, 6 scales, 8 orientations
 % files are in the list: ..\CAFE\240list
 % aligned images in folder: ..\CAFE\aligned\, output pat files in ..\CAFE\240pat\
-gfFilterFolder('..\CAFE\240list', '..\CAFE\aligned', '..\CAFE\240pat', 100, 0, 6, 8, 1); 
+gfFilterFolder('..\CAFE\240list', '..\CAFE\aligned', '..\CAFE\240pat', 100, 0, 6, 8, 1);
 
 % collate and sample gabor responses into L and R hemisphere inputs
 [L, R] = samplepats('..\CAFE\240list', '..\CAFE\240pat', 12, 16); % each image is a row vector

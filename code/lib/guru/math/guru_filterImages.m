@@ -2,12 +2,12 @@ function [filt_images, filt] = guru_filterImages(images, filterType, filterParam
 %
 %
   if (length(size(images))==2), images=reshape(images,[1 size(images)]); end;
-  
+
 
   filt_images = zeros(size(images));
   num_images  = size(images,1);
   size_images = [size(images,2) size(images,3)];
-  
+
   switch (filterType)
       case 'lowpass'
         [~,rho] = guru_freq2to1(size_images);
@@ -21,7 +21,7 @@ function [filt_images, filt] = guru_filterImages(images, filterType, filterParam
 
           guru_assert(all(isreal(filt_image(:))));
         end;
-        
+
       case 'highpass'
         [~,rho] = guru_freq2to1(size_images);
         for ii=1:num_images
@@ -40,7 +40,6 @@ function [filt_images, filt] = guru_filterImages(images, filterType, filterParam
         filt_images      = guru_filterImages(semi_filt_images, 'highpass', filterParams(1));
 
   end;
-      
-  
-  
-  
+
+
+

@@ -4,13 +4,13 @@ function [rho,pval] = de_StatsVsHuman(mSets, LS)
 
   % Make sure we have RH vs LH
   guru_assert(length(mSets.sigma)==2);
-  
+
   % Define human data
   humanRTs = zeros(6,2); %6 condition, 2 visual fields
   [ss,ssIdx] = sort(mSets.sigma);
   lvfIdx = ssIdx(1); %rh = small sigma
   rvfIdx = ssIdx(2); %lh = large sigma
-  
+
   humanRTs(mSets.data.LpSpID,  lvfIdx) = 519;
   humanRTs(mSets.data.LpSpID,  rvfIdx) = 536;
   humanRTs(mSets.data.LpSpNID, lvfIdx) = 547;
@@ -23,7 +23,7 @@ function [rho,pval] = de_StatsVsHuman(mSets, LS)
   humanRTs(mSets.data.LmSmID,  rvfIdx) = 623;
   humanRTs(mSets.data.LmSmNID, lvfIdx) = 668;
   humanRTs(mSets.data.LmSmNID, rvfIdx) = 650;
- 
+
   % Group the experiment data
   ls = zeros(size(humanRTs));
   for ss=1:length(mSets.sigma)
@@ -36,9 +36,9 @@ function [rho,pval] = de_StatsVsHuman(mSets, LS)
   [rho,pval] = corr(reshape(ls(conds,:), sz), reshape(humanRTs(conds,:), sz));
 
 %  for ss=1:length(mSets.sigma)
-%    
+%
 %    % Normalize ls and human data
 %    ls(conds) = ls(conds)
 %    coefficient(ss) = (ls*humanRTs(:,ss)) / (norm(humanRTs(:,ss)) * norm(ls));
-%	  end;
-  
+%      end;
+

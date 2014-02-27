@@ -180,7 +180,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
     lastTrainImage = 0;
     lastTestImage  = 0;
     for ii=1:length(trains)
-		%trains{ii} = de_NormalizeDataset( trains{ii}, mSets );
+        %trains{ii} = de_NormalizeDataset( trains{ii}, mSets );
 
         for jj=1:trainMult(ii)
             train.X(:,lastTrainImage+[1:size(trains{ii}.X,2)]) = trains{ii}.X;
@@ -188,7 +188,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
             lastTrainImage = lastTrainImage + size(trains{ii}.X,2);
         end;
 
-		%tests{ii} = de_NormalizeDataset( tests{ii}, mSets );
+        %tests{ii} = de_NormalizeDataset( tests{ii}, mSets );
 
         for j=1:testMult(ii)
             test.X (:,lastTestImage +[1:size(tests{ii}.X, 2)]) = tests{ii}.X;

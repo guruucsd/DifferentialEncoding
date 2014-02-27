@@ -6,12 +6,12 @@ function [ti, pval] = de_StatsTrainItersAC(models)
 % Input:
 % LS            :
 % errAutoEnc    :
-% 
+%
 % Output:
 % ti : # of training iterations
 
   ti = cell(length(models), 1);
-  
+
   for s=1:length(models)
     ac = [models{s}.ac];
     ti{s} = [ac.Iterations]';

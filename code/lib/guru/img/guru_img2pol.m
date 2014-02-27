@@ -10,4 +10,3 @@ function rtimg = guru_img2pol(xyimg)
     end;
 
     rtimg = reshape(rtcoeff_ * xyimg(:), rtsz_);
-    

@@ -35,8 +35,8 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   % With this info, create our X and TT vectors
   [train.X, train.XLAB] = stim2D(stimSet, train.nInput, train.freqs, train.phases, train.thetas);
   if (~isempty(taskType))
-	  %[train.X, train.XLAB] = de_applyOptions(opt, train.X, train.XLAB);
-	  [train.T, train.TLAB] = de_createTargets(taskType, train.XLAB, train.phases);
+      %[train.X, train.XLAB] = de_applyOptions(opt, train.X, train.XLAB);
+      [train.T, train.TLAB] = de_createTargets(taskType, train.XLAB, train.phases);
   end;
 
   % Train & test sets are the same

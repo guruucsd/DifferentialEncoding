@@ -6,10 +6,10 @@ function [err] = de_StatsLS(LS)
 % Input:
 % LS            :
 % errAutoEnc    :
-% 
+%
 % Output:
 % err           :
-% learningError : 
+% learningError :
 
   %--------------------------------------------------------------------------
   %Step 1: separate errors into 4 cell arrays
@@ -22,5 +22,4 @@ function [err] = de_StatsLS(LS)
     err(:,i) = mean( LS{i}, 1 );
     %std(:,i) = std(LS{i});
   end;
-  
-  
+

@@ -2,20 +2,20 @@ function [figs] = de_PlotLoopmeHL(allstats)
 
   figs.handle = figure;
   figs.name   = 'loopme-hl';
-  
+
   alldata = zeros(conds, length(sigmas));
 
   for d1i=1:size(allstats,1)
     for d2i=1:size(allstats,2)
-    
+
       % save off each number
       alldata(:,:,d1i,d2i) = (stats.rej.basics.bars(conds,:));
     end;
   end;
-  
+
   plotfile = fullfile(de_GetBaseDir(), 'results', guru_callerAt(1));
 
-  % Do the plot  
+  % Do the plot
   for i=1:size(alldata,1)
     tmp = squeeze(alldata(i,:,:,:));
     d = squeeze( (tmp(1,:,:)-tmp(2,:,:))./mean(tmp,1) );
@@ -32,4 +32,3 @@ function [figs] = de_PlotLoopmeHL(allstats)
   end;
 
   print(gcf, plotfile, '-dpng');
-  

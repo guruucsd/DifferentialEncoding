@@ -23,7 +23,7 @@ function [sta] = de_StatsSTA(mss, nImages)
   train = mSets.data.train.X(1:nPix,:);
   images = mean(train(:)) + std(train(:))*(rand([nPix+1 nImages])-0.5);
   images(end,:) = mSets.data.train.bias;
-  
+
   % Measure the hidden unit output and compute each hidden unit's "preferred" image
   sta = cell(size(mss));
   for si=1:length(mss)
