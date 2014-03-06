@@ -34,12 +34,12 @@ function out = nan_std(in,dim)
     if (~exist('dim','var')), dim=1; end;
     nans = find(isnan(in));
     in(nans) = 0;
-   
+
     nonnans = ones(size(in));
     nonnans(nans) = 0;
     nonnans = sum(nonnans,dim);
     nononnans = find(nonnans==0);
     nonnans(nononnans) = NaN;
-   
+
     out = sqrt((sum(in.^2,dim)-sum(in,dim).^2./nonnans)./(nonnans-1));
     out(nononnans) = NaN;

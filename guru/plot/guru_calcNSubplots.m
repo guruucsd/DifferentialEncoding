@@ -8,6 +8,6 @@ function [nrows,ncols] = guru_calcNSubplots(nPlots, w2hratio)
     ss = get( 0, 'ScreenSize' );
     w2hratio = ss(3)/ss(4);
   end;
-  
+
   nrows = ceil(nPlots^(1/w2hratio));
   ncols = ceil(nPlots / nrows);

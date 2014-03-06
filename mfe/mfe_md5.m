@@ -80,10 +80,10 @@ Message = reshape(Message,16,[]);
 
 % Loop over message blocks each 16 uint32 long
 for iBlock = 1:size(Message,2)
-  
+
   % Extract next block
   X = Message(:,iBlock);
-  
+
   % Store current buffer state
   AA = A;
   BB = B;
@@ -96,13 +96,13 @@ for iBlock = 1:size(Message,2)
   for iRound = 1:4
     for q = 1:4
       A = Fun(iRound,A,B,C,D,X(idxX(k+1)),S(k+1),T(k+1));
-      D = Fun(iRound,D,A,B,C,X(idxX(k+2)),S(k+2),T(k+2)); 
-      C = Fun(iRound,C,D,A,B,X(idxX(k+3)),S(k+3),T(k+3)); 
-      B = Fun(iRound,B,C,D,A,X(idxX(k+4)),S(k+4),T(k+4)); 
+      D = Fun(iRound,D,A,B,C,X(idxX(k+2)),S(k+2),T(k+2));
+      C = Fun(iRound,C,D,A,B,X(idxX(k+3)),S(k+3),T(k+3));
+      B = Fun(iRound,B,C,D,A,X(idxX(k+4)),S(k+4),T(k+4));
       k = k + 4;
     end
   end
-  
+
   % Add old buffer state
   A = bitadd32(A,AA);
   B = bitadd32(B,BB);

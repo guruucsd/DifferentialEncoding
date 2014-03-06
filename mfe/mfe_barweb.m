@@ -41,63 +41,63 @@ function handles = barweb(barvalues, errors, width, groupnames, bw_title, bw_xla
 
 % Get function arguments
 if nargin < 2
-	error('Must have at least the first two arguments:  barweb(barvalues, errors, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend)');
+    error('Must have at least the first two arguments:  barweb(barvalues, errors, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend)');
 elseif nargin == 2
-	width = 1;
-	groupnames = 1:size(barvalues,1);
-	bw_title = [];
-	bw_xlabel = [];
-	bw_ylabel = [];
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    width = 1;
+    groupnames = 1:size(barvalues,1);
+    bw_title = [];
+    bw_xlabel = [];
+    bw_ylabel = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 3
-	groupnames = 1:size(barvalues,1);
-	bw_title = [];
-	bw_xlabel = [];
-	bw_ylabel = [];
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    groupnames = 1:size(barvalues,1);
+    bw_title = [];
+    bw_xlabel = [];
+    bw_ylabel = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 4
-	bw_title = [];
-	bw_xlabel = [];
-	bw_ylabel = [];
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    bw_title = [];
+    bw_xlabel = [];
+    bw_ylabel = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 5
-	bw_xlabel = [];
-	bw_ylabel = [];
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    bw_xlabel = [];
+    bw_ylabel = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 6
-	bw_ylabel = [];
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    bw_ylabel = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 7
-	bw_colormap = jet;
-	gridstatus = 'none';
-	bw_legend = [];
+    bw_colormap = jet;
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 8
-	gridstatus = 'none';
-	bw_legend = [];
+    gridstatus = 'none';
+    bw_legend = [];
 elseif nargin == 9
-	bw_legend = [];
+    bw_legend = [];
 end
 
 change_axis = 0;
 
 if size(barvalues,1) ~= size(errors,1) || size(barvalues,2) ~= size(errors,2)
-	error('barvalues and errors matrix must be of same dimension');
+    error('barvalues and errors matrix must be of same dimension');
 end;
 
-%	if size(barvalues,2) == 1
-%		barvalues = barvalues';
-%		errors = errors';
-%	end
+%    if size(barvalues,2) == 1
+%        barvalues = barvalues';
+%        errors = errors';
+%    end
 if size(barvalues,1) == 1
   barvalues = [barvalues; zeros(1,length(barvalues))];
   errors = [errors; zeros(1,size(barvalues,2))];

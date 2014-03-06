@@ -8,17 +8,17 @@ function X = pinvs(A,varargin)
 %
 %   PINV(A,TOL) uses the tolerance TOL instead of the default.
 %
-%   Class support for input A: 
+%   Class support for input A:
 %      float: double, single
 %
 %   See also RANK.
 
-%   Copyright 1984-2004 The MathWorks, Inc. 
+%   Copyright 1984-2004 The MathWorks, Inc.
 %   $Revision: 5.12.4.2 $  $Date: 2004/12/06 16:35:27 $
 
 if isempty(A)     % quick return
-  X = zeros(size(A'),class(A));  
-  return  
+  X = zeros(size(A'),class(A));
+  return
 end
 
 [m,n] = size(A);

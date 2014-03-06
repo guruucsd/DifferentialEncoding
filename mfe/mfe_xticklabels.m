@@ -49,7 +49,7 @@ if ~isempty(h_olds)
     delete(h_olds)
 end
 
-%% Make XTickLabels 
+%% Make XTickLabels
 NTick = length(xtickpos);
 Ybot = min(get(gca,'YLim'));
 ht = zeros(NTick,1);

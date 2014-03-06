@@ -3,14 +3,14 @@ function [minmax] = guru_minmax(data, opt)
 %  outputs [min max] of data matrix
 %
 % guru_minmax(data,opt)
-%   opt: 
+%   opt:
 %     'none'--(default) get actual min & max
 %     'equal'--make min and max symmetric around zero
 
     if (any(imag(data(:)))), error('This function does not work for complex/imaginary data!'); end;
-    
+
     if (~exist('opt','var')), opt = 'none'; end;
-    
+
     switch (opt)
         case 'none',  minmax = [min(data);max(data)];
         case 'equal', minmax = [-max(abs(data));max(abs(data))];

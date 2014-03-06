@@ -7,11 +7,11 @@ function [ax,h]=suplabel(text,whichLabel,supAxes)
 % returns a handle to the axis only.
 %  suplabel(text) with one input argument assumes whichLabel='x'
 %
-% whichLabel is any of 'x', 'y', or 't', specifying whether the 
+% whichLabel is any of 'x', 'y', or 't', specifying whether the
 % text is to be the xlable, ylabel, or title respectively.
 %
-% supAxes is an optional argument specifying the Position of the 
-%  "super" axes surrounding the subplots. 
+% supAxes is an optional argument specifying the Position of the
+%  "super" axes surrounding the subplots.
 %  supAxes defaults to [.075 .075 .85 .85]
 %  specify supAxes if labels get chopped or overlay subplots
 %

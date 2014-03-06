@@ -1,7 +1,7 @@
 function A = makehatch_plus(hatch,n,m)
 %MAKEHATCH_PLUS Predefined hatch patterns
 %
-% Modification of MAKEHATCH to allow for selection of matrix size. Useful whe using 
+% Modification of MAKEHATCH to allow for selection of matrix size. Useful whe using
 %   APPLYHATCH_PLUS with higher resolution output.
 %
 % input (optional) N    size of hatch matrix (default = 6)
@@ -25,7 +25,7 @@ function A = makehatch_plus(hatch,n,m)
 %  See also: APPLYHATCH, APPLYHATCH_PLUS, APPLYHATCH_PLUSCOLOR, MAKEHATCH
 
 %  By Ben Hinkle, bhinkle@mathworks.com
-%  This code is in the public domain. 
+%  This code is in the public domain.
 
 % Modified Brian FG Katz    8-aout-03
 % Modified David M Kaplan    19-fevrier-08
@@ -37,7 +37,7 @@ n=round(n);
 switch (hatch)
   case '\'
     [B,C] = meshgrid( 0:n-1 );
-    B = B-C; 
+    B = B-C;
     clear C
     A = abs(B) <= m/2;
     A = A | abs(B-n) <= m/2;

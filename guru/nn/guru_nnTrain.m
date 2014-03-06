@@ -1,7 +1,7 @@
 function [model,o_p] = guru_nnTrain(model,X,Y)
 %function [model,o_p] = guru_trainNN(model,X,Y)
 %  Train a neural network using backpropogation
-%  
+%
 %  Input:
 %  model : model object (see guru_nn_model for details)
 %  X     : input layer values: rows=input values, cols=training examples
@@ -15,7 +15,7 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
 
   if (~isfield(model, 'TrainMode')), model.TrainMode = 'batch'; end;
   try, startTime = toc; catch err, tic; startTime = toc; end;
-  
+
   nUnits = size(model.Weights,1); nOutput = size(Y,1); nInput = size(X,1); nHidden = nUnits-nOutput-nInput;
   if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHidden+nOutput))
     old_xferfn = model.XferFn;
@@ -26,14 +26,14 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
   end;
 
   switch (model.TrainMode)
-      case 'batch' 
+      case 'batch'
         if (nargout<2), [model]     = guru_nnTrain_batch(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_batch(model,X,Y); end;
-        
+
       case 'online'
         if (nargout<2), [model]     = guru_nnTrain_online(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_online(model,X,Y); end;
-    
+
       case 'resilient'
         if (nargout<2), [model]     = guru_nnTrain_resilient(model,X,Y);
         else,           [model,o_p] = guru_nnTrain_resilient(model,X,Y); end;
@@ -49,8 +49,8 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
       otherwise
         error('Unknown training type: %s', model.trainMode);
   end;
-  
-  
+
+
   model.err                  = model.err(1:model.Iterations(end),:);
 
   if (~isfield(model, 'trainTime')),     model.trainTime     = zeros(0,1); end;

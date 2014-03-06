@@ -1,5 +1,5 @@
 function imR = mfe_pol2img(imP, rMin, rMax, Mr, Nr)
-% POLARTOIM converts polar image to rectangular image. 
+% POLARTOIM converts polar image to rectangular image.
 %
 % V0.1 16 Dec, 2007 (Created) Prakash Manandhar, pmanandhar@umassd.edu
 %
@@ -18,19 +18,19 @@ if ~exist('rMax','var'), rMax=1; end;
 if ~exist('Mr','var'), Mr=size(imP,1); end;
 if ~exist('Nr','var'), Nr=size(imP,2); end;
 
-[M N] = size(imP); % size of rectangular image 
-xRc = (Nr+1)/2; % co-ordinates of the center of the image 
-yRc = (Mr+1)/2; 
-sx = (Nr-1)/2; % scale factors 
+[M N] = size(imP); % size of rectangular image
+xRc = (Nr+1)/2; % co-ordinates of the center of the image
+yRc = (Mr+1)/2;
+sx = (Nr-1)/2; % scale factors
 sy = (Mr-1)/2;
 
-r=linspace(rMax,rMin,M); 
-th=linspace(0+atan(2/M)/2, 2*pi-atan(2/M)/2,N);%:dth:(N-1)*dth)'; 
-[th,r]=meshgrid(th,r);%r,th); 
-x=r.*cos(th); 
-y=r.*sin(th); 
-xP = x*sx + xRc; 
-yP = y*sy + yRc; 
+r=linspace(rMax,rMin,M);
+th=linspace(0+atan(2/M)/2, 2*pi-atan(2/M)/2,N);%:dth:(N-1)*dth)';
+[th,r]=meshgrid(th,r);%r,th);
+x=r.*cos(th);
+y=r.*sin(th);
+xP = x*sx + xRc;
+yP = y*sy + yRc;
 
 warning off MATLAB:TriScatteredInterp:DupPtsAvValuesWarnId
 F = TriScatteredInterp(xP(:),yP(:),imP(:));
@@ -39,19 +39,19 @@ imR = reshape(F(X(:),Y(:)), [M N]);
 return
 
 
-[Mr Nr] = size(imP); % size of rectangular image 
-xRc = (Mr+1)/2; % co-ordinates of the center of the image 
-yRc = (Nr+1)/2; 
-sx = (Mr-1)/2; % scale factors 
+[Mr Nr] = size(imP); % size of rectangular image
+xRc = (Mr+1)/2; % co-ordinates of the center of the image
+yRc = (Nr+1)/2;
+sx = (Mr-1)/2; % scale factors
 sy = (Nr-1)/2;
 
-r=linspace(rMin,rMax,M); 
-th=linspace(0,2*pi,N);%:dth:(N-1)*dth)'; 
-[th,r]=meshgrid(th,r);  
-x=r.*cos(th); 
-y=r.*sin(th); 
-xP = x(end:-1:1,:)*sx + xRc; 
-yP = y(end:-1:1,:)*sy + yRc; 
+r=linspace(rMin,rMax,M);
+th=linspace(0,2*pi,N);%:dth:(N-1)*dth)';
+[th,r]=meshgrid(th,r);
+x=r.*cos(th);
+y=r.*sin(th);
+xP = x(end:-1:1,:)*sx + xRc;
+yP = y(end:-1:1,:)*sy + yRc;
 
 F = TriScatteredInterp(yP(:),xP(:),imP(:));
 [X,Y] = meshgrid(1:M,1:N);

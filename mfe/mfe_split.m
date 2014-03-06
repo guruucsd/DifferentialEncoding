@@ -1,12 +1,12 @@
 function l = mfe_split(d,s,max)
 %L=SPLIT(D,S) splits a string S delimited by characters in D.  Meant to
 %             work roughly like the PERL split function (but without any
-%             regular expression support).  Internally uses STRTOK to do 
+%             regular expression support).  Internally uses STRTOK to do
 %             the splitting.  Returns a cell array of strings.
 %
 %Example:
 %    >> split('_/', 'this_is___a_/_string/_//')
-%    ans = 
+%    ans =
 %        'this'    'is'    'a'    'string'   []
 %
 %Written by Gerald Dalley (dalleyg@mit.edu), 2004
@@ -18,8 +18,11 @@ if (iscell(s))
     end;
 elseif (ischar(s))
     l = {};
-    while (length(s) > 0 && length(l)<max)
+    while ~isempty(s) && length(l)<max
         [t,s] = strtok(s,d);
         l = {l{:}, t};
     end
+    if ~isempty(s) % paste on the rest
+        l{end} = [l{end} s];
+    end;
 end;

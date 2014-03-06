@@ -5,7 +5,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   nDatapts  = size(X,2);
   nUnits    = size(model.Weights,1);
   nOutputs  = size(Y,1);
-  nHidden   = nUnits - nInputs - nOutputs;
+  nHidden   = nUnits - nInputs - nOutputs - 1;
 
   model.err = zeros([model.MaxIterations nDatapts]);
 
@@ -28,13 +28,18 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
+  if (isfield(model, 'noise_input'))
+    X_orig = X;
+  end;
 
   for ip = 1:model.MaxIterations
-    % Inject noise into the input
-    if (isfield(model, 'noise_input'))
-        X_orig = X;
-        X      = X_orig + model.noise_input*(randn(size(X)));
 
+    % Inject noise into the input
+    if (isfield(model, 'noise_input') && any(model.noise_input))
+        X      = X_orig + model.noise_input*(randn(size(X))); % mean 0 noise
+        if ip == 1
+            fprintf('%f noise is %f%% of activation.\n', model.noise_input, 100*model.noise_input/mean(abs(X_orig(:))));
+        end;
         % Note: don't change Y!!  We don't want to model the noise...
     end;
 
@@ -83,7 +88,6 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
 
     elseif (currErr <= model.Error)
-      %keyboard
       if (ismember(13, model.debug))
           fprintf('Error reached criterion on iteration %d; done!\n', ip);
       end;
@@ -92,20 +96,18 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     % We're precisely the same; quit!
     elseif (currErr==lastErr && sum(abs(model.err(ip,:)-model.err(ip-1,:)))==0)
       warning(sprintf('Error didn''t change on iteration %d; done training early.\n',ip));
-      keyboard
       break;
     end;
 
     if (ismember(10, model.debug)), fprintf('[%4d]: err = %6.4e\n', ip, currErr/numel(Y)); end;
 
     % Adjust the weights
-    guru_assert(~any(isnan(grad(:))));
+    %guru_assert(~any(isnan(grad(:))));
     model.Weights=model.Weights-model.Eta.*model.Conn.*sign(grad);
     if (isfield(model, 'lambda') && currErr < lastErr)
-        %keyboard
         model.Weights = model.Weights .* (1-model.lambda);
     end;
-    guru_assert(~any(isnan(model.Weights(:))));
+    %guru_assert(~any(isnan(model.Weights(:))));
     if (isfield(model, 'wmax'))
         over_wts = abs(model.Weights)>model.wmax;
         model.Weights(over_wts) = sign(model.Weights(over_wts)) .* model.wmax;

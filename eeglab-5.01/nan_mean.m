@@ -44,8 +44,8 @@ function out = nan_mean(in, dim)
             dim = 1;
         elseif size(in,2) ~= 1
             dim = 2;
-        else 
-            dim = 3; 
+        else
+            dim = 3;
         end;
     end;
     tmpin = in;
@@ -53,7 +53,7 @@ function out = nan_mean(in, dim)
     denom = sum(~isnan(in),dim);
     denom(find(~denom)) = nan;
     out = sum(tmpin, dim) ./ denom;
-    
+
     s = size(in);
     s(dim) = 1;
     out = reshape(out, s);

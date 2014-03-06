@@ -10,4 +10,3 @@ function [val, opts, inopts] = guru_popopt(opts, optname, def)
       opts = opts([1:idx-1 idx+2:end]);
   end;
 
-      

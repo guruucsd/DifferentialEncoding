@@ -12,7 +12,7 @@ function fn = guru_smartfn(fn,type)
 
   if (~exist('type','var')), type = 'file'; end;
 
-  % 
+  %
   [PATHSTR,NAME,EXT,VERSN]       = fileparts(fn);
   if (isempty(EXT)),     EXT     = '';  end;
   if (isempty(PATHSTR)), PATHSTR = '.'; end;

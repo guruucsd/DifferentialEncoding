@@ -67,7 +67,7 @@ function [dnw_data,axes] = guru_dnw(data, varargin)
       [Vf, Df] = eig(Z * Z');        % Get the eigenvectors and eigenvalues of Z'Z
       [Vf, Df] = eigsort(Vf, Df);    % Sort them
 
-      keyboard % I don't know if this code works.
+      error('This version of the dnw option may or may not work.');
 
       Vf       = Vf(:,1:end-1);      % Remove meaningless eigenvector
       Df       = Df(1:end-1,1:end-1);
@@ -101,8 +101,8 @@ function [dnw_data,axes] = guru_dnw(data, varargin)
   %   * multiply by sqrt(lambda)
   %   * rotate back to original space
   %   * add back mean
-  
-  
+
+
 function V = normc(U)
     V = U./repmat(sqrt(sum(U.^2,1)), [size(U,1), 1]);
 

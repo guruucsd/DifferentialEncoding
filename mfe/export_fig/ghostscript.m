@@ -6,7 +6,7 @@
 % Attempts to locate a ghostscript executable, finally asking the user to
 % specify the directory ghostcript was installed into. The resulting path
 % is stored for future reference.
-% 
+%
 % Once found, the executable is called with the input command string.
 %
 % This function requires that you have Ghostscript installed on your
@@ -62,7 +62,7 @@ if ispc
     default_location = 'C:\Program Files\gs\';
     dir_list = dir(default_location);
     if isempty(dir_list)
-        default_location = 'C:\Program Files (x86)\gs\'; % Possible location on 64-bit systems 
+        default_location = 'C:\Program Files (x86)\gs\'; % Possible location on 64-bit systems
         dir_list = dir(default_location);
     end
     executable = {'\bin\gswin32c.exe', '\bin\gswin64c.exe'};

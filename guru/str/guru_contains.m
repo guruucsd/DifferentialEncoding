@@ -13,7 +13,7 @@ function c = guru_contains(M,v)
     return;
   end;
 
-  % Look inside the cell array; 
+  % Look inside the cell array;
   %  any non-strings will fail.  So,
   %  convert non-strings to strings
   %  and note the index, so we can be
@@ -26,11 +26,10 @@ function c = guru_contains(M,v)
       v{i} = '';
     end;
   end;
-  
+
   % Find members, and blank out accidental matches
   d = ismember(v,M).*str;
-  
+
   % Summarize to output
   c = ~isempty(find(d));
-  
-  
+

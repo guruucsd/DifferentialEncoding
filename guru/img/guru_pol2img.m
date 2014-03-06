@@ -13,6 +13,5 @@ function xyimg = guru_pol2img(rtimg)
         xysz_ = rtsz_;
         %xycoeff_ = pinvs(rtcoeff_);
     end;
-    
+
     xyimg = reshape(rtcoeff_ \ rtimg(:), xysz_);
-    

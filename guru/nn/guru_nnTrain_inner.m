@@ -1,9 +1,8 @@
 function [model, currErr, lastErr, newgrad, o_p] = guru_nnTrain_inner(X, Y, m, errorType, ep, ip, lastErr, lastgrad)
     if (ip==0), ip=1; end; % hack for now; doesn't really matter as it'll all get overwritten
-    %if (ip==5) && lastErr<124, keyboard; end;
-    
+
     model = m; % default: output the same things as we got on input.  Only update what we want to change.
-    
+
     %% Update with the last grad
     m.Weights=m.Weights - m.Eta.*m.Conn.*lastgrad;
     if (isfield(model, 'lambda')),
