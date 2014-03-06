@@ -17,7 +17,7 @@ switch fit_distn
     case 'lognormal'
         % functions for computing mu and sigma from empirical mean and std
         % p(1) = ln(mn)-p(2).^2/2;
-        % p(2) = sqrt(ln(var/mn.^2 + 1)) 
+        % p(2) = sqrt(ln(var/mn.^2 + 1))
         %sigmafn = @(mn,var) (sqrt(log(var./(mn.^2)+1)));
         %mufn  = @(mn,var) (log(mn)-log(var./(mn.^2)+1)/2);
 
@@ -25,7 +25,7 @@ switch fit_distn
         pmffn = @(x,p) cdf2pmf(@logncdf, x, p);
         pdffn = @lognpdf;
 %        fitfn = @(d,b) fitpdf(pdffn,d,b,[-0.3 0.1]);
-        fitfn = @(d,b) fitpmf(pmffn,d,b,[-0.3 0.1],frac,showfig);
+        fitfn = @(d,b) fitpmf(pmffn,d,b,[-0.3 0.1], frac, showfig);
         mnfn  = @(p) exp(p(1)+p(2).^2/2);
         varfn = @(p) (exp(p(2).^2)-1).*exp(2*p(1)+p(2).^2);
 
@@ -33,11 +33,11 @@ switch fit_distn
         pmffn = @(x,p) cdf2pmf(@IUBDcdf, x, p);
         pdffn = @IUBDpdf;
 %        fitfn = @(d,b) fitpdf(pdffn,d,b,[1 1]);
-        fitfn = @(d,b) fitpmf(pmffn,d,b,[1 1],frac,showfig);
+        fitfn = @(d,b) fitpmf(pmffn,d,b,[1 1], frac, showfig);
 
     case 'gamma'
         pmffn = @(x,p) cdf2pmf(@gamcdf, x, p);
         pdffn = @gampdf;
 %        fitfn = @(d,b) fitpdf(pdffn,d,b,[6 0.1]);
-        fitfn = @(d,b) fitpmf(pmffn,d,b,[4.5 0.1],frac,showfig);
+        fitfn = @(d,b) fitpmf(pmffn,d,b,[4.5 0.1], frac, showfig);
 end;

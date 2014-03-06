@@ -1,4 +1,4 @@
-function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
+function [p, fns, resid, p_inv] = allometric_regression(x,y,xform,order,flip,figtype)
 %function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
 %
 % x: 
@@ -70,7 +70,7 @@ function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
     
     if flip==true
         [p_flp,fns_flp] = allometric_regression(y,x,xform(end:-1:1),order,false,'');
-        p_inv = [1./p_flp(:,1) -p_flp(:,2)./p_flp(:,1)] % show algebraic derivation of coeffs from inverse regression
+        p_inv = [1./p_flp(:,1) -p_flp(:,2)./p_flp(:,1)]; % show algebraic derivation of coeffs from inverse regression
     end;
 
     
@@ -102,7 +102,7 @@ function [p,fns,resid] = allometric_regression(x,y,xform,order,flip,figtype)
     % compute residuals
     resid = cell(size(x));
     for ci=1:length(x)
-        resid{ci} = y{ci} - fns.y(x{ci});
+        resid{ci} = y{ci} - fns(ci).y(x{ci});
     end;
     
     

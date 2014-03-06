@@ -1,4 +1,4 @@
-function mfc_ax2ax(hSource,hDest)
+function mfe_ax2ax(hSource,hDest)
 % Copy everything on one axes to another.
 % Still doesn't do legend. Don't know abouut colorbars, but hey its a
 % start.
@@ -17,5 +17,3 @@ subplot(hDest)
 xlabel(get(get(hSource,'xlabel'),'string'));
 ylabel(get(get(hSource,'ylabel'),'string'));
 title(get(get(hSource,'title'),'string'));
-
-end
