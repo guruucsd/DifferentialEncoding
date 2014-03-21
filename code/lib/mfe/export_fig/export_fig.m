@@ -33,8 +33,8 @@
 %   - Variable image compression, including lossless (pdf, eps, jpg)
 %   - Optionally append to file (pdf, tiff)
 %   - Vector formats: pdf, eps
-%   - Bitmap formats: png, tiff, jpg, bmp, export to workspace
-%
+%   - Bitmap formats: png, tiff, jpg, bmp, export to workspace 
+%   
 % This function is especially suited to exporting figures for use in
 % publications and presentations, because of the high quality and
 % portability of media produced.
@@ -174,6 +174,8 @@ function [im, alpha] = export_fig(varargin)
 drawnow;
 % Parse the input arguments
 [fig, options] = parse_args(nargout, varargin{:});
+%set(fig,'Color','none'); %ben's addition
+
 % Isolate the subplot, if it is one
 cls = all(ismember(get(fig, 'Type'), {'axes', 'uipanel'}));
 if cls
@@ -678,6 +680,8 @@ function [A, v] = crop_background(A, bcol)
 [h, w, c] = size(A);
 if isscalar(bcol) && c > 1
     bcol = bcol(ones(1, c));
+elseif isempty(bcol) % bens addition
+    bcol = 204*ones(1,c);
 end
 bail = false;
 for l = 1:w

@@ -1,4 +1,4 @@
-function [oact,err,huact] = guru_nnExec(model,X,Y)
+function [oact, err, huact] = guru_nnExec(model,X,Y)
 %  Run a model
 %
 %  Input:
