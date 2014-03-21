@@ -1,1 +1,0 @@
-[v2,v1] = guru_swap(v1,v2)
