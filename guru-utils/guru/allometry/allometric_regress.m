@@ -1,4 +1,4 @@
-function [p,fns] = allometric_regress(x,y,xform,order,flip,figtype)
+function [p,fns,rsq] = allometric_regress(x,y,xform,order,flip,figtype)
 %function [p,fns] = allometric_regress(x,y,xform,order,flip,figtype)
 
     if ~exist('xform','var'),   xform   = {'log' 'log'}; end;
@@ -8,4 +8,4 @@ function [p,fns] = allometric_regress(x,y,xform,order,flip,figtype)
     elseif islogical(figtype),  figtype = guru_iff(figtype, '1', ''); % legacy
     end;
 
-    [p,fns] = allometric_regression(x,y,xform,order,flip,figtype);
+    [p,fns,rsq] = allometric_regression(x,y,xform,order,flip,figtype);

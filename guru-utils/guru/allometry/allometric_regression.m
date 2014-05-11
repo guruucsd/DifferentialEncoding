@@ -1,4 +1,4 @@
-function [p, fns, resid, p_inv] = allometric_regression(x,y,xform,order,flip,figtype)
+function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,figtype)
 %function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
 %
 % x: 
@@ -99,12 +99,16 @@ function [p, fns, resid, p_inv] = allometric_regression(x,y,xform,order,flip,fig
     end;
 
     
-    % compute residuals
+    % compute residuals and r-squared
     resid = cell(size(x));
+    rsquared = cell(size(x));
     for ci=1:length(x)
         resid{ci} = y{ci} - fns(ci).y(x{ci});
+
+        SSresid = sum(resid{ci}.^2);  % Square the residuals and total them obtain the residual sum of squares:
+        SStotal = (length(y{ci})-1) * var(y{ci});  %Compute the total sum of squares of y by multiplying the variance of y by the number of observations minus 1:
+        rsquared{ci} = 1 - SSresid/SStotal;  %Compute R2 using the formula given in the introduction of this topic:
     end;
-    
     
     
 function dt = xformfn(d,type,inv)

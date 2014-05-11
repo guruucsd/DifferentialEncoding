@@ -28,7 +28,7 @@ for si=1:nsubs
             hold on;
             plot(xvsteps, gplt.y(xvsteps), 'LineWidth', 5);
             if pplt(1)==1
-                legend({' Original Data', sprintf(' %4.3fx', pplt(2))}, 'Location', 'NorthWest');
+                legend({' Original Data', sprintf(' %4.3fx', pplt(2))}, 'Location', 'NorthWest');  % exponent 1 means truly linear... never any intercept 
             else
                 legend({' Original Data', sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1))}, 'Location', 'NorthWest');
             end;
