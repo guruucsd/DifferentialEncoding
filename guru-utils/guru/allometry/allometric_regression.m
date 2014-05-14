@@ -50,6 +50,15 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,
 
         if length(xt)>1
             p(ci,:) = polyfit(xt,yt,order);
+            if order ~= 1
+                error('RMA for non-order 1?  Impossible!  If needed, can revert back to polyfit, but ... show a warning?');
+            end;
+            p1 = mfe_rmaregress(xt,yt,[2, 2]); p1 = p1(end:-1:1);
+            diff = (p1 - p(ci,:)) ./ (p1 + p(ci,:)) / 2;
+            if any(abs(diff) > 0.05)
+                fprintf('Differences between polyfit and rmaregress: [ %s]', sprintf('%5.1f%% ', diff*100));
+            end;
+            p(ci,:) = p1;
         else
             p(ci,:) = ones(order,1);
         end;
