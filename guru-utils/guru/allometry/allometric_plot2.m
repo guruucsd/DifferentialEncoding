@@ -27,19 +27,27 @@ for si=1:nsubs
             plot(xvals, yvals, 'ro', 'MarkerSize', 10, 'LineWidth', 5);
             hold on;
             plot(xvsteps, gplt.y(xvsteps), 'LineWidth', 5);
-            if pplt(1)==1
-                legend({' Original Data', sprintf(' %4.3fx', pplt(2))}, 'Location', 'NorthWest');  % exponent 1 means truly linear... never any intercept 
+            if pplt(1)==1 && length(pplt) == 3 && pplt(3) ~= 0  % linear with intercept
+                sgn = guru_iff(pplt(3) > 0, '+', '-');
+                data_label = sprintf(' %4.3fx %s %6.3e', pplt(2), sgn, abs(pplt(3))); 
+            elseif pplt(1)==1  % linear, no intercept specified
+                data_label = sprintf(' %4.3fx', pplt(2));   % exponent 1 means truly linear... never any intercept 
             else
-                legend({' Original Data', sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1))}, 'Location', 'NorthWest');
+                data_label = sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1));
             end;
+            legend({' Original Data', data_label}, 'Location', 'NorthWest');
             axis square; axis tight;
 
         case {'log','loglog'}
             loglog(xvals, yvals, 'ro', 'MarkerSize', 10, 'LineWidth', 5);
             hold on;
             loglog(xvsteps, gplt.y(xvsteps), 'LineWidth', 5);
-            legend({' Original Data', sprintf(' %4.3fx + %4.3f', pplt)}, 'Location', 'NorthWest');
+
+            sgn = guru_iff(pplt(2) > 0, '+', '-');
+            data_label = sprintf(' %4.3fx %s %4.3f', pplt(1), sgn, abs(pplt(2)));
+            legend({' Original Data', data_label}, 'Location', 'NorthWest');
             axis square;
+
             xl    = xvsteps([1 end]); yl = gplt.y(xl); %get(gca,'xlim'); yl    = get(gca,'ylim');
             xdiff = diff(log10(xl));        ydiff = diff(log10(yl));    mdiff = max(xdiff,ydiff);
             xl2   = 10.^(log10(xl) + (mdiff-xdiff)/2*[-1 1]); if (xl2(1)<0), xl2=xl2-xl2(1); end;
