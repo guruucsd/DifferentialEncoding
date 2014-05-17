@@ -1,4 +1,4 @@
-function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,figtype)
+function [p, fns, rsquared, p_inv] = allometric_regression(x, y, xform, order, flip, figtype, est)
 %function [p,fns] = allometric_regression(x,y,xform,order,flip,figtype)
 %
 % x: 
@@ -32,6 +32,7 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,
     if ~exist('figtype','var'), figtype = ''; %guru_iff(flip, '1', '3');
     elseif islogical(figtype),  figtype = guru_iff(figtype, '1', ''); % legacy
     end;
+    if ~exist('est','var'), est = true; end;
     
     
     if ischar(xform), xform={xform}; end;
@@ -56,7 +57,7 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,
             p1 = mfe_rmaregress(xt,yt,[2, 2]); p1 = p1(end:-1:1);
             diff = (p1 - p(ci,:)) ./ (p1 + p(ci,:)) / 2;
             if any(abs(diff) > 0.05)
-                fprintf('Differences between polyfit and rmaregress: [ %s]', sprintf('%5.1f%% ', diff*100));
+                fprintf('Differences between polyfit and rmaregress: [ %s]\n', sprintf('%5.1f%% ', diff*100));
             end;
             p(ci,:) = p1;
         else
@@ -119,7 +120,16 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x,y,xform,order,flip,
         rsquared{ci} = 1 - SSresid/SStotal;  %Compute R2 using the formula given in the introduction of this topic:
     end;
     
-    
+    % Compare to xxxx
+    if est
+        for di=1:length(x)
+            [p1, ~, rsquared1] = allometric_regression_offset(x{di}, y{di});
+
+            % Print the result
+            fprintf('%6.4e + %6.4e * x.^%6.4f r^2 = %5.3f vs. %5.3f; \n', p1(end:-1:1), rsquared1, rsquared{1});
+        end;
+    end;    
+
 function dt = xformfn(d,type,inv)
     if ~exist('inv','var'), inv=false;
     elseif ischar(inv), inv = true; end;
