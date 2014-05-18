@@ -33,7 +33,7 @@ for si=1:nsubs
             elseif pplt(1)==1  % linear, no intercept specified
                 data_label = sprintf(' %4.3fx', pplt(2));   % exponent 1 means truly linear... never any intercept 
             else
-                data_label = sprintf(' %4.3fx^{%4.3f}', pplt(2), pplt(1));
+                data_label = sprintf(' %4.3e * x^{%4.3f}', 10.^pplt(2), pplt(1));
             end;
             legend({' Original Data', data_label}, 'Location', 'NorthWest');
             axis square; axis tight;
