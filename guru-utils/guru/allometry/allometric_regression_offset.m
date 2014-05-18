@@ -27,12 +27,14 @@ function [p, fns, rsquared] = allometric_regression_offset(x, y)
 
     % initialize through allometric regressions
 %    function [p, fns, rsquared, p_inv] = allometric_regression(x, y, xform, order, flip, figtype, est)
-    
     plog = allometric_regression(x, y, 'log', 1, false, '', false);
     plinear = allometric_regression(x, y, 'linear', 1, false, '', false);
     pinit = [plog(1) 10.^plog(2) plinear(2)];
-    p = fminsearch(cost_fn, pinit, optimset('MaxFunEvals', 1E10, 'MaxIter', 1E8));
 
+    % Do the optimization
+    p = fminsearch(cost_fn, pinit, optimset('MaxFunEvals', 1E8, 'MaxIter', 1E8));
+
+    % Set up dummy functions that allometric_regress would return and that other code expects
     fns.reg = @(x) p(3) + p(2) * x.^p(1);
     fns.xinv = @(x) x;
     fns.yinv = @(y) y;
@@ -46,11 +48,3 @@ function [p, fns, rsquared] = allometric_regression_offset(x, y)
     SStotal = (length(y)-1) * var(y);  %Compute the total sum of squares of y by multiplying the variance of y by the number of observations minus 1:
     rsquared = 1 - SSresid/SStotal;  %Compute R2 using the formula given in the introduction of this topic:
 
-    % get true offset
-
-%    fns(ci).reg    = @(x) polyval(p(ci,:),xformfn(x,xform{1}));
-%    fns(ci).xxform = @(d) (d);
-%    fns(ci).yxform = @(d) (d);
-%    fns(ci).xinv   = @(d) (d); %inverse transform
-%    fns(ci).yinv   = @(d) (d);
-%    fns(ci).y      = @(x) (fns(ci).yinv(fns(ci).reg(x)));
