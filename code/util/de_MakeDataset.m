@@ -252,6 +252,15 @@ function dset = de_StimApplyFiltering(dset, opts)
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
 
+    % Noise filter
+    noise_filter = guru_getopt(opts, 'noise', NaN);
+    if (~isnan(noise_filter))
+        guru_assert(length(noise_filter), 'Noise filter should have 1 parameter');
+        dset.X = dset.X + noise_filter * diff(dset.minmax) * randn(size(dset.X));%reshape(filt_images,[num_images prod(dset.nInput)])';
+        dset.X = max(dset.minmax(1), min(dset.minmax(2), dset.X));
+    end;
+    
+    
 %%%%%%%%%%%%%%%%%
 function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 
