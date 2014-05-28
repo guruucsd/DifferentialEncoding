@@ -5,7 +5,7 @@ clear all; close all;
 
 addpath(genpath('../../code'));
 de_SetupExptPaths('young_bion_1981');
-load(de_GetDataFile('young_bion_1981', 'orig', [], {'small', 'dnw', false}));
+load(de_MakeDataset('young_bion_1981', 'orig', '', {'small', 'dnw', false}));
 img = reshape(train.X(end:-1:1, 16), train.nInput)';
 
 rand('seed',1);
@@ -136,7 +136,7 @@ for i=1:length(sigmas)
     for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [2 1], 'k', 'LineWidth', 2); end;
 
     % hidden unit
-    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'LineWidth', 10);
+    plot3(huloc(1), huloc(2), 1,  'r.','MarkerSize', 50, 'LineWidth', 10);
     
     % image @ input
     colormap gray;
@@ -162,6 +162,10 @@ for i=1:length(sigmas)
     [X,Y] = meshgrid(1:gridfreq*2:imageSize(1), 1:gridfreq*2:imageSize(2)); % all inputs
     plot3(X,Y, zeros(size(X)),  'k.', 'MarkerSize', 0.5);  % input layer: 
 
+    % image @ input
+    colormap gray;
+    surf(zeros(size(img)), img, 'EdgeColor','none')
+
     %inputs
     plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
     plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
@@ -170,10 +174,7 @@ for i=1:length(sigmas)
     for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
     
     % hidden unit
-    plot3(huloc(1), huloc(2), 1,  'ro','MarkerSize', 10, 'linewidth', 10);
+    plot3(huloc(1), huloc(2), 1,  'r.','MarkerSize', 50, 'linewidth', 10);
     
-    % image @ input
-    colormap gray;
-    surf(zeros(size(img)), img, 'EdgeColor','none')
 end;
 
