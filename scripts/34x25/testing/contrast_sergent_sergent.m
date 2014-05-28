@@ -3,7 +3,7 @@
 addpath('../sergent_1982');
 clear all variables; clear all globals;
 
-<<<<<<< HEAD
+%% ...
 stats = {'paths','images','ffts'};%{'images','ffts'};
 plts = {'ls-bars', stats{:}};
 
@@ -11,7 +11,9 @@ plts = {'ls-bars', stats{:}};
 
 % Run sergent task by training on all images
 [trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', {opts{:}, 'contrast', 'low'}, args);
-=======
+
+
+%% ...
 stats = {'images','ffts'};%{'images','ffts'};
 plts = {'ls-bars', stats{:}};
 
@@ -19,4 +21,3 @@ plts = {'ls-bars', stats{:}};
 
 % Run sergent task by training on all images
 [trn, tst] = de_SimulatorUber('vanhateren/100', 'sergent_1982/de/sergent', {opts{:}, 'contrast', 'low'}, args);
->>>>>>> origin/img2pol

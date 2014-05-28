@@ -12,8 +12,5 @@ clear all variables;
                            'p.wmax', 2.0, ...
                            'p.MaxIterations', 100 ...
                            );
-<<<<<<< HEAD
-=======
-                       
->>>>>>> origin/img2pol
+
 [mSets, models, stats] = de_SimulatorUber('vanhateren/100', 'sergent_1982/de/sergent', {opts{:}}, args);
