@@ -24,6 +24,28 @@ function [rtimgs] = de_img2pol(xyimgs, location, nInput)
                 xyimg = reshape(xyimgs(:,ii), nInput);
                 rtimg = mfe_img2pol(xyimg);
 
+            case 'CVF-RH' % polar: 90 to 270 degrees
+                xyimg = reshape(xyimgs(:,ii), nInput);
+                rtimg = mfe_img2pol(xyimg);
+
+                deg90_idx = size(rtimg,2) / 4;
+                deg270_idx = 3 * size(rtimg, 2) / 4;
+
+                % ceil & floor allow LH & RH to be stitched together
+                rtimg(:, [ceil(deg270_idx):end 1:ceil(deg90_idx - 1)]) = 0;
+                rtimg = rtimg(:, [ceil(deg90_idx):end 1:ceil(deg90_idx-1)]);
+
+            case 'CVF-LH' % polar: 270 to 0, 0 to 90 degrees
+                xyimg = reshape(xyimgs(:,ii), nInput);
+                rtimg = mfe_img2pol(xyimg);
+
+                deg90_idx = size(rtimg,2) / 4;
+                deg270_idx = 3 * size(rtimg, 2) / 4;
+
+                % ceil & floor allow LH & RH to be stitched together
+                rtimg(:, [ceil(deg90_idx):ceil(deg270_idx - 1)]) = 0;
+                rtimg = rtimg(:, [ceil(deg90_idx):end 1:ceil(deg90_idx-1)]);
+
             case {'LVF','RVF'}
 
                 % Right-pad images
