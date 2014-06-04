@@ -113,13 +113,11 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x, y, xform, order, f
     resid = cell(size(x));
     rsquared = cell(size(x));
     for ci=1:length(x)
-        resid{ci} = y{ci} - fns(ci).y(x{ci});
-
-        SSresid = sum(resid{ci}.^2);  % Square the residuals and total them obtain the residual sum of squares:
-        SStotal = (length(y{ci})-1) * var(y{ci});  %Compute the total sum of squares of y by multiplying the variance of y by the number of observations minus 1:
-        rsquared{ci} = 1 - SSresid/SStotal;  %Compute R2 using the formula given in the introduction of this topic:
+        rsquared{ci} = compute_rsquared(y{ci}, fns(ci).y(x{ci}));
+        
+        fprintf('rsquared: %.2f vs %.2f\n', rsquared{ci}, compute_rsquared(fns.yxform(y{ci}), fns.yxform(fns(ci).y(x{ci}))));
     end;
-    
+
     % Compare to xxxx
     if est
         for di=1:length(x)
@@ -129,6 +127,14 @@ function [p, fns, rsquared, p_inv] = allometric_regression(x, y, xform, order, f
             fprintf('%6.4e + %6.4e * x.^%6.4f r^2 = %5.3f vs. %5.3f; \n', p1(end:-1:1), rsquared1, rsquared{1});
         end;
     end;    
+
+function rsquared = compute_rsquared(y, yest)
+    resid = y - yest;
+
+    SSresid = sum(resid.^2);  % Square the residuals and total them obtain the residual sum of squares:
+    SStotal = (length(y)-1) * var(y);  %Compute the total sum of squares of y by multiplying the variance of y by the number of observations minus 1:
+    rsquared = 1 - SSresid/SStotal;  %Compute R2 using the formula given in the introduction of this topic:
+
 
 function dt = xformfn(d,type,inv)
     if ~exist('inv','var'), inv=false;

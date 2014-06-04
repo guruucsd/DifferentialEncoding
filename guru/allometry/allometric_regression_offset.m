@@ -23,7 +23,7 @@ function [p, fns, rsquared] = allometric_regression_offset(x, y)
     eu_dist = @(x,y) sqrt(sum((x(:) - y(:)).^2));
     offset_log_fn = @(p, x) p(3) + p(2) * x.^p(1);
     cost_fn = @(p) eu_dist(y, offset_log_fn(p, x));
-    safety_cost_fn = @(p) cost_fn(p) + 1E50 * sum((0 > offset_log_fn(p, x)) .* -offset_log_fn(p, x));
+    %safety_cost_fn = @(p) cost_fn(p) + 1E50 * sum((0 > offset_log_fn(p, x)) .* -offset_log_fn(p, x));
 
     % initialize through allometric regressions
 %    function [p, fns, rsquared, p_inv] = allometric_regression(x, y, xform, order, flip, figtype, est)
