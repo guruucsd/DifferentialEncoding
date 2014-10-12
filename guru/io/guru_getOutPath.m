@@ -16,7 +16,7 @@ function outdir = guru_getOutPath(dirtype)
         outdir = fullfile('~', 'datasets');
 
     otherwise 
-          error('Unknown type: %s', dirType);
+          error('Unknown type: %s', dirtype);
 end;
 
 %  if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
