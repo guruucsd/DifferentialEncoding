@@ -23,7 +23,7 @@ function guru_saveall_figures(base_name, types, overwrite, close_after)
                 %set(fh(fi), 'PaperPositionMode', 'auto');
                 pos = get(fh(fi), 'Position');
                 set(fh(fi), 'PaperPosition', pos / 100);
-                get(fh(fi), 'position')
+                %get(fh(fi), 'position')
                 switch types{ti}
                     case {'fig', 'png'}, saveas(fh(fi), fn, types{ti});
                     otherwise, print(fh(fi), ['-d' types{ti}], fn); %export_fig(fn, '-painters');
