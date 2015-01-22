@@ -1,7 +1,7 @@
 function img = guru_text2im(str, width, height, varargin)
 
     fh = figure('Visible', 'off'); 
-    imshow(0.5 * ones(height, width));
+    imagesc(0.5 * ones(height, width), [0 1]); colormap('gray');
 
     text(width/2, height/2, str, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', varargin{:});
     set(gca, 'xlim', [0 width], 'ylim', [0 height]);
