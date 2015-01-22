@@ -19,6 +19,7 @@ for ii=1:120
 end
 
 fixed     = true; % don't use random connections, but fix them to match some previous figure
+distn     = true;
 nConns    = 5;              % # connections from hidden->input/output
 sigmas    = [5 16];
 imageSize = [34 25];      % input/output size
@@ -26,6 +27,7 @@ gshape    = [2 0;0 2];      % multivariate gaussian sigma shape
 huloc     = imageSize/2;    % position of hidden unit in center of image
 gridfreq  = 1;
 nSamples  = 1;
+
 
 %a = de_connector2D([34 25],1,1,25,'norme',0,3,0,1); %
 %a(:,851)==input=>hidden
@@ -39,7 +41,7 @@ for n=1:nSamples
         cxns = zeros(0,2);
         
         theta=2*pi*rand;
-        rmat = [cos(theta) sin(theta);-sin(theta) cos(theta)];
+        rmat = [cos(theta) sin(theta); -sin(theta) cos(theta)];
         mvsig = sigmas(i)*(rmat*gshape);
         while (size(cxns,1)<nConns)
           newcxns   = round(mvnrnd(imageSize/2, sigmas(i)*gshape, nConns)); %connection points
@@ -142,11 +144,11 @@ for i=1:length(sigmas)
     colormap gray;
     h = surf(zeros(size(img)), img, 'EdgeColor','none');
     h = surf(2*ones(size(img)), img, 'EdgeColor','none');  alpha(h,0.25);
-
+    mfe_freezeColors();
     
     
     %%%%%%%%%%%%%%%
-    % 3-layer
+    % 2-layer
     %%%%%%%%%%%%%%%
     subplot(2, length(sigmas),length(sigmas)+i); hold on;
     daspect(gca, [1 1 1/10])
@@ -158,23 +160,31 @@ for i=1:length(sigmas)
     set(gca, 'xtick', [], 'ytick', []);
     set(gca, 'ztick', [0 1], 'zticklabel', {'Input', 'Output'});
 
-    %Plot input/output layers
+    % Plot input layer
     [X,Y] = meshgrid(1:gridfreq*2:imageSize(1), 1:gridfreq*2:imageSize(2)); % all inputs
     plot3(X,Y, zeros(size(X)),  'k.', 'MarkerSize', 0.5);  % input layer: 
 
     % image @ input
     colormap gray;
     surf(zeros(size(img)), img, 'EdgeColor','none')
+    mfe_freezeColors();
 
-    %inputs
-    plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
-    plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
-    
-    % connect them
-    for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
-    
-    % hidden unit
-    plot3(huloc(1), huloc(2), 1,  'r.','MarkerSize', 50, 'linewidth', 10);
+    if distn
+    % Plot gaussian
+        mfe_freezeColors(); colormap('jet');
+        surf(X,Y,100*reshape(mvnpdf([X(:) Y(:)], huloc, sigmas(i) * gshape), size(Y))); alpha(0.5);
+    else
+        % inputs
+        plot3(cxns(:,1), cxns(:,2), 0*ones(size(cxns(:,2))), 'go','MarkerSize', 5, 'LineWidth', 5);
+        plot3(round(huloc(1)),  round(huloc(2)),  0,         'ro','MarkerSize', 5, 'LineWidth', 5);
+
+        % connect them
+        for j=1:size(cxns,1), plot3([cxns(j,1) huloc(1)], [cxns(j,2), huloc(2)], [0 1], 'k', 'LineWidth', 2); end;
+
+        % hidden unit
+        plot3(huloc(1), huloc(2), 1,  'r.','MarkerSize', 50, 'linewidth', 10);
+
+    end;
     
 end;
 
