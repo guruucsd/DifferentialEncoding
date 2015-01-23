@@ -7,16 +7,13 @@ function guru_saveall_figures(base_name, types, overwrite, close_after)
 
     % print all figures
     fh = get(0,'Children');
-    suffs = zeros(size(types));
+    suffs = zeros(size(types)); %numbering figs
 
     warning('off', 'MATLAB:prnRenderer:opengl');
     for fi=1:length(fh);
         for ti=1:length(types)
-            while true
-                fn = sprintf('%s%01d.%s', base_name, fi+suffs(ti), types{ti});
-                if exist(fn) && ~overwrite, suffs(ti) = suffs(ti) + 1;
-                else, break; end;
-            end;
+            fn = get_unique_filename(base_name, get(gcf, 'name'), types{ti}, overwrite);
+
             if overwrite || ~exist(fn)
                 fprintf('Saving figure %d to %s.\n', fh(fi), fn);
                 figure(fh(fi));
@@ -33,4 +30,20 @@ function guru_saveall_figures(base_name, types, overwrite, close_after)
             end;
         end;
         if close_after, close(fh(fi)); end;
+    end;
+
+function filename = get_unique_filename(base_name, figure_name, ext, overwrite, start_idx)
+    if ~exist('start_idx', 'var')
+        start_idx = 1;
+    end;
+
+    if ~isempty(figure_name)
+        base_name = sprintf('%s_%s', base_name, figure_name);
+    end;
+
+    fi = start_idx;
+    while true
+        filename = sprintf('%s%01d.%s', base_name, fi, ext);
+        if exist(filename) && ~overwrite, fi = fi + 1;
+        else, break; end;
     end;
