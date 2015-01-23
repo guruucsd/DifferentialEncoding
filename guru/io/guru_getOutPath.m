@@ -15,12 +15,18 @@ function outdir = guru_getOutPath(dirtype)
     case {'datasets'}
         outdir = fullfile('~', 'datasets');
 
-    otherwise 
+    case {'results'}
+        abc = dbstack;
+        script_name = abc(length(abc)).name;
+        script_dir = fileparts(which(script_name));
+        outdir = fullfile(script_dir, '..', '..', 'results');
+
+    otherwise
           error('Unknown type: %s', dirtype);
 end;
 
 %  if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
 %    outdir = fullfile(de_GetBaseDir(), outdir);
 %  end;
-  
-  
+
+
