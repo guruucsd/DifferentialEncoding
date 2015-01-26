@@ -225,7 +225,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
 %                            if (fpxz_d(1,p,i,j) ~= fpx_d(p,i,j)*z_d(p,i,j)), error('fpxz_d'); end;
 %                            if (T_rrepd(1,p,i,j) ~= T_repd(1,p,j)), error('T_rrepd'); end;
 %                        if (gradE_w(ti,p,i,j) - gradE_wij_t > 1E-10)
-%                                keyboard;
+%                                error('NYI');
 %                        end;
 %                    end;
 %                end;

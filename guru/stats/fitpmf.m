@@ -65,7 +65,6 @@ function err = meankldiv(xv, d1, d2)
   minval = min([1E-5, min(d1(d1>0)), min(d2(d2>0))]);
   d1x = d1; d1x(d1x==0)=minval; d1x = d1x./sum(d1x);
   d2x = d2; d2x(d2x==0)=minval; d2x = d2x./sum(d2x);
-  %keyboard
   
   e1 = kldiv(xv,d1x,d2x);
   e2 = kldiv(xv,d2x,d1x);

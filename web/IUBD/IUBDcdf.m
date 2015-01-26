@@ -26,8 +26,3 @@ function c = IUBDcdf(s,a,b,stepsz,xmax)
     cdf = cdf./cdf(end);
     c = cdf(cidx);
     %c = IUBDcdf__(gidx,cidx);
-
-    if any(isnan(c)) && ~isnan(a) && ~isnan(b)
-        keyboard
-    end;
-    
