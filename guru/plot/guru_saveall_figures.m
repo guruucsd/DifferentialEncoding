@@ -3,36 +3,39 @@ function guru_saveall_figures(results_dir, types, overwrite, close_after)
     if ~iscell(types), types = {types}; end;
     if ~exist('overwrite','var'), overwrite=false; end;
     if ~exist('close_after', 'var'), close_after = false; end;
+    if ~exist(results_dir, 'dir'), mkdir(results_dir); end;
 
     % print all figures
-    fh = get(0,'Children');
-    suffs = zeros(size(types)); %numbering figs
+    fh = unique(get(0, 'Children'));
 
-    %
-    if ~exist(results_dir, 'dir'), mkdir(results_dir);
+    % Store figure sizes, as somehow they get
+    %   reset during the print process
+    %   when doing remotely, with no display set.
+    positions = cell(size(fh));
+    for fi=1:length(fh)
+        positions{fi} = get(fh(fi), 'Position');
+    end;
 
     warning('off', 'MATLAB:prnRenderer:opengl');
     for fi=1:length(fh);
         for ti=1:length(types)
-            file_path = get_unique_filename(results_dir, get(gcf, 'name'), types{ti}, overwrite);
+            file_path = get_unique_filename(results_dir, get(fh(fi), 'name'), types{ti}, overwrite);
 
             if overwrite || ~exist(file_path)
                 fprintf('Saving figure %d to %s.\n', fh(fi), file_path);
-                figure(fh(fi));
-                %set(fh(fi), 'PaperPositionMode', 'auto');
-                pos = get(fh(fi), 'Position');
-                set(fh(fi), 'PaperPosition', pos / 100);
-                %get(fh(fi), 'position')
+                copyfig(fh(fi)); close(fh(fi));
+                set(gcf, 'PaperPositionMode', 'manual');
+                set(gcf, 'PaperUnits', 'inches');
+                set(gcf, 'PaperPosition', positions{fi}/100);
+                set(gcf, 'Position', positions{fi});
                 switch types{ti}
-                    case {'fig'}, saveas(fh(fi), file_path, types{ti});
-                    case {'png'}, export_fig(file_path, '-painters');
-                    otherwise, print(fh(fi), ['-d' types{ti}], file_path);
+                    case {'fig'}, saveas(gcf, file_path, types{ti});
+                    %otherwise, export_fig(gcf, file_path, '-transparent', '-painters');
+                    otherwise, print(gcf, file_path, ['-d' types{ti}]);
                 end;
-                get(fh(fi), 'position')
-                get(fh(fi), 'paperposition')
             end;
         end;
-        if close_after, close(fh(fi)); end;
+        if close_after, close(gcf); end;
     end;
 
 function file_path = get_unique_filename(results_dir,figure_name, ext, overwrite, start_idx)
