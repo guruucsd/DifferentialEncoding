@@ -7,7 +7,7 @@
 %
 % This function requires that you have pdftops, from the Xpdf suite of
 % functions, installed on your system. This can be downloaded from:
-% http://www.foolabs.com/xpdf
+% http://www.foolabs.com/xpdf  
 %
 %IN:
 %   source - filename of the source pdf file to convert. The filename is
@@ -24,7 +24,7 @@ function pdf2eps(source, dest)
 % Construct the options string for pdftops
 options = ['-q -paper match -eps -level2 "' source '" "' dest '"'];
 % Convert to eps using pdftops
-[status message] = pdftops(options);
+[status, message] = pdftops(options);
 % Check for error
 if status
     % Report error
@@ -47,5 +47,5 @@ if strcmp(str(1:min(13, end)), '% Produced by')
     fwrite(fid, '%'); % Turn ' ' into '%'
 end
 fclose(fid);
-return
+end
 
