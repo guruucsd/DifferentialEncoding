@@ -49,7 +49,7 @@ function file_path = get_unique_filename(results_dir,figure_name, ext, overwrite
 
     fi = start_idx;
     while true
-        file_name = sprintf('%s%01d.%s', figure_name, fi, ext);
+        file_name = sprintf('%s-%01d.%s', figure_name, fi, ext);
         file_path = fullfile(results_dir, file_name);
         if exist(file_path) && ~overwrite, fi = fi + 1;
         else, break; end;
