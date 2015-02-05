@@ -1,6 +1,6 @@
 function stats = de_StatsBasicsSF(mSets, mss, verbose)
   if (~exist('verbose','var')), verbose = false; end;
-
+  if ~isfield(mss(1), 'p'), stats = struct(); return; end;
 
   for di=1:2
       if (di==1), dset='train';
