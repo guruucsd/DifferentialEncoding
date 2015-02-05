@@ -6,17 +6,23 @@ function new_model = de_CopyModelSettings(model, mi)
                'ac.EtaInit', 'ac.Acc', 'ac.Dec', 'ac.lambda', ...
                'uberpath', 'out.dirstem', 'out.runspath' ...
     };
-
     for fi=1:length(flds)
         if ~guru_isfield(model, flds{fi}), continue; end;
 
         field_vals = guru_getfield(model, flds{fi}, NaN);
 
-        if length(field_vals) == 1
-            new_model = guru_setfield(new_model, flds{fi}, field_vals);
-        elseif iscell(field_vals)
-            new_model = guru_setfield(new_model, flds{fi}, field_vals{mi});
+        if iscell(field_vals)
+            if length(field_vals) == 1
+                cur_val = field_vals{1};
+            else
+                cur_val = field_vals{mi};
+            end;
+        elseif length(field_vals) == 1
+            cur_val = field_vals;
         else
-            new_model = guru_setfield(new_model, flds{fi}, field_vals(mi));
+            cur_val = field_vals(mi);
         end;
+
+        new_model = guru_setfield(new_model, flds{fi}, cur_val);
     end;
+

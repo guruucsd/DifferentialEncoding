@@ -9,7 +9,7 @@ function DE_PATH = de_GetBaseDir(p)
 
   while (length(p)>1)
      if (exist(fullfile(p, 'code')) == 7 ...
-         && exist(fullfile(p, 'scripts')) == 7)
+         && exist(fullfile(p, 'experiments')) == 7)
          break;
      end;
      p=guru_fileparts(p, 'pathstr'); %go to parent directory
