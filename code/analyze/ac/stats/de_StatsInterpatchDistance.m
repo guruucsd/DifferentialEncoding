@@ -1,5 +1,5 @@
 function [ipd] = de_StatsInterpatchDistance(models)
-%function [ti] = de_StatsTrainIters(models)
+%function [ipd] = de_StatsInterpatchDistance(models)
 %
 % Calculates stats that we care about
 %
