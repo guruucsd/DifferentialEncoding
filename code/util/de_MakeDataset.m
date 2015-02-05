@@ -229,7 +229,7 @@ function dset = de_StimApplyFiltering(dset, opts)
     lowpass_filter = guru_getopt(opts, 'lowpass', NaN );
     if (~isnan(lowpass_filter))
         guru_assert(length(lowpass_filter), 'Lowpass filter should have 1 parameter');
-        num_images = size(dset.X,2);
+        num_images = size(dset.X, 2);
         filt_images = guru_filterImages(reshape(dset.X', [num_images dset.nInput]), 'lowpass', lowpass_filter);
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
@@ -238,20 +238,29 @@ function dset = de_StimApplyFiltering(dset, opts)
     bandpass_filter = guru_getopt(opts, 'bandpass', NaN);
     if (~isnan(bandpass_filter))
         guru_assert(length(bandpass_filter), 'Bandpass filter should have 2 parameters');
-        num_images = size(dset.X,2);
+        num_images = size(dset.X, 2);
         filt_images = guru_filterImages(reshape(dset.X', [num_images dset.nInput]), 'bandpass', bandpass_filter);
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
 
     % High-pass filter
-    highpass_filter = guru_getopt(opts, 'highpass', nan);
+    highpass_filter = guru_getopt(opts, 'highpass', NaN);
     if (~isnan(highpass_filter))
         guru_assert(length(highpass_filter), 'Highpass filter should have 1 parameter');
-        num_images = size(dset.X,2);
+        num_images = size(dset.X, 2);
         filt_images = guru_filterImages(reshape(dset.X', [num_images dset.nInput]), 'highpass', highpass_filter);
         dset.X = reshape(filt_images,[num_images prod(dset.nInput)])';
     end;
 
+    % Noise filter
+    noise_filter = guru_getopt(opts, 'noise', NaN);
+    if (~isnan(noise_filter))
+        guru_assert(length(noise_filter), 'Noise filter should have 1 parameter');
+        dset.X = dset.X + noise_filter * diff(dset.minmax) * randn(size(dset.X));%reshape(filt_images,[num_images prod(dset.nInput)])';
+        dset.X = max(dset.minmax(1), min(dset.minmax(2), dset.X));
+    end;
+    
+    
 %%%%%%%%%%%%%%%%%
 function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 

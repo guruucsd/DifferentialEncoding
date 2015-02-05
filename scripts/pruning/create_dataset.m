@@ -21,6 +21,7 @@ function [train,test] = create_dataset(ws, model, ii)
     opt{find(guru_findstr(ws.fullfidel.opt,'dnw'))+1} = ws.fullfidel.axes;
   end;
 
+  opts
 	switch(ws.dataset_train.name)
 		case {'c' 'cafe'},   [~, train, test] = de_MakeDataset('young_bion_1981',     'orig',    '', opts);
 		case {'n' 'natimg'}, [~, train, test] = de_MakeDataset('vanhateren',          '250',     '', opts);
