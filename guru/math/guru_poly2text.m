@@ -1,4 +1,4 @@
-function reg_txt = guru_poly2text(p,varname,type)
+function reg_txt = guru_poly2text(p,varname)
 %function reg_txt = guru_poly2text(p)
 % Takes polynomial coefficients (a la polyfit), and returns
 % a string equation from them
@@ -10,7 +10,6 @@ function reg_txt = guru_poly2text(p,varname,type)
 
 
 if ~exist('varname','var'), varname = 'x'; end;
-if ~exist('type', 'var'), type = 'linear'; end;
 
 reg_txt = sprintf('%4.2f',p(end));
 for oi=length(p)-1:-1:1
@@ -22,4 +21,3 @@ for oi=length(p)-1:-1:1
     else,                   reg_txt  = [cur_term ' + ' reg_txt];
     end;
 end;
-
