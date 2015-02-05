@@ -31,9 +31,9 @@ else
 
     % upsampling; better smooth, then downsample!
     if (diff(bins(1:2))-diff(bins(3:4))) > eps
-        [new_d_sm, new_bins_sm] = smooth_distn(new_d, new_bins, [], [], showfig);
-        [new_d, new_bins] = rebin_distn(new_d_sm, new_bins_sm, new_bins, showfig, nsamples);
-        return; % no plot
+      [new_d_sm, new_bins_sm] = smooth_distn(new_d, new_bins, [], [], showfig);
+      [new_d, new_bins] = rebin_distn(new_d_sm, new_bins_sm, new_bins, showfig, nsamples);
+      return; % no plot
     end;
 end;
 

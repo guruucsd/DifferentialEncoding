@@ -24,6 +24,11 @@ function outdir = guru_getOutPath(dirtype)
           error('Unknown type: %s', dirtype);
 end;
 
+%  if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
+%    outdir = fullfile(de_GetBaseDir(), outdir);
+%  end;
+  
+
 
 function script_name = guru_getScriptName()
     abc = dbstack;

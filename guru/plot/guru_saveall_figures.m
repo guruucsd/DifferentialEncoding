@@ -38,6 +38,7 @@ function guru_saveall_figures(results_dir, types, overwrite, close_after)
         if close_after, close(gcf); end;
     end;
 
+
 function file_path = get_unique_filename(results_dir,figure_name, ext, overwrite, start_idx)
     if ~exist('start_idx', 'var')
         start_idx = 1;
