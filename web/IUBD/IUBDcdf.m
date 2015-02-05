@@ -27,7 +27,6 @@ function c = IUBDcdf(s,a,b,stepsz,xmax)
     c = cdf(cidx);
     %c = IUBDcdf__(gidx,cidx);
 
-    if any(isnan(c)) && ~isnan(a) && ~isnan(b)
-        keyboard
-    end;
-    
+    %if any(isnan(c)) && ~isnan(a) && ~isnan(b)
+    %    error('Unexpected NaN')
+    %end;

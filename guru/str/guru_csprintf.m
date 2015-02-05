@@ -16,9 +16,9 @@ function carr = guru_csprintf(fmt, cells, delim)
   end;
 
   if ~iscell(cells)
-    carr = guru_csprintf(fmt, {cells}, delim)
+    carr = guru_csprintf(fmt, {cells}, delim);
     carr = carr{1};
-    carr = carr(2:end);
+    %carr = carr(2:end);
     return;
   end;
 

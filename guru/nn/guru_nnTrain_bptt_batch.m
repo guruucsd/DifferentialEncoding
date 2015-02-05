@@ -58,9 +58,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
     dw           = zeros(size(net.wC));
     dT           = zeros(size(net.TC));
     dD           = zeros(size(net.DC));
-    dwr          = zeros(size(dw)); % last iteration's dw
-    dTr          = zeros(size(dT)); % last iteration's dT
-    dDr          = zeros(size(dD)); % last iteration's dD
+    dwr          = zeros(size(dw)); % last iteration`s dw
+    dTr          = zeros(size(dT)); % last iteration`s dT
+    dDr          = zeros(size(dD)); % last iteration`s dD
 
     % For variable learning rate
     if (numel(ns.eta_w)==1),    ns.eta_w    = ns.eta_w   .*ones(size(net.wC),'single'); end;
@@ -106,7 +106,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
     % Main Loop
     %%%%%%%%%%%%%%
 
-    if (ns.verbose), r_printPats(data); end;
+    if (ns.verbose), r_print_pats(data); end;
 
     I(:,:,1:1+net.ninput) = pats.P;  %patterns defined for input nodes; I is for all nodes
     pcIter              = 1;       %iteration where a param change was made
@@ -225,7 +225,7 @@ function [net,data] = r_train_resilient_batch(net,pats)
 %                            if (fpxz_d(1,p,i,j) ~= fpx_d(p,i,j)*z_d(p,i,j)), error('fpxz_d'); end;
 %                            if (T_rrepd(1,p,i,j) ~= T_repd(1,p,j)), error('T_rrepd'); end;
 %                        if (gradE_w(ti,p,i,j) - gradE_wij_t > 1E-10)
-%                                keyboard;
+%                                error('NYI');
 %                        end;
 %                    end;
 %                end;

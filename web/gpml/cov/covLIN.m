@@ -13,7 +13,7 @@ function K = covLIN(hyp, x, z, i)
 % Copyright (c) by Carl Edward Rasmussen and Hannes Nickisch, 2010-09-10.
 %
 % See also COVFUNCTIONS.M.
-keyboard
+
 if nargin<2, K = '0'; return; end                  % report number of parameters
 if nargin<3, z = []; end                                   % make sure, z exists
 xeqz = numel(z)==0; dg = strcmp(z,'diag') && numel(z)>0;        % determine mode

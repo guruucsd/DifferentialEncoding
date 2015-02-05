@@ -104,7 +104,6 @@ end
 % dlgn = (lg_h-lg)/h; d2lgn = (dlg_h-dlg)/h; d3lgn = (d2lg_h-d2lg)/h;
 % 
 % [dlg(:),dlgn(:), d2lg(:),d2lgn(:), d3lg(:),d3lgn(:)]
-% keyboard
 
 % compute the log Poisson intensity
 function varargout = g(f,kind)

@@ -19,5 +19,5 @@ for oi=length(p)-1:-1:1
 
     if p(oi+1)<0,           reg_txt  = [cur_term reg_txt];
     else,                   reg_txt  = [cur_term ' + ' reg_txt];
-    end;
+    end;    
 end;
