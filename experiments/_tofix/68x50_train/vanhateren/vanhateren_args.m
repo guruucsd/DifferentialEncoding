@@ -3,13 +3,9 @@ function [args,c_freqs,k_freqs,sz] = uber_args(varargin)
 %  Final shared settings for 2YP runs
 
   % Add absolute path to code
-  if (exist('de_GetBaseDir')~=2)
-    addpath(genpath(fullfile('..','..', 'code')));
-    addpath(genpath(fullfile('..','..','..', 'code')));
-    addpath(genpath(fullfile(de_GetBaseDir(),'code')));
-    rmpath (genpath(fullfile('..','..','..', 'code')));
-    rmpath (genpath(fullfile('..','..', 'code')));
-  end;
+  addpath('..');
+  [cargs,opts] = common_args();
+  rmpath('..');
   
   
   sz = [34 25];
@@ -17,7 +13,7 @@ function [args,c_freqs,k_freqs,sz] = uber_args(varargin)
 c_freqs = 2*[0.03 0.06 0.12 0.24 0.48];
 k_freqs = [0.05 0.15];
 
-  args  = de_ArgsInit({ ...
+  args  = de_ArgsInit({ cargs{:}, ...
               'ac.randState', 600,  ...
               'distn', {'norme'}, 'mu',    0, 'sigma', [ 3 6 ], ...
               'nHidden', 425, 'hpl', 1, 'nConns', 12, ...

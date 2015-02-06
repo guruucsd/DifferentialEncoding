@@ -3,7 +3,7 @@ function [args] = lsb_args(varargin)
 
   % Get shared args
   addpath('..');
-  [cargs,opt] = common_args();
+  [cargs, opt] = common_args();
   rmpath('..');
 
   args = de_ArgsInit ( cargs{:}, ... %Network structure

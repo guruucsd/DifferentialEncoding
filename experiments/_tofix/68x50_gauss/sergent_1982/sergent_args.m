@@ -4,7 +4,7 @@ function [args,sz] = sergent_args(varargin)
 
   % Get shared args
   addpath('..');
-  [cargs,sz] = common_args();
+  [cargs, sz] = common_args();
   rmpath('..');
   
   args = de_ArgsInit ( cargs{:}, ... %Network structure

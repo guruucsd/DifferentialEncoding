@@ -1,10 +1,10 @@
-function [args,opts] = lsb_args(varargin)
+function [args, opts] = lsb_args(varargin)
 %
 %  Final shared settings for left-side-bias runs
 
   % Get shared args
   addpath('..');
-  [cargs,opts] = common_args();
+  [cargs, opts] = common_args();
   rmpath('..');
 
 

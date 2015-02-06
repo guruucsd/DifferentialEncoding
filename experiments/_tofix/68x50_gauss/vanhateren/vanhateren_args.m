@@ -3,18 +3,14 @@ function [args,sz] = uber_args(varargin)
 %  Final shared settings for 2YP runs
 
   % Add absolute path to code
-  if (exist('de_GetBaseDir')~=2)
-    addpath(genpath(fullfile('..','..', 'code')));
-    addpath(genpath(fullfile('..','..','..', 'code')));
-    addpath(genpath(fullfile(de_GetBaseDir(),'code')));
-    rmpath (genpath(fullfile('..','..','..', 'code')));
-    rmpath (genpath(fullfile('..','..', 'code')));
-  end;
+  addpath('..');
+  [cargs, opts] = common_args();
+  rmpath('..');
   
   
   sz = [68 50];
   
-  args  = de_ArgsInit({ ...
+  args  = de_ArgsInit({ cargs{:}, ...
               'ac.randState', 600,  ...
               'distn', {'norme'}, 'mu',    0, 'sigma', [ 10 20 ], ...
               'nHidden', 1134, 'hpl', 1, 'nConns', 30, ...

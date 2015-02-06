@@ -1,10 +1,10 @@
-function [args,opts] = christman_args(varargin)
+function [args, opts] = christman_args(varargin)
 %
 %  Final shared settings for 2YP runs
 
   % Get shared args
   addpath('..');
-  [cargs,opts] = common_args();
+  [cargs, opts] = common_args();
   rmpath('..');
 
   %freqs = [0.06 0.12 0.18 0.24 0.32]
