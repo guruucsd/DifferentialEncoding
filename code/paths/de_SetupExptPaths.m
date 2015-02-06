@@ -8,12 +8,13 @@ function de_SetupExptPaths(expt_name)
   if (~exist(expt_dir, 'dir')), error('Experiment does not exist at expected directory: %s', expt_dir); end;
 
   % Parse out paths
-  p = mfe_split(':', path());
+  paths = mfe_split(':', path());
 
   % Remove all other experiments
   base_expts_dirname = guru_fileparts(guru_fileparts(expt_dir, 'path'), 'name');
-  other_expt_dirs    = p(guru_instr(p, fullfile('',base_expts_dirname,'')));
-  if (~isempty(other_expt_dirs)),
+  all_expt_dirs      = paths(guru_instr(paths, fullfile('',base_expts_dirname,'')));
+  other_expt_dirs    = setdiff(expt_dir, all_expt_dirs);
+  if ~isempty(other_expt_dirs)
       rmpath(other_expt_dirs{:}); % a hack about the structure of the directories here
   end;
 

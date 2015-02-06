@@ -1,4 +1,4 @@
-function varargout = guru_loadVar(fn, varargin)
+function varargout = guru_loadVars(fn, varargin)
 
   v = load(fn, varargin{:});
   

@@ -25,3 +25,10 @@ experiments/34x25 - differential encoding model, as published in Cipollini, Hsia
 experiments/prunetrain - Pruning model of Cipollini & Cottrell (2014).  Trains left and right hemisphere autoencoders on an image set, removing the weakest connections during training. Left and right hemisphere networks differ only in the spatial frequency filtering of the training images, to simulate maturation under differing stages of visual acuity.
 
 experiments/recfield - Unpublished (rejected from COSYNE for 2012 - 2014) 2D model showing the effects on a single neuron of different connection patterns.
+
+
+Octave compatibility:
+
+This code runs under octave, with the following setup steps:
+1. Download and install Octave.
+2. Download and install the `image` code package http://octave.sourceforge.net/image/
