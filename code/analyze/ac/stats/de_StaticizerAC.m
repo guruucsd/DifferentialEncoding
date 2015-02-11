@@ -38,6 +38,17 @@ function [stats] = de_StaticizerAC(mSets, mss, stats, stc)
       [stats.ffts] = de_DoStat('ffts', stats.ffts, 'pals', stc, 'de_StatsFFTs_TTest',  stats.ffts);
   end;
 
+%  if (~isfield(stats, 'pca')), stats.pcas = []; end;
+%  if (isfield(mSets.data, 'test')),
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'orig',  stc, 'de_StatsPCAs',       mSets.data.test, mSets.data.test.X(1:end-1,:));
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'model', stc, 'de_StatsPCAs',       mSets.data.test, stats.images.test);
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'pals',  stc, 'de_StatsPCAs_TTest',  stats.pcas);
+%  else,
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'orig',  stc, 'de_StatsPCAs',       mSets.data.train, mSets.data.train.X(1:end-1,:));
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'model', stc, 'de_StatsPCAs',       mSets.data.train,  stats.images.train);
+%      [stats.pcas] = de_DoStat('pca', stats.pcas, 'pals', stc, 'de_StatsPCAs_TTest',  stats.pcas);
+%  end;
+
   [stats] = de_DoStat('distns',    stats, 'distns',    stc, 'de_StatsDistributions', mss);
   [stats] = de_DoStat('freqprefs', stats, 'freqprefs', stc, 'de_StatsFreqPreferences', mss);
   [stats] = de_DoStat('paths',     stats, 'paths',     stc, 'de_StatsPaths', mss);

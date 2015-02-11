@@ -27,7 +27,7 @@ function out = de_SavePlots(mSets, figs)
       if (figs(j).cached), continue; end;
 
       if (ismember(1,mSets.debug))
-        fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], guru_replace(out.files{end}, de_GetBaseDir(), ''));
+        fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], out.files{end});%guru_replace(out.files{end}, de_GetBaseDir(), ''));
       end;
 
       %i/o
@@ -44,7 +44,7 @@ function out = de_SavePlots(mSets, figs)
         if (~strcmp(ft, 'fig'))
           hatch_fn = [out.files{end}(1:end-4) '-pub' out.files{end}(end-3:end)];
           if (ismember(1,mSets.debug))
-            fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], guru_replace(hatch_fn, de_GetBaseDir(), ''));
+            fprintf('Saving plot %-15s to %s.\n', ['"' figs(j).name '"'], hatch_fn);%guru_replace(hatch_fn, de_GetBaseDir(), ''));
           end;
 
           im = imread(out.files{end}, ft);
