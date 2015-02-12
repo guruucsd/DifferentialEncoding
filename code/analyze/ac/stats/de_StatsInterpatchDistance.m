@@ -15,7 +15,7 @@ function [ipd] = de_StatsInterpatchDistance(models)
     models = mat2cell(models, size(models,1), ones(size(models,2),1));
   end;
 
-  ipd.nn_dists = cell(length(models), 1);
+  ipd.neighbor_dists = cell(length(models), 1);
   ipd.fc_dists = cell(length(models), 1);
 
   for ss=1:length(models)
@@ -52,7 +52,7 @@ function [ipd] = de_StatsInterpatchDistance(models)
 
       [~,mupos] = de_connector_positions(ms(1).nInput, ms(1).nHidden/ms(1).hpl);
 
-      nn_dists = cell(length(ms), ms(1).nHidden);
+      neighbor_dists = cell(length(ms), ms(1).nHidden);
       fc_dists = cell(length(ms), ms(1).nHidden);
 
       for mm=1:length(ms)
@@ -82,9 +82,9 @@ function [ipd] = de_StatsInterpatchDistance(models)
             [cy,cx] = find(squeeze(cc(hui,:,:)));
 
             if (isempty(cx))
-                nn_dist = zeros(0, 0);
+                neighbor_dist = zeros(0, 0);
             else
-                nn_dist = inf(length(cx),length(cx));
+                neighbor_dist = inf(length(cx),length(cx));
             end;
 
             %  For each connected unit
@@ -96,46 +96,46 @@ function [ipd] = de_StatsInterpatchDistance(models)
               % Manual search for nearest neighbor
               for di=ci+1:length(cx)
                 % Interpatch distance
-                nn_dist(ci,di) = sqrt( (cx(ci)-cx(di)).^2 + (cy(ci)-cy(di)).^2);
-                nn_dist(di,ci) = nn_dist(ci,di); % must include this, for the min below to work.
+                neighbor_dist(ci,di) = sqrt( (cx(ci)-cx(di)).^2 + (cy(ci)-cy(di)).^2);
+                neighbor_dist(di,ci) = neighbor_dist(ci,di); % must include this, for the min below to work.
               end;
             end;
 
             % 0 connections for this hu
-            if (isempty(nn_dist))
+            if (isempty(neighbor_dist))
                 if (nnz(cy)>0)
                     error('Couldn''t find a nearest neighbor?');
                 elseif (ismember(11, m.debug))
                     fprintf('No connections for model{%d,%d} to hu # %d?\n', ss, mm, hui);
                 end;
-                nn_dists{mm,hui} = []; %these will be removed
+                neighbor_dists{mm,hui} = []; %these will be removed
 
             % 1 connection--only at center
-            elseif ~any(~isinf(nn_dist(:)))
-                if (numel(nn_dist)~=1)
+            elseif ~any(~isinf(neighbor_dist(:)))
+                if (numel(neighbor_dist)~=1)
                     error('All distances = inf?');
                 end;
-                nn_dists{mm,hui} = []; %these will be removed
+                neighbor_dists{mm,hui} = []; %these will be removed
 
             else
-                guru_assert(all(nn_dist(:)>=1), 'nearest neighbor distance cannot be smaller than one!');
+                guru_assert(all(neighbor_dist(:)>=1), 'nearest neighbor distance cannot be smaller than one!');
 
-                %nn_dist = nn_dist(1:end-1,2:end); % dist is upper triangular; only off-diagonal elements
+                %neighbor_dist = neighbor_dist(1:end-1,2:end); % dist is upper triangular; only off-diagonal elements
                 %                            % make sense.  Select only the comparisons that make sense.
-                nn_dists{mm,hui} = min(nn_dist);
+                neighbor_dists{mm,hui} = min(neighbor_dist);
 
             end;
           end;
       end;
 
-%      ipd.nn_dists{ss} = nn_dists;
+%      ipd.neighbor_dists{ss} = neighbor_dists;
 %      ipd.fc_dists{ss} = fc_dists;
-      ipd.nearest_neighbor_mean(ss)  = mean(horzcat(nn_dists{:})); %inter-patch distance
-      ipd.nearest_neighbor_std (ss)  = std (horzcat(nn_dists{:}));
+      ipd.nearest_neighbor_mean(ss)  = mean(horzcat(neighbor_dists{:})); %inter-patch distance
+      ipd.nearest_neighbor_std (ss)  = std (horzcat(neighbor_dists{:}));
       ipd.from_center_mean(ss)       = mean(horzcat(fc_dists{:}));     %average distance from center
       ipd.from_center_std (ss)       = std (horzcat(fc_dists{:}));
       if (ismember(10, models{1}(1).debug)) % show mean, per model
-          for ii=1:size(nn_dists,1), abc(ii) = mean(horzcat(nn_dists{ii,:})); end;
+          for ii=1:size(neighbor_dists,1), abc(ii) = mean(horzcat(neighbor_dists{ii,:})); end;
           abc
       end;
 
@@ -144,24 +144,24 @@ function [ipd] = de_StatsInterpatchDistance(models)
       [~,closest_idx] = sort(dfc); %distance of each hu pos from center
 
       % Repeat analyses, but for closest to center (i.e. least edge effects)
-      nn_dists_closest = nn_dists(:,closest_idx(1:round(0.10*length(closest_idx))));
+      neighbor_dists_closest = neighbor_dists(:,closest_idx(1:round(0.10*length(closest_idx))));
       fc_dists_closest = fc_dists(:,closest_idx(1:round(0.10*length(closest_idx))));
-      ipd.top10.nearest_neighbor_mean(ss)  = mean(horzcat(nn_dists_closest{:})); %inter-patch distance
-      ipd.top10.nearest_neighbor_std (ss)  = std (horzcat(nn_dists_closest{:}));
+      ipd.top10.nearest_neighbor_mean(ss)  = mean(horzcat(neighbor_dists_closest{:})); %inter-patch distance
+      ipd.top10.nearest_neighbor_std (ss)  = std (horzcat(neighbor_dists_closest{:}));
       ipd.top10.from_center_mean(ss)       = mean(horzcat(fc_dists_closest{:}));      %average distance from center
       ipd.top10.from_center_std (ss)       = std (horzcat(fc_dists_closest{:}));
 
-      nn_dists_closest = nn_dists(:,closest_idx(1:round(0.05*length(closest_idx))));
+      neighbor_dists_closest = neighbor_dists(:,closest_idx(1:round(0.05*length(closest_idx))));
       fc_dists_closest = fc_dists(:,closest_idx(1:round(0.05*length(closest_idx))));
-      ipd.top5.nearest_neighbor_mean(ss)  = mean(horzcat(nn_dists_closest{:})); %inter-patch distance
-      ipd.top5.nearest_neighbor_std (ss)  = std (horzcat(nn_dists_closest{:}));
+      ipd.top5.nearest_neighbor_mean(ss)  = mean(horzcat(neighbor_dists_closest{:})); %inter-patch distance
+      ipd.top5.nearest_neighbor_std (ss)  = std (horzcat(neighbor_dists_closest{:}));
       ipd.top5.from_center_mean(ss)       = mean(horzcat(fc_dists_closest{:}));      %average distance from center
       ipd.top5.from_center_std (ss)       = std (horzcat(fc_dists_closest{:}));
 
-      nn_dists_closest = nn_dists(:,closest_idx(1:round(0.25*length(closest_idx))));
+      neighbor_dists_closest = neighbor_dists(:,closest_idx(1:round(0.25*length(closest_idx))));
       fc_dists_closest = fc_dists(:,closest_idx(1:round(0.25*length(closest_idx))));
-      ipd.top25.nearest_neighbor_mean(ss)  = mean(horzcat(nn_dists_closest{:})); %inter-patch distance
-      ipd.top25.nearest_neighbor_std (ss)  = std (horzcat(nn_dists_closest{:}));
+      ipd.top25.nearest_neighbor_mean(ss)  = mean(horzcat(neighbor_dists_closest{:})); %inter-patch distance
+      ipd.top25.nearest_neighbor_std (ss)  = std (horzcat(neighbor_dists_closest{:}));
       ipd.top25.from_center_mean(ss)       = mean(horzcat(fc_dists_closest{:}));      %average distance from center
       ipd.top25.from_center_std (ss)       = std (horzcat(fc_dists_closest{:}));
   end;

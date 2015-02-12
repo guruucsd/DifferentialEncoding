@@ -180,11 +180,11 @@ function [ipd, fs] = expt_ipd( models, ws )
 
     else
         % Similar map, showing difference in mean ipd
-        nn_mns = zeros(length(ipd.nn_dists),size(ipd.nn_dists{1},2));
+        nn_mns = zeros(length(ipd.neighbor_dists),size(ipd.neighbor_dists{1},2));
         fc_mns = zeros(length(ipd.fc_dists),size(ipd.fc_dists{1},2));
         for fi=1:size(nn_mns,1)      % kernels
             for hui=1:size(nn_mns,2)  % hidden units
-                nn_mns(fi,hui) = mean( horzcat(ipd.nn_dists{fi}{:,hui}) ); % average over model instances
+                nn_mns(fi,hui) = mean( horzcat(ipd.neighbor_dists{fi}{:,hui}) ); % average over model instances
                 fc_mns(fi,hui) = mean( horzcat(ipd.fc_dists{fi}{:,hui}) );
             end;
         end;
@@ -228,13 +228,13 @@ function [ipd, fs] = expt_ipd( models, ws )
 
 
         % Get histograms
-        nkernels  = length(ipd.nn_dists);
+        nkernels  = length(ipd.neighbor_dists);
         ipd.nbins =20;
         ipd.bins  = [linspace(1,10,20)];
         ipd_hists = zeros(nkernels,ipd.nbins);
 
         for fi=1:nkernels
-            d = horzcat(ipd.nn_dists{fi}{:});
+            d = horzcat(ipd.neighbor_dists{fi}{:});
 
             if (isfield(ipd,'bins'))
                 ipd_hists(fi,:) = hist(d, ipd.bins)/length(d);
@@ -297,7 +297,7 @@ function [s, f] = expt_shapes( models, ws, ipd )
             hui = s.closest_idx(s.chosen_idx(ci));
 
             % Collect the relevant data
-            %s.dists{kki,ci}    = ipd.nn_dists{kki}(:,hui);
+            %s.dists{kki,ci}    = ipd.neighbor_dists{kki}(:,hui);
             s.allpts{kki,ci}   = zeros(0,2);
             s.r{kki,ci}        = zeros(0,1);
             s.rho{kki,ci}      = zeros(0,1);

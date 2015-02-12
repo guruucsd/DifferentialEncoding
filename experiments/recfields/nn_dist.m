@@ -1,10 +1,10 @@
-function nn_dist(desired_nn_dist, nConns, npts)
+function neighbor_dist(desired_neighbor_dist, nConns, npts)
 
 params = { 'nInput', [35 35], 'nHidden', 1, 'hpl', 1, 'distn', {'norme'}, 'mu', 0, ...
            'ac', struct('debug',1:10,'tol',1,'useBias',0), ...
            'nConns', nConns};
 
-%cost_fn = @(sig) abs(desired_nn_dist -
+%cost_fn = @(sig) abs(desired_neighbor_dist -
 %estimate_spread(struct('sigma',sig,params{:})));
 %sig = fminsearch(cost_fn,2,optimset('Display','iter'));
 sig=3

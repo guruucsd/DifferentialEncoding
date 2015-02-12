@@ -1,3 +1,6 @@
+% Plot how inter-patch distance (to nearest neighbor) changes as a function
+%    of sigma and # connections.
+
 %clear all;
 sigs = [0.5 1:10];
 nconns = 2:3:20;
@@ -10,7 +13,7 @@ end;
 for si=1:length(sigs)
     for ni=1:length(nconns)
         if ~emp_means(si,ni)
-            [gam_params(:,si,ni),emp_means(si,ni)] =  min_nn_dist(sigs(si), nconns(ni), 10000);
+            [gam_params(:,si,ni),emp_means(si,ni)] =  min_neighbor_dist(sigs(si), nconns(ni), 10000);
         end;
         means(si,ni) = prod(gam_params(:,si,ni));
         fprintf('[%4.1f %2d]: Empirical vs. estimated means: %5.3f vs. %5.3f\n', sigs(si), nconns(ni), emp_means(si,ni), prod(gam_params(:,si,ni)));
@@ -55,12 +58,12 @@ hold on;
 surf(log(X),log(Y),gz(log(X),log(Y)))
 axis tight;
 
-pred_min_nn_dist = @(sig,nconn) exp(gz(log(sig),log(nconn)));
-find_nconn       = @(min_nn_dist,sig)   fminsearch(@(nconn) abs(min_nn_dist - pred_min_nn_dist(sig,nconn)), 10);
-find_sig         = @(min_nn_dist,nconn) fminsearch(@(sig)   abs(min_nn_dist - pred_min_nn_dist(sig,nconn)), 5);
+pred_min_neighbor_dist = @(sig,nconn) exp(gz(log(sig),log(nconn)));
+find_nconn       = @(min_neighbor_dist,sig)   fminsearch(@(nconn) abs(min_neighbor_dist - pred_min_neighbor_dist(sig,nconn)), 10);
+find_sig         = @(min_neighbor_dist,nconn) fminsearch(@(sig)   abs(min_neighbor_dist - pred_min_neighbor_dist(sig,nconn)), 5);
 
 
-vary_nn_dist = @(min_nn_dist,nconn,pct_diff) [find_sig(min_nn_dist*(1-pct_diff/2),nconn) find_sig(min_nn_dist*(1+pct_diff/2),nconn)];
+vary_neighbor_dist = @(min_neighbor_dist,nconn,pct_diff) [find_sig(min_neighbor_dist*(1-pct_diff/2),nconn) find_sig(min_neighbor_dist*(1+pct_diff/2),nconn)];
 
 
 

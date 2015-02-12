@@ -1,4 +1,4 @@
-function [fc_dist, nn_dist] = de_stats_ipd(img, pts, mupos)
+function [fc_dist, neighbor_dist] = de_stats_ipd(img, pts, mupos)
 %function [ipd] = de_stats_ipd(pts)
 %
 % Calculates stats that we care about
@@ -27,7 +27,7 @@ function [fc_dist, nn_dist] = de_stats_ipd(img, pts, mupos)
     end;
     
     fc_dist = zeros(size(cx));
-    nn_dist = nan(length(cx));  % want dist from 
+    neighbor_dist = nan(length(cx));  % want dist from 
     
     %  For each connected unit
     for ci=1:length(cx)
@@ -38,13 +38,13 @@ function [fc_dist, nn_dist] = de_stats_ipd(img, pts, mupos)
         % Manual search for nearest neighbor
         for di=ci+1:length(cx)
             % Interpatch distance
-            nn_dist(ci,di) = sqrt( (cx(ci)-cx(di)).^2 + (cy(ci)-cy(di)).^2);
-            nn_dist(di,ci) = nn_dist(ci,di); % must include this, for the min below to work.
+            neighbor_dist(ci,di) = sqrt( (cx(ci)-cx(di)).^2 + (cy(ci)-cy(di)).^2);
+            neighbor_dist(di,ci) = neighbor_dist(ci,di); % must include this, for the min below to work.
         end;
     end;
 
     
     %fprintf('Average distance from center: %f\n', mean(fc_dist));
-    %fprintf('Average minimum inter-patch distance: %f\n', mean(min(nn_dist)));
+    %fprintf('Average minimum inter-patch distance: %f\n', mean(min(neighbor_dist)));
     
     % dist_fn = @(sig) mean(sqrt(sum( mvnrnd(zeros(1, ndims(sig)), sig, 1000000).^2, 2)))

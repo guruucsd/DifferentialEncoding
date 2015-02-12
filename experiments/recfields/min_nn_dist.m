@@ -1,4 +1,4 @@
-function [gam_params, emp_mean] = min_nn_dist(sig, nConns, npts, showfig)
+function [gam_params, emp_mean] = min_neighbor_dist(sig, nConns, npts, showfig)
 
 if ~exist('showfig','var'), showfig = false; end;
 

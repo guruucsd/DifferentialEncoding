@@ -27,7 +27,7 @@ matfile = fullfile(cur_dir, sprintf('%s-%d.mat', mfilename(), expt));
 
 % Add paths
 if ~exist('guru_csprintf','file'), addpath(genpath(fullfile(cur_dir, '../../../_lib'))); end;
-if ~exist('de_calc_nn_dist','file'), addpath(genpath(fullfile(cur_dir, '../../code'))); end;
+if ~exist('de_calc_neighbor_dist','file'), addpath(genpath(fullfile(cur_dir, '../../code'))); end;
 
 
 % Load a cached result
@@ -112,9 +112,9 @@ for szi=1:length(sigmas)
     for si=1:length(sigma_variations)
         lbls{szi,si} = sprintf('d_{center}=%.1f%% (%.1fpx); d_{nn} = %.1f%% (%.1fpx)', ...
                              100*p{szi}(si).avg_dist/p{szi}(1).sz(1),      p{szi}(si).avg_dist, ...
-                             100*mean(p{szi}(si).nn_dist/p{szi}(1).sz(1)), mean(p{szi}(si).nn_dist));
+                             100*mean(p{szi}(si).neighbor_dist/p{szi}(1).sz(1)), mean(p{szi}(si).neighbor_dist));
     end;
-    dff = (mean(p{szi}(1).nn_dist)-mean(p{szi}(end).nn_dist))/((mean(p{szi}(1).nn_dist)+mean(p{szi}(end).nn_dist))/2);
+    dff = (mean(p{szi}(1).neighbor_dist)-mean(p{szi}(end).neighbor_dist))/((mean(p{szi}(1).neighbor_dist)+mean(p{szi}(end).neighbor_dist))/2);
     
     fprintf('\tActual difference: %5.2f%% difference.\n', 100*abs(dff));
 

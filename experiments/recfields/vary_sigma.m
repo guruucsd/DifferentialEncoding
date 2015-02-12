@@ -67,7 +67,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
   for pi=1:length(p)
       lbls{pi} = sprintf('d_{center}=%.1f%% (%.1fpx); d_{nn} = %.1f%% (%.1fpx)', ...
                          100*p(pi).avg_dist/p(1).sz(1),      p(pi).avg_dist, ...
-                         100*mean(p(pi).nn_dist/p(1).sz(1)), mean(p(pi).nn_dist));
+                         100*mean(p(pi).neighbor_dist/p(1).sz(1)), mean(p(pi).neighbor_dist));
   end;
 
   %
@@ -161,15 +161,15 @@ function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(var
   p.avg_dist = dist_fn(:)' * (wts_mean(:)/sum(wts_mean(:)));
 
   % Calculate nearest-neighbor distance
-  p.nn_dist = zeros(size(raw_wts,1), 1);
+  p.neighbor_dist = zeros(size(raw_wts,1), 1);
   for mi=1:size(raw_wts,1)
-    p.nn_dist(mi) = de_calc_nn_dist(squeeze(raw_wts(mi,:,:))~=0);
+    p.neighbor_dist(mi) = de_calc_neighbor_dist(squeeze(raw_wts(mi,:,:))~=0);
   end;
 
 
   if ismember(13, p.disp)
       f = figure; imagesc(wts_mean); colorbar;
-      title(sprintf('\\sigma=%.2fpx; d_{cent}=%.2fpx; d_{nn}=%.2f', p.Sigma(1), p.avg_dist, mean(p.nn_dist)), 'FontSize', 16);
+      title(sprintf('\\sigma=%.2fpx; d_{cent}=%.2fpx; d_{nn}=%.2f', p.Sigma(1), p.avg_dist, mean(p.neighbor_dist)), 'FontSize', 16);
   else
       f = NaN;
   end;
