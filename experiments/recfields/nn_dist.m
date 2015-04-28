@@ -7,7 +7,7 @@ params = { 'nInput', [35 35], 'nHidden', 1, 'hpl', 1, 'distn', {'norme'}, 'mu', 
 %cost_fn = @(sig) abs(desired_neighbor_dist -
 %estimate_spread(struct('sigma',sig,params{:})));
 %sig = fminsearch(cost_fn,2,optimset('Display','iter'));
-sig=3
+sig=3;
 [a,b,c]=estimate_spread(struct('sigma',sig,params{:}),npts);
 bins = 0:0.1:10;%unique(c(:));
 figure;

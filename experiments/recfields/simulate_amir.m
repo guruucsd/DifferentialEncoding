@@ -1,4 +1,14 @@
 function simulate_amir(expt, disp)
+%
+% expt:
+%   1: vary # connections per sigma (like amir, but linearly spaced)
+%   2: vary only sigmas.
+% disp:
+%   array of plot numbers to display
+%   1: 
+%   2: 
+%   11: 
+%   12: 
 
 % Set variables
 if ~exist('expt', 'var'), expt=1; end;
@@ -27,7 +37,7 @@ matfile = fullfile(cur_dir, sprintf('%s-%d.mat', mfilename(), expt));
 
 % Add paths
 if ~exist('guru_csprintf','file'), addpath(genpath(fullfile(cur_dir, '../../../_lib'))); end;
-if ~exist('de_calc_neighbor_dist','file'), addpath(genpath(fullfile(cur_dir, '../../code'))); end;
+if ~exist('calc_neighbor_dist','file'), addpath(genpath(fullfile(cur_dir, '../../code'))); end;
 
 
 % Load a cached result

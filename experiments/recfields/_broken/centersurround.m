@@ -30,7 +30,7 @@ function centersurround()
 
   keyboard
 
-4
+
 function [avg_mean, std_mean, wts_mean, f] = nn_2layer_processor(varargin)
 
   [std_avg, std_std, ~, wts] = nn_2layer(varargin{:});

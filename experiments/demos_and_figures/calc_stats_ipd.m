@@ -9,6 +9,12 @@ function [fc_dist, neighbor_dist] = de_stats_ipd(img, pts, mupos)
 % 
 % Output:
 % ti : # of training iterations
+%
+% Notes:
+%  * used by demo_ipd_map
+%  * duplicates similar code in experiments/recfields/calc_neighbor_dist 
+%      and code/analyze/ac/stats/de_StatInterpatchDistance
+%
     if exist('img','var') && ~isempty(img)
         % Defined by non-zero entries in a 2D matrix
         [cy,cx] = find(img);

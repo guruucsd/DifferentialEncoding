@@ -1,7 +1,8 @@
-function [mean_neighbor_dist, min_neighbor_dist, unique_neighbor_dist] = de_calc_neighbor_dist(varargin)
+function [mean_neighbor_dist, min_neighbor_dist, unique_neighbor_dist] = calc_nearest_neigbor(varargin)
 % Given a 2D connection matrix, or two vectors containing x and y values of connections,
 %   returns the mean, min, and unique distances between connection nearest neighbors.
 %
+% Similar code to de_StatsInterpatchDistance
 
 if nargin == 1
     cxn_matrix = varargin{1};

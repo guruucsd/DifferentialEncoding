@@ -163,7 +163,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(var
   % Calculate nearest-neighbor distance
   p.neighbor_dist = zeros(size(raw_wts,1), 1);
   for mi=1:size(raw_wts,1)
-    p.neighbor_dist(mi) = de_calc_neighbor_dist(squeeze(raw_wts(mi,:,:))~=0);
+    p.neighbor_dist(mi) = calc_neighbor_dist(squeeze(raw_wts(mi,:,:))~=0);
   end;
 
 
