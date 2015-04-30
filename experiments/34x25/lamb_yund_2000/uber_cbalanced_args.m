@@ -1,7 +1,4 @@
-function [args,opts] = uber_sergent_args(varargin)
-%
-%  Final shared settings for 2YP runs
-%   http://www.willamette.edu/~gorr/classes/cs449/classify.html
+function [args,opts] = uber_cbalanced_args(varargin)
 
   % Get shared args
   addpath('..');
