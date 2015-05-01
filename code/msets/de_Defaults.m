@@ -8,8 +8,8 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
 
   % Whatever we have, we output.
   args = varargin;
-  
-  
+
+
   % Take some args and expand them out.
   if ismember('spacing', aKeys)
       spacing = guru_getopt(args, 'spacing');
@@ -19,8 +19,8 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   end;
 
   % Whatever we don't have, add!
-  
-  
+
+
   % Run parameters
   if (~ismember('parallel',         aKeys)), args(end+1:end+2) = {'parallel', false}; end;
 
@@ -111,3 +111,4 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
                                                                                                               any(strcmp(args(ischar(args)), 'uberpath')), ...
                                                                                                               any(strcmp(args(ischar(args)), 'uberpath')))}; end;
   if (~ismember('out.pub',          aKeys)), args(end+1:end+2) = {'out.pub',   0}; end;
+  if (~ismember('out.titles',       aKeys)), args(end+1:end+2) = {'out.titles',   {'1', '2'}}; end;
