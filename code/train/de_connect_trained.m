@@ -128,7 +128,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
             % Filter the images
             if (ii==1 || diff(model.steps(ii+[-1 0]))~=0)
                 %fprintf('[making filtered images]');
-                f = filt_imgs( ws.train.X, ws.train.nInput, ws.filters{ii} );
+                f = guru_filt_imgs( ws.train.X, ws.train.nInput, ws.filters{ii} );
             end;
 
             %if (ii>1)

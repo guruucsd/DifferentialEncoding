@@ -1,4 +1,4 @@
-function fimgs = filt_imgs( imgs, sz, G )
+function fimgs = guru_filt_imgs( imgs, sz, G )
 
     fimgs = zeros(size(imgs));
     for jj=1:size(imgs,2)
