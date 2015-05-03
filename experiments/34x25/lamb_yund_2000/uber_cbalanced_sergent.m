@@ -1,7 +1,7 @@
 clear all variables; clear all globals;
 
 stats = {'images','ffts'};
-plts = {stats{:}};
+plts = {'ls-bars', stats{:}};
 
 [args,opts]  = uber_cbalanced_args('parallel', false, 'plots',plts, 'stats',stats, 'runs', 5);
 

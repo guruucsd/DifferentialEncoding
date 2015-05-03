@@ -10,9 +10,9 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
 % stats      :
 % figs       :
 
-  % Run the generic analyses
-  [stats,figs] = de_AnalyzerDE(mSets, mss);
-%  [stats.raw.r] = de_FindRejectionsHL(mss, mSets.rej, stats.raw, stats.raw.r);
-  [mss]        = de_DoRejections(mss, stats.raw.r);
-
+  % Get the hierarchical letters
+  sergent_dir = fileparts(strrep(which(mfilename), 'lamb_yund_2000', 'sergent_1982'));
+  addpath(genpath(sergent_dir));
+  [stats, figs] = de_Analyzer(mSets, mss)
+  rmpath(genpath(sergent_dir));
 
