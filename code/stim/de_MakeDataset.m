@@ -176,6 +176,7 @@ function dset = de_StimApplyResizing(dset, opts)
     if     (guru_hasopt(opts, 'mini')),   tgtInput = [27 20];
     elseif (guru_hasopt(opts, 'small')),  tgtInput = [34 25];
     elseif (guru_hasopt(opts, 'medium')), tgtInput = [68 50];
+    elseif (guru_hasopt(opts, 'standard')), tgtInput = [102 75];
     elseif (guru_hasopt(opts, 'large')),  tgtInput = [135 100];
     elseif (guru_hasopt(opts, 'nInput')), tgtInput = guru_getopt(opts, 'nInput');
     end;
