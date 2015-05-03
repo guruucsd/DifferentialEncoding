@@ -44,9 +44,27 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %
 %  test.*     : same as train object, but
 
-  if (~exist('stimSet', 'var') || isempty(stimSet)), stimSet  = 'sergent'; end;
-  if (~exist('taskType','var')), taskType = 'sergent';     end;
   if (~exist('opt','var')),      opt      = {};     end;
-  if (~iscell(opt)),             opt      = {opt};  end;
 
-  keyboard;
+  % Get the hierarchical letters
+  sergent_dir = fileparts(strrep(which(mfilename), 'lamb_yund_2000', 'sergent_1982'));
+  addpath(sergent_dir);
+  [train, test, aux] = de_StimCreate('de', 'sergent', opt)
+  rmpath(sergent_dir);
+
+  % Determine the border width
+  border_width = guru_getopt(opt, 'border_width', 1);
+
+  % Now push them through the contrast balancing algorithm
+  train = contrast_balance(train, border_width);
+  test = contrast_balance(test, border_width);
+  train.X(:, 1)
+
+function dset = contrast_balance(dset, border_width)
+    for ii=1:size(dset.X, 2)
+      img = reshape(dset.X(:, ii), dset.nInput);
+      img = guru_contrast_balance_image(img, border_width);
+      dset.X(:, ii) = img(:);
+      guru_assert(length(unique(img(:))) == 3, 'Only three colors must be present.');
+      %if ii == 1, imshow(img); keyboard; end;
+    end;

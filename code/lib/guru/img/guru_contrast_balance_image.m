@@ -1,4 +1,4 @@
-function [ return_image ] = guru_contrast_balance_image( image, fg_color, eight_neighbors, border_width )
+function [ return_image ] = guru_contrast_balance_image( image, border_width, fg_color, eight_neighbors )
 %
 % Inputs:
 %   image           : 2D matrix of binary pixels
@@ -16,6 +16,8 @@ if ~exist('border_width', 'var'), border_width = 1; end;
 bg_color = 1 - fg_color;
 [height, width] = size(image);
 total_color = 0;
+
+guru_assert(length(unique(image(:))) == 2, 'Input must be a binary image');
 
 for ii = 1:height
   for ij = 1:width
