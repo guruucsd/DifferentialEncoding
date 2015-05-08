@@ -157,28 +157,13 @@ function dset = de_StimApplyTransform(dset, opts)
 function dset = de_StimApplyResizing(dset, opts)
 %
 
-    % Resizing--this should be last
-    %newsize = guru_getopt(opt, 'nInput', []);
-    %if (~isempty(newsize))
-    %    error('nInput option deprecated; change to small/medium/large');
-    %end;
-
-    % Resizing option 2
-    if (  ~guru_hasopt(opts, 'mini') ...
-       && ~guru_hasopt(opts, 'small') ...
-       && ~guru_hasopt(opts, 'medium') ...
-       && ~guru_hasopt(opts, 'large') ...
-       && ~guru_hasopt(opts, 'nInput'))
-        return;
-    end;
-
-
     if     (guru_hasopt(opts, 'mini')),   tgtInput = [27 20];
     elseif (guru_hasopt(opts, 'small')),  tgtInput = [34 25];
     elseif (guru_hasopt(opts, 'medium')), tgtInput = [68 50];
     elseif (guru_hasopt(opts, 'standard')), tgtInput = [102 75];
     elseif (guru_hasopt(opts, 'large')),  tgtInput = [135 100];
     elseif (guru_hasopt(opts, 'nInput')), tgtInput = guru_getopt(opts, 'nInput');
+    else, return;
     end;
 
     % Must resize

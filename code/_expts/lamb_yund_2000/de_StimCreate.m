@@ -49,28 +49,27 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   % Get the hierarchical letters
   sergent_dir = fileparts(strrep(which(mfilename), 'lamb_yund_2000', 'sergent_1982'));
   addpath(sergent_dir);
-  [train, test, aux] = de_StimCreate('de', 'sergent', opt)
+  [train, test, aux] = de_StimCreate('de', 'sergent', opt);
   rmpath(sergent_dir);
 
   % Expand size, to allow greater spacing.
   train = expand_size(train, 3);
   test = expand_size(test, 3);
-  
+
   % Determine the border width
   border_width = guru_getopt(opt, 'border_width', 1);
   bg_color = guru_getopt(opt, 'bg_color', 0.5);
-  
+
   % Now push them through the contrast balancing algorithm
   train = contrast_balance(train, border_width, bg_color);
   test = contrast_balance(test, border_width, bg_color);
-  train.X(:, 1)
 
 
 function dset = expand_size(dset, size_factor)
     nInput = dset.nInput * size_factor;
     n_imgs = size(dset.X, 2);
     X = zeros(prod(nInput), n_imgs);
-    
+
     for ii = 1:n_imgs
         img = reshape(dset.X(:, ii), dset.nInput);
         img = imresize(img, size_factor, 'nearest');
@@ -86,7 +85,7 @@ function dset = expand_size(dset, size_factor)
         end;
         X(:, ii) = shrank_img(:);
     end;
-    
+
     dset.nInput = nInput;
     dset.X = X;
 
@@ -96,7 +95,6 @@ function dset = contrast_balance(dset, border_width, bg_color)
       img = reshape(dset.X(:, ii), dset.nInput);
       img = guru_contrast_balance_image(img, border_width, bg_color);
       dset.X(:, ii) = img(:);
-      if ii == 1, figure; imshow(img); end;
       guru_assert(length(unique(img(:))) == 3, ...
                   sprintf('Exactly three colors must be present; %d found.', ...
                           length(unique(img(:)))));
