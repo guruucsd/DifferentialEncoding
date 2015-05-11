@@ -1,12 +1,20 @@
 function [cargs, opts] = common_args(varargin)
 
-  % Add absolute path to code
+  %% Generic setup
+  dbstop if error
+  dbstop if warning
+  more off
+  
+  % Add absolute path to the 'code' directory
   if (exist('de_GetBaseDir')~=2)
-    addpath(genpath(fullfile('..','..', 'code')));
-    addpath(genpath(fullfile('..','..','..', 'code')));
-    addpath(genpath(fullfile(de_GetBaseDir(),'code')));
-    rmpath (genpath(fullfile('..','..','..', 'code')));
-    rmpath (genpath(fullfile('..','..', 'code')));
+    curpath = 'code';
+    for i=1:5
+        curpath = fullfile('..', curpath);
+        if exist(curpath)
+            addpath(genpath(curpath));
+            addpath(genpath(fullfile(de_GetBaseDir(),'code')));
+        end;
+    end;
   end;
 
   opts = {'small'};
