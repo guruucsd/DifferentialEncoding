@@ -172,12 +172,16 @@ function dset = de_StimApplyResizing(dset, opts)
         yscale = tgtInput(1)/dset.nInput(1);
         xscale = tgtInput(2)/dset.nInput(2);
 
+        is_binary = length(unique(dset.X(:))) == 2;
+        interp_method = guru_iff(is_binary, 'nearest', 'bicubic');
+
         % Rescale image
         X = zeros([tgtInput size(dset.X,2)]);
         for ii=1:size(dset.X,2)
 
             % Scale based on the dimension we must maximally scale
-            tmp    = imresize(reshape(dset.X(:,ii), dset.nInput), min(xscale,yscale));
+            tmp    = imresize(reshape(dset.X(:,ii), dset.nInput), ...
+                              min(xscale, yscale), interp_method);
 
             % Add padding
             npad = max(tgtInput - size(tmp));
