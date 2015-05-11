@@ -245,6 +245,7 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
           pd = abs(avgPowerOrig_2D - avgPowerModelLH_2D) - abs(avgPowerOrig_2D - avgPowerModelRH_2D);
           pd = pd ./ avgPowerOrig_2D;
 
+          pd(isinf(abs(pd))) = 1;  % change inf to zero (one, then log, is zero)
           pd(abs(pd)<1) = 1; % any difference that's small, just call it zero,
                              %   so we don't have to deal with sign flipping
           pd = sign(pd).*log10(abs(pd));
