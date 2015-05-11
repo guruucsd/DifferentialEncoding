@@ -1,10 +1,12 @@
-function [freqs1D, rho, x, y] = guru_freq2to1(sz2D)
-%function [freqs1D, rho, x, y] = guru_freq2to1(sz2D)
+function [freqs1D, rho, x, y] = guru_freq2to1(sz2D, padfactor)
+%function [freqs1D, rho, x, y] = guru_freq2to1(sz2D, padfactor)
 %
 % Takes a 2D size, and returns all 1D frequencies
 %
 % Input:
 %   sz2D: [height width] of image
+%   padfactor: # of times image size is replicated to pad with zeros
+%              (which increases resolution)
 %
 % Output:
 %   freqs1D: all unique 1D frequencies
@@ -12,6 +14,8 @@ function [freqs1D, rho, x, y] = guru_freq2to1(sz2D)
 %
 % Example:
 % [freqs1D] = guru_freq2to1(size(img));
+    if ~exist('padfactor', 'var'), padfactor = 0; end;
+    guru_assert(padfactor >= 0);
 
     centerpt=(sz2D-1)/2; % center of image
 
@@ -21,3 +25,4 @@ function [freqs1D, rho, x, y] = guru_freq2to1(sz2D)
 
     [~, rho] = cart2pol(x-centerpt(2)-1,y-centerpt(1)-1);
     freqs1D = unique(rho(:))';
+    freqs1D = freqs1D / (padfactor + 1);
