@@ -17,7 +17,7 @@ function [cargs, opts] = common_args(varargin)
     end;
   end;
 
-  opts = {'small'};
+  opts = {'small', 'logpolar'};
 
   cargs = {  'parallel', false, 'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...
