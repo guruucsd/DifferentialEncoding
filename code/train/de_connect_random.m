@@ -43,6 +43,8 @@ function [Con,Wts] = de_connect_random(model)
             Con( prod(model.nInput) + (i-1)*nHidPerLayer + [1:nHidPerLayer], (i-1)*nPix+[1:nPix]) = C(nPix+[1:nHidPerLayer],[1:nPix]); %Input->Hidden
             Con( prod(model.nInput) +model.nHidden + (i-1)*nPix + [1:nPix], prod(model.nInput) + (i-1)*nHidPerLayer + [1:nHidPerLayer]) = C(nPix+nHidPerLayer+[1:nPix], nPix+[1:nHidPerLayer]); %Hidden->Output
         end;
+        if (model.ac.debug), fprintf('\n'); end;
+
     end;
 
 

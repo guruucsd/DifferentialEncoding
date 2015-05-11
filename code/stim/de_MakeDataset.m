@@ -157,27 +157,13 @@ function dset = de_StimApplyTransform(dset, opts)
 function dset = de_StimApplyResizing(dset, opts)
 %
 
-    % Resizing--this should be last
-    %newsize = guru_getopt(opt, 'nInput', []);
-    %if (~isempty(newsize))
-    %    error('nInput option deprecated; change to small/medium/large');
-    %end;
-
-    % Resizing option 2
-    if (  ~guru_hasopt(opts, 'mini') ...
-       && ~guru_hasopt(opts, 'small') ...
-       && ~guru_hasopt(opts, 'medium') ...
-       && ~guru_hasopt(opts, 'large') ...
-       && ~guru_hasopt(opts, 'nInput'))
-        return;
-    end;
-
-
     if     (guru_hasopt(opts, 'mini')),   tgtInput = [27 20];
     elseif (guru_hasopt(opts, 'small')),  tgtInput = [34 25];
     elseif (guru_hasopt(opts, 'medium')), tgtInput = [68 50];
+    elseif (guru_hasopt(opts, 'standard')), tgtInput = [102 75];
     elseif (guru_hasopt(opts, 'large')),  tgtInput = [135 100];
     elseif (guru_hasopt(opts, 'nInput')), tgtInput = guru_getopt(opts, 'nInput');
+    else, return;
     end;
 
     % Must resize
@@ -186,12 +172,16 @@ function dset = de_StimApplyResizing(dset, opts)
         yscale = tgtInput(1)/dset.nInput(1);
         xscale = tgtInput(2)/dset.nInput(2);
 
+        is_binary = length(unique(dset.X(:))) == 2;
+        interp_method = guru_iff(is_binary, 'nearest', 'bicubic');
+
         % Rescale image
         X = zeros([tgtInput size(dset.X,2)]);
         for ii=1:size(dset.X,2)
 
             % Scale based on the dimension we must maximally scale
-            tmp    = imresize(reshape(dset.X(:,ii), dset.nInput), min(xscale,yscale));
+            tmp    = imresize(reshape(dset.X(:,ii), dset.nInput), ...
+                              min(xscale, yscale), interp_method);
 
             % Add padding
             npad = max(tgtInput - size(tmp));
@@ -259,8 +249,8 @@ function dset = de_StimApplyFiltering(dset, opts)
         dset.X = dset.X + noise_filter * diff(dset.minmax) * randn(size(dset.X));%reshape(filt_images,[num_images prod(dset.nInput)])';
         dset.X = max(dset.minmax(1), min(dset.minmax(2), dset.X));
     end;
-    
-    
+
+
 %%%%%%%%%%%%%%%%%
 function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 

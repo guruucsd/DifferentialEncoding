@@ -49,7 +49,7 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
 
       % Convert back from polar to regular image
 %      if guru_hasopt(dset.opt, 'img2pol')
-%          m.ac.output = de_pol2img(m.ac.output, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
+%          m.ac.output = guru_pol2img(m.ac.output, guru_getopt(dset.opt,'location','CVF'),dset.nInput);
 %      end;
 
       % Store the result

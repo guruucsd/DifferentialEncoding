@@ -322,7 +322,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [X,STIM,ST,nInput] = stim2D(idx)
-    nInput = [135 100];
+    nInput = [34 25];
 
     % File in the following format:
     %H_H, H_F, H_L, H_T
@@ -346,8 +346,8 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
     for ii=1:16
         X_tmp = zeros([34 25]);
         X_tmp(3:end-1,7:end-6) = reshape(I(:,ii), [31 13]);
-        X_tmp = imresize(X_tmp, 4);
-        X_tmp = X_tmp(2:end,:); % remove first row
+        %X_tmp = imresize(X_tmp, 4, 'nearest');
+        %X_tmp = X_tmp(2:end,:); % remove first row
         X(:,ii) = reshape(X_tmp, [prod(nInput) 1]);
     end;
 

@@ -30,15 +30,18 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
   if (isfield(model, 'noise_input'))
     X_orig = X;
+    noise_std = model.noise_input * mean(abs(X_orig(:)));
   end;
 
   for ip = 1:model.MaxIterations
 
     % Inject noise into the input
     if (isfield(model, 'noise_input') && any(model.noise_input))
-        X      = X_orig + model.noise_input*(randn(size(X))); % mean 0 noise
+        noise_sig = noise_std * randn(size(X)) / 0.7982; % mean 0 noise
+        X = X_orig + noise_sig;
         if ip == 1
-            fprintf('%f noise is %f%% of activation.\n', model.noise_input, 100*model.noise_input/mean(abs(X_orig(:))));
+            noise_level = abs(1 - mean(abs(X(:))) / mean(abs(X_orig(:))));
+            fprintf('%f noise is %.2f%% of activation.\n', model.noise_input, 100 * noise_level);
         end;
         % Note: don't change Y!!  We don't want to model the noise...
     end;

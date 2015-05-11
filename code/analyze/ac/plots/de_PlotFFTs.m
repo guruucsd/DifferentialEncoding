@@ -73,7 +73,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
           semilogy(ffts.freqs_1D, log10(1+[avgPowerModelRH_1D; avgPowerModelLH_1D; avgPowerOrig_1D]))
           set(gca,'xlim', ffts.freqs_1D([1 end]));
           legend(lgnd{:}, 'Orig'); xlabel('spatial frequency (cycles)'); ylabel('Power (log_{10} scale)');
-          title('1D frequency spectrum (log(power+1))');
+          title('1D frequency spectrum (log_{10}(power+1))');
 
       end;
 
@@ -157,36 +157,36 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
       %%%%%%%%%%%%%%%%%%%
       % Colored Log-spectrum (models difference from orig)
       if (strcmp(ftp{fi}, 'fft-2D-log-diff-orig'))
-          pd1  = avgPowerModelRH_2D-avgPowerOrig_2D;
-          pd2  = avgPowerModelLH_2D-avgPowerOrig_2D;
+          pdRH  = abs(avgPowerModelRH_2D-avgPowerOrig_2D);
+          pdLH  = abs(avgPowerModelLH_2D-avgPowerOrig_2D);
+          pdiff = pdLH - pdRH;  % RH will be positive, LH will be negative
 
-          %pd1(abs(pd1)<1) = 1; % any difference that's small, just call it zero,
-          %pd2(abs(pd2)<1) = 1; %   so we don't have to deal with sign flipping
-          pd1  = sign(pd1).*log10(1+abs(pd1));
-          pd2  = sign(pd2).*log10(1+abs(pd2));
+          pdLH(pdLH < 1) = 1; % any difference that's small, just call it zero,
+          pdRH(pdRH < 1) = 1; %   so we don't have to deal with sign flipping
+          pdiff(abs(pdiff) < 1) = 1;
 
-          mv = max(abs([pd1(:);pd2(:)]));
+          mv = max(log10([pdLH(:);pdRH(:)]));
           cl = [-mv mv];
           subplot(1,3,1); colormap jet; hold on;
           title(sprintf('LH (\\sigma=%3.2f) - orig', mSets.sigma(end)));
-          imagesc(fftshift(pd2), cl); axis image;
+          imagesc(fftshift(log10(pdLH)), cl); axis image;
           set(gca, 'xtick',[],'ytick',[]);
           %colorbar;
           xlabel('color == log_{10}(power+1)');
 
           subplot(1,3,2); colormap jet; hold on;
           title( sprintf('RH (\\sigma=%3.2f) - orig', mSets.sigma(1)));
-          imagesc(fftshift(pd1), cl); axis image;
+          imagesc(fftshift(log10(pdRH)), cl); axis image;
           set(gca, 'xtick',[],'ytick',[]);
           %colorbar;
 
           subplot(1,3,3); colormap jet; hold on;
           title( sprintf('RH - LH', mSets.sigma(1)));
-          imagesc(fftshift(pd1 - pd2), cl); axis image;
+          imagesc(fftshift(sign(pdiff) .* log10(abs(pdiff))), cl); axis image;
           set(gca, 'xtick',[],'ytick',[]);
           %colorbar;
 
-          clear('pd1','pd2');
+          clear('pdLH','pdRH');
       end;
 
 
@@ -242,12 +242,13 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
       if (strcmp(ftp{fi}, 'fft-2D-log-diff-pct'))
 
           % We want + to be "better RH", which means negative value (smaller difference from orig)
-          pd = abs(avgPowerOrig_2D-avgPowerModelLH_2D) - abs(avgPowerOrig_2D-avgPowerModelRH_2D);
+          pd = abs(avgPowerOrig_2D - avgPowerModelLH_2D) - abs(avgPowerOrig_2D - avgPowerModelRH_2D);
           pd = pd ./ avgPowerOrig_2D;
 
-%          pd(abs(pd)<1) = 1; % any difference that's small, just call it zero,
-%                             %   so we don't have to deal with sign flipping
-          pd = sign(pd).*log10(1+abs(pd));
+          pd(isinf(abs(pd))) = 1;  % change inf to zero (one, then log, is zero)
+          pd(abs(pd)<1) = 1; % any difference that's small, just call it zero,
+                             %   so we don't have to deal with sign flipping
+          pd = sign(pd).*log10(abs(pd));
 
           %clim = max([0.1, min([min(pd(:)), max(pd(:))])]);
           %clim = [-1 1] * clim
@@ -269,10 +270,10 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
       if (strcmp(ftp{fi}, 'fft-2D-log-diff-statsig') && length(mSets.sigma)==2)
 
           % We want + to be "better RH", which means negative value (smaller difference from orig)
-          pd=abs(avgPowerOrig_2D-avgPowerModelLH_2D)-abs(avgPowerOrig_2D-avgPowerModelRH_2D);
-          %pd(abs(pd)<1) = 1; % any difference that's small, just call it zero,
-          %                   %   so we don't have to deal with sign flipping
-          pd = sign(pd).*log10(1+abs(pd));
+          pd = abs(avgPowerOrig_2D - avgPowerModelLH_2D) - abs(avgPowerOrig_2D - avgPowerModelRH_2D);
+          pd(abs(pd)<1) = 1; % any difference that's small, just call it zero,
+                             %   so we don't have to deal with sign flipping
+          pd = sign(pd).*log10(abs(pd));
           pd = pd .* (ffts.pals.an2D<=0.05); % limit to only statistically different frequencies
 
           clim = [-max(0.1, max(abs(pd(:)))), max(0.1, max(abs(pd(:))))];
@@ -345,12 +346,12 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
               %   up and down 1 sd as well
               %
               nModels = [size(ffts.model1D.power{1}, 2), size(ffts.model1D.power{end}, 2)];
-              pMean2 = [reshape(mean(ffts.model1D.power{1}(si,:,:),2), size(ffts.freqs_1D)); ...
-                        reshape(mean(ffts.model1D.power{end}(si,:,:),2), size(ffts.freqs_1D))]; %average over models
+              pMean2 = [reshape(mean(ffts.model1D.power{RH_IDX}(si,:,:),2), size(ffts.freqs_1D)); ...
+                        reshape(mean(ffts.model1D.power{LH_IDX}(si,:,:),2), size(ffts.freqs_1D))]; %average over models
               % Standard deviation of the mean
               pStd2  =  sqrt( ...
-                  reshape(std (ffts.model1D.power{1}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(1) ...
-                  + reshape(std (ffts.model1D.power{end}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(2) ...  %std
+                    reshape(std (ffts.model1D.power{RH_IDX}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(1) ...
+                  + reshape(std (ffts.model1D.power{LH_IDX}(si,:,:),0,2), size(ffts.freqs_1D)).^2 / nModels(2) ...  %std
               );
 
               % Follow the logic:
@@ -358,6 +359,7 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
               % To have RH = up, LH down, subtract RH error from LH error.
               %   + error means MORE LH ERROR = better RH fidelity,
               %   - error means MORE RH ERROR = better LH fidelity
+              % Note: index 1 is RH, index 2 is LH
               d_o        = [ pMean2(1,:) - reshape(ffts.orig1D.power(si,:,:), size(ffts.freqs_1D));   % RH
                              pMean2(2,:) - reshape(ffts.orig1D.power(si,:,:), size(ffts.freqs_1D)) ]; % LH
               pm2d_o     =   abs(d_o(2,:)) - abs(d_o(1,:));   % LH_err-RH_err => pos means LESS ERROR/better job by RH!
@@ -434,7 +436,7 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
 
                   title(sprintf('RH (\\sigma=%3.2f) - LH (\\sigma=%3.2f) (smooth_{\\sigma}=%3.2f)', mSets.sigma(1), mSets.sigma(end), sig));
                   xlabel('spatial frequency (cycles/image)');
-                  ylabel('% greater log(power+1) encoded');
+                  ylabel('% greater log_{10}(power+1) encoded');
               end;
 
 
