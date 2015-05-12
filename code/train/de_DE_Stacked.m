@@ -66,32 +66,35 @@ function [model] = de_DE_Stacked(model)
   if (isfield(model, 'p'))
 
       if (~model.p.cached)
-        error('stacked classifier NYI');
+        % error('stacked classifier NYI');
 
         good_train = ~isnan(sum(model.data.train.T,1));
         nTrain    = sum(good_train); % count the # of trials with no NaN anywhere in them
 
         % Use images as inputs
         X_train = model.data.train.X;
-        Y_train = model.data.train.X(1:end-1,:);
+        Y_train = model.data.train.T;
 
         % Set up connectivity matrix:
         pInputs         = size(X_train,1);
         acHidden        = model.nHidden;
-        pHidden        = model.p.nHidden;
-        pOutputs        = size(model.data.train.T,1);
-        pUnits          = pInputs + acHidden+pHidden + pOutputs;
+        pHidden         = model.p.nHidden;
+        pOutputs        = size(model.data.train.T, 1);
+        pUnits          = pInputs + acHidden + pHidden + pOutputs;
 
         if (~model.p.continue)
-            model.p.Conn    = false( pUnits, pUnits );
-            model.p.Conn(1:(pInputs+acHidden), 1:(pInputs+acHidden)) = model.ac.Conn(1:(pInputs+acHidden), 1:(pInputs+acHidden));
+            % Build the connection matrix
+            model.p.Conn = false( pUnits, pUnits );
+            model.p.Conn(pInputs + [1:acHidden], 1:pInputs) = model.ac.Conn(pInputs + [1:acHidden], 1:pInputs);
             model.p.Conn(pInputs+acHidden+[1:pHidden],  pInputs+[1:acHidden]) = true; %hidden1=>hidden2
             model.p.Conn(pInputs+acHidden+pHidden+[1:pOutputs], pInputs+acHidden+[1:pHidden])=true; %hidden2=>output
-            model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
+            model.p.Conn(1:(pInputs + acHidden), pInputs) = model.ac.useBias ~= 0;
+            model.p.Conn(pInputs + acHidden + [1:(pHidden + pOutputs)], pInputs) = model.p.useBias ~= 0;
 
+            % Copy over relevant weights from the ac
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
-            model.p.Weights(1:(pInputs+acHidden), 1:(pInputs+acHidden)) = model.ac.Weights(1:(pInputs+acHidden), 1:(pInputs+acHidden));
+            model.p.Weights(pInputs + [1:acHidden], 1:pInputs) = model.ac.Weights(pInputs + [1:acHidden], 1:pInputs);
         end;
 
         % Train
@@ -109,7 +112,7 @@ function [model] = de_DE_Stacked(model)
 
         % TEST
         X_test = model.data.test.X;
-        Y_test = model.data.test.X(1:end-1,:);
+        Y_test = model.data.test.T;
 
         good_test  = ~isnan(sum(model.data.test.T,1));
         nTest      = sum(good_test); % count the # of trials with no NaN anywhere in them

@@ -117,7 +117,7 @@ function [model] = de_DE(model)
 
             model.p.Conn(pInputs+[1:pHidden],          [1:pInputs])=true; %input->hidden
             model.p.Conn(pInputs+pHidden+[1:pOutputs], pInputs+[1:pHidden])=true; %hidden->output
-            model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
+            model.p.Conn(:, pInputs) = (model.p.useBias~=0); %bias=>all
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
@@ -155,7 +155,7 @@ function [model] = de_DE(model)
         end;
         fprintf('\tP dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
 
-        % Add bias
+        % Add bias to test
         if (model.p.useBias)
             biasArray=biasVal*ones(1,nTrials);
             X_test     = [X_test;biasArray];  %bias is last input
