@@ -15,7 +15,7 @@ function de_LogSettingsMap(mSets)
     % Make the output path
     fn = de_GetOutFile(mSets, 'settings-map');
     if (~exist(guru_fileparts(fn, 'pathstr')))
-      mkdir(guru_fileparts(fn, 'pathstr'));
+      guru_mkdir(guru_fileparts(fn, 'pathstr'));
     end;
 
     % Read through all lines; don't write if it's there

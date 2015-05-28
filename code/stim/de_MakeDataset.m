@@ -41,6 +41,12 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
                 error('de_StimCreate has the wrong number of output arguments!');
         end;
 
+        % Make sure what comes out is the MVP (minimum viable product)
+        for prpo_name={'X', 'T', 'nInput'}
+            guru_assert(hasfield(train, prop_name{1}), ...
+                        sprintf('Training set must have "%s" property defined.', prop_name{1}));
+        end;
+
         path(p); % Restore path
 
         %%
@@ -68,7 +74,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Output everything (including images)
         if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
-          mkdir(guru_fileparts(dataFile,'pathstr'));
+          guru_mkdir(guru_fileparts(dataFile,'pathstr'));
         end;
 
         if show_figs

@@ -118,10 +118,10 @@ for si=1:length(lambdas)
         close all;        % close figures
 
         % Move output
-        if (~exist(wss{mi}.matdir,'dir')), mkdir(wss{mi}.matdir); end;
+        if (~exist(wss{mi}.matdir,'dir')), guru_mkdir(wss{mi}.matdir); end;
         unix( ['mv "' fs{end} '" "' fns{mi} '"'] );
 
-        if (~exist(wss{mi}.plotdir,'dir')), mkdir(wss{mi}.plotdir); end;
+        if (~exist(wss{mi}.plotdir,'dir')), guru_mkdir(wss{mi}.plotdir); end;
         for pfi=1:length(plot_formats)
             fmt = plot_formats{pfi};
 
@@ -167,7 +167,7 @@ for si=1:length(lambdas)
     end;
 
     % Save off results
-    if (~exist(ws.matdir,'dir')), mkdir(ws.matdir); end;
+    if (~exist(ws.matdir,'dir')), guru_mkdir(ws.matdir); end;
     save(fullfile(ws.matdir, mfilename));
 
     expt_analyze( models, wss, s, plot_formats );

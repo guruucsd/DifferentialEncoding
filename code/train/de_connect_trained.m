@@ -330,7 +330,7 @@ function [Con,Wts,model,ws] = de_connect_trained(mSets, ct)
     %   but also be able to cache.
     if (~exist(connFile))
         if (~exist(guru_fileparts(connFile,'path'),'dir'))
-            mkdir(guru_fileparts(connFile,'path'));
+            guru_mkdir(guru_fileparts(connFile,'path'));
         end;
         save(connFile, 'model', 'ws');
     end;

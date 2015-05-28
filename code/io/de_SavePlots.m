@@ -32,7 +32,7 @@ function out = de_SavePlots(mSets, figs)
 
       %i/o
       if (~exist(guru_fileparts(out.files{end}, 'pathstr'), 'dir'))
-        mkdir(guru_fileparts(out.files{end}, 'pathstr'));
+        guru_mkdir(guru_fileparts(out.files{end}, 'pathstr'));
       end;
 
       saveas(figs(j).handle, out.files{end}, ext(2:end));

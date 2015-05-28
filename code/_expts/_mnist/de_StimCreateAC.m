@@ -54,7 +54,7 @@ function de_StimCreateAC(stimSet, opt)
   % Output everything (including images)
   outFile        = de_GetDataFile(dim, stimSet, '', opt);
   if (~exist(guru_fileparts(outFile,'pathstr'), 'dir'))
-    mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
+    guru_mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
   end;
   save(outFile);
 

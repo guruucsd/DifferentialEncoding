@@ -7,10 +7,10 @@ function fetchMcmcPackages()
     %These are required for MCMC-based error bars
     fprintf('Fetching dram package\n');
     thepath = fileparts(which('fetchMcmcPackages'));
-    mkdir([thepath '/dram']);
+    guru_mkdir([thepath '/dram']);
     unzip('http://www.helsinki.fi/~mjlaine/dram/dramcode.zip',[thepath '/dram']);
     fprintf('Fetching spatial econometrics toolbox (6MB)\n');
-    mkdir([thepath '/econo']);
+    guru_mkdir([thepath '/econo']);
     unzip('http://www.spatial-econometrics.com/html/jplv7.zip',[thepath '/econo']);
 
     addpath([thepath '/dram']);

@@ -17,8 +17,8 @@ function model = de_CompressAndSave(model)
   model = de_CompressModels(model);
 
   % make output directories
-  d = de_GetOutPath(model, 'ac');  if (~exist(d, 'dir')), mkdir(d);  end;
-  d = de_GetOutPath(model, 'p');   if (~exist(d, 'dir')), mkdir(d);  end;
+  d = de_GetOutPath(model, 'ac');  if (~exist(d, 'dir')), guru_mkdir(d);  end;
+  d = de_GetOutPath(model, 'p');   if (~exist(d, 'dir')), guru_mkdir(d);  end;
   clear('d');
 
   %% ac
