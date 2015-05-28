@@ -42,10 +42,13 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
         end;
 
         % Make sure what comes out is the MVP (minimum viable product)
-        for prpo_name={'X', 'T', 'nInput'}
-            guru_assert(hasfield(train, prop_name{1}), ...
+        all_required_props = {'X', 'nInput'};
+        if ~isempty(taskType), all_required_props{end+1} = 'T'; end;            
+        for prop_name=all_required_props
+            guru_assert(isfield(train, prop_name{1}), ...
                         sprintf('Training set must have "%s" property defined.', prop_name{1}));
         end;
+        
 
         path(p); % Restore path
 
