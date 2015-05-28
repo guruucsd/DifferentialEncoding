@@ -13,7 +13,7 @@ function [mss] = de_DoRejections(mss, rejectTypes, verbose)
 % rejectTypes     : indices of runs that should be rejected
 % models
   if (~exist('verbose','var')), verbose = false; end;
-  if (~iscell(mss)),            mss = num2cell(mss, 1); end;
+  if (~iscell(mss)),            mss = guru_num2cell(mss, 1); end;
   nSigmas = length(mss);
 
   % Do the rejections
