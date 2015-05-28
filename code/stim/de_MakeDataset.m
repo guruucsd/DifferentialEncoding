@@ -42,7 +42,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
         end;
 
         % Make sure what comes out is the MVP (minimum viable product)
-        all_required_props = {'X', 'nInput'};
+        all_required_props = {'X', 'XLAB', 'nInput'};
         if ~isempty(taskType), all_required_props{end+1} = 'T'; end;            
         for prop_name=all_required_props
             guru_assert(isfield(train, prop_name{1}), ...

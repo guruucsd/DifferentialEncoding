@@ -1,6 +1,6 @@
 clear all variables; clear all globals;
 
-stats = {'images','ffts', 'distns', 'ipd'};
+stats = {};%'images','ffts', 'distns', 'ipd'};
 plts = {stats{:}};
 
 [args,opts]  = uber_okubo_args('plots', plts,'stats',stats, 'runs', 2, 'ac.AvgError', 1E-3);

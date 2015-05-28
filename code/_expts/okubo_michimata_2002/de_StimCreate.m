@@ -34,11 +34,14 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if (~iscell(opt)),             opt      = {opt};  end;
 
   % Create the input images.
-  heights = guru_getopt('heights', [[0.5 1.0 1.5 2.5 3.0 3.5] -1*[0.5 1.0 1.5 2.5 3.0 3.5]]);
+  heights = 2 * guru_getopt(opt, 'heights', [[0.5 1.0 1.5 2.5 3.0 3.5] -1*[0.5 1.0 1.5 2.5 3.0 3.5]]);
   train.nInput = [68 50];
   train.X = zeros(prod(train.nInput), 0);
-  for h=heights:
-    train.X(:, end+1) = create_cat_coord_stimuli(h);
+  train.XLAB = guru_csprintf('height=%.2f', num2cell(heights));
+
+  for h=heights
+    img = create_cat_coord_stimuli(h);
+    train.X(:, end+1) = img(:);%rd_stimuli(h);
   end;
 
   % Create the output vectors.
@@ -55,7 +58,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   aux.heights = heights;
 
 
-function [ image ] = create_cat_coord_stimuli( height, above )
+function [ image ] = create_cat_coord_stimuli( height )
 % Takes two parameters:
 %   height (vertical displacement of 2 dots from middle 5), 
 %   above (1 for true, 0 for false, i.e. below)
@@ -76,9 +79,8 @@ for ii = 1:10:41
   image(midline+1, padding+ii+1) = 0;
 end
 
-if above == 1 
     height = height * -1;
-end
+
 % create the 2 stimuli based on the height
 
 image(midline+height,29) = 0;
