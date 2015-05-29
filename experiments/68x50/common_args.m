@@ -10,7 +10,7 @@ function [cargs, opts] = common_args(varargin)
     addpath(genpath(code_path));
   end;
 
-  opts = {'medium', 'logpolar'};
+  opts = {'medium'};
 
   cargs = {  'parallel', false, 'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...

@@ -26,4 +26,4 @@ function [cargs, opts] = uber_args(varargin)
            );
 
 
-% opts = {opts{:}, 'img2pol','location','LVF'};
+opts = {opts{:}, 'img2pol', 'location', 'LVF'};
