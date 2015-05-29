@@ -122,7 +122,7 @@ function dset = de_StimApplyTransform(dset, opts)
     if guru_hasopt(opts, 'img2pol')
         %de_visualizeData(dset);
 
-        dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        dset.X = guru_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
         %de_visualizeData(dset); % just for now
 
         %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
