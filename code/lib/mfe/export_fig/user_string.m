@@ -45,7 +45,7 @@ if nargin > 1
     if ~exist(dname, 'dir')
         % Create the directory
         try
-            if ~mkdir(dname)                
+            if ~guru_mkdir(dname)                
                 string = false;
                 return
             end

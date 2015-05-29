@@ -121,7 +121,7 @@ function de_StimCreateHL(stimSet, taskType, opt)
   % Output everything (including images)
   outFile        = fullfile(de_GetBaseDir(), 'data', de_GetDataFile(dim, stimSet, taskType, opt));
   if (~exist(guru_fileparts(outFile,'pathstr'), 'dir'))
-    mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
+    guru_mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
   end;
   save(outFile);
 

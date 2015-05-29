@@ -123,7 +123,7 @@ function [outFile] = de_StimCreate(expt, stimSet, taskType, opt)
   % Output everything (including images)
   outFile        = de_GetDataFile(expt, stimSet, taskType, opt);
   if (~exist(guru_fileparts(outFile,'pathstr'), 'dir'))
-    mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
+    guru_mkdir(guru_fileparts(outFile,'pathstr'), 'dir');
   end;
 
   save(outFile);

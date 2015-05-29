@@ -23,9 +23,9 @@ function [success,mSets] = de_SaveAll(mSets, models, stats, figs)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % Make sure output paths exist
-  if (~exist(mSets.out.resultspath, 'dir')), mkdir(mSets.out.resultspath); end;
+  if (~exist(mSets.out.resultspath, 'dir')), guru_mkdir(mSets.out.resultspath); end;
   for si=1:length(mSets.sigma)
-      if (~exist(mSets.out.runspath{si},    'dir')), mkdir(mSets.out.runspath{si}); end;
+      if (~exist(mSets.out.runspath{si},    'dir')), guru_mkdir(mSets.out.runspath{si}); end;
   end;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

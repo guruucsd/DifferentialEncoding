@@ -2,7 +2,7 @@ function [rejMats] = de_FindRejectionsP(mss, rejSets, stats, rejMats)
 %
 %
   if (~iscell(mss))
-    mss = num2cell(mss, 1);
+    mss = guru_num2cell(mss, 1);
   end;
 
   nSigmas = length(mss);

@@ -11,13 +11,13 @@ function expt_analyze(models, wss, s, exts, force)
 
     % Collect histogram stats
     [s.hist, f.hist] = expt_histograms( models, ws, s );
-    if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     saveas_multiformat(f.hist, fullfile(ws.plotdir, 'f_hist'), exts);
 
     % Collect distribution stats
     s.distn = de_StatsDistributions(models);
     f.distn = de_PlotDistributions(models{end}(end), s.distn);
-    if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     for ii=1:length(f.distn)
         saveas_multiformat(f.distn(ii).handle, fullfile(ws.plotdir, ['f_distn_' f.distn(ii).name]), exts);
     end;
@@ -25,7 +25,7 @@ function expt_analyze(models, wss, s, exts, force)
 
     % Collect inter-patch distance stats
     [s.ipd,  f.ipd ] = expt_ipd( models, ws );
-    if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     for ii=1:length(f.ipd)
         saveas_multiformat(f.ipd(ii).handle, fullfile(ws.plotdir, ['f_ipd_' f.ipd(ii).name]), exts);
     end;
@@ -33,14 +33,14 @@ function expt_analyze(models, wss, s, exts, force)
     % Collect stats on shapes
     %if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_shape_*.png')))==0)
     %  [s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
-    %  if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    %  if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     %  saveas_multiformat(f.shp,  fullfile(ws.plotdir, 'f_shape_map'), exts);
     %end;
 
     % Collect spatial frequency info
     if (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_sf_*.png')))==0)
       [s.sf,  f.sf ] = expt_sf( models, wss );
-      if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+      if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
       for ii=1:length(f.sf)
         saveas_multiformat(f.sf(ii).handle, fullfile(ws.plotdir, ['f_sf_' f.sf(ii).name]), exts);
       end;
@@ -49,14 +49,14 @@ function expt_analyze(models, wss, s, exts, force)
     % Collect
     %if force || (~exist(ws.plotdir,'dir') || length(dir(fullfile(ws.plotdir,'f_trn_*.png')))==0)
     %  [s.trn,  f.trn ] = expt_trn( models, ws );
-    %  if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    %  if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     %  for ii=1:length(f.trn)
     %    saveas_multiformat(f.trn(ii).handle, fullfile(ws.plotdir, ['f_trn_' f.sf(ii).name]), exts);
     %  end;
     %end;
 
     %[s.cxn,  f.cxn ] = expt_connections( models, ws, s.shp );
-    %if (~exist(ws.plotdir,'dir')), mkdir(ws.plotdir); end;
+    %if (~exist(ws.plotdir,'dir')), guru_mkdir(ws.plotdir); end;
     %saveas(f.cxn,  fullfile(ws.plotdir, 'f4'), exts);
 
     %[s.tst, f.tst] = expt_testsets( models, ws );
@@ -668,7 +668,7 @@ function [s, f] = expt_junk( models, ws )
 %        imagesc(img); axis image;
 %        set(gca, 'xtick', [], 'ytick', []);
 %    end;
-%    if (~exist(pngdir,'dir')), mkdir(pngdir); end;
+%    if (~exist(pngdir,'dir')), guru_mkdir(pngdir); end;
 %    saveas_multiformat(gcf, '~/test-rho-q','png');
 
     % 7: Histogram of # of connections

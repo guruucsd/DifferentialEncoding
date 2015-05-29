@@ -3,7 +3,7 @@ function guru_saveall_figures(results_dir, types, overwrite, close_after)
     if ~iscell(types), types = {types}; end;
     if ~exist('overwrite','var'), overwrite=false; end;
     if ~exist('close_after', 'var'), close_after = false; end;
-    if ~exist(results_dir, 'dir'), mkdir(results_dir); end;
+    if ~exist(results_dir, 'dir'), guru_mkdir(results_dir); end;
 
     % print all figures
     fh = unique(get(0, 'Children'));

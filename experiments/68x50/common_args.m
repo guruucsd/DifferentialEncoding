@@ -4,9 +4,10 @@ function [cargs, opts] = common_args(varargin)
   if (exist('de_GetBaseDir')~=2)
     addpath(genpath(fullfile('..','..', 'code')));
     addpath(genpath(fullfile('..','..','..', 'code')));
-    addpath(genpath(fullfile(de_GetBaseDir(),'code')));
+    code_path = fullfile(de_GetBaseDir(),'code');
     rmpath (genpath(fullfile('..','..','..', 'code')));
     rmpath (genpath(fullfile('..','..', 'code')));
+    addpath(genpath(code_path));
   end;
 
   opts = {'medium', 'logpolar'};

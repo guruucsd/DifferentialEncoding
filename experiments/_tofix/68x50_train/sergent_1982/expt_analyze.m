@@ -19,11 +19,11 @@ function expt_analyze(models, s)
 
     % Collect stats & figures
     [s.hist, f.hist] = expt_histograms( models, ws, s );
-    if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+    if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
     saveas(f.hist, fullfile(ws.pngdir, 'f_hist'), 'png');
 
     [s.ipd,  f.ipd ] = expt_ipd( models, ws );
-    if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+    if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
     for ii=1:length(f.ipd)
         saveas(f.ipd(ii).handle, fullfile(ws.pngdir, ['f_ipd_' f.ipd(ii).name '.png']), 'png');
     end;
@@ -31,14 +31,14 @@ function expt_analyze(models, s)
     if false &&(~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_shape_*.png')))==0)
 		[s.shp,  f.shp ] = expt_shapes( models, ws, s.ipd );
 
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+		if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
 		saveas(f.shp,  fullfile(ws.pngdir, 'f_shape_map'), 'png');
     end;
     
     if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_sf_*.png')))==0)
 		[s.sf,  f.sf ] = expt_sf( models, ws );
 
-		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+		if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
 		for ii=1:length(f.sf)
 			saveas(f.sf(ii).handle, fullfile(ws.pngdir, ['f_sf_' f.sf(ii).name '.png']), 'png');
 		end;
@@ -47,14 +47,14 @@ function expt_analyze(models, s)
 %    if (~exist(ws.pngdir,'dir') || length(dir(fullfile(ws.pngdir,'f_trn_*.png')))==0)
 %		[s.trn,  f.trn ] = expt_trn( models, ws );
 %
-%		if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+%		if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
 %		for ii=1:length(f.trn)
 %			saveas(f.trn(ii).handle, fullfile(ws.pngdir, ['f_trn_' f.trn(ii).name '.png']), 'png');
 %		end;
 %    end;
 
     %[s.cxn,  f.cxn ] = expt_connections( models, ws, s.shp );
-    %if (~exist(ws.pngdir,'dir')), mkdir(ws.pngdir); end;
+    %if (~exist(ws.pngdir,'dir')), guru_mkdir(ws.pngdir); end;
     %saveas(f.cxn,  fullfile(ws.pngdir, 'f4'), 'png');
 
     %[s.tst, f.tst] = expt_testsets( models, ws );
@@ -694,7 +694,7 @@ function [s, f] = expt_junk( models, ws )
 %        colormap(jet);
 %        imagesc(img); axis image;
 %    end;
-%    if (~exist(pngdir,'dir')), mkdir(pngdir); end;
+%    if (~exist(pngdir,'dir')), guru_mkdir(pngdir); end;
 %    saveas(gcf, '~/test-rho-q','png');
     
     % 7: Histogram of # of connections

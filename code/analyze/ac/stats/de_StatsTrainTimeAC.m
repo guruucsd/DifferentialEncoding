@@ -1,4 +1,4 @@
-function [tt] = de_StatsTrainTime(models)
+function [tt] = de_StatsTrainTimeAC(models)
 %function [tt] = de_StatsTrainTime(models)
 %
 % Calculates stats that we care about
