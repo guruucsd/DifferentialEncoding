@@ -12,6 +12,7 @@ function fig = de_NewFig(varargin)
 
   elseif (isempty(varargin))
       fig.handle = figure;
+      varargin = {'default'};
 
   elseif ischar(varargin{1})
       fig.handle = figure;

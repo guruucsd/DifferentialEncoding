@@ -1,7 +1,7 @@
 function out = de_SavePlot(modelSettings, figs)
 %
 %
-  if (isstruct(figs)), figs = {figs}; end;
+  % if (isstruct(figs)), figs = {figs}; end;
 
   out = modelSettings.out;
 
