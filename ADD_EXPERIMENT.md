@@ -54,4 +54,17 @@ Define your input images (in code, or elsewhere and simply load in code) and cor
     * image set for training the autoencoder (`vanhateren/250` is 250 patches from the vanhateren "natural images" dataset)
     * image and task for the perceptron (`okubo_michimata_2002/dots/categorical` is appropriate here)
 
+
+#### 3. Add analysis code.
+
+3a. Add file `code/_expts/okubo_michimata_2002/de_Analyze.m` (copy from `code/_expts/vanhateren/de_Analyze.m`).
+3b. Add any specific code into that file (or call functions from there).
+
+
+#### (optional) 4. Analyzing all experiments at once.
+
+These instructions get you up and running to analyze a single experiment. However, the main result of this paper is a comparison across all four experiments (Figure 2). To do this:
+
+4a. Add a new script (`experiments/68x50/okubo_michimata_2002/uber_okubo_all.m`) that calls into all four experiments, and saves the output from each call.
+4b. Add new code into that script (or better, into `code/_expts/okubo_michimata_2002/analysis/`) to analyze the results across all 4 experiments and plot a figure similar to figure 4.
  
