@@ -34,14 +34,17 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if (~iscell(opt)),             opt      = {opt};  end;
 
   % Create the input images.
-  heights = 2 * guru_getopt(opt, 'heights', [[0.5 1.0 1.5 2.5 3.0 3.5] -1*[0.5 1.0 1.5 2.5 3.0 3.5]]);
+  heights = 6 * guru_getopt(opt, 'heights', [[0.5 1.0 1.5 2.5 3.0 3.5] -1*[0.5 1.0 1.5 2.5 3.0 3.5]]);
   train.nInput = [68 50];
   train.X = zeros(prod(train.nInput), 0);
   train.XLAB = guru_csprintf('height=%.2f', num2cell(heights));
 
   for h=heights
-    img = create_cat_coord_stimuli(h);
-    train.X(:, end+1) = img(:);%rd_stimuli(h);
+    img = 1 - create_cat_coord_stimuli(h)';
+    if strcmp(stimSet, 'dots-cb')
+      img = guru_contrast_balance_image(img, 1, 0.5);
+    end;
+    train.X(:, end+1) = img(:);
   end;
 
   % Create the output vectors.
