@@ -6,6 +6,7 @@ function [args,opts] = uber_okubo_args(varargin)
   % Get shared args
   addpath('..');
   [args,opts] = uber_args( ... %Network structure
+                  'ac.AvgError', 2E-4, ...
                   'errorType', 2,... % cross-entropy
                   'p.errorType', 2,... % cross-entropy
                   'p.XferFn', [6 3], ...  %sigmoid->sigmoid
