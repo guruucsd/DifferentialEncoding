@@ -1,14 +1,14 @@
 function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %
 %Input:
-%  stimSet  : a string specifying the (INPUT) image dataset. 
+%  stimSet  : a string specifying the (INPUT) image dataset.
 %               'dots' => the "dot" stimuli shown on the left of Figure 1.
-%               'dots-cb' => the contrast balanced "dot" stimuli shown on the right of Figure 1. 
+%               'dots-cb' => the contrast balanced "dot" stimuli shown on the right of Figure 1.
 %
 %  taskType : a string specifying the (OUTPUT) task.
 %               'categorical' => whether the dots are above or below the line.
 %               'coordinate' => how far the dots are from the line.
-% 
+%
 %  opt      : a vector of options; all listed will be applied
 %               (none used here)
 %%
@@ -51,7 +51,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if ~isempty(taskType)
     switch (taskType)
       case 'categorical', train.T = heights > 0;
-      case 'coordinate', train.T = abs(heights);
+      case 'coordinate', train.T = abs(heights) / max(abs(heights));
       otherwise, error('Unknown taskType: %s', taskType);
     end;
   end;
@@ -63,7 +63,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
 function [ image ] = create_cat_coord_stimuli( height )
 % Takes two parameters:
-%   height (vertical displacement of 2 dots from middle 5), 
+%   height (vertical displacement of 2 dots from middle 5),
 %   above (1 for true, 0 for false, i.e. below)
 img_height = 50;
 img_width = 68;
