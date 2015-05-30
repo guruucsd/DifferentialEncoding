@@ -21,11 +21,13 @@ for ei=1:n_expts
         o_p       = reshape(horzcat(o.test),[numel(o(1).test),length(o)])';  % # models x # trials
         
         raw_error{ei, hi} = de_calcPErr( o_p, mSets.data.test.T, mSets.errorType );        % # models x # trials
+        median_error(ei, hi) = median(raw_error{ei, hi}(:));
         mean_error(ei, hi) = mean(raw_error{ei, hi}(:));
         std_error(ei, hi) = std(raw_error{ei, hi}(:));
     end;
 end;
 
 stats = struct('raw_error', {raw_error}, ...
+               'median_error', {median_error}, ...
                'mean_error', {mean_error}, ...
                'std_error', {std_error});
