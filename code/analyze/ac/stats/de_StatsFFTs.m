@@ -24,7 +24,7 @@ function [stats_fft] = de_StatsFFTs(dset, images)
     if guru_hasopt(dset.opt, 'img2pol')
         for si=1:length(images)
             for mi=1:size(images{si},1)
-                images{si}(mi,:,:,:) = guru_pol2img(squeeze(images{si}(mi,:,:,:)), guru_getopt(dset.opt,'location','CVF'),dset.nInput);
+                images{si}(mi,:,:,:) = guru_pol2img(squeeze(images{si}(mi,:,:,:)), guru_getopt(dset.opt, 'location', 'CVF'));
             end;
             guru_assert(~any(isnan(images{si}(:))));
             guru_assert(all(isreal(images{si}(:))));
