@@ -1,9 +1,15 @@
 function [cargs, opts] = common_args(varargin)
 
   %% Generic setup
-  dbstop if error
-  dbstop if warning
   more off
+  if exist('OCTAVE_VERSION', 'builtin') == 0  % MATLAB
+    dbstop if error
+    dbstop if warning
+  else  % OCTAVE
+    debug_on_error = 1;
+    pkg load image;
+    pkg load statistics;
+  end;
 
   % Add absolute path to the 'code' directory
   if (exist('de_GetBaseDir')~=2)
