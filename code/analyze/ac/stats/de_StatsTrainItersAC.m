@@ -14,7 +14,7 @@ function [ti, pval] = de_StatsTrainItersAC(models)
 
   for s=1:length(models)
     ac = [models{s}.ac];
-    ti{s} = [ac.Iterations]';
+    ti{s} = [ac.Iterations]';  %'
   end;
 
 
@@ -28,5 +28,5 @@ function [ti, pval] = de_StatsTrainItersAC(models)
       tmp = guru_csprintf('%i', num2cell(repmat(i,size(ti{i}))));
       g = [g tmp];
     end;
-    [pval] = anova1(x,g', 'off');
+    [pval] = anovaSRV(x,g', 'off');  % '
   end;
