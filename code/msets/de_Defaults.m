@@ -44,6 +44,7 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('dataFile',         aKeys)), args(end+1:end+2) = {'dataFile', de_GetDataFile(expt, stimSet, taskType, opt); }; end;
 
   % autoencoder
+  if (~ismember('ac.train_on_task_images', aKeys)), args(end+1:end+2) = {'ac.train_on_task_images', false}; end;
   if (~ismember('ac.randState',     aKeys)), args(end+1:end+2) = {'ac.randState',     1}; end;
   if (~ismember('ac.AvgError',      aKeys)), args(end+1:end+2) = {'ac.AvgError',      0}; end;
   if (~ismember('ac.MaxIterations', aKeys)), args(end+1:end+2) = {'ac.MaxIterations', 350}; end;
@@ -52,7 +53,7 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('ac.EtaInit',       aKeys)), args(end+1:end+2) = {'ac.EtaInit',       0.1}; end;
   if (~ismember('ac.errorType',     aKeys)), args(end+1:end+2) = {'ac.errorType',     2}; end;   % abs(ERR)
   if (~ismember('ac.XferFn',        aKeys)), args(end+1:end+2) = {'ac.XferFn',        3}; end;
-  if (~ismember('ac.useBias',       aKeys)), args(end+1:end+2) = {'ac.useBias',       false}; end;
+  if (~ismember('ac.useBias',       aKeys)), args(end+1:end+2) = {'ac.useBias',       true}; end;
   if (~ismember('ac.WeightInitType',aKeys)), args(end+1:end+2) = {'ac.WeightInitType','rand-normd'}; end;
   if (~ismember('ac.WeightInitScale',aKeys)),args(end+1:end+2) = {'ac.WeightInitScale',0.25}; end;
   if (~ismember('ac.debug',         aKeys)), args(end+1:end+2) = {'ac.debug',         1}; end;
@@ -77,7 +78,7 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
       if (~ismember('p.EtaInit',        aKeys)), args(end+1:end+2) = {'p.EtaInit',       0.1}; end;
       if (~ismember('p.errorType',      aKeys)), args(end+1:end+2) = {'p.errorType',     2}; end;  % abs(ERR)
       if (~ismember('p.XferFn',         aKeys)), args(end+1:end+2) = {'p.XferFn',        3}; end;
-      if (~ismember('p.useBias',        aKeys)), args(end+1:end+2) = {'p.useBias',       false}; end;
+      if (~ismember('p.useBias',        aKeys)), args(end+1:end+2) = {'p.useBias',       true}; end;
       if (~ismember('p.WeightInitType', aKeys)), args(end+1:end+2) = {'p.WeightInitType','rand-normd'}; end;
       if (~ismember('p.WeightInitScale',aKeys)), args(end+1:end+2) = {'p.WeightInitScale',0.10}; end;
       if (~ismember('p.debug',          aKeys)), args(end+1:end+2) = {'p.debug',         1}; end;

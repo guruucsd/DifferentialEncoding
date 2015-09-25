@@ -13,14 +13,14 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   training_imageset = training_info_split{2};
 
   % Remove args for perceptron
-  non_p_argname_idx = find(guru_findstr(args(1:2:end),'p.')~=1);
-  non_p_arg_idx = sort([2*non_p_argname_idx-1,2*non_p_argname_idx]);
+  non_p_argname_idx = find(guru_findstr(args(1:2:end), 'p.')~=1);
+  non_p_arg_idx = sort([2*non_p_argname_idx-1, 2*non_p_argname_idx]);
   uber_args = args(non_p_arg_idx);
 
-  %%%%%%%%%%%%%%%%
-  % Pull out the path to the stored autoencoders
-  %%%%%%%%%%%%%%%%%
-  %dbstop in de_LoadOrTrain
+  % Remove ac args that can't be handled
+  tough_ac_argname_idx = find(strcmp(uber_args(1:2:end), {'ac.train_on_task_images'}) ~= 1);
+  tough_ac_arg_idx = sort([ 2 * tough_ac_argname_idx - 1, 2 * tough_ac_argname_idx]);
+  uber_args = uber_args(tough_ac_arg_idx);
 
   [trn.mSets, trn.models, trn.stats] = de_Simulator(training_expt, training_imageset, '', opts, uber_args{:});
 
@@ -32,13 +32,11 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   end;
   clear('ac');
 
-  %dbstop in de_LoadOrTrain
-
   %%%%%%%%%%%%%%%%
   % Train classifiers on images run through the pre-trained autoencoders
   %%%%%%%%%%%%%%%%%
   testing_info_split  = mfe_split('/', testing_info);
-  guru_assert(length(testing_info_split) >=2, 'testing info must have correct format: expt/stimset[/tasktype]');
+  guru_assert(length(testing_info_split) >= 2, 'testing info must have correct format: expt/stimset[/tasktype]');
   testing_expt      = testing_info_split{1};
   testing_imageset  = testing_info_split{2};
   if length(testing_info_split)==2
@@ -47,8 +45,6 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
       testing_task      = testing_info_split{3};
   end;
 
-  p_args = { args{:},'uberpath', dirs };
+  p_args = { args{:}, 'uberpath', dirs };
 
   [tst.mSets, tst.models, tst.stats] = de_Simulator(testing_expt, testing_imageset, testing_task, opts, p_args{:});
-
-

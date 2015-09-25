@@ -5,9 +5,29 @@ function model = de_LoadOrTrain(model)
 %   If not, loads results metadata from disk
 % Output model is the 'clean' version without 'heavy' props
 %
+% How to do attentional training:
+%   * Try to load with flags.
+%   * If that fails, then load without the flags, then pass in (how to indicate to skip first training?).
+
+  % Force the separate training of the non-task-based images
+  if isfield(model.ac, 'train_on_task_images') && model.ac.train_on_task_images
+      guru_assert(strcmp(model.deType, 'de'), 'train_on_task_images is only supported currently for the de training type.');
+
+      % Just load/train on the previous autoencoder result
+      pre_train_model = guru_rmfield(model, 'p');
+      pre_train_model.ac.train_on_task_images = false;
+      pre_train_model = de_LoadOrTrain(pre_train_model);
+
+      % Now load/train on the full thing
+      model.ac = pre_train_model.ac;
+      model.ac.train_on_task_images = true;
+      model.ac.cached = false;
+      model.ac.continue = true;
+      %model = guru_rmfield(model, 'uberpath'); % is this necessary?
+
 
   %% Load autoencoder weights, if they exist
-  if (  ~model.ac.continue ...
+  elseif (  ~model.ac.continue ...
      && exist(de_GetOutFile(model, 'ac'),         'file') ...
      && exist(de_GetOutFile(model, 'ac.weights'), 'file'))
 
@@ -65,8 +85,8 @@ function model = de_LoadOrTrain(model)
 
   % Report total time
   trainTime = 0;
-  if (model.ac.cached == 0), trainTime = trainTime + model.ac.trainTime; end;
-  if (isfield(model, 'p') && model.p.cached == 0),  trainTime = trainTime + model.p.trainTime;  end;
+  if (model.ac.cached == 0), trainTime = trainTime + model.ac.trainTime(end); end;
+  if (isfield(model, 'p') && model.p.cached == 0),  trainTime = trainTime + model.p.trainTime(end);  end;
 
 
   %fprintf(' | t: %5.1fs (%5.1fs', trainTime, model.ac.trainTime);

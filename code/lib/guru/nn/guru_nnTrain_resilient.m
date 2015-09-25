@@ -14,8 +14,8 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
       o_p       = zeros([model.MaxIterations nUnits nDatapts]);
   end;
 
-  if (~isfield(model,'Error'))
-    model.Error = model.AvgError*numel(Y);
+  if isfield(model,'AvgError')
+    model.Error = model.AvgError * numel(Y);
   end;
 
   if ~isfield(model, 'Eta')

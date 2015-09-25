@@ -58,8 +58,11 @@ function [models] = de_TrainAllAC(mSets)
             rand ('state',new_model.ac.randState);
 
             fprintf('[%3d]',zz);
-            models(zz,ii) = de_Trainer(new_model);
-            if (~models(zz,ii).ac.cached), fprintf('\n'); end;
+            new_model = de_Trainer(new_model);
+            if (~new_model.ac.cached), fprintf('\n'); end;
+
+            % Save
+            models(zz,ii) = new_model;
         end;  %zz
     end;
 

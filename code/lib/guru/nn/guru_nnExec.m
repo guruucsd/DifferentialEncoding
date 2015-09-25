@@ -37,7 +37,7 @@ function [oact, err, huact] = guru_nnExec(model,X,Y)
 
   % Multiple loops
   else
-    if isfield(model, 'debug') && ismember(11,model.debug)
+    if isfield(model, 'debug') && ismember(11,model.debug) && model.ts > 1
       fprintf('Running %d re-entrant loops of model\n', model.ts);
     end;
 
