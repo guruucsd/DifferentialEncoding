@@ -42,7 +42,7 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
         end;
 
         % Make sure what comes out is the MVP (minimum viable product)
-        all_required_props = {'X', 'nInput'};
+        all_required_props = {'X', 'XLAB', 'nInput'};
         if ~isempty(taskType), all_required_props{end+1} = 'T'; end;            
         for prop_name=all_required_props
             guru_assert(isfield(train, prop_name{1}), ...
@@ -122,11 +122,8 @@ function dset = de_StimApplyTransform(dset, opts)
     if guru_hasopt(opts, 'img2pol')
         %de_visualizeData(dset);
 
-        dset.X = de_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
+        dset.X = guru_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'));
         %de_visualizeData(dset); % just for now
-
-        %junk = dset; junk.X = de_pol2img(dset.X, guru_getopt(opts, 'location', 'CVF'), dset.nInput);
-        %de_visualizeData(junk); % just for now
     end;
 
     if guru_hasopt(opts, 'contrast')

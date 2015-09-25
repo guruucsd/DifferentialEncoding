@@ -7,5 +7,5 @@ nohup.out
 /results*
 *.log
 *.out
-plots/
+*.png
 .DS_STORE

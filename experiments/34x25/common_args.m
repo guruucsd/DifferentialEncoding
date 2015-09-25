@@ -4,7 +4,7 @@ function [cargs, opts] = common_args(varargin)
   dbstop if error
   dbstop if warning
   more off
-  
+
   % Add absolute path to the 'code' directory
   if (exist('de_GetBaseDir')~=2)
     curpath = 'code';
@@ -17,7 +17,7 @@ function [cargs, opts] = common_args(varargin)
     end;
   end;
 
-  opts = {'small', 'logpolar'};
+  opts = {'small'};
 
   cargs = {  'parallel', false, 'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...

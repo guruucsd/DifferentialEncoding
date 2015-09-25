@@ -9,7 +9,7 @@ function [cargs, opts] = common_args(varargin)
     rmpath (genpath(fullfile('..','..', 'code')));
   end;
 
-  opts = {'standard', 'logpolar'};
+  opts = {'standard'};
 
   cargs = {  'parallel', false, 'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...
