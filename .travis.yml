@@ -7,6 +7,9 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-4.8
   - export CXX="g++-4.8"
+  - export OLD_CXX=`which g++`
+  - sudo rm -f "$OLD_CXX"
+  - sudo ln -s "`which g++`" "$OLD_CXX"
   - sudo add-apt-repository ppa:octave/stable -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq octave liboctave-dev
