@@ -22,4 +22,5 @@ install:
   - octave --no-gui --eval "pkg install statistics-1.2.4.tar.gz"
 
 script: 
+  - cd experiments/34x25/sergent_1982
   - octave --no-gui --eval "pkg load image; uber_sergent_sergent"
