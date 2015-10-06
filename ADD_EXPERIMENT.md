@@ -32,7 +32,7 @@ There are two tasks:
 ##### To model this, there are three steps:
 
 1. Create "datasets" that define the inputs (stimuli) and expected outputs (task) for all 4 experiments.
-2. Create experiment-specific analysis & plotting code.
+2. (optional) Create experiment-specific analysis & plotting code.
 3. Create "experiment" files that train the models, run them through the analyses, and save the results.
 4. Gather data from across all four experiments, and write analyses / scripts to compare/contrast results.
 
@@ -55,11 +55,15 @@ There are two tasks:
 4. In the code, write functions to create the stimuli of each type, the expected outputs for each stimulus (based on the task), and assign to the objects as above.
 
 
-#### 2. Add analysis code.
+#### 2. (optional) Add analysis code.
 
-1. Add file `code/_expts/okubo_michimata_2002/de_Analyze.m` (copy from `code/_expts/vanhateren/de_Analyze.m`).
+1. Add file `code/_expts/okubo_michimata_2002/de_Analyzer.m` (copy from `code/_expts/vanhateren/de_Analyze.m`).
+* `function [stats, figs]  = de_Analyzer(mSets, mss)`
+  * `mSets` - struct containing model settings applied to each model run (many instances are trained and averaged)
+  * `mss` - cell matrix containing each model run, including: model settings, model connection and weights, etc.
+  * `stats` - struct containing statistical analyses that were run (as requested in the experiment file below)
+  * `figs` - struct containing figure handles for plots generated (as requested in the experiment file below)
 2. Add any specific code into that file (or call functions from there).
-
 
 
 #### 3. Create "experiment" files to train models.
