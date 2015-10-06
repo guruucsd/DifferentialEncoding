@@ -28,14 +28,19 @@ Sound easy? Let's do it.
 
 #### 1. Define the task data.
 
-1a. Create a file `code/_expts/okubo_michimata_2002/de_StimCreate.m` (copy from the `sergent_1982` directory for the proper header)
+1a. Create a file `code/_expts/okubo_michimata_2002/de_StimCreate.m` (copy from the `sergent_1982` directory for the proper function declaration)
 
 When you run the experiment later, you'll pass `okubo_michimata_2002` as your experiment ID. The code will know to call `de_StimCreate` from that directory.
 
 1b. For each stimulus type (`dots` and `dots-cb` for the two image types defined in their Figure 1) and task (`categorical` and `coordinate`)
 Define your input images (in code, or elsewhere and simply load in code) and corresponding task outputs.
 
-1c. Return all data in the documented variables (train, test, aux)
+1c. Return all data in the documented variables (train, test)
+* `train.X` - [pixels x examples] e.g. 850x16
+* `train.XLAB` - [1 x examples] a text label for each image (used for display or filtering purposes)
+* `train.T` - [n_outputs x examples] expected outputs based on the task
+* `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
+
 
 
 #### 2. Make scripts to run.
