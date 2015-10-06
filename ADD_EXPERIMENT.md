@@ -7,7 +7,7 @@ This file outlines how to add a new experiment to the codebase.
 
 Let's say you'd like to model the Okubo & Michimata (2002). 
 
-Stimuli:
+##### Stimuli:
 Subjects are shown five dots, all in a horizontal row, and then two dots
 either above or below. The dots can be monochrome (white), or
 "contrast balanced"--surrounded by a think black outline that removes
@@ -16,18 +16,21 @@ low spatial frequency information.
 A second line of two dots appears either above or below the line
 of five dots, at variable distances.
 
-Task:
+##### Task:
 There are two tasks:
+
 1. Categorical: subjects respond whether the line of two dots is "above" or "below" the line of five dots.
 2. Coordinate: subjects respond whether the line of two dots is "near" or "far" from the line of five dots.
 
-So to summarize, there are 4 experiments:
+##### So to summarize, there are 4 experiments:
+
 1. monochrome dots, categorical task
 2. contrast-balanced dots, coordinate task.
 3. monochrome dots, categorical task
 4. contrast-balanced dots, coordinate task.
 
-To model this, there are three steps:
+##### To model this, there are three steps:
+
 1. Create "datasets" that define the inputs (stimuli) and expected outputs (task) for all 4 experiments.
 2. Create experiment-specific analysis & plotting code.
 3. Create "experiment" files that train the models, run them through the analyses, and save the results.
@@ -38,19 +41,16 @@ To model this, there are three steps:
 
 1. Create a directory for experiment-specific code: `code/_expts/okubo_michimata_2002/`
 2. In that directory, create a `de_StimCreate.m` file.
-3. Add the required function header:
-```matlab
-function [train,test] = de_StimCreate(stimSet, taskType, opt)
-```
-    * `stimSet` - string specifying which stimulus set to create inputs for (let's say, 'dots' or 'dots-cb')
-    * `taskType` - string specifying which task to create expected outputs for (let's say, 'categorical' or 'coordinate')
-    * `opts` - cell array containing experiment-specific options. Could be the distances between dots, or some other optional metric.
-    * `train`, `test` - structures containing data and metadata for the stimuli/task experiment combo:
-        * `train.X` - [pixels x examples (e.g. 850x16)] - input images
-        * `train.XLAB` - [1 x examples] a text label for each image (used for display or filtering purposes)
-        * `train.T` - [n_outputs x examples] expected outputs based on the task
-        * `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
-        * any other metadata that you'd like to have for your analysis code.
+3. Add the required function header: `function [train,test] = de_StimCreate(stimSet, taskType, opt)`
+   * `stimSet` - string specifying which stimulus set to create inputs for (let's say, 'dots' or 'dots-cb')
+   * `taskType` - string specifying which task to create expected outputs for (let's say, 'categorical' or 'coordinate')
+   * `opts` - cell array containing experiment-specific options. Could be the distances between dots, or some other optional metric.
+   * `train`, `test` - structures containing data and metadata for the stimuli/task experiment combo:
+      * `train.X` - [pixels x examples (e.g. 850x16)] - input images
+      * `train.XLAB` - [1 x examples] a text label for each image (used for display or filtering purposes)
+      * `train.T` - [n_outputs x examples] expected outputs based on the task
+      * `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
+     * any other metadata that you'd like to have for your analysis code.
 
 4. In the code, write functions to create the stimuli of each type, the expected outputs for each stimulus (based on the task), and assign to the objects as above.
 
