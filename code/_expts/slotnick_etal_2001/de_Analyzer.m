@@ -1,4 +1,4 @@
-function [stats, figs]  = de_AnalyzerSF(mSets, mss)
+function [stats, figs]  = de_AnalyzerCC(mSets, mss)
 %function [stats, figs]  = de_AnalyzerSF(mSets, mss)
 %
 % Trains a differential encoder under the model and training parameters specified
@@ -14,7 +14,7 @@ function [stats, figs]  = de_AnalyzerSF(mSets, mss)
 %  [stats.raw.r] = de_FindRejectionsRF(mss, mSets.rej, stats.raw, stats.raw.r);
   [mss]        = de_DoRejections(mss, stats.raw.r);
 
-  % Do SF-specific stats & figs
+  % Do CC-specific stats & figs
   [stats.rej.sf] = de_StaticizerCC(mSets, mss, stats);
   [figs]         = [figs de_FigurizerCC(mSets, mss, stats) ];
 
