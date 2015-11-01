@@ -4,7 +4,8 @@ function [args,opts] = uber_slotnick_args(varargin)
 %   http://www.willamette.edu/~gorr/classes/cs449/classify.html
 
   % Get shared args
-  addpath('..');
+  fparts = fileparts(which(mfilename));
+  addpath(fullfile(fparts, '..'));
   [args,opts] = uber_args( ... %Network structure
                   'ac.AvgError', 2E-4, ...
                   'errorType', 2,... % cross-entropy
