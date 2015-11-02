@@ -15,7 +15,7 @@ function [stats, figs]  = de_AnalyzerCC(mSets, mss)
   [mss]        = de_DoRejections(mss, stats.raw.r);
 
   % Do CC-specific stats & figs
-  [stats.rej.sf] = de_StaticizerCC(mSets, mss, stats);
+  [stats.rej.cc] = de_StaticizerCC(mSets, mss, stats);
   [figs]         = [figs de_FigurizerCC(mSets, mss, stats) ];
 
 
