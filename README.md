@@ -1,6 +1,8 @@
 Differential Encoding model
 ====================
 
+[![Join the chat at https://gitter.im/guruucsd/DifferentialEncoding](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/guruucsd/DifferentialEncoding?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Journal publications:
 
     Hsiao, Janet H., Cipollini, Ben, and Cottrell, Garrison W. (2013) Hemispheric asymmetry in perception: A differential encoding account. Journal of Cognitive Neuroscience 25(7):998-1007.
