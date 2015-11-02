@@ -1,10 +1,8 @@
+function figs = de_FigurizerCC(mSets, mss, stats)
 %% Still needed:
 % 1) Make the plots prettier.
 % 2) Implement code that generalizes based on the task (blob/dot vs paired
 % squares etc)
-
-
-function figs = de_FigurizerCC(mSets, mss, stats)
 
 ds = 'test';
 
@@ -21,7 +19,7 @@ if strcmp(mSets.data.taskType, 'categorical')
     
     left_stddev = std(left_results(:)');
     right_stddev = std(right_results(:)');
-    fig = createfigure([left_average right_average], [left_stddev right_stddev], 'Categorical');
+    fig = de_CreateSlotnickFigure1([left_average right_average], [left_stddev right_stddev], 'Categorical');
     figs = [fig];
 
 elseif strcmp(mSets.data.taskType, 'coordinate') 
@@ -34,7 +32,7 @@ elseif strcmp(mSets.data.taskType, 'coordinate')
     
     left_stddev = std(left_results(:)');
     right_stddev = std(right_results(:)');
-    fig = createfigure([left_average right_average], [left_stddev right_stddev], 'Coordinate');
+    fig = de_CreateSlotnickFigure1([left_average right_average], [left_stddev right_stddev], 'Coordinate');
     figs = [fig];
 
 else
