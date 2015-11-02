@@ -41,9 +41,6 @@ for ii=1:5
         train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
         counter = counter + 1;
         train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
-        subplot(4, 5, counter);
-        imshow(img);
-        title(train.XLAB{counter});
         heights = [heights, distances(ij)];
     end
 end
@@ -55,9 +52,6 @@ for ii=1:5
         counter = counter + 1;
         img = blob_stimuli(distances(ij), 3, ii);
         train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
-        subplot(4, 5, counter);
-        imshow(img);
-        title(train.XLAB{counter});
         train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
         heights = [heights, distances(ij)];
     end
