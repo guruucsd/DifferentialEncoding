@@ -28,7 +28,7 @@ function [pals] = de_StatsFFTs(stats)
 
             dta = abs(dta - repmat( stats.orig.power1D.mean{1}(si,1,fi), [nModels 2] ));
 
-            [pals.an1D(si,fi)] =anova1( dta, {'rh','lh'}, 'off');
+            [pals.an1D(si,fi)] =anovaSRV( dta, {'rh','lh'}, 'off');
         end;
     end;
 
@@ -47,7 +47,7 @@ function [pals] = de_StatsFFTs(stats)
               dta = [reshape(pwrRH(1:nInst,1:nImages,yi,xi), [nInst*nImages 1]) ...
                      reshape(pwrLH(1:nInst,1:nImages,yi,xi), [nInst*nImages 1])];
 
-              [pals.an2D(yi,xi)] = anova1(dta,{'rh','lh'},'off');
+              [pals.an2D(yi,xi)] = anovaSRV(dta,{'rh','lh'},'off');
           end;
       end;
     end;

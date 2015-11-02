@@ -30,5 +30,6 @@ This code base contains code for running 3 major types of simulations; further d
 This code runs under octave, with the following setup steps:
 
 1. Download and install Octave.
-2. Install and import the following packages: `general`, `control`, `image`, 
-3. Set `more off` to make sure you get timely outputs :)
+2. Install and import the following packages: `image`, `io`, `statistics` 
+3. Set `more off` to make sure you get timely outputs.
+
