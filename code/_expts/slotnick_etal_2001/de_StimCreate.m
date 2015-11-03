@@ -19,8 +19,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 if (~exist('opt','var')),      opt      = {};     end;
 if (~iscell(opt)),             opt      = {opt};  end;
 
-if (~exist('stimSet', 'var')), stimSet  = 'de';   end;
-
 % Create the input images.
 train.nInput = [68 50];
 train.X = zeros(prod(train.nInput), 0);
@@ -29,8 +27,8 @@ train.TLAB = cell(20, 1);
 %train.XLAB = guru_csprintf('height=%.2f', num2cell(heights);
 counter = 0;
 heights = [];
-if (~strcmp(stimSet, 'de')) %default set of images
-    error('Invalid stimulus type. Choose one from: {''de''}');
+if (~strcmp(stimSet, 'blob-dot')) %default set of images
+    error('Invalid stimulus type. Choose one from: {''blob-dot''}');
 end
 figure('Position', [0, 0, 1024, 800]);
 % first, 10 "far" images
