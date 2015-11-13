@@ -1,4 +1,4 @@
-function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskType)
+function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskType, rons)
 % de_CreateSlotnickFigure1(Y1, E1)
 %  Y1:  errorbar y
 %  E1:  errorbar e
@@ -24,4 +24,4 @@ box(axes1,'on');
 set(axes1,'XTick',[1 2],'XTickLabel',{'LH','RH'});
 
 ylabel('Percent error');
-title(sprintf('%s Stimuli: Blob Dot', taskType)); 
+title(sprintf('%s Stimuli: Blob Dot (n=%d)', taskType, rons)); 
