@@ -7,6 +7,7 @@ function [args,opts] = uber_slotnick_args(varargin)
   fparts = fileparts(which(mfilename));
   addpath(fullfile(fparts, '..'));
   [args,opts] = uber_args( ... %Network structure
+                  'sigma', [2 20], ...
                   'ac.AvgError', 2E-4, ...
                   'errorType', 2,... % cross-entropy
                   'p.errorType', 2,... % cross-entropy
