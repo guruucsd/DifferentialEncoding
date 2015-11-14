@@ -1,3 +1,5 @@
+% See Slotnick, et al. 2001: Figure 2 for comparison.
+
 function [ms,ss] = slotnick_interaction_analysis(tst_cate, tst_coor)
 
   % Reconstitute into expected format

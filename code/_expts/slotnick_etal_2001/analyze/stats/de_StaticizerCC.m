@@ -13,7 +13,7 @@ for ti=1:2
         o    = [p.output];
         
         tmp   = de_calcPErr( vertcat(o.(ds)), mSets.data.test.T, 2);
-        %goodTrials = ~isnan(sum(mSets.data.(ds).T,1)); % only grab trials where
+        
         if (strcmp(mSets.data.taskType, 'categorical'))
             trial_types = {'on', 'off'};
         else
@@ -43,35 +43,32 @@ for ti=1:2
     % Can't do stats with a single sigma
     if (length(stats.perf.(ds))<2),  return; end;
     
-    % Choose two sigmas to compare
+    % Use the first and last sigmas as the two to compare
     perf = stats.perf.(ds)([1 end]);
     
     
     
-    % First, test for main interaction of S1=2Freqs vs S2=3Freqs
+    % First, test for main interaction of on/near vs. off/far
     
-    % Vector of all dependent measures: cell 1 is S1 responses, 2 is S2; average over all instances of each stim class
-    Y   = [ mean(perf{1}{1},2); mean(perf{2}{1},2); ...
+    % Vector of all dependent measures:
+    % cell 1 is on/near responses, 2 is off/far; average over all instances of each stim class
+    Y = [ mean(perf{1}{1},2); mean(perf{2}{1},2); ...
         mean(perf{1}{2},2); mean(perf{2}{2},2) ];
     
     % Subject names: "RH-and-model instance number" and "LH-and-model-instance-number"
-    S   = horzcat( guru_csprintf('RH%d', num2cell(1:size(perf{1}{1},1))), ...
+    S = horzcat( guru_csprintf('RH%d', num2cell(1:size(perf{1}{1},1))), ...
         guru_csprintf('LH%d', num2cell(1:size(perf{2}{1},1))), ...
         guru_csprintf('RH%d', num2cell(1:size(perf{1}{2},1))), ...
         guru_csprintf('LH%d', num2cell(1:size(perf{2}{2},1))) ...
         )';
     
-    
-    
-    % First, test for main interaction of on off
-    
     % Factor 1: Hemisphere
-    F1  = [ repmat({'RH'},   [size(perf{1}{1},1) 1]); repmat({'LH'},   [size(perf{2}{1},1) 1]); ...
-        repmat({'RH'},   [size(perf{1}{2},1) 1]); repmat({'LH'},   [size(perf{2}{2},1) 1]) ];
+    F1 = [ repmat({'RH'},   [size(perf{1}{1},1) 1]); repmat({'LH'},   [size(perf{2}{1},1) 1]); ...
+         repmat({'RH'},   [size(perf{1}{2},1) 1]); repmat({'LH'},   [size(perf{2}{2},1) 1]) ];
     
     % Factor 2: On/off or Near/far
-    F2  = [ repmat({trial_types{1}}, [size(perf{1}{1},1) 1]); repmat({trial_types{1}}, [size(perf{2}{1},1) 1]); ...
-        repmat({trial_types{2}}, [size(perf{1}{2},1) 1]); repmat({trial_types{2}}, [size(perf{2}{2},1) 1]) ];
+    F2 = [ repmat({trial_types{1}}, [size(perf{1}{1},1) 1]); repmat({trial_types{1}}, [size(perf{2}{1},1) 1]); ...
+         repmat({trial_types{2}}, [size(perf{1}{2},1) 1]); repmat({trial_types{2}}, [size(perf{2}{2},1) 1]) ];
     
     % Convert all above labels to numeric
     [~,~,S_n] = unique(S);
@@ -88,16 +85,18 @@ for ti=1:2
     stats.anova.(ds).Fnames = {'hemi', 'trial type'};
     
     % repeated-measures anova:
-    % we h
     stats.anova.(ds).stats = mfe_anova_rm( stats.anova.(ds).Y, ...
         stats.anova.(ds).S_n, ...
         stats.anova.(ds).F1_n, ...
         stats.anova.(ds).F2_n, ...
         stats.anova.(ds).Fnames );
     
-    % For the Christman task, we care to see if:
-    %   2-component task is easier than 3-component task
-    %   if there is an interaction between the hemispheres and stimulus type
+    % For the Slotnick tasks, we care to see if:
+    %   If there is an interaction between the hemispheres and stimulus
+    %   type, i.e. cat/coord (done in group analysis)
+    %   To a lesser extent: if on/near and off/far interact with
+    %   hemispheres (done here)
+    
     stats.anova.(ds).stats([1 1+find(strcmp(stats.anova.(ds).Fnames,'trial type')) 4], :)
     
     
