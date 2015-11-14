@@ -15,7 +15,7 @@ function [te, pval] = de_StatsTrainErrorP(models)
   for s=1:length(models)
       if isempty(models{s}), continue; end;
       p  = [models{s}.p];
-      te{s}  = [p.trainingError]';
+      te{s}  = [p.trainingError]';  % '
   end;
 
 
@@ -29,5 +29,5 @@ function [te, pval] = de_StatsTrainErrorP(models)
       tmp = guru_csprintf('%i', num2cell(repmat(i,size(te{i}))));
       g = [g tmp];
     end;
-    [pval] = anova1(x,g', 'off');
+    [pval] = anovaSRV(x,g', 'off');  % '
   end;

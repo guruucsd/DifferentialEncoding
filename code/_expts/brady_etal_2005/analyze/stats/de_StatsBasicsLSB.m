@@ -93,7 +93,7 @@ function stats = de_StatsBasicsSF(mSets, mss, verbose)
 
       % repeated-measures anova
 %      mfe_anova_rm(Y, S_n, F1_n, F2_n, {'hemi', 'response(y/n)'})
-      [stats.anova.(dset).p, stats.anova.(dset).table] = anova1(Y,F1, 'off');
+      [stats.anova.(dset).p, stats.anova.(dset).table] = anovaSRV(Y,F1, 'off');
 
       fprintf('anova for [%s]:\n', dset);
       stats.anova.(dset).table

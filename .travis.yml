@@ -1,0 +1,26 @@
+# travis-ci does not have first-class support for octave
+language: cpp
+compiler: g++
+
+install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-4.8
+  - export CXX="g++-4.8"
+  - export OLD_CXX=`which g++`
+  - sudo rm -f "$OLD_CXX"
+  - sudo ln -s `which g++-4.8` "$OLD_CXX"
+  - sudo add-apt-repository ppa:octave/stable -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq octave liboctave-dev
+  - sudo apt-get install -qq epstool transfig
+  - wget http://downloads.sourceforge.net/project/octave/Octave%20Forge%20Packages/Individual%20Package%20Releases/image-2.4.1.tar.gz
+  - octave --no-gui --eval "pkg install image-2.4.1.tar.gz"
+  - wget http://downloads.sourceforge.net/project/octave/Octave%20Forge%20Packages/Individual%20Package%20Releases/io-2.2.9.tar.gz
+  - octave --no-gui --eval "pkg install io-2.2.9.tar.gz"
+  - wget http://downloads.sourceforge.net/project/octave/Octave%20Forge%20Packages/Individual%20Package%20Releases/statistics-1.2.4.tar.gz
+  - octave --no-gui --eval "pkg install statistics-1.2.4.tar.gz"
+
+script: 
+  - cd experiments/34x25/sergent_1982
+  - octave --no-gui --eval "pkg load image; uber_sergent_sergent"

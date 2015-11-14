@@ -19,13 +19,13 @@ function outdir = de_GetOutPath(model, dirType)
         outdir = de_GetBaseDir();
 
     case {'cache'},
-        outdir = fullfile('~', '_cache', 'de');
+        outdir = fullfile(mfe_getuserdir(), '_cache', 'de');
 
     case {'data'},
         outdir = fullfile(de_GetOutPath(model,'cache'), 'data');
 
     case {'datasets'}
-        outdir = fullfile('~', 'datasets');
+        outdir = fullfile(mfe_getuserdir(), 'datasets');
 
     % Connections are stored to a directory based ONLY on its own properties,
     %   NOTHING about how it will be used after the pruned connections are established
@@ -188,7 +188,7 @@ function outdir = de_GetOutPath(model, dirType)
             error('Unknown type: %s', dirType);
   end;
 
-  if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr('~', outdir))
+  if (~guru_findstr(de_GetBaseDir(), outdir) && ~guru_findstr(mfe_getuserdir(), outdir))
     outdir = fullfile(de_GetBaseDir(), outdir);
   end;
 
