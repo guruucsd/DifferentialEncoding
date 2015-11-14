@@ -11,18 +11,18 @@ for dsi=1:length(dss)
     cate = ss.cate.rej.cc;
     coord = ss.coor.rej.cc;
     % Find # instances to use
-    nInstF = [ size(cate.perf.(ds){1},1), ...
+    nInstCate = [ size(cate.perf.(ds){1},1), ...
         size(cate.perf.(ds){end},1) ];
-    nInstT = [ size(coord.perf.(ds){1},1), ...
+    nInstCoord = [ size(coord.perf.(ds){1},1), ...
         size(coord.perf.(ds){end},1) ];
-    nInst  = min([nInstF nInstT]);
+    nInst  = min([nInstCate nInstCoord]);
     
     % Extract indices of data for expt 1
-    idxCat_old = mod(cate.anova.(ds).S_n-1, max(nInstF))+1;
+    idxCat_old = mod(cate.anova.(ds).S_n-1, max(nInstCate))+1;
     idxCat_cur = (idxCat_old <= nInst);
     
     % Extract indices of data for expt 2
-    idxCoor_old = mod(coord.anova.(ds).S_n-1, max(nInstT))+1;
+    idxCoor_old = mod(coord.anova.(ds).S_n-1, max(nInstCoord))+1;
     idxCoor_cur = (idxCoor_old <= nInst);
     
     %%%%%%%%
@@ -36,8 +36,8 @@ for dsi=1:length(dss)
     %   rows 1:N    = RH
     %   rows N+1:2N = LH
     %
-    % Col 1: freq task
-    % Col 2: type task
+    % Col 1: Cat task
+    % Col 2: Coor task
     %%%%%%%%
     
     % Get indices of hemispheres
@@ -45,8 +45,8 @@ for dsi=1:length(dss)
     hemiCoor = coord.anova.(ds).F1_n(idxCoor_cur);
     
     % Sort into LH and RH
-    [hemi_srtF, srtidxCat] = sort(hemiCat);
-    [hemi_srtT, srtidxCoor] = sort(hemiCoor);
+    [~, srtidxCat] = sort(hemiCat);
+    [~, srtidxCoor] = sort(hemiCoor);
     
     % Select data
     XCAT = cate.anova.(ds).Y(idxCat_cur);
@@ -58,6 +58,7 @@ for dsi=1:length(dss)
     
     % Cobble together data matrix
     nRepeats = nInst*2; % factor of 2 is because there are 2 conditions per expt
+    % (nRepeats left in to match the Kitterle base file )
     X = [ XCAT_srt(1:nRepeats)       XCOOR_srt(1:nRepeats);
         XCAT_srt((nRepeats+1):end) XCOOR_srt((nRepeats+1):end) ];
     
@@ -65,7 +66,7 @@ for dsi=1:length(dss)
     % Run the stats
     stats.anova.(ds).X = X;
     stats.anova.(ds).nRepeats = nRepeats;
-    [p,t,s] = anova2(stats.anova.(ds).X, stats.anova.(ds).nRepeats);
+    [~,t,s] = anova2(stats.anova.(ds).X, stats.anova.(ds).nRepeats);
     
     % Add labels
     t{2,1} = 'hemi'; % rows label
