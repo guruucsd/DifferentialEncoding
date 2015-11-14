@@ -49,24 +49,24 @@ for dsi=1:length(dss)
     [~, srtidxCoor] = sort(hemiCoor);
     
     % Select data
-    XCAT = cate.anova.(ds).Y(idxCat_cur);
-    XCOOR = coord.anova.(ds).Y(idxCoor_cur);
+    YCAT = cate.anova.(ds).Y(idxCat_cur);
+    YCOOR = coord.anova.(ds).Y(idxCoor_cur);
     
     % Sort by hemispheres
-    XCAT_srt = XCAT(srtidxCat);
-    XCOOR_srt = XCOOR(srtidxCoor);
+    YCAT_srt = YCAT(srtidxCat);
+    YCOOR_srt = YCOOR(srtidxCoor);
     
     % Cobble together data matrix
     nRepeats = nInst*2; % factor of 2 is because there are 2 conditions per expt
     % (nRepeats left in to match the Kitterle base file )
-    X = [ XCAT_srt(1:nRepeats)       XCOOR_srt(1:nRepeats);
-        XCAT_srt((nRepeats+1):end) XCOOR_srt((nRepeats+1):end) ];
+    Y = [ YCAT_srt(1:nRepeats)       YCOOR_srt(1:nRepeats);
+          YCAT_srt((nRepeats+1):end) YCOOR_srt((nRepeats+1):end) ];
     
     
     % Run the stats
-    stats.anova.(ds).X = X;
+    stats.anova.(ds).Y = Y;
     stats.anova.(ds).nRepeats = nRepeats;
-    [~,t,s] = anova2(stats.anova.(ds).X, stats.anova.(ds).nRepeats);
+    [~,t,s] = anova2(stats.anova.(ds).Y, stats.anova.(ds).nRepeats);
     
     % Add labels
     t{2,1} = 'hemi'; % rows label

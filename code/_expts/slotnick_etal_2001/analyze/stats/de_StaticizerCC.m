@@ -41,7 +41,7 @@ for ti=1:2
     %%%%%%%%%%%%%%%%%%
     
     % Can't do stats with a single sigma
-    if (length(stats.perf.(ds))<2),  return; end;
+    if (length(stats.perf.(ds)) < 2),  return; end;
     
     % Use the first and last sigmas as the two to compare
     perf = stats.perf.(ds)([1 end]);
@@ -53,7 +53,7 @@ for ti=1:2
     % Vector of all dependent measures:
     % cell 1 is on/near responses, 2 is off/far; average over all instances of each stim class
     Y = [ mean(perf{1}{1},2); mean(perf{2}{1},2); ...
-        mean(perf{1}{2},2); mean(perf{2}{2},2) ];
+          mean(perf{1}{2},2); mean(perf{2}{2},2) ];
     
     % Subject names: "RH-and-model instance number" and "LH-and-model-instance-number"
     S = horzcat( guru_csprintf('RH%d', num2cell(1:size(perf{1}{1},1))), ...
