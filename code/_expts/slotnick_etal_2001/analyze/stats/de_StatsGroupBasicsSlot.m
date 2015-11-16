@@ -11,19 +11,20 @@ for dsi=1:length(dss)
     cate = ss.cate.rej.cc;
     coord = ss.coor.rej.cc;
     % Find # instances to use
-    nInstCate = [ size(cate.perf.(ds){1},1), ...
-        size(cate.perf.(ds){end},1) ];
-    nInstCoord = [ size(coord.perf.(ds){1},1), ...
-        size(coord.perf.(ds){end},1) ];
+    nInstCate = [ size(cate.perf.(ds){1}{1},1), ...
+        size(cate.perf.(ds){end}{1},1) ];
+    nInstCoord = [ size(coord.perf.(ds){1}{1},1), ...
+        size(coord.perf.(ds){end}{1},1) ];
     nInst  = min([nInstCate nInstCoord]);
     
     % Extract indices of data for expt 1
-    idxCat_old = mod(cate.anova.(ds).S_n-1, max(nInstCate))+1;
-    idxCat_cur = (idxCat_old <= nInst);
+    index_range_cat = [1:nInst, nInstCate(1)+[1:nInst]]; %range of models #s to keep
+    [~,index_cat] = intersect(cate.anova.(ds).S_n, index_range_cat); %get the indices of those models
     
     % Extract indices of data for expt 2
-    idxCoor_old = mod(coord.anova.(ds).S_n-1, max(nInstCoord))+1;
-    idxCoor_cur = (idxCoor_old <= nInst);
+    index_range_coord = [1:nInst, nInstCoord(1)+[1:nInst]];
+    [~,index_coor] = intersect(coord.anova.(ds).S_n, index_range_coord);
+
     
     %%%%%%%%
     % Select out data and construct data table
@@ -41,38 +42,42 @@ for dsi=1:length(dss)
     %%%%%%%%
     
     % Get indices of hemispheres
-    hemiCat = cate.anova.(ds).F1_n(idxCat_cur);
-    hemiCoor = coord.anova.(ds).F1_n(idxCoor_cur);
+    hemiCat = cate.anova.(ds).F1_n(index_cat);
+    hemiCoor = coord.anova.(ds).F1_n(index_coor);
     
     % Sort into LH and RH
     [~, srtidxCat] = sort(hemiCat);
     [~, srtidxCoor] = sort(hemiCoor);
     
     % Select data
-    YCAT = cate.anova.(ds).Y(idxCat_cur);
-    YCOOR = coord.anova.(ds).Y(idxCoor_cur);
+    YCAT = cate.anova.(ds).Y(index_cat, :);
+    YCAT = mean(YCAT, 2); %average over trial type
+    YCOOR = coord.anova.(ds).Y(index_coor, :);
+    YCOOR = mean (YCOOR, 2); %average over trial type
     
     % Sort by hemispheres
     YCAT_srt = YCAT(srtidxCat);
     YCOOR_srt = YCOOR(srtidxCoor);
     
     % Cobble together data matrix
-    nRepeats = nInst*2; % factor of 2 is because there are 2 conditions per expt
-    % (nRepeats left in to match the Kitterle base file )
-    Y = [ YCAT_srt(1:nRepeats)       YCOOR_srt(1:nRepeats);
-          YCAT_srt((nRepeats+1):end) YCOOR_srt((nRepeats+1):end) ];
+    Y = [ YCAT_srt(1:nInst);       YCOOR_srt(1:nInst);
+          YCAT_srt((nInst+1):end); YCOOR_srt((nInst+1):end) ];
     
-    
+    hemis = [ones(nInst*2, 1); 2*ones(nInst*2, 1)]; 
+    trial_types = [ones(nInst, 1); 2*ones(nInst,1); ones(nInst, 1); 2*ones(nInst,1)];
+      
     % Run the stats
     stats.anova.(ds).Y = Y;
-    stats.anova.(ds).nRepeats = nRepeats;
-    [~,t,s] = anova2(stats.anova.(ds).Y, stats.anova.(ds).nRepeats);
+    stats.anova.(ds).hemis = hemis;
+    stats.anova.(ds).trial_types = trial_types;
+    [~,t,s,~] = anovan(Y, {hemis, trial_types}, 'display', 'off', 'model', 'full');
     
     % Add labels
     t{2,1} = 'hemi'; % rows label
     t{3,1} = 'task'; % cols label
     t{4,1} = [t{2,1} ' x ' t{3,1}]; % interaction label
     
+    t = t(:, [1:3, 5:end]); % remove column for "Singular?"
     % Save off the results
     stats.anova.(ds).table = t;
     stats.anova.(ds).stats = s;
