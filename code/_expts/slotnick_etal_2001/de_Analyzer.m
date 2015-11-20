@@ -1,5 +1,5 @@
 function [stats, figs]  = de_AnalyzerCC(mSets, mss)
-%function [stats, figs]  = de_AnalyzerSF(mSets, mss)
+%function [stats, figs]  = de_AnalyzerCC(mSets, mss)
 %
 % Trains a differential encoder under the model and training parameters specified
 %
