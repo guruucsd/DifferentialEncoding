@@ -10,5 +10,5 @@ function [ms,ss] = slotnick_interaction_analysis(tst_cate, tst_coor)
   mSets   = tst_cate.mSets;
 
   ss.group = de_StatsGroupBasicsSlot( mSets, ms, ss );
-
+  de_PlotGroupBasicsSlot(ms, ss);
 end
