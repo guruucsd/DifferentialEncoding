@@ -1,4 +1,4 @@
-function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, rons, ax, yrng)
+function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, rons, ax)
 % de_CreateSlotnickFigure1(Y1, E1)
 %  Y1:  errorbar y
 %  E1:  errorbar e
@@ -7,7 +7,7 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, rons, ax, yrng)
 if ~exist('ax', 'var')
     % Create figure
     figure1 = de_NewFig(sprintf('blobdot_%s', lower(taskTitle)));
-    ax = gca();
+    ax = gca(); % make current figure the axis if not passed in.
 end
 
 % Create errorbar
@@ -20,12 +20,6 @@ box(ax, 'on');
 
 % Set the remaining axes properties
 set(ax, 'XTick', [1 2], 'XTickLabel', {'LH', 'RH'});
-if exist('yrng', 'var')
-    avg = mean(Y1);
-    minimum = avg - 2*yrng; % Only need yrng/2 for full range, but 2* yrng for room for error bar
-    maximum = avg + 2*yrng;
-    ylim([minimum, maximum])
-end
 ylabel(ax, 'Percent error');
 title(ax, sprintf('%s Stimuli: Blob Dot (n=%d)', taskTitle, rons)); 
 
