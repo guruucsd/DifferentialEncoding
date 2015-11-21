@@ -10,8 +10,7 @@ taskTitle = guru_capitalizeStr(mSets.data.taskType);
 
 left = stats.rej.cc.perf.(ds){1};
 right = stats.rej.cc.perf.(ds){end};
-rons = min(length(left), length(right));
-
+rons = mSets.runs;
 % these results are for on/near
 left_results1 = left{1};
 right_results1 = right{1};
