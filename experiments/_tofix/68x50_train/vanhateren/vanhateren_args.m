@@ -7,7 +7,7 @@ function [args,c_freqs,k_freqs,sz] = uber_args(varargin)
   addpath(fullfile(script_dir, '..'));  
 
   [cargs,opts] = common_args();
-  rmpath('..');
+    rmpath(script_dir);  % clean paths for running other experimental scripts.
   
   
   sz = [34 25];

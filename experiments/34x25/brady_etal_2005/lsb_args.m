@@ -7,7 +7,7 @@ function [args, opts] = lsb_args(varargin)
   addpath(fullfile(script_dir, '..'));  
 
   [cargs, opts] = common_args();
-  rmpath('..');
+    rmpath(script_dir);  % clean paths for running other experimental scripts.
 
 
   args = de_ArgsInit ( cargs{:}, ... %Network structure

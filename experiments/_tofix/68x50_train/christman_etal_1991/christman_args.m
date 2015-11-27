@@ -7,7 +7,7 @@ function [args, opts] = christman_args(varargin)
   addpath(fullfile(script_dir, '..'));  
 
   [cargs, opts] = common_args();
-  rmpath('..');
+    rmpath(script_dir);  % clean paths for running other experimental scripts.
 
   %freqs = [0.06 0.12 0.18 0.24 0.32]
 %
