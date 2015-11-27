@@ -2,7 +2,9 @@ function [args,c_freqs,k_freqs,sz] = uber_args(varargin)
 %
 %  Final shared settings for 2YP runs
 
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs,sz] = common_args();
   rmpath('..');
     

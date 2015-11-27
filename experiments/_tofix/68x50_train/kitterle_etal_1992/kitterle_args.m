@@ -2,7 +2,9 @@ function [args,opts] = kitterle_args(varargin)
 %
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs,opts] = common_args();
   rmpath('..');
 

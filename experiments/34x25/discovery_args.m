@@ -2,7 +2,9 @@ function [cargs, opts] = discovery_args(varargin)
 % These args are for exploring the parameter space.
 
   % Add absolute path to code
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs, opts] = common_args();
   rmpath('..');
 

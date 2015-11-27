@@ -3,7 +3,9 @@ function [args,sz] = sergent_args(varargin)
 %  Final shared settings for 2YP runs
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs, sz] = common_args();
   rmpath('..');
   

@@ -2,7 +2,9 @@ function [args,opts] = classic_kitterle_args(varargin)
 %
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = classic_args( ...
              'runs',    25, ...
              ...

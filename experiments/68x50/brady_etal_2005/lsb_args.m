@@ -3,7 +3,9 @@ function [args,opts] = lsb_args(varargin)
 %  Final shared settings for left-side-bias runs
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs,opts] = common_args();
   rmpath('..');
 

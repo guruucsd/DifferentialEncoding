@@ -4,7 +4,9 @@ function [args,opts] = classic_sergent_args(varargin)
 %   http://www.willamette.edu/~gorr/classes/cs449/classify.html
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = classic_args(...
              'runs',    10, ...
              'errorType', 1, ...

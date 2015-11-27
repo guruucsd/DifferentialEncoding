@@ -2,7 +2,9 @@ function [args] = lsb_args(varargin)
 %
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs, opt] = common_args();
   rmpath('..');
 

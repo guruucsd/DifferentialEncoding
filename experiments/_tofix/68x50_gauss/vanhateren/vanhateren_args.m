@@ -3,7 +3,9 @@ function [args,sz] = uber_args(varargin)
 %  Final shared settings for 2YP runs
 
   % Add absolute path to code
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs, opts] = common_args();
   rmpath('..');
   
