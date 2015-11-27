@@ -95,7 +95,6 @@ for si=1:length(lambdas)
         mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda ...
     );
 
-    %parallel
     for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
         fi = 1+floor((mi-1)/ws.N);
         ni = mi-(fi-1)*ws.N;
