@@ -31,39 +31,46 @@ function [models] = de_TrainAllAC(mSets)
     % Loop over sigmas and trials
     %   (to collect enough samples)
     %----------------
+    nhemis = max( length(mSets.mu), length(mSets.sigma) );
+    models = cell(mSets.runs, nhemis);
 
-    for zz=1:mSets.runs
-        randState = mSets.ac.randState + (zz-1);
+    try
+        parfor zz=1:mSets.runs
+            randState = mSets.ac.randState + (zz-1);
 
 
-        % Can specify multiple mu & sigma,
-        %   but one of them must be 1 value,
-        %   or they both must be of the same size
-        if (length(mSets.mu) > 1 && length(mSets.sigma) > 1 ...
-            && length(mSets.mu) ~= length(mSets.sigma))
-          error('mu & sigma must match!');
+            % Can specify multiple mu & sigma,
+            %   but one of them must be 1 value,
+            %   or they both must be of the same size
+            if (length(mSets.mu) > 1 && length(mSets.sigma) > 1 ...
+                && length(mSets.mu) ~= length(mSets.sigma))
+              error('mu & sigma must match!');
+            end;
+
+
+
+            for ii=1:nhemis
+
+                new_model           = de_CopyModelSettings(model, ii);
+                new_model.hemi      = ii;
+
+                % Generate randState for ac
+                new_model.ac.randState = randState;
+                if isfield(model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
+                rand ('state',new_model.ac.randState);
+
+                fprintf('[%3d]',zz);
+                new_model = de_Trainer(new_model);
+                if (~new_model.ac.cached), fprintf('\n'); end;
+
+                % Save
+                models{zz,ii} = new_model;
+            end;  %zz
         end;
-
-
-        niters = max( length(mSets.mu), length(mSets.sigma) );
-
-        for ii=1:niters
-
-            new_model           = de_CopyModelSettings(model, ii);
-            new_model.hemi      = ii;
-
-            % Generate randState for ac
-            new_model.ac.randState = randState;
-            if isfield(model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
-            rand ('state',new_model.ac.randState);
-
-            fprintf('[%3d]',zz);
-            new_model = de_Trainer(new_model);
-            if (~new_model.ac.cached), fprintf('\n'); end;
-
-            % Save
-            models(zz,ii) = new_model;
-        end;  %zz
+    catch
+        rethrow(lasterror())
     end;
 
     fprintf('\n');
+
+    models = cell2mat(models);

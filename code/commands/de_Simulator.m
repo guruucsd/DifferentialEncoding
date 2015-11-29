@@ -34,13 +34,11 @@ function [mSets,models,stats] = de_Simulator(expt, stimSet, taskType, opt, varar
 
 
   % Train autoencoders
-  if (mSets.parallel),   [models]      = de_TrainAllAC_parallel (mSets);
-  else,                  [models]      = de_TrainAllAC          (mSets); end;
+  [models]      = de_TrainAllAC          (mSets);
 
   % Train classifiers
-  if (isfield(mSets, 'p') && isfield(mSets.data.train, 'T'))
-      if (mSets.parallel),   [models]      = de_TrainAllP_parallel (mSets, models);
-      else,                  [models]      = de_TrainAllP          (mSets, models); end;
+  if isfield(mSets, 'p')
+      [models]      = de_TrainAllP(mSets, models);
   end;
 
   %%%%%%%%%%%%%%%%%
