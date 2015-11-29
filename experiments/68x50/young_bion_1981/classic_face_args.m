@@ -2,7 +2,9 @@ function [args,opts] = face_args(varargin)
 %
 %  Final shared settings for left-side-bias runs
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = classic_args( ... 
              'runs',   25,                'ac.randState', 2,    'p.randState', 2, ...
              'p.XferFn', [6 4],           'p.useBias', 1, ...

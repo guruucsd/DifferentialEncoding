@@ -1,7 +1,9 @@
 function args = depp_1D_args(varargin)
 %
 %  Final shared settings for 2YP runs
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
 
   args = DEArgsInit ( ...
          {   'runs', 68, 'ac.randState', 2, 'p.randState', 2, ...

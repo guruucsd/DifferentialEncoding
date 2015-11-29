@@ -2,9 +2,11 @@ function [args,opts] = kitterle_args(varargin)
 %
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [cargs,opts] = common_args();
-  rmpath('..');
+    rmpath(script_dir);  % clean paths for running other experimental scripts.
 
   args = de_ArgsInit ( cargs{:}, ... %Network structure
              'runs', 25, ...

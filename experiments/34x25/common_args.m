@@ -12,22 +12,16 @@ function [cargs, opts] = common_args(varargin)
   end;
 
   % Add absolute path to the 'code' directory
-  if (exist('de_GetBaseDir')~=2)
-    curpath = 'code';
-    for i=1:5
-        curpath = fullfile('..', curpath);
-        if exist(curpath)
-            addpath(genpath(curpath));
-            addpath(genpath(fullfile(de_GetBaseDir(),'code')));
-        end;
-    end;
-  end;
+  script_dir = fileparts(which(mfilename));
+  code_dir = fullfile(script_dir, '..', '..', 'code');
+  addpath(genpath(code_dir));
 
   opts = {'small'};
 
   cargs = {  'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...
-             'distn',   {'normem2'},     'mu',        0,  'spacing', struct('mean', 2.318, 'maxdiffpct', 0.5), ...%2245), ...
+             'distn',   {'normem2'},     'mu',        0, 'sigma', [2, 15], ...
+             ... %  'spacing', struct('mean', 2.318, 'maxdiffpct', 0.5), ...%2245), ...
              'nHidden', 850*4,          'hpl',       4,    'nConns',      15, ...
              'deType', 'de', ...
              ...% Input

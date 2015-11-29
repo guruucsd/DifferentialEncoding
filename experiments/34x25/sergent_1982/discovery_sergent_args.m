@@ -2,7 +2,9 @@ function [args,opts] = discovery_sergent_args(varargin)
 % These args are for exploring the parameter space.
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = discovery_args( ... %Network structure
                   'errorType', 2, 'p.errorType', 3,... % cross-entropy
                   'p.ndupes', 1,...

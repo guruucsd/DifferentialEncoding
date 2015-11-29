@@ -5,7 +5,9 @@ stats = {'ipd', 'ffts', 'distns'};
 plts = {'ls-bars', stats{:}};
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = uber_args( ...% 'out.pub', true, ... %Network structure
                   'runs', 10, ...
                   'p.zscore', 0.10, ...
