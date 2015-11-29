@@ -15,9 +15,19 @@ for ti=1:2
         tmp   = de_calcPErr( vertcat(o.(ds)), mSets.data.test.T, 2);
         
         if (strcmp(mSets.data.taskType, 'categorical'))
-            trial_types = {'on', 'off'};
+            switch(mSets.data.stimSet)
+                case 'blob-dot',
+                    trial_types = {'on', 'off'};
+                otherwise, error('Unimplemented stimSet for categorical. Choose from {blob-dot}');
+            end
         else
-            trial_types = {'near', 'far'};
+            switch(mSets.data.stimSet)
+                case 'blob-dot',
+                    trial_types = {'near', 'far'};
+                case 'paired-squares',
+                    trial_types = {'same', 'different'};
+                otherwise, error('Unimplemented stimSet for coordinate. Choose from {blob-dot, paired-squares}');
+            end
         end
         type1_perf = tmp(:, guru_instr(mSets.data.(ds).TLAB, trial_types{1})); %2 freqs
         type2_perf = tmp(:, guru_instr(mSets.data.(ds).TLAB, trial_types{2}));
