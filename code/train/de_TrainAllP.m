@@ -34,7 +34,7 @@ function [models] = de_TrainAllP(mSets, modelsAC)
   models = cell(n_runs, n_pis, n_pas, n_pes, n_pds);
 
   try
-      for mm=1:n_runs
+      parfor mm=1:n_runs
         randState = mSets.p.randState;
 
         model = modelsAC(mm);
@@ -42,8 +42,10 @@ function [models] = de_TrainAllP(mSets, modelsAC)
 
         for pi=1:n_pis, for pa=1:n_pas
         for pe=1:n_pes for pd=1:n_pds
-            model.p.AvgError  = pis(pi);   model.p.Acc = pas(pa);
-            model.p.EtaInit   = pes(pe);   model.p.Dec = pds(pd);
+            model.p.AvgError = mSets.p.AvgError(pi);
+            model.p.Acc = mSets.p.Acc(pa);
+            model.p.EtaInit = mSets.p.EtaInit(pe);
+            model.p.Dec = mSets.p.Dec(pd);
 
             % Generate randState for ac
             model.p.randState = randState;
