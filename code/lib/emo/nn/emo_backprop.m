@@ -1,10 +1,10 @@
-function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
-%[Err, Grad, Out] = backprop( X, Y, W, Con, Trn, Ern )
+function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
+%[Err, Grad, Out] = backprop( X, T, W, Con, Trn, Ern )
 %
 %Compute error and gradient of feedforward network via backpropagation
 %
 % X: inputs; each column of the matrix X is an input vector
-% Y: outputs; each column of Y is a desired output vector
+% T: target outputs; each column of T is a desired output vector
 %     correspoding to the input vector given by the same column of X
 % W: synaptic weights; W(j,i) is the weight from unit i to unit j;
 %     non-existing weights are ignored
@@ -37,7 +37,7 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
 
   % compute sizes
   nInput    = size(X,1);
-  nOutput   = size(Y,1);
+  nOutput   = size(T,1);
   nTotal    = size(W,1);
   nData     = size(X,2);
   idxOutput = (nTotal-nOutput+1 : nTotal);
@@ -61,7 +61,7 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
   hididx = (nInput+1):(nTotal-nOutput);
   outidx = (nTotal-nOutput+1):nTotal;
   multilayer = (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1);
-  
+
   % More than 1 hidden layer
   if (multilayer)
       for j = nInput+1:nTotal-nOutput % loop is slow?
@@ -78,9 +78,9 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
 
 
   % Compute error and error derivative
-  %d_a = Y - Out(idxOutput,:);   % compute residuals (desired minus actual outputs)
-  [Err, Errp] = emo_nnError(Ern, Y, Out(idxOutput,:));
-  
+  %d_a = T - Out(idxOutput,:);   % compute residuals (desired minus actual outputs)
+  [Err, Errp] = emo_nnError(Ern, Out(idxOutput, :), T);
+
   % initialize backward pass
   d(idxOutput,:) = - (Errp.^Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
 
@@ -93,7 +93,7 @@ function [Err, Grad, Out] = emo_backprop( X, Y, W, Con, Trn, Ern, Pow )
     j = hididx;
     d(j,:) = h1(j,:) .* (W(:,j)'*d);
   end;
-  
+
   % Run backwards pass from Hidden->Input
   %j = 1:nInput;
   %d(j,:) = h1(j,:) .* (W(:,j)'*d);
