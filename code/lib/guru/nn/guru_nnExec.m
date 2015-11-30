@@ -13,15 +13,12 @@ function [oact, err, huact] = guru_nnExec(model,X,Y)
 %  o    : calculated output at LAST step.
 
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
-  if isfield(model, 'linout'), warning('linout deprecated; use XferFn with multiple values instead.'); end;
 
   % Calc
   nUnits = size(model.Weights,1); nIn = size(X,1)-1; nOut = size(Y,1); nHid = nUnits-nIn-nOut-1; % remove input, output, and
 
   % Set up transfer function for each unit
-  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHid+prod(nOut)))
-    model.XferFn = [model.XferFn*ones(1,nHid) ones(1,nOut)]; %linear hidden->output
-  elseif (length(model.XferFn)==2)
+  if (length(model.XferFn)==2)
     model.XferFn = [model.XferFn(1)*ones(1,nHid) model.XferFn(2)*ones(1,nOut)];
   end;
 
