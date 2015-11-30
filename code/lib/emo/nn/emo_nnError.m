@@ -1,4 +1,4 @@
-function [err, errP] = emo_nnError(errorType, Y, T, RAW_ERROR)
+function [err, errP] = emo_nnError(errorType, Y, T)
 %
 % Input:
 % RAW_ERROR  :
@@ -14,18 +14,19 @@ function [err, errP] = emo_nnError(errorType, Y, T, RAW_ERROR)
 
   switch(errorType)
     case {1,'abs'},
-      if ~exist('RAW_ERROR', 'var'), RAW_ERROR = Y-T; end;
+      RAW_ERROR = T-Y;
       err = abs(RAW_ERROR);
       if nargout>1, errP = ones(size(Y)); end;
 
     case {2,'squ'},
-      if ~exist('RAW_ERROR', 'var'), RAW_ERROR = Y-T; end;
+      RAW_ERROR = T-Y;
       err = (RAW_ERROR.^2)/2;
       if nargout>1, errP = RAW_ERROR; end;
 
     case {3,'cent'}
         err = -(T.*log(Y) + (1-T).*log(1-Y));
-        if ~exist('RAW_ERROR', 'var'), RAW_ERROR = Y-T; end;
-          errP = -RAW_ERROR;
+        if nargout>1
+	        RAW_ERROR = T-Y;
+        	 errP = RAW_ERROR;
         end;
   end;
