@@ -36,7 +36,6 @@ function [model,ws,s,fs] = autoencoder(model, ws, exts)
   if (~isfield(model, 'nConnPerHidden_Start')), model.nConnPerHidden_Start = 30; end; % reduce this and below, tomorrow
   if (~isfield(model, 'nConnPerHidden_End')),   model.nConnPerHidden_End   = 15; end;
   if (~isfield(model, 'nConns')),               model.nConns               = model.nConnPerHidden_Start; end;
-  %if (~isfield(model, 'linout')),              model.linout               = true; end;
   if (~isfield(model, 'debug')),                model.debug                = 1:10; end;
   if (~isfield(model, 'useBias')),              model.useBias              = 1; end;
 

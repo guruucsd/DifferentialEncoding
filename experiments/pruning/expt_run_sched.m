@@ -49,7 +49,6 @@ end;
 
 mSets.debug          = 1:11;
 mSets.lrrev          = false;
-%mSets.linout         = true;
 
 % Allow multiple loops, for simplicity's sake (hi, nohup! :D)
 

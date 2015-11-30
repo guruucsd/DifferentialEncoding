@@ -17,10 +17,7 @@ function [model,o_p] = guru_nnTrain(model,X,Y)
   try, startTime = toc; catch err, tic; startTime = toc; end;
 
   nUnits = size(model.Weights,1); nOutput = size(Y,1); nInput = size(X,1); nHidden = nUnits-nOutput-nInput;
-  if (isfield(model, 'linout') && model.linout && length(model.XferFn) ~= (nHidden+nOutput))
-    old_xferfn = model.XferFn;
-    model.XferFn = [model.XferFn*ones(1,nHidden) ones(1,nOutput)]; %linear hidden->output
-  elseif (length(model.XferFn)==2)
+  if (length(model.XferFn)==2)
     old_xferfn = model.XferFn;
     model.XferFn = [model.XferFn(1)*ones(1,nHidden) model.XferFn(2)*ones(1,nOutput)];
   end;
