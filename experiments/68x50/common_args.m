@@ -1,20 +1,16 @@
 function [cargs, opts] = common_args(varargin)
 
-  % Add absolute path to code
-  if (exist('de_GetBaseDir')~=2)
-    addpath(genpath(fullfile('..','..', 'code')));
-    addpath(genpath(fullfile('..','..','..', 'code')));
-    code_path = fullfile(de_GetBaseDir(),'code');
-    rmpath (genpath(fullfile('..','..','..', 'code')));
-    rmpath (genpath(fullfile('..','..', 'code')));
-    addpath(genpath(code_path));
-  end;
+  % Add absolute path to the 'code' directory
+  script_dir = fileparts(which(mfilename));
+  code_dir = fullfile(script_dir, '..', '..', 'code');
+  addpath(genpath(code_dir));
 
   opts = {'medium'};
 
-  cargs = {  'parallel', false, 'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
+  cargs = {  'debug', 1:10, 'ac.debug', 1:10, 'p.debug', 1:10, ...
              'ac.randState', 2,   'p.randState', 2, ...
-             'distn',   {'normem2'},    'mu',         0,    'sigma', [5.0 25.0], ...
+             'distn',   {'normem2'},    'mu',         0, ...
+             'sigma', [2.0 25.0], ...
              'nHidden', 1*3400,        'hpl',       1,    'nConns',      12, ...
              ...% Input
              'ac.tol',    0*34/25, ... %tolerance for disconnected pixels

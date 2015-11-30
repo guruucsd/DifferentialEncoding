@@ -1,8 +1,8 @@
 function args = depp_2D_args(varargin)
 %
 %  Final shared settings for 2YP runs
-  addpath('..');
-  de_Init('2D');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
   
   
 %  nHidden = 957; nConns = 7;

@@ -21,9 +21,6 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   % Whatever we don't have, add!
 
 
-  % Run parameters
-  if (~ismember('parallel',         aKeys)), args(end+1:end+2) = {'parallel', false}; end;
-
   %
   if (~ismember('expt',             aKeys)), args(end+1:end+2) = {'expt', expt}; end;
 

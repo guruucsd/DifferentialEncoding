@@ -48,7 +48,6 @@ end;
 
 mSets.debug          = 1:11;
 mSets.lrrev          = false;
-%mSets.linout         = true;
 mSets.out.titles     = {'RH ()', 'LH ()'};
 % Allow multiple loops, for simplicity's sake (hi, nohup! :D)
 
@@ -92,11 +91,11 @@ for si=1:length(lambdas)
 			[ws.klabs{:}], ws.N, ...
 			mSets.nConnPerHidden_Start, mSets.nConnPerHidden_End, mSets.sigma, ...
 			mSets.nHidden/mSets.hpl, mSets.hpl, mSets.lambda);
-	%parallel
-        for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
-            fi = 1+floor((mi-1)/ws.N);
+
+    for mi=1:ws.nkernels*ws.N %lsf,msf,hsf
+        fi = 1+floor((mi-1)/ws.N);
 		ni = mi-(fi-1)*ws.N;
-            wss{mi} = ws;
+        wss{mi} = ws;
 
 		fns{mi}  = fullfile(wss{mi}.matdir,sprintf('pruning-de-freq-%s-%d.mat', wss{mi}.klabs{fi}, ni));
 		if (exist(fns{mi},'file'))
@@ -104,8 +103,8 @@ for si=1:length(lambdas)
 			continue;
 		end;
 
-                wss{mi}.kernels   = kernels{fi,si};
-	        wss{mi}.iters_per = iters_per{fi,si};
+        wss{mi}.kernels   = kernels{fi,si};
+	    wss{mi}.iters_per = iters_per{fi,si};
 		curmodel          = mSets;
 		curmodel.fi       = fi; %mark these so we can debug later
 		curmodel.ni       = ni;
@@ -159,9 +158,9 @@ for si=1:length(lambdas)
 
 
 			models        {fi}    = [models{fi} model];
-      wss{fi} = [wss{fi} ld.ws];
-      %s.model{fi} = [s.model{fi} ld.s.model];
-    end;
+            wss{fi} = [wss{fi} ld.ws];
+            %s.model{fi} = [s.model{fi} ld.s.model];
+        end;
 	end;
 
 

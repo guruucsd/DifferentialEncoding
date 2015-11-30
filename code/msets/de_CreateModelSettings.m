@@ -4,9 +4,6 @@ function mSets = de_CreateModelSettings(varargin)
     mSets = guru_stampProps(struct(), varargin{:});
     nSigmas = length(mSets.sigma);
 
-    %
-    %mSets.parallel = false;
-
     % Load settings from input file
     if (~isfield(mSets,      'data')),     mSets.data = load(mSets.dataFile); end;
 

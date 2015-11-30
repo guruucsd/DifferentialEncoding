@@ -2,7 +2,9 @@ function [args,opts] = uber_christman_args(varargin)
 %
 %  Final shared settings for left-side-bias runs
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = uber_args( ...
                   'runs',   10, ...
                   'errorType', 2, ...

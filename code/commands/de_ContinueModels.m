@@ -1,4 +1,6 @@
 function new_models = de_ContinueModels(models, expt, stimSet, taskType, opt)
+% Preliminary code for training models that were created via developmental pruning.
+
     mSets = models(1);
 
     % Do what's necessary to make the models re-trainable.
@@ -38,23 +40,16 @@ function new_models = de_ContinueModels(models, expt, stimSet, taskType, opt)
     %%%%%%%%%%%%%%%%%
 
     % Train autoencoders
-    if (mSets.parallel)
+    parfor zz=1:numel(new_models)
+        % Generate randState for ac
+        rand ('state',new_models(zz).ac.randState);
 
-    else
-        for zz=1:numel(new_models)
-            % Generate randState for ac
-            rand ('state',new_models(zz).ac.randState);
-
-            fprintf('[%3d]',zz);
-            new_models(zz) = de_Trainer(new_models(zz));
-        end;
+        fprintf('[%3d]',zz);
+        new_models(zz) = de_Trainer(new_models(zz));
     end;
 
     % Train classifiers
-    if (isfield(mSets, 'p'))
-        if (mSets.parallel),   [new_models]      = de_TrainAllP_parallel (new_models);
-        else,                  [new_models]      = de_TrainAllP          (new_models); end;
-    end;
+    [new_models]      = de_TrainAllP          (new_models);
 
     %%%%%%%%%%%%%%%%%
     % Analysis

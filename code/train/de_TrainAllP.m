@@ -25,32 +25,43 @@ function [models] = de_TrainAllP(mSets, modelsAC)
           ['[ ' sprintf('%3d ',  mSets.nHidden) ']'], ...
           ['[ ' sprintf('%3d ',  mSets.runs) ']'] );
 
-  for mm=1:numel(modelsAC)
-    randState = mSets.p.randState;
+  n_runs = numel(modelsAC);
+  n_pis = numel(mSets.p.AvgError);
+  n_pas = numel(mSets.p.Acc);
+  n_pes = numel(mSets.p.EtaInit);
+  n_pds = numel(mSets.p.Dec);
 
-    model = modelsAC(mm);
-    model.p = mSets.p; % re-stamp the p settings!
+  models = cell(n_runs, n_pis, n_pas, n_pes, n_pds);
 
-    pis = mSets.p.AvgError;   pas=mSets.p.Acc;
-    pes = mSets.p.EtaInit;    pds=mSets.p.Dec;
+  try
+      parfor mm=1:n_runs
+        randState = mSets.p.randState;
 
-    for pi=1:length(pis), for pa=1:length(pas)
-    for pe=1:length(pes), for pd=1:length(pds)
-        model.p.AvgError  = pis(pi);   model.p.Acc = pas(pa);
-        model.p.EtaInit   = pes(pe);   model.p.Dec = pds(pd);
+        model = modelsAC(mm);
+        model.p = mSets.p; % re-stamp the p settings!
 
-        % Generate randState for ac
-        model.p.randState = randState;
-        rand ('state',model.p.randState);
+        for pi=1:n_pis, for pa=1:n_pas
+        for pe=1:n_pes for pd=1:n_pds
+            model.p.AvgError = mSets.p.AvgError(pi);
+            model.p.Acc = mSets.p.Acc(pa);
+            model.p.EtaInit = mSets.p.EtaInit(pe);
+            model.p.Dec = mSets.p.Dec(pd);
 
-        fprintf('[%3d]',mm);
-        models(mm,pd,pe,pa,pi) = de_Trainer(model);
-        if (~models(mm,pd,pe,pa,pi).p.cached), fprintf('\n'); end;
+            % Generate randState for ac
+            model.p.randState = randState;
+            rand ('state',model.p.randState);
 
-        %% CRITICAL: UPDATE THE RANDOM STATE!!
-        randState = randState + 1;
-      end; end; %pd, pe
-      end; end; %pa, pi
+            fprintf('[%3d]',mm);
+            models{mm,pd,pe,pa,pi} = de_Trainer(model);
+            if (~models{mm,pd,pe,pa,pi}.p.cached), fprintf('\n'); end;
+
+            %% CRITICAL: UPDATE THE RANDOM STATE!!
+            randState = randState + 1;
+          end; end; %pd, pe
+        end; end; %pa, pi
+      end;
+  catch
+    rethrow(lasterror());
   end;
 
-  models = reshape(models, [size(modelsAC) squeeze(size(models(1,:,:,:,:)))]);
+  models = reshape(cell2mat(models), [size(modelsAC) squeeze(size(models(1,:,:,:,:)))]);

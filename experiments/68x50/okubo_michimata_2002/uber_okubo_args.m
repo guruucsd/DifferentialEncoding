@@ -4,8 +4,11 @@ function [args,opts] = uber_okubo_args(varargin)
 %   http://www.willamette.edu/~gorr/classes/cs449/classify.html
 
   % Get shared args
-  addpath('..');
+  script_dir = fileparts(which(mfilename));
+  addpath(fullfile(script_dir, '..'));  
+
   [args,opts] = uber_args( ... %Network structure
+                  'runs', 50, ...
                   'ac.AvgError', 2E-4, ...
                   'errorType', 2,... % cross-entropy
                   'p.errorType', 2,... % cross-entropy
