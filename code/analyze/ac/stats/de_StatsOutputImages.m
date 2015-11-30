@@ -28,7 +28,7 @@ function [images] = de_StatsOutputImages(mss, dset, selectedImages)
 
      m = models(mi);
 
-      % Only re-run neural net if we didn`t save the output already
+      % Only re-run neural net if we didn't save the output already
 
      if ~isfield(m.ac,'output')
 

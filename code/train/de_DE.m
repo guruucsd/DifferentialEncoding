@@ -52,18 +52,18 @@ function [model] = de_DE(model)
     fprintf('\twts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}\n', ih_mn,ih_mx,ho_mn,ho_mx);
   end;
 
-  % Even if it`s cached, we need the output characteristics
+  % Even if it's cached, we need the output characteristics
   %   of the model.
   if (~isfield(model.ac,'hu'))
 
     try
-      error('Can`t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
+      error('Can''t cache these properties, because it''s not about the autoencoder--also depends on the image set!'); % Get the prop from disk, then rename
       model = de_LoadProps(model, 'ac',{'hu','output'});
       %if size(
     catch
      if ismember(11, model.debug), fprintf('Failed to find hu output on disk; computing now.\n'); end;
 
-     % Make sure the autoencoder`s connectivity is set.
+     % Make sure the autoencoder's connectivity is set.
       model = de_LoadProps(model, 'ac', 'Weights');
       model.ac.Conn = (model.ac.Weights~=0);
 
