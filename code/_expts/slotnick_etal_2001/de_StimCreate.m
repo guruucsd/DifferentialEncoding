@@ -19,131 +19,174 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 if (~exist('opt','var')),      opt      = {};     end;
 if (~iscell(opt)),             opt      = {opt};  end;
 
-if (~strcmp(stimSet, 'blob-dot') && ~strcmp(stimSet, 'paired-squares')) %default set of images
-    error('Invalid stimulus type. Choose one from: {''blob-dot'', ''paired-squares''}');
+if (~strcmp(stimSet, 'blob-dot') && ~strcmp(stimSet, 'paired-squares') && ~strcmp(stimSet, 'plus-minus')) %default set of images
+    error('Invalid stimulus type. Choose one from: {''blob-dot'', ''paired-squares'', ''plus-minus''}');
 end
 
-figure('Position', [0, 0, 1024, 800]);
+%figure('Position', [0, 0, 1024, 800]); % is this line still needed?
 
-if (strcmp(stimSet, 'blob-dot'))
-    
-    % first, set some variables
-    
-    % Create the input images.
-    train.nInput = [68 50];
-    train.X = zeros(prod(train.nInput), 0);
-    train.XLAB = cell(20, 1); % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
-    train.TLAB = cell(20, 1);
-    counter = 0;
-    heights = [];
-    
-    % first, 10 "far" images
-    for ii=1:5
-        distances = [10, 12];
-        for ij=1:length(distances)
-            img = blob_stimuli(distances(ij), 3, ii);
-            train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            counter = counter + 1;
-            train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
-            subplot(4, 5, counter);
-            imshow(img);
-            title(train.XLAB{counter});
-            heights = [heights, distances(ij)];
+switch(stimSet)
+    case 'blob-dot',
+        % first, set some variables
+        
+        % Create the input images.
+        train.nInput = [68 50];
+        train.X = zeros(prod(train.nInput), 0);
+        train.XLAB = cell(20, 1); % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
+        train.TLAB = cell(20, 1);
+        counter = 0;
+        heights = [];
+        
+        % first, 10 "far" images
+        for ii=1:5
+            distances = [10, 12];
+            for ij=1:length(distances)
+                img = blob_stimuli(distances(ij), 3, ii);
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
+                counter = counter + 1;
+                train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
+                heights = [heights, distances(ij)];
+            end
         end
-    end
-    % now, 10 "close" images (5 on, 5 off)
-    
-    for ii=1:5
-        distances = [0, 4];
-        for ij=1:length(distances)
-            counter = counter + 1;
-            img = blob_stimuli(distances(ij), 3, ii);
-            train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
-            train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            subplot(4, 5, counter);
-            imshow(img);
-            title(train.XLAB{counter});
-
-            heights = [heights, distances(ij)];
+        % now, 10 "close" images (5 on, 5 off)
+        
+        for ii=1:5
+            distances = [0, 4];
+            for ij=1:length(distances)
+                counter = counter + 1;
+                img = blob_stimuli(distances(ij), 3, ii);
+                train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);                
+                heights = [heights, distances(ij)];
+            end
+            
+        end
+        test = train;
+        
+        % Create the output vectors.
+        switch (taskType)
+            case 'categorical'
+                train.T = heights > 0;
+                for ii = 1:20
+                    if train.T(ii) == 1
+                        train.TLAB{ii} = 'on';
+                    else
+                        train.TLAB{ii} = 'off';
+                    end
+                end
+            case 'coordinate',
+                train.T = abs(heights) / max(abs(heights));
+                for ii=1:20
+                    if train.T(ii) < 0.5
+                        train.TLAB{ii} = 'near';
+                    else
+                        train.TLAB{ii} = 'far';
+                    end
+                end
+            otherwise, error('Unknown taskType: %s', taskType);
         end
         
-    end
-    test = train;
-    
-    % Create the output vectors.
-    switch (taskType)
-        case 'categorical'
-            train.T = heights > 0;
-            for ii = 1:20
-                if train.T(ii) == 1
-                    train.TLAB{ii} = 'on';
-                else
-                    train.TLAB{ii} = 'off';
-                end
+        % Now say that test data is the same as training data.
+        test = train;
+        
+    case 'paired-squares',
+        
+        % first, set some variables
+        distances = [2 3 4 5];
+        
+        train.nInput = [34 25];
+        train.X = zeros(prod(train.nInput), 0);
+        train.XLAB = cell(16, 1); % paired squares has 16 stimuli: 4 distances left side x 4 distances right
+        train.TLAB = cell(16, 1);
+        
+        left_distances = []; % to be used when assigning labels
+        right_distances = [];
+        
+        % Create the 16 images
+        for ii=1:length(distances) % left side: distance b/n squares ranges [2, 5]
+            for ij = 1:length(distances) % right side: distance b/n square ranges [2, 5]
+                img = paired_squares_stimuli(distances(ii), distances(ij), 0);
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
+                counter = counter + 1;
+                train.XLAB{counter} = sprintf('(Dist) Left: %dpx ; Right: %dpx', distances(ii), distances (ij));                
+                left_distances = [left_distances, distances(ii)];
+                right_distances = [right_distances, distances(ij)];
             end
-        case 'coordinate',
-            train.T = abs(heights) / max(abs(heights));
-            for ii=1:20
-                if train.T(ii) < 0.5
-                    train.TLAB{ii} = 'near';
-                else
-                    train.TLAB{ii} = 'far';
-                end
-            end
-        otherwise, error('Unknown taskType: %s', taskType);
-    end
-    
-    % Now say that test data is the same as training data.
-    test = train;
-    
-elseif (strcmp(stimSet, 'paired-squares'))
-    
-    % first, set some variables
-    distances = [2 3 4 5];
-
-    train.nInput = [34 25];
-    train.X = zeros(prod(train.nInput), 0);
-    train.XLAB = cell(16, 1); % paired squares has 16 stimuli: 4 distances left side x 4 distances right
-    train.TLAB = cell(16, 1);
-    counter = 0; %for the subplot
-    
-    left_distances = []; % to be used when assigning labels
-    right_distances = [];
-    
-    % Create the 16 images
-    for ii=1:length(distances) % left side: distance b/n squares ranges [2, 5]
-        for ij = 1:length(distances) % right side: distance b/n square ranges [2, 5]
-            img = paired_squares_stimuli(distances(ii), distances(ij), 0);
-            train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            counter = counter + 1;
-            train.XLAB{counter} = sprintf('(Dist) Left: %dpx ; Right: %dpx', distances(ii), distances (ij));
-            subplot(4, 4, counter);
-            imshow(img);
-            title(train.XLAB{counter});
-            
-            left_distances = [left_distances, distances(ii)];
-            right_distances = [right_distances, distances(ij)];
         end
-    end
-    test = train;
-    
-    % Create the output vectors.
-    switch (taskType)
-        case 'coordinate',
-            train.T = (left_distances == right_distances); % same distance or no?
-            for ii=1:16
-                if train.T(ii) == 1
-                    train.TLAB{ii} = 'same';
-                else
-                    train.TLAB{ii} = 'different';
+        test = train;
+        
+        % Create the output vectors.
+        switch (taskType)
+            case 'coordinate',
+                train.T = (left_distances == right_distances); % same distance or no?
+                for ii=1:16
+                    if train.T(ii) == 1
+                        train.TLAB{ii} = 'same';
+                    else
+                        train.TLAB{ii} = 'different';
+                    end
                 end
+            otherwise, error('Unknown taskType: %s. paired-squares only takes coordinate task type.', taskType);
+        end
+        
+        % Now say that test data is the same as training data.
+        test = train;
+        
+    case 'plus-minus',
+        % first, set some variables
+        
+        % Create the input images.
+        train.nInput = [34 25];
+        train.X = zeros(prod(train.nInput), 0);
+        train.XLAB = cell(16, 1); % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
+        train.TLAB = cell(16, 1);
+        counter = 0;
+        dist = []; % array of distances
+        plus_on_right = []; % array of if plus is on right
+        
+        distances = [2 3 4 5 6 7 8 9];
+        
+        for ii=1:length(distances)
+            for ij= -1 : 2 : 1  %is -1 or 1 
+                img = plus_minus_stimuli(distances(ii), ij);
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
+                counter = counter + 1;
+                if ij == -1, str = 'left'; else str = 'right'; end
+                train.XLAB{counter} = sprintf('Plus on %s, %dpx apart', str, distances(ii));
+                dist = [dist, distances(ii)];
+                plus_on_right = [plus_on_right, ij];
             end
-        otherwise, error('Unknown taskType: %s. paired-squares only takes coordinate task type.', taskType);
-    end
-    
-    % Now say that test data is the same as training data.
-    test = train;
-    
+        end
+        
+        test = train;
+        
+        % Create the output vectors.
+        switch (taskType)
+            case 'categorical'
+                train.T = (plus_on_right == 1);
+                for ii = 1:16
+                    if train.T(ii) == 1
+                        train.TLAB{ii} = 'right';
+                    else
+                        train.TLAB{ii} = 'left';
+                    end
+                end
+            case 'coordinate',
+                train.T = abs(dist) / max(abs(dist));
+                for ii=1:16
+                    if train.T(ii) <= 0.6 % make cut between 5/9, 6/9, but to avoid precision error use 0.6
+                        train.TLAB{ii} = 'near'; 
+                    else
+                        train.TLAB{ii} = 'far';
+                    end
+                end
+            otherwise, error('Unknown taskType: %s', taskType);
+        end
+        
+        % Now say that test data is the same as training data.
+        test = train;
+
+        
 end
 
 
@@ -450,3 +493,36 @@ end
 
 
 end
+
+
+%% distance = distance of CENTER of plus, minus from midpoint
+%% distance = 0 means that the plus and minus are overlaid on top of each other
+%% valid distance ranges from [2, 11]
+%% plus_on_right = 1 if you want the plus on the right, 0 if on the left
+
+
+function image = plus_minus_stimuli(distance, plus_on_right)
+
+image_height = 34;
+image_width = 25;
+
+image = ones(34, 25);
+
+horiz_midline = (image_height)/2;
+center = ceil(image_width/2);
+
+for i = -1:1
+    image(horiz_midline, center+distance+i) = 0;
+    image(horiz_midline, center-distance-i) = 0;
+    
+    if (plus_on_right == 1)
+        image(horiz_midline+1, center+distance) = 0;
+        image(horiz_midline-1, center+distance) = 0;
+    else
+        image(horiz_midline+1, center-distance) = 0;
+        image(horiz_midline-1, center-distance) = 0;
+    end
+    
+end
+end
+
