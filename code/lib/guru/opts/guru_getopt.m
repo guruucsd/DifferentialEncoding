@@ -4,11 +4,11 @@ function [val, inopts, idx] = guru_getopt(opts, optname, def)
 
   %[inopts, idx] = ismember(opts, optname);
   inopts = 0; idx=0;
-  for ii=1:length(opts)
+  for ii=length(opts):-1:1
       if (ischar(opts{ii}) && strcmp(opts{ii}, optname))
           inopts = 1;
           idx    = ii;
-          break;
+          break;  % don't stop--get the final value!
       end;
   end;
 
