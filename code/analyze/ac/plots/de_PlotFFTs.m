@@ -24,7 +24,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
 
   % Limit 1D FFTs to just the range that makes sense for the image.
   minSize = min(mSets.nInput);
-  minSharedFreq = minSize * 10;
+  minSharedFreq = minSize * 0.55;  % (0.5 is nyquist freq; add a small tail :))
   fft1D_idx = ffts.orig.freqs_1D <= minSharedFreq;
   reidx_fn = @(f) (f(:, :, fft1D_idx));
 
