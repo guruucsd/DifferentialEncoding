@@ -20,7 +20,6 @@ function [Con,Wts] = de_connect_random(model)
                                       model.sigma,...
                                       model.ac.debug, ...
                                       model.ac.tol);
-            if (model.ac.debug), fprintf('!'); end;
 
     otherwise
         nPix         = prod(model.nInput(1:2));
