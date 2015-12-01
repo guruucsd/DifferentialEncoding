@@ -34,7 +34,7 @@ function [model] = de_DE(model)
     end;
 
     % Train the model on the training images
-    if ~isfield(model.ac, 'train_on_task_images') || ~model.ac.train_on_task_images
+    if ~isfield(model.ac, 'retrain_on_task_images') || ~model.ac.retrain_on_task_images
         [model.ac] = guru_nnTrainAC(model.ac, model.data.train.X);
         fprintf('| e_AC(%5d): %6.5e',size(model.ac.err,1),model.ac.avgErr(end));
 
@@ -49,10 +49,10 @@ function [model] = de_DE(model)
     ih_mx = 0+max(max(model.ac.Weights(nPixels+1+[1:model.nHidden], 1:nPixels+1)));
     ho_mn = 0+min(min(model.ac.Weights(nPixels+1+model.nHidden+[1:nPixels], nPixels+[1:model.nHidden])));
     ho_mx = 0+max(max(model.ac.Weights(nPixels+1+model.nHidden+[1:nPixels], nPixels+[1:model.nHidden])));
-    fprintf('\twts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}\n', ih_mn,ih_mx,ho_mn,ho_mx);
+    fprintf('\nwts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}', ih_mn,ih_mx,ho_mn,ho_mx);
   end;
 
-  % Even if it`s cached, we need the output characteristics
+  % Even if it's cached, we need the output characteristics
   %   of the model.
   if (~isfield(model.ac,'hu'))
 
@@ -63,7 +63,7 @@ function [model] = de_DE(model)
     catch
      if ismember(11, model.debug), fprintf('Failed to find hu output on disk; computing now.\n'); end;
 
-     % Make sure the autoencoder`s connectivity is set.
+     % Make sure the autoencoder's connectivity is set.
       model = de_LoadProps(model, 'ac', 'Weights');
       model.ac.Conn = (model.ac.Weights~=0);
 
@@ -117,7 +117,7 @@ function [model] = de_DE(model)
 
             model.p.Conn(pInputs+[1:pHidden],          [1:pInputs])=true; %input->hidden
             model.p.Conn(pInputs+pHidden+[1:pOutputs], pInputs+[1:pHidden])=true; %hidden->output
-            model.p.Conn((pInputs+1):pUnits, pInputs) = (model.p.useBias~=0); %bias=>all
+            model.p.Conn(:, pInputs) = (model.p.useBias~=0); %bias=>all
 
             model.p.Weights = model.p.WeightInitScale*guru_nnInitWeights(model.p.Conn, ...
                                                                          model.p.WeightInitType);
@@ -155,7 +155,7 @@ function [model] = de_DE(model)
         end;
         fprintf('\tP dataset [%s]: min/max=[%f %f]; mean=%4.3e std=%4.3e\n', 'test', min(X_test(:)), max(X_test(:)), mean(X_test(:)), std(X_test(:)));
 
-        % Add bias
+        % Add bias to test
         if (model.p.useBias)
             biasArray=biasVal*ones(1,nTrials);
             X_test     = [X_test;biasArray];  %bias is last input

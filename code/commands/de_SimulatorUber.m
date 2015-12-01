@@ -18,7 +18,7 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   uber_args = args(non_p_arg_idx);
 
   % Remove ac args that can't be handled
-  tough_ac_argname_idx = find(strcmp(uber_args(1:2:end), {'ac.train_on_task_images'}) ~= 1);
+  tough_ac_argname_idx = find(strcmp(uber_args(1:2:end), {'ac.retrain_on_task_images'}) ~= 1);
   tough_ac_arg_idx = sort([ 2 * tough_ac_argname_idx - 1, 2 * tough_ac_argname_idx]);
   uber_args = uber_args(tough_ac_arg_idx);
 

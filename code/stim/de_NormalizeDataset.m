@@ -6,21 +6,16 @@ function dset = de_NormalizeDataset(dset, mSets)
 %  dset.X should come in with values in range [0 1]
 %  mSets contains the options for the dataset
 
-  if (~isfield(mSets.ac, 'minmax'))
+  if (~isfield(mSets.ac, 'minmax') || isempty(mSets.ac.minmax))
 
-      if (mSets.ac.XferFn(end) == 1) % anything can happen on the output
-          mSets.ac.minmax = [];
-
-      else
-          switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
-              case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
-                                                       % in the [-1 1] range as well
-              case {1}, mSets.ac.minmax = [];
-              case {2,3}, mSets.ac.minmax    = [0 1];
-              case {5}, mSets.ac.minmax = 0.5*[-1 1];
-              otherwise, error('unknown transfer function');
-          end;
-      end;
+	  switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
+		  case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
+												   % in the [-1 1] range as well
+		  case {2,3}, mSets.ac.minmax    = [0 1];
+		  case {5}, mSets.ac.minmax = 0.5*[-1 1];
+		  case {1}, mSets.ac.minmax = [];
+		  otherwise, error('unknown transfer function');
+	  end;
   end;
 
   %%%%%%%%%%%%%%%%%%%%%%%
@@ -112,6 +107,12 @@ function dset = de_NormalizeDataset(dset, mSets)
       if (~isfield(mSets.p, 'minmax'))
           switch (mSets.p.XferFn(end)) % either a single number, or a vector with output nodes at the end
               case {4,6}, mSets.p.minmax    = [-1 1];
+              case {1}
+              	mSets.p.minmax = [0 1];
+  		        rand_idx = randi(numel(dset.T), 1000, 1);
+				if length(unique(dset.T(rand_idx))) <= 2
+				  mSets.p.minmax = [-1 1];
+				end;
               otherwise,  mSets.p.minmax    = [0 1];
           end;
       end;

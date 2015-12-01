@@ -30,16 +30,16 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
   if (isfield(model, 'noise_input'))
     X_orig = X;
-    noise_std = model.noise_input * mean(abs(X_orig(:)));
+    noise_std = model.noise_input * std(abs(X(:)));
   end;
 
   for ip = 1:model.MaxIterations
     % Inject noise into the input
-    if (isfield(model, 'noise_input'))
+    if (isfield(model, 'noise_input') && any(model.noise_input))
         noise_sig = noise_std * randn(size(X)) / 0.7982; % mean 0 noise
         X = X_orig + noise_sig;
         if ip == 1
-            noise_level = abs(1 - mean(abs(X(:))) / mean(abs(X_orig(:))));
+            noise_level = mean(abs(noise_sig(:)./X_orig(:)));
             fprintf('%f noise is %.2f%% of activation.\n', model.noise_input, 100 * noise_level);
         end;
         % Note: don't change Y!!  We don't want to model the noise...
@@ -85,7 +85,7 @@ function [model,o_p] = guru_nnTrain_resilient_homeostatic(model,X,Y)
 
     % Finished training
     if (isnan(currErr))
-        warning('NaN error; probably Eta is too large`');
+        warning('NaN error; probably Eta is too large');
 
 
     elseif (currErr <= model.Error)

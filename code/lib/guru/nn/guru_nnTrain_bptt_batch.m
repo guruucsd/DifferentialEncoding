@@ -58,9 +58,9 @@ function [net,data] = r_train_resilient_batch(net,pats)
     dw           = zeros(size(net.wC));
     dT           = zeros(size(net.TC));
     dD           = zeros(size(net.DC));
-    dwr          = zeros(size(dw)); % last iteration`s dw
-    dTr          = zeros(size(dT)); % last iteration`s dT
-    dDr          = zeros(size(dD)); % last iteration`s dD
+    dwr          = zeros(size(dw)); % last iteration's dw
+    dTr          = zeros(size(dT)); % last iteration's dT
+    dDr          = zeros(size(dD)); % last iteration's dD
 
     % For variable learning rate
     if (numel(ns.eta_w)==1),    ns.eta_w    = ns.eta_w   .*ones(size(net.wC),'single'); end;

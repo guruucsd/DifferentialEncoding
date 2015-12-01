@@ -273,7 +273,9 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
 
 
     % See if any inputs/outputs are NOT connected
-    if want_fully_connected
+    if ~want_fully_connected
+        if (ismember(10,dbg) && nLoc >= 100), fprintf('!\n'); end;
+    else
         nNotCon = sum(~sum(halfCon,1)>0);
 
         if (nNotCon/prod(sI) > tol)
@@ -285,12 +287,16 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                 return;
             end;
 
-            if (dbg), fprintf('.'); end;
+            if (ismember(10,dbg) && nLoc >= 100), fprintf('.'); end;
 
             % Recursive call if we're above some tolerance (here, 1%)
             Con = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol);
-            if (nCalls==1 && isempty(Con))
-                error('Failed to connect network to ALL inputs/outputs after %d calls; quitting...', MAX_CALLS);
+            if (nCalls==1)
+            	if (isempty(Con))
+					error('Failed to connect network to ALL inputs/outputs after %d calls; quitting...', MAX_CALLS);
+                elseif (dbg)
+                    fprintf('!\n');
+                end;
             end;
         end;
     end;

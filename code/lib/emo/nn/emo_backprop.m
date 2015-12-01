@@ -17,7 +17,7 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
 % The total number of units is (W,1).
 % The first size(X,1) "units" are inputs with identity transfer functions.
 % When Trn is a vector it should not include the input units;
-%  thus the length of Trn should be either 1 or size(W,1)-size(X,1).
+%  thus the length of Trn should be either n_layers or size(W,1)-size(X,1).
 %
 % Err: squared error summed over all data points
 % Grad: gradient of Err with respect to W; Grad is a matrix with same
@@ -34,16 +34,38 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   if (~exist('Ern','var')), Ern = 2; end;
   if (~exist('Pow','var')), Pow = 1; end;
 
-
   % compute sizes
+  nTotal    = size(W,1);
   nInput    = size(X,1);
   nOutput   = size(T,1);
-  nTotal    = size(W,1);
+  nHidden   = nTotal - nInput - nOutput;
   nData     = size(X,2);
+
+  idxInput = 1:nInput;
+  idxHidden = (nInput+1):(nTotal-nOutput);
   idxOutput = (nTotal-nOutput+1 : nTotal);
-  if length(Trn)==1,
-     Trn = Trn*ones(nTotal-nInput,1);
-  end
+
+  % Check for multilevel.  % >1 because every unit connects with the bias.
+  idxHiddenByLayer = {};
+  idxCurConn = nInput + find(sum(Con(idxHidden, idxInput), 2) > 1);
+  while any(idxCurConn)
+      idxHiddenByLayer{end+1} = idxCurConn;
+      idxCurConn = nInput + find(sum(Con(idxHidden, idxCurConn), 2) > 1);
+  end;
+
+  % Set up transfer functions
+  if numel(Trn) ~= nTotal-nInput
+      if length(Trn) == 1
+          Trn = Trn*ones(nTotal-nInput, 1);
+      elseif length(Trn) == length(idxHiddenByLayer) + 1
+          tmp = ones(nTotal-nInput, 1);
+          for li=1:length(idxHiddenByLayer)
+              tmp(idxHiddenByLayer{li} - nInput) = Trn(li);
+          end;
+          tmp(idxOutput - nInput) = Trn(end);
+          Trn = tmp;
+      end;
+  end;
 
   % remove nonexistent weights
   W = W .* Con;
@@ -58,23 +80,14 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   Out(1:nInput,:) = X;
 
   % run forward pass
-  hididx = (nInput+1):(nTotal-nOutput);
-  outidx = (nTotal-nOutput+1):nTotal;
-  multilayer = (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1);
-
-  % More than 1 hidden layer
-  if (multilayer)
-      for j = nInput+1:nTotal-nOutput % loop is slow?
-          z(j,:) = W(j,:)*Out;
-          [Out(j,:), h1(j,:)] = emo_trnsfr( Trn(j-nInput), z(j,:) );
-      end
-  else
-      z(hididx,:) = W(hididx,:)*Out;
-      [Out(hididx,:), h1(hididx,:)] = emo_trnsfr( Trn(hididx(1)-nInput), z(hididx,:) );
+  for li=1:length(idxHiddenByLayer)
+      idxCur = idxHiddenByLayer{li};
+      z(idxCur, :) = W(idxCur, :) * Out;
+      [Out(idxCur,:), h1(idxCur,:)] = emo_trnsfr( Trn(idxCur(1)-nInput), z(idxCur,:) );
   end;
 
-  z(outidx,:) = W(outidx,:)*Out;
-  [Out(outidx,:), h1(outidx,:)] = emo_trnsfr( Trn(outidx(1)-nInput), z(outidx,:) );
+  z(idxOutput,:) = W(idxOutput,:) * Out;
+  [Out(idxOutput,:), h1(idxOutput,:)] = emo_trnsfr( Trn(idxOutput(1)-nInput), z(idxOutput,:) );
 
 
   % Compute error and error derivative
@@ -85,18 +98,14 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   d(idxOutput,:) = - (Errp.^Pow) .* h1(idxOutput,:); % use "pow" here, so that ERROR reports are on regular error; POW only affects the gradient
 
   % run backward pass over hidden units, one-by-one
-  if multilayer
-    for j = nTotal-nOutput:-1:nInput+1
-      d(j,:) = h1(j,:) .* (W(:,j)'*d);
-    end
-  else
-    j = hididx;
-    d(j,:) = h1(j,:) .* (W(:,j)'*d);
+  for li=length(idxHiddenByLayer):-1:1
+      idxCur = idxHiddenByLayer{li};
+      d(idxCur,:) = h1(idxCur,:) .* (W(:,idxCur)'*d);
   end;
 
   % Run backwards pass from Hidden->Input
-  %j = 1:nInput;
-  %d(j,:) = h1(j,:) .* (W(:,j)'*d);
+  idxCur = 1:nInput;
+  d(idxCur,:) = h1(idxCur,:) .* (W(:,idxCur)'*d);
 
   % Output error (across all output nodes) and gradient
   Err  = sum(Err, 1); %  Err = sum(sum(d_a.^2))/ 2;

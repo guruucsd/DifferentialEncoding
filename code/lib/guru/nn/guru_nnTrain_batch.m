@@ -61,7 +61,7 @@ function [model,o_p] = guru_nnTrain_batch(model,X,Y)
 
     % Finished training
     if (isnan(currErr))
-        warning('NaN error; probably Eta is too large`');
+        warning('NaN error; probably Eta is too large');
 
 
     elseif (currErr <= model.Error)

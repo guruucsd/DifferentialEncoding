@@ -16,7 +16,7 @@ function [err, errP] = emo_nnError(errorType, Y, T)
     case {1,'abs'},
       RAW_ERROR = T-Y;
       err = abs(RAW_ERROR);
-      if nargout>1, errP = ones(size(Y)); end;
+      if nargout>1, errP = -ones(size(Y)); end;
 
     case {2,'squ'},
       RAW_ERROR = T-Y;
@@ -25,8 +25,9 @@ function [err, errP] = emo_nnError(errorType, Y, T)
 
     case {3,'cent'}
         err = -(T.*log(Y) + (1-T).*log(1-Y));
+        guru_assert(isreal(err), 'All error must be real.');
         if nargout>1
 	        RAW_ERROR = T-Y;
-        	 errP = RAW_ERROR;
+        	errP = RAW_ERROR;
         end;
   end;

@@ -10,17 +10,17 @@ function model = de_LoadOrTrain(model)
 %   * If that fails, then load without the flags, then pass in (how to indicate to skip first training?).
 
   % Force the separate training of the non-task-based images
-  if isfield(model.ac, 'train_on_task_images') && model.ac.train_on_task_images
-      guru_assert(strcmp(model.deType, 'de'), 'train_on_task_images is only supported currently for the de training type.');
+  if isfield(model.ac, 'retrain_on_task_images') && model.ac.retrain_on_task_images
+      guru_assert(strcmp(model.deType, 'de'), 'retrain_on_task_images is only supported currently for the de training type.');
 
       % Just load/train on the previous autoencoder result
       pre_train_model = guru_rmfield(model, 'p');
-      pre_train_model.ac.train_on_task_images = false;
+      pre_train_model.ac.retrain_on_task_images = false;
       pre_train_model = de_LoadOrTrain(pre_train_model);
 
       % Now load/train on the full thing
       model.ac = pre_train_model.ac;
-      model.ac.train_on_task_images = true;
+      model.ac.retrain_on_task_images = true;
       model.ac.cached = false;
       model.ac.continue = true;
       %model = guru_rmfield(model, 'uberpath'); % is this necessary?

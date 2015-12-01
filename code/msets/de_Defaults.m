@@ -41,7 +41,7 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
   if (~ismember('dataFile',         aKeys)), args(end+1:end+2) = {'dataFile', de_GetDataFile(expt, stimSet, taskType, opt); }; end;
 
   % autoencoder
-  if (~ismember('ac.train_on_task_images', aKeys)), args(end+1:end+2) = {'ac.train_on_task_images', false}; end;
+  if (~ismember('ac.retrain_on_task_images', aKeys)), args(end+1:end+2) = {'ac.retrain_on_task_images', false}; end;
   if (~ismember('ac.randState',     aKeys)), args(end+1:end+2) = {'ac.randState',     1}; end;
   if (~ismember('ac.AvgError',      aKeys)), args(end+1:end+2) = {'ac.AvgError',      0}; end;
   if (~ismember('ac.MaxIterations', aKeys)), args(end+1:end+2) = {'ac.MaxIterations', 350}; end;
