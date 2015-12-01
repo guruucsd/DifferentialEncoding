@@ -17,7 +17,7 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
 % The total number of units is (W,1).
 % The first size(X,1) "units" are inputs with identity transfer functions.
 % When Trn is a vector it should not include the input units;
-%  thus the length of Trn should be either 1 or size(W,1)-size(X,1).
+%  thus the length of Trn should be either n_layers or size(W,1)-size(X,1).
 %
 % Err: squared error summed over all data points
 % Grad: gradient of Err with respect to W; Grad is a matrix with same
@@ -40,8 +40,12 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   nOutput   = size(T,1);
   nTotal    = size(W,1);
   nData     = size(X,2);
+
+  idxHidden = (nInput+1):(nTotal-nOutput);
   idxOutput = (nTotal-nOutput+1 : nTotal);
-  if length(Trn)==1,
+
+  % Determine layer structure
+  if length(Trn) == 1
      Trn = Trn*ones(nTotal-nInput,1);
   end
 
@@ -58,23 +62,22 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
   Out(1:nInput,:) = X;
 
   % run forward pass
-  hididx = (nInput+1):(nTotal-nOutput);
-  outidx = (nTotal-nOutput+1):nTotal;
-  multilayer = (any(find(W(hididx,hididx))) || length(unique(Trn(hididx-nInput)))~=1);
+  multilayer = (any(find(W(idxHidden, idxHidden))) || length(unique(Trn(idxHidden-nInput)))~=1);
 
   % More than 1 hidden layer
   if (multilayer)
+      keyboard
       for j = nInput+1:nTotal-nOutput % loop is slow?
           z(j,:) = W(j,:)*Out;
           [Out(j,:), h1(j,:)] = emo_trnsfr( Trn(j-nInput), z(j,:) );
       end
   else
-      z(hididx,:) = W(hididx,:)*Out;
-      [Out(hididx,:), h1(hididx,:)] = emo_trnsfr( Trn(hididx(1)-nInput), z(hididx,:) );
+      z(idxHidden,:) = W(idxHidden,:)*Out;
+      [Out(idxHidden,:), h1(idxHidden,:)] = emo_trnsfr( Trn(idxHidden(1)-nInput), z(idxHidden,:) );
   end;
 
-  z(outidx,:) = W(outidx,:)*Out;
-  [Out(outidx,:), h1(outidx,:)] = emo_trnsfr( Trn(outidx(1)-nInput), z(outidx,:) );
+  z(idxOutput,:) = W(idxOutput,:)*Out;
+  [Out(idxOutput,:), h1(idxOutput,:)] = emo_trnsfr( Trn(idxOutput(1)-nInput), z(idxOutput,:) );
 
 
   % Compute error and error derivative
@@ -90,7 +93,7 @@ function [Err, Grad, Out] = emo_backprop( X, T, W, Con, Trn, Ern, Pow )
       d(j,:) = h1(j,:) .* (W(:,j)'*d);
     end
   else
-    j = hididx;
+    j = idxHidden;
     d(j,:) = h1(j,:) .* (W(:,j)'*d);
   end;
 
