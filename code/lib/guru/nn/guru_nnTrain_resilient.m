@@ -18,13 +18,8 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     model.Error = model.AvgError * numel(Y);
   end;
 
-  if ~isfield(model, 'Eta')
-    model.Eta = sparse(model.EtaInit.*model.Conn);
-  else
-    model.Eta = model.Eta.*model.Conn; % validate that we won't train any non-connections
-  end;
+  model.Eta = sparse(guru_getfield(model, 'Eta', model.EtaInit) .* model.Conn);
 
-%  lastErr   = NaN;
   currErr   = NaN;
   lastGrad  = spalloc(size(model.Conn,1), size(model.Conn,2), nnz(model.Conn));
 
@@ -35,7 +30,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
 
   for ip = 1:model.MaxIterations
     % Inject noise into the input
-    if (isfield(model, 'noise_input') && any(model.noise_input))
+    if any(guru_getfield(model, 'noise_input', 0))
         noise_sig = noise_std * randn(size(X)) / 0.7982; % mean 0 noise
         X = X_orig + noise_sig;
         if ip == 1
@@ -46,7 +41,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
     end;
 
     %% Determine model error based on that update
-    if isfield(model,'dropout') && model.dropout>0
+    if guru_getfield(model, 'dropout', 0) > 0
         wOrig = model.Weights;
         cOrig = model.Conn;
         idxHOut = find(rand(nHidden,1)<model.dropout);
@@ -63,7 +58,7 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
         [model.err(ip,:),grad]             =emo_backprop(X, Y, model.Weights, model.Conn, model.XferFn, model.errorType, model.Pow );
     end;
 
-    if (isfield(model, 'dropout') && model.dropout>0)
+    if guru_getfield(model, 'dropout', 0) > 0
       model.Conn = cOrig;
       model.Weights = wOrig;
     end;

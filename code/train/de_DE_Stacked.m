@@ -35,7 +35,7 @@ function [model] = de_DE_Stacked(model)
     end;
 
     % Train the model
-    [model.ac] = guru_nnTrainAC(model.ac,X);
+    [model.ac] = guru_nnTrainAC(model.ac, X);
     clear('X', 'Y');
 
     % report results to screen
