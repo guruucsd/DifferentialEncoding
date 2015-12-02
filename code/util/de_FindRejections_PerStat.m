@@ -23,8 +23,8 @@
     %   So, if you run multiple, one follows another logically.
     rejectTypes = zeros(rons, min(1,length(rmodes)));
 
-    if (length(models) ~= size(stats,1))
-        warning('# models(%d) and size of stats(%d) not compatible.', rons, length(stats));
+    if (numel(models) ~= numel(stats))
+        warning('# models(%d) and size of stats(%d) not compatible.', numel(models), numel(stats));
     end;
 
     for r=1:length(rmodes)

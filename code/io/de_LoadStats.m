@@ -6,6 +6,7 @@ function stats = de_LoadStats(mSets, mss)
         stats = [];
 
     else
+      try
         % See if our stats cache has been invalidated (or not)
         all_ac = true; all_p = true;
         for i=1:length(mss)
@@ -37,6 +38,10 @@ function stats = de_LoadStats(mSets, mss)
 
             stats.cached = (all_ac && all_p);
          end;
+       catch err
+         warning(sprintf('Error while loading stats; re-running from scratch. %s\n', err.message));
+         stats = [];
+       end;
     end;
 
     if (true || ~isfield(stats, 'cached')), stats.cached = false; end;
