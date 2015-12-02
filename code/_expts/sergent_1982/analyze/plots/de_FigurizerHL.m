@@ -22,6 +22,7 @@ function figs = de_FigurizerHL(mSets, mss, stats)
       figs = [figs de_DoPlot('ls-bars-raw', 'de_PlotHLBars',                        mSets, mSets, stats.raw) ];
       figs = [figs de_DoPlot('ls-bars',     'de_PlotHLBars',                        mSets, mSets, stats.rej) ];
       figs = [figs de_DoPlot('ls-bars',     'de_PlotHLBarsZoomed',                  mSets, mSets, stats.rej) ];
+      figs = [figs de_DoPlot('ls-bars',     'de_PlotHLBarsNormed',                  mSets, mSets, stats.rej) ];
       figs = [figs de_DoPlot('ls-bars-div', 'de_PlotHLBarsDivided',                 mSets, mSets, stats.rej) ];
   end
 %  figs = [figs de_DoPlot('ffts-bycond', 'de_PlotHLFFTs_ByCondition',            mSets, mSets, stats.rej.ac.ffts.(ds)) ];
