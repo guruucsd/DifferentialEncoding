@@ -1,6 +1,6 @@
 clear all variables; clear all globals;
 
-stats =  {'ffts','images'};
+stats =  {}; %'ffts','images'};
 plots = stats;
 
 [args,opts] = uber_christman_args( 'plots', plots, 'stats', stats);
