@@ -7,8 +7,8 @@ function [fig] = de_PlotHLBarsNormd(mSets, stats)
           mSets.data.aux.idx.LmSmID mSets.data.aux.idx.LmSmNID];
 
   new_stats = stats;
-  new_stats.basics.bars(tidx, :), ...
-  new_stats.basics.bars_stde(tidx, :), ...
+  new_stats.basics.bars(tidx, :);
+  new_stats.basics.bars_stde(tidx, :);
 
   scale_factors = mean(new_stats.basics.bars(tidx, :), 1);
   rep_scale_factors = repmat(scale_factors, [length(tidx) 1]);
