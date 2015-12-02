@@ -1,13 +1,10 @@
 function [fig] = de_PlotHLBars(mSets, stats)
-%function [h] = de_PlotHLBars(modelSettings)
+%function [h] = de_PlotHLBars(mSets, stats)
 %
 % Plot LpSm,LmSp,LpSp,LmSm
 %
 % Input:
-% LS            :
-% sigmas    :
-% errorType         : (optional) rejections mode
-
+%
 % Output:
 % h             : array of handles to plots
 
@@ -60,17 +57,3 @@ function [fig] = de_PlotHLBars(mSets, stats)
   ylabel('Error');
   title('Model Data');
   box('on');
-
-%  else
-%    bar(err(tidx, :));
-%    set(gca,'tickdir','out');
-%    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.aux.TLBL(tidx),' ',sprintf('\n')));
-%
-%    if (length(mSets.sigma)==2)
-%      legend(lentries, 'Location','NorthWest');
-%    elseif (length(lentries)<3)
-%      legend(lentries,'Location','NorthOutside');
-%    else
-%      legend(lentries,'Location','EastOutside');
-%    end;
-%  end;
