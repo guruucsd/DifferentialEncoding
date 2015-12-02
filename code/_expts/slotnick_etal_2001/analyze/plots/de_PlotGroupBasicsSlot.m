@@ -9,6 +9,7 @@ yrng = 0;
 
 for tt = 1:num_ttypes
     taskTitle = guru_capitalizeStr(models{tt}(1).data.taskType);
+    stimSet = models{tt}(1).data.stimSet;
     left = data{tt}.rej.cc.perf.(ds){1};
     right = data{tt}.rej.cc.perf.(ds){end};
     rons = models{1}(1).runs;
@@ -28,12 +29,12 @@ for tt = 1:num_ttypes
     left_average = mean(left_results(:)');
     right_average = mean(right_results(:)');
     avg(tt) = mean([left_average, right_average]);
-    yrng = max(yrng, left_average-right_average);
+    yrng = max(yrng, abs(left_average-right_average));
     
     left_stderr = std(mean(left_results, 2)) / sqrt(size(left_results, 1));
     right_stderr = std(mean(right_results, 2)) / sqrt(size(right_results, 1));
     ax(tt) = subplot(1, num_ttypes, tt);
-    de_CreateSlotnickFigure1([left_average right_average], [left_stderr right_stderr], taskTitle, rons, ax(tt));
+    de_CreateSlotnickFigure1([left_average right_average], [left_stderr right_stderr], taskTitle, stimSet, rons, ax(tt));
 
 end
 
