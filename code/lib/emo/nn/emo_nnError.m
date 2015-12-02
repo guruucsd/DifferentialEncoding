@@ -26,6 +26,7 @@ function [err, errP] = emo_nnError(errorType, Y, T)
     case {3,'cent'}
         err = -(T.*log(Y) + (1-T).*log(1-Y));
         guru_assert(isreal(err), 'All error must be real.');
+        guru_assert(~any(isnan(err(:))));
         if nargout>1
 	        RAW_ERROR = T-Y;
         	errP = RAW_ERROR;
