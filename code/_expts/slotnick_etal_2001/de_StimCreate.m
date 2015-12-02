@@ -45,9 +45,8 @@ function train = MakeBlobDot(taskType)
     % Create the input images.
     train.nInput = [68 50];
     train.X = zeros(prod(train.nInput), 0);
-    train.XLAB = cell(20, 1); % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
-    train.TLAB = cell(20, 1);
-    counter = 0;
+    train.XLAB = {}; % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
+    train.TLAB = {};
     heights = [];
 
     % first, 10 "far" images
@@ -56,8 +55,7 @@ function train = MakeBlobDot(taskType)
         for ij=1:length(distances)
             img = blob_stimuli(distances(ij), 3, ii);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            counter = counter + 1;
-            train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
+            train.XLAB{end+1} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
             heights = [heights, distances(ij)];
         end
     end
@@ -66,9 +64,8 @@ function train = MakeBlobDot(taskType)
     for ii=1:5
         distances = [0, 4];
         for ij=1:length(distances)
-            counter = counter + 1;
             img = blob_stimuli(distances(ij), 3, ii);
-            train.XLAB{counter} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
+            train.XLAB{end+1} = sprintf('%dpx from %d%c', distances(ij), (ii-1)* 72, char(176));
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
             heights = [heights, distances(ij)];
         end
@@ -107,8 +104,8 @@ function train = MakePairedSquares(taskType)
 
     train.nInput = [34 25];
     train.X = zeros(prod(train.nInput), 0);
-    train.XLAB = cell(16, 1); % paired squares has 16 stimuli: 4 distances left side x 4 distances right
-    train.TLAB = cell(16, 1);
+    train.XLAB = {}; % paired squares has 16 stimuli: 4 distances left side x 4 distances right
+    train.TLAB = {};
 
     left_distances = []; % to be used when assigning labels
     right_distances = [];
@@ -118,8 +115,7 @@ function train = MakePairedSquares(taskType)
         for ij = 1:length(distances) % right side: distance b/n square ranges [2, 5]
             img = paired_squares_stimuli(distances(ii), distances(ij), 0);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            counter = counter + 1;
-            train.XLAB{counter} = sprintf('(Dist) Left: %dpx ; Right: %dpx', distances(ii), distances (ij));
+            train.XLAB{end+1} = sprintf('(Dist) Left: %dpx ; Right: %dpx', distances(ii), distances (ij));
             left_distances = [left_distances, distances(ii)];
             right_distances = [right_distances, distances(ij)];
         end
@@ -151,7 +147,6 @@ function train = MakePlusMinus(taskType)
     train.X = zeros(prod(train.nInput), 0);
     train.XLAB = cell(16, 1); % blob-dot has 20 stimuli: 10 far/off, 5 near/off, 5 near/on
     train.TLAB = cell(16, 1);
-    counter = 0;
     dist = []; % array of distances
     plus_on_right = []; % array of if plus is on right
 
@@ -161,9 +156,8 @@ function train = MakePlusMinus(taskType)
         for ij= -1 : 2 : 1  %is -1 or 1
             img = plus_minus_stimuli(distances(ii), ij);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            counter = counter + 1;
             if ij == -1, str = 'left'; else str = 'right'; end
-            train.XLAB{counter} = sprintf('Plus on %s, %dpx apart', str, distances(ii));
+            train.XLAB{end+1} = sprintf('Plus on %s, %dpx apart', str, distances(ii));
             dist = [dist, distances(ii)];
             plus_on_right = [plus_on_right, ij];
         end
