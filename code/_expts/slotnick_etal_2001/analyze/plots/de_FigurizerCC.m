@@ -15,7 +15,7 @@ function figs = de_FigurizerCC(mSets, mss, stats)
     n_trial_types = length(left);
     n_plots = n_trial_types + 1;  % plot for each trial type, plus combined
     for pi=1:n_plots
-        subplot(1, n_tplots, pi);
+        subplot(1, n_plots, pi);
 
         if pi == 1
             left_mean = mean(cellfun(@(d) mean(d(:)), left));
