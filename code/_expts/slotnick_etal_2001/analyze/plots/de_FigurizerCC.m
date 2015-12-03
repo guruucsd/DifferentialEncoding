@@ -15,14 +15,14 @@ function figs = de_FigurizerCC(mSets, mss, stats)
     n_trial_types = length(left);
     n_plots = n_trial_types + 1;  % plot for each trial type, plus combined
     for pi=1:n_plots
-        subplot(1, n_plots, pi);
+        ax = subplot(1, n_plots, pi);
 
         if pi == 1
             left_mean = mean(cellfun(@(d) mean(d(:)), left));
             right_mean = mean(cellfun(@(d) mean(d(:)), right));
             left_stderr = 0 * left_mean;  % feeling lazy; errorbars are clear
             right_stderr = 0 * right_mean; % on other subplots.
-            taskTitle = guru_captializeStr(mSets.data.taskType);
+            taskTitle = guru_capitalizeStr(mSets.data.taskType);
 
         else
             ti = pi - 1;
@@ -41,7 +41,8 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
-                                 taskTitle, mSets.data.stimSet, rons);
+                                 taskTitle, mSets.data.stimSet, ...
+                                 rons, ax);
 
         if pi ~= round(n_plots/2)
             xlabel('');  % remove label
