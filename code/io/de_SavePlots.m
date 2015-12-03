@@ -35,7 +35,7 @@ function out = de_SavePlots(mSets, figs)
         guru_mkdir(guru_fileparts(out.files{end}, 'pathstr'));
       end;
 
-      export_fig(figs(j).handle, [out.files{end} '-export-fig' ext], '-transparent');
+      % export_fig(figs(j).handle, [out.files{end} '-export-fig' ext], '-transparent');
       saveas(figs(j).handle, out.files{end}, ext(2:end));
 
       % Make a version of the plot for publication
