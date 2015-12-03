@@ -18,5 +18,5 @@ function [tt] = de_StatsTrainTimeAC(models)
   tt = cell(length(models), 1);
 
   for s=1:length(models)
-    tt{s} = cellfun(@(m) m.ac.trainTime, num2cell(models{s}));
+    tt{s} = arrayfun(@(m) m.ac.trainTime, models{s});
   end;
