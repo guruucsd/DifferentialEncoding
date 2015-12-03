@@ -13,26 +13,7 @@ for ti=1:2
         o    = [p.output];
         
         tmp   = de_calcPErr( vertcat(o.(ds)), mSets.data.test.T, 2);
-        
-        if (strcmp(mSets.data.taskType, 'categorical'))
-            switch(mSets.data.stimSet) % Use TLBL?
-                case 'blob-dot',
-                    trial_types = {'on', 'off'};
-                case 'plus-minus',
-                    trial_types = {'right', 'left'};
-                otherwise, error('Unimplemented stimSet for categorical. Choose from {blob-dot}');
-            end
-        else
-            switch(mSets.data.stimSet)
-                case 'blob-dot',
-                    trial_types = {'near', 'far'};
-                case 'paired-squares',
-                    trial_types = {'same', 'different'};
-                case 'plus-minus',
-                    trial_types = {'near', 'far'};
-                otherwise, error('Unimplemented stimSet for coordinate. Choose from {blob-dot, paired-squares}');
-            end
-        end
+        trial_types = {'easy', 'hard'};
         type1_perf = tmp(:, guru_instr(mSets.data.(ds).TLAB, trial_types{1})); %2 freqs
         type2_perf = tmp(:, guru_instr(mSets.data.(ds).TLAB, trial_types{2}));
         stats.perf.(ds){mi} = {type1_perf type2_perf};
@@ -82,7 +63,7 @@ for ti=1:2
     
     % Factor 2: On/off or Near/far
     F2 = [ repmat({trial_types{1}}, [size(perf{1}{1},1) 1]); repmat({trial_types{1}}, [size(perf{2}{1},1) 1]); ...
-         repmat({trial_types{2}}, [size(perf{1}{2},1) 1]); repmat({trial_types{2}}, [size(perf{2}{2},1) 1]) ];
+           repmat({trial_types{2}}, [size(perf{1}{2},1) 1]); repmat({trial_types{2}}, [size(perf{2}{2},1) 1]) ];
     
     % Convert all above labels to numeric
     [~,~,S_n] = unique(S);
