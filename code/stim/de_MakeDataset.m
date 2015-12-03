@@ -80,15 +80,6 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
           guru_mkdir(guru_fileparts(dataFile,'pathstr'));
         end;
 
-        if show_figs
-            figpath = guru_fileparts(dataFile,'path');
-            prefix  = guru_fileparts(dataFile, 'name');
-            for fi=1:length(tr_figs)
-                saveas(tr_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-train.png']), 'png');
-                saveas(te_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-test.png']), 'png');
-            end;
-        end;
-
         save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
     end;
 
@@ -291,25 +282,18 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 
 
 %%%%%%%%%%%%%%%%%
-function figs = de_visualizeData(dset)
-  figs = de_NewFig('dummy');
+function fig = de_visualizeData(dset)
 
   nImages = min(4*4,size(dset.X,2));
 
   % View some sample images
-  figs(end+1) = de_NewFig('data', '__img', [34 25], nImages);
+  fig = de_NewFig('dataset-images', '__img', [34 25], nImages);
   im2show     = de_SelectImages(dset, nImages);
-  %randperm(size(dset.X,2));
-  %im2show     = sort(im2show(1:nImages));
 
   for ii=1:nImages
-          subplot(4,4,ii);
-          colormap gray;
-          imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
-          axis image; set(gca, 'xtick',[],'ytick',[]);
-          xlabel(guru_text2label(dset.XLAB{im2show(ii)}));
+      subplot(4,4,ii);
+      colormap gray;
+      imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
+      axis image; set(gca, 'xtick',[],'ytick',[]);
+      xlabel(guru_text2label(sprintf('%s\n%s', dset.XLAB{im2show(ii)}, dset.TLAB{im2show(ii)})));
   end;
-
-  % View frequency info for images
-
-  %
