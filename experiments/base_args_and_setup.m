@@ -4,7 +4,7 @@ function [cargs]  = base_args_and_setup(varargin)
   more off
   if exist('OCTAVE_VERSION', 'builtin') == 0  % MATLAB
     dbstop if error
-    dbstop if warning
+    % dbstop if warning
   else  % OCTAVE
     debug_on_error = 1;
     pkg load image;
