@@ -1,50 +1,42 @@
 function figs = de_PlotGroupBasicsSlot( ms, ss )
 
-data = {ss.cate; ss.coor};
-models = {ms.cate; ms.coor};
-ds = 'test';
-num_ttypes = size(data, 1);
-fig = de_NewFig('blobdot_comparison');
-yrng = 0;
+    data = {ss.cate; ss.coor};
+    models = {ms.cate; ms.coor};
+    ds = 'test';
+    num_ttypes = size(data, 1);
+    trial_types = data{1}.rej.cc.perf.(ds){1}.trial_types;
 
-for tt = 1:num_ttypes
-    taskTitle = guru_capitalizeStr(models{tt}(1).data.taskType);
-    stimSet = models{tt}(1).data.stimSet;
-    left = data{tt}.rej.cc.perf.(ds){1};
-    right = data{tt}.rej.cc.perf.(ds){end};
-    rons = models{1}(1).runs;
+    for tri = 1:length(trial_types)  % trial type
+        trial_type = trial_types{tri};
+        fig = de_NewFig(sprintf('blobdot_comparison_%s', trial_type);
+        yrng = 0;
 
-    % these results are for on/near
-    left_results1 = left{1};
-    right_results1 = right{1};
-    
-    %these results are for off/far
-    left_results2 = left{2};
-    right_results2 = right{2};
-    
-    % combine them into a single results matrix
-    left_results = [left_results1, left_results2];
-    right_results = [right_results1, right_results2];
-    
-    left_average = mean(left_results(:)');
-    right_average = mean(right_results(:)');
-    avg(tt) = mean([left_average, right_average]);
-    yrng = max(yrng, abs(left_average-right_average));
-    
-    left_stderr = std(mean(left_results, 2)) / sqrt(size(left_results, 1));
-    right_stderr = std(mean(right_results, 2)) / sqrt(size(right_results, 1));
-    ax(tt) = subplot(1, num_ttypes, tt);
-    de_CreateSlotnickFigure1([left_average right_average], [left_stderr right_stderr], taskTitle, stimSet, rons, ax(tt));
+        for tai = 1:length(data)  % task type
+            mSets = models{tt}(1);
+            taskTitle = guru_capitalizeStr(mSets.data.taskType);
+            stimSet = mSets.data.stimSet;
 
-end
+            left = data{tt}.rej.cc.perf.(ds){1}{tri};
+            right = data{tt}.rej.cc.perf.(ds){end}{tri};
+            rons = min(length(models{1}), length(models{end}));
 
-for tt = 1:num_ttypes
-    minimum = avg(tt) - 2*yrng; % Only need yrng/2 for full range, but 2* yrng for room for error bar
-    maximum = avg(tt) + 2*yrng;
-    yrange=[minimum, maximum];
-    set(ax(tt), 'ylim', yrange)
-end
+            left_mean = mean(left(:));
+            right_mean = mean(right(:));
+            left_stderr = std(mean(left, 2)) / sqrt(size(left, 1));
+            right_stderr = std(mean(left, 2)) / sqrt(size(right, 1));
 
-figs = [fig];
+            ax(tt) = subplot(1, num_ttypes, tt);
+            de_CreateSlotnickFigure1([left_mean right_mean], ...
+                                     [left_stderr right_stderr], ...
+                                     taskTitle, stimSet, rons, ax(tt));
 
-end
+            % Store properties to correct axes
+            avg(tt) = mean([left_mean, right_mean]);
+            yrng = max(yrng, abs(left_mean - right_mean));
+        end
+
+        for tt = 1:num_ttypes
+            % Only need yrng/2 for full range, but 2* yrng for room for error bar
+            set(ax(tt), 'ylim', avg(tt) + 2*[-1, 1])
+        end
+    end;

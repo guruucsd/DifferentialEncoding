@@ -4,30 +4,31 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 % 2) Implement code that generalizes based on the task (blob/dot vs paired
 % squares etc)
 
-ds = 'test';
-taskTitle = guru_capitalizeStr(mSets.data.taskType);
+    ds = 'test';
 
+    left = stats.rej.cc.perf.(ds){1};
+    right = stats.rej.cc.perf.(ds){end};
+    rons = mSets.runs;
 
-left = stats.rej.cc.perf.(ds){1};
-right = stats.rej.cc.perf.(ds){end};
-rons = mSets.runs;
-% these results are for the first trial type, i.e. one of {on, near, same}
-left_results1 = left{1};
-right_results1 = right{1};
+    figs = de_NewFig(mSets.data.taskType);
 
-% these results are for the second trial type, i.e. one of {off, near, different}
-left_results2 = left{2};
-right_results2 = right{2};
+    n_trial_types = length(left);
+    for ti=1:n_trial_types  % plot for each trial type
+        subplot(1, n_trial_types, ti);
 
-% combine them into a single results matrix
-left_results = [left_results1, left_results2];
-right_results = [right_results1, right_results2];
+        left_mean = mean(left{ti}(:));
+        right_mean = mean(right{ti}(:));
 
-left_average = mean(left_results(:)');
-right_average = mean(right_results(:)');
+        % Average over trials to get a single score per network,
+        % then find stderr over all networks.
+        left_stderr = std(mean(left{ti}, 2)) / sqrt(size(left{ti}, 1));
+        right_stderr = std(mean(right{ti}, 2)) / sqrt(size(right{ti}, 1));
 
-left_stderr = std(mean(left_results, 2)) / sqrt(size(left_results, 1));
-right_stderr = std(mean(right_results, 2)) / sqrt(size(right_results, 1));
+        taskTitle = sprintf('%s (%s)', ...
+                            guru_capitalizeStr(mSets.data.taskType), ...
+                            guru_capitalizeStr(stats.rej.cc.anova.(ds).trial_types{ti}));
 
-fig = de_CreateSlotnickFigure1([left_average right_average], [left_stderr right_stderr], taskTitle, mSets.data.stimSet, rons);
-figs = [fig];
+        de_CreateSlotnickFigure1([left_mean right_mean], ...
+                                 [left_stderr right_stderr], ...
+                                 taskTitle, mSets.data.stimSet, rons);
+    end;

@@ -295,5 +295,9 @@ function fig = de_visualizeData(dset)
       colormap gray;
       imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
       axis image; set(gca, 'xtick',[],'ytick',[]);
-      xlabel(guru_text2label(sprintf('%s\n%s', dset.XLAB{im2show(ii)}, dset.TLAB{im2show(ii)})));
+      lbl = dset.XLAB{im2show(ii)};
+      if isfield(dset, 'TLAB')
+          lbl = sprintf('%s\n%s', lbl, dset.TLAB{im2show(ii)});
+      end;
+      xlabel(guru_text2label(lbl));
   end;
