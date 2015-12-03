@@ -10,8 +10,10 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, rons, ax
         ax = gca(); % make current figure the axis if not passed in.
     end
 
-    % Create errorbar
-    errorbar(ax, Y1,E1,'MarkerSize', 15,...
+    % REVERSE the order of data, as Slotnick plots
+    % the *hemisphere injected*, whereas our data are for
+    % the hemisphere running.
+    errorbar(ax, Y1(end:-1:1), E1(end:-1:1),'MarkerSize', 15,...
              'MarkerFaceColor', [0.600000023841858 0.200000002980232 0],...
              'MarkerEdgeColor', [0.600000023841858 0.200000002980232 0],...
              'Marker', 'square',...
@@ -19,6 +21,7 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, rons, ax
     box(ax, 'on');
 
     % Set the remaining axes properties
-    set(ax, 'XTick', [1 2], 'XTickLabel', {'LH', 'RH'});
+    set(ax, 'XTick', [1 2], 'XTickLabel', {'Left', 'Right'});
+    xlabel('Hemisphere Injected');  % weird, right??
     ylabel(ax, 'Sum squared error');
-    title(ax, sprintf('%s Stimuli: %s (n=%d)', taskTitle, stimSet, rons));
+    title(ax, sprintf('%s, Stimuli: %s (n=%d)', taskTitle, stimSet, rons));
