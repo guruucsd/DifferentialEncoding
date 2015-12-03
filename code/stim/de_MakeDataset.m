@@ -43,19 +43,19 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Make sure what comes out is the MVP (minimum viable product)
         all_required_props = {'X', 'XLAB', 'nInput'};
-        if ~isempty(taskType), all_required_props{end+1} = 'T'; end;            
+        if ~isempty(taskType), all_required_props{end+1} = 'T'; end;
         for prop_name=all_required_props
             guru_assert(isfield(train, prop_name{1}), ...
                         sprintf('Training set must have "%s" property defined.', prop_name{1}));
         end;
-        
+
 
         path(p); % Restore path
 
         %%
         % Stamp on parameters
-        train.expt = expt; train.stimSet = stimSet; train.TaskType = taskType; train.opt = opt;
-        test.expt  = expt; test.stimSet  = stimSet; test.TaskType  = taskType; test.opt  = opt;
+        train.expt = expt; train.stimSet = stimSet; train.taskType = taskType; train.opt = opt;
+        test.expt  = expt; test.stimSet  = stimSet; test.taskType  = taskType; test.opt  = opt;
 
         % Apply missing (but expected) field
         if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
