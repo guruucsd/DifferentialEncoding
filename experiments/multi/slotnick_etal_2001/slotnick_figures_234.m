@@ -39,8 +39,8 @@ for si=1:n_scripts
     end;
 
     % Plot each figure
-    left = stats.rej.cc.perf.(ds){1};
-    right = stats.rej.cc.perf.(ds){end};
+    right = stats.rej.cc.perf.(ds){1};
+    left = stats.rej.cc.perf.(ds){end};
     rons = mSets.runs;
 
     n_trial_types = length(left);

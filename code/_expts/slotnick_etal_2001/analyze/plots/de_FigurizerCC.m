@@ -6,8 +6,8 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 
     ds = 'test';
 
-    left = stats.rej.cc.perf.(ds){1};
-    right = stats.rej.cc.perf.(ds){end};
+    right = stats.rej.cc.perf.(ds){1};
+    left = stats.rej.cc.perf.(ds){end};
     rons = mSets.runs;
 
     figs = de_NewFig(mSets.data.taskType);

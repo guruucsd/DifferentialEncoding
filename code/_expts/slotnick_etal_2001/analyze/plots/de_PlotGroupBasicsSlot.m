@@ -16,8 +16,8 @@ function figs = de_PlotGroupBasicsSlot( ms, ss )
             taskTitle = guru_capitalizeStr(mSets.data.taskType);
             stimSet = mSets.data.stimSet;
 
-            left = data{tt}.rej.cc.perf.(ds){1}{tri};
-            right = data{tt}.rej.cc.perf.(ds){end}{tri};
+            right = data{tt}.rej.cc.perf.(ds){1}{tri};
+            left = data{tt}.rej.cc.perf.(ds){end}{tri};
             rons = min(length(models{1}), length(models{end}));
 
             left_mean = mean(left(:));
