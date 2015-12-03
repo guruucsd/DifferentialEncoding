@@ -3,9 +3,10 @@ function [args,opts] = face_args(varargin)
 %  Final shared settings for left-side-bias runs
   % Get shared args
   script_dir = fileparts(which(mfilename));
-  addpath(fullfile(script_dir, '..'));  
+  addpath(fullfile(script_dir, '..'));
 
   [args,opts] = uber_args( ...
+    'runs', 25, ...
     'errorType', 3, ...
     'p.errorType', 3,... % cross-entropy
     'p.XferFn', [6 7], ...  %sigmoid->sigmoid
