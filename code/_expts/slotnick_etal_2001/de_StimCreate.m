@@ -52,7 +52,7 @@ function train = MakeBlobDot(taskType)
     heights = [];
 
     distances = [0, 4, 10, 12];
-    for bi=1:5  % 5 blob images have been coded. 
+    for bi=1:5  % 5 blob images have been coded.
         for di=1:length(distances)
             img = blob_stimuli(distances(di), 3, bi);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
@@ -93,16 +93,16 @@ function train = MakePairedSquares(taskType)
     right_distances = [];
 
     % Create the 16 images
-    for di1=1:length(distances) % left side: distance b/n squares ranges [2, 5]
-        for di2 = 1:length(distances) % right side: distance b/n square ranges [2, 5]
-            img = paired_squares_stimuli(distances(di1), distances(di2), 0);
+    for d1=distances % left side: distance b/n squares ranges [2, 5]
+        for d2 = 1:distances % right side: distance b/n square ranges [2, 5]
+            img = paired_squares_stimuli(d1, d2, 0);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            train.XLAB{end+1} = sprintf('(Dist) Left: %dpx ; Right: %dpx', distances(di1), distances(di2));
+            train.XLAB{end+1} = sprintf('(Dist) Left: %dpx ; Right: %dpx', d1, d2);
 
             % Coordinate task
-            train.T(end+1) = (distances(di1) == distances(di2)); % same distance or no?
-            difficulty = guru_iff(abs(distances(di1) - distances(di2)) > 2, 'easy', 'hard');
-            lbl = guru_iff(train.T(end) == 1, 'same', 'different')
+            train.T(end+1) = (d1 == d2); % same distance or no?
+            difficulty = guru_iff(abs(d1 - d2) > 2, 'easy', 'hard');
+            lbl = guru_iff(train.T(end) == 1, 'same', 'different');
             train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
         end
     end
@@ -123,7 +123,7 @@ function train = MakePlusMinus(taskType)
     train.TLAB = {};
 
     distances = [2 3 4 5 6 7 8 9];
-    sides = {'left', 'right'}
+    sides = {'left', 'right'};
     for di=1:length(distances)
         for plus_side=sides
             plus_side = plus_side{1};
