@@ -1,6 +1,3 @@
-clear all variables; clear all globals;
-dbstop if error
-
 stats = {'ipd', 'ffts', 'distns', 'pca', 'images'};
 plts = {'ls-bars', stats{:}};
 

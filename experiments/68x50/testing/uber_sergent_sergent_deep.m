@@ -17,4 +17,4 @@ plts = {'ls-bars', stats{:}};
                             'p.AvgError', 7.5E-5, 'p.rej.width', [NaN], 'p.rej.type', {'max'} ...
                             );
 % Run sergent task by training on all images
-[trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent',         {opts{:}}, args);
+[trn, tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent',         {opts{:}}, args);
