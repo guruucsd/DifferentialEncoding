@@ -40,7 +40,7 @@ function model = de_LoadOrTrain(model)
       model.ac.cached = 0;
     end;
 
-    try:
+    try
       if (exist(de_GetOutFile(model,'ac.err'),   'file')), model.ac.err    = guru_loadVars(de_GetOutFile(model,'ac.err'),'err'); end;
       if (~isfield(model, 'uberpath'))
           if (exist(de_GetOutFile(model,'ac.output'),'file')), model.ac.output = guru_loadVars(de_GetOutFile(model,'ac.output'),'output'); end;

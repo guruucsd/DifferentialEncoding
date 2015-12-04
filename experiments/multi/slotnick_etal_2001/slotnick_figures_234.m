@@ -1,5 +1,4 @@
-% Recreate figures 3 and 4.
-matlabpool open 4
+% Recreate figures 2, 3 and 4.
 
 % Add paths
 script_dir = fileparts(which(mfilename));
@@ -24,7 +23,9 @@ figs(end+1) = de_NewFig('slotnick_figure_2');
 figs(end+1) = de_NewFig('slotnick_figure_3');
 figs(end+1) = de_NewFig('slotnick_figure_4');
 fhs = arrayfun(@(f) f.handle, figs);
+n_figs = length(figs);
 
+ymax = zeros(n_figs, 1);
 n_scripts = length(all_scripts);
 for si=1:n_scripts
     script_file = all_scripts{si};
@@ -45,7 +46,7 @@ for si=1:n_scripts
     runs = mSets.runs;
 
     n_trial_types = length(left);
-    for fi=1:length(figs)
+    for fi=1:n_figs
         figure(figs(fi).handle);
         set(gcf, 'Position', [0, 0, 1200, 600]);
 
@@ -82,8 +83,16 @@ for si=1:n_scripts
         end;
         if si ~= 1
             ylabel('');
+            set(gca, 'ytick', []);
         end;
-        set(gca, 'xlim', [0.5, 2.5], 'ylim', [0 0.15]);
+
+        % Set the axes equally.
+        yl = get(gca, 'ylim');
+        ymax(fi) = max(yl(2), ymax(fi));
+        for sxi=1:si
+            ax2 = subplot(1, n_scripts, sxi);
+            set(ax2, 'xlim', [0.5, 2.5], 'ylim', [0 ymax(fi)]);
+        end;
     end;
 
     % Save on every loop, for good measure.
