@@ -22,7 +22,7 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, rons, ax
 
     % Set the remaining axes properties
     set(ax, 'XTick', [1 2], ...
-            'XTickLabel', {sprintf('Left (n=%d)', rons), sprintf('Right (n=%d)', rons)});
+            'XTickLabel', {sprintf('LH'), sprintf('RH')});
     xlabel('Hemisphere Injected');  % weird, right??
     ylabel(ax, 'Sum squared error');
-    title(ax, sprintf('%s\n%s', taskTitle, stimSet));
+    title(ax, sprintf('%s\n%s\n ', taskTitle, stimSet));

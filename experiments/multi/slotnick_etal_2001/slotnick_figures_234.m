@@ -80,6 +80,10 @@ for si=1:n_scripts
         if si ~= round(n_scripts/2)
             xlabel('');  % remove label
         end;
+        if si ~= 1
+            ylabel('');
+        end;
+        set(gca, 'xlim', [0.5, 2.5], 'ylim', [0 0.15]);
     end;
 
     % Save on every loop, for good measure.
