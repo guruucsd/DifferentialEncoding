@@ -45,6 +45,8 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
     img = 1 - create_cat_coord_stimuli(h)';
     if strcmp(stimSet, 'dots-cb')
       img = guru_contrast_balance_image(img, 1, 0.5);
+    else
+      img(img == 0) = 0.5;  % match the grey background.
     end;
     train.X(:, end+1) = img(:);
     train.XLAB{end+1} = sprintf('height=%.2f', h);

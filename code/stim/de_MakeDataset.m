@@ -284,12 +284,14 @@ function fig = de_visualizeData(dset)
 
   % View some sample images
   fig = de_NewFig('dataset-images', '__img', [34 25], nImages);
+  set(fig.handle, 'Position', [0, 0, 1200, 1200]);
+
   im2show     = de_SelectImages(dset, nImages);
 
-  for ii=1:nImages
+  for ii=1:length(im2show)
       subplot(4, 4, ii);
       colormap gray;
-      imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
+      imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput), [0, 1]);
       axis image; set(gca, 'xtick',[],'ytick',[]);
       lbl = dset.XLAB{im2show(ii)};
       if isfield(dset, 'TLAB')
