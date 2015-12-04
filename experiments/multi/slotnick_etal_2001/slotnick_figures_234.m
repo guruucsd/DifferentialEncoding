@@ -1,4 +1,5 @@
 % Recreate figures 3 and 4.
+matlabpool open 4
 
 % Add paths
 script_dir = fileparts(which(mfilename));
