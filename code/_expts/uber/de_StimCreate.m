@@ -23,7 +23,7 @@ function [train, test, aux] = de_StimCreate(stimSet, taskType, opt)
 
     %% Christman
     % Get options for christman study
-    c_opts = {};%{'thetas', guru_getopt(opt, 'c_thetas', pi/2), all_opt{:}};
+    c_opts = {};
     c_opts(end+[1:2]) = { 'cycles' guru_getopt(opt, 'c_cycles', [3 5 8 12 16]) };
 
     fprintf('Making christman dataset with options=%s\n', guru_cell2str(c_opts));

@@ -3,11 +3,11 @@
 addpath('../sergent_1982');
 clear all variables; clear all globals;
 
-stats = {'images','ffts'};%{'images','ffts'};
+stats = {'images','ffts'};
 plts = {'ls-bars', stats{:}};
 
 % because there are so many more grey pixels, and more redundancy, need to increase training
-[args,opts]  = uber_sergent_args('plots',plts,'stats',stats,'runs',25);
+[args,opts]  = uber_sergent_args('plots', plts,'stats', stats,'runs',25);
 opts = {opts{:},'img2pol','location','LVF'};
 
 % Run sergent task by training on all images

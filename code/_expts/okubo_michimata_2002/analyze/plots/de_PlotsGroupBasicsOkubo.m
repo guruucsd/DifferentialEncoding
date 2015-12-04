@@ -23,4 +23,5 @@ for si=1:2
     set(gca, 'ylim', [min(stats.median_error(:) - stats.std_error(:)) ...
                       max(stats.median_error(:) - stats.std_error(:))] ...;
                      .* [0.9 1.1]);
+    keyboard
 end;

@@ -3,7 +3,7 @@ clear all variables; clear all globals;
 stats = {'images','ffts'};
 plts = {stats{:}};
 
-[args,opts]  = uber_cbalanced_args('plots',plts, 'stats', stats, 'runs', 2);
+[args,opts]  = uber_cbalanced_args('plots', plts, 'stats', stats, 'runs', 2);
 opts = {'small', 'tweak_opt_val_to_redo', round(sum(clock()))};
 
 % Run sergent task by training on all images
