@@ -248,7 +248,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
         case 'emot'
           error('emotion recognition task NYI');
 
-        otherwise, error('Unknown task: ', taskType);
+        otherwise, error('Unknown task: %s', taskType);
       end;
     end;
 

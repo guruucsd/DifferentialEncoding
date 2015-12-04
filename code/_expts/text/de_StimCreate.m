@@ -6,7 +6,12 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-  txt = fileread(fullfile(fileparts(which(mfilename)), sprintf('%s.txt', stimSet)));
+  script_dir = fileparts(which(mfilename));
+  text_filepath = fullfile(script_dir, sprintf('%s.txt', stimSet));
+  if ~exist(text_filepath, 'file')
+      error('stimSet must point to a valid text file within %s', script_dir);
+  end;
+  txt = fileread(text_filepath);
   txt_opt = {'FontSize', guru_getopt(opt, 'FontSize', 12), ...
              'FontName', guru_getopt(opt, 'FontName', 'Times'), ...
              'FontWeight', guru_getopt(opt, 'FontWeight', 'Normal') ...
