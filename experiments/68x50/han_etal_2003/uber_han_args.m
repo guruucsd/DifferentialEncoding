@@ -1,11 +1,12 @@
-function [args,opts] = uber_sergent_args(varargin)
+function [args, opts] = uber_han_args(varargin)
 %
 
   % Get shared args
   script_dir = fileparts(which(mfilename));
   addpath(fullfile(script_dir, '..'));
 
-  [args,opts] = uber_args( ... %Network structure
+  [args, opts] = uber_args( ... %Network structure
+    'runs', 1, ...
     'p.XferFn', [6 3], ...  %sigmoid->sigmoid
     'p.zscore', 0.15, ...
     'p.EtaInit', 2E-3, ...
