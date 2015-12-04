@@ -1,4 +1,4 @@
-function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, rons, ax)
+function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, runs, ax)
 % de_CreateSlotnickFigure1(Y1, E1)
 %  Y1:  errorbar y
 %  E1:  errorbar e

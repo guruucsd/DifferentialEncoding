@@ -1,6 +1,6 @@
 function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorType)
 %
-% models : NxM matrix of models, N=rons, M=nSigmas
+% models : NxM matrix of models, N=runs, M=nSigmas
 %
 % LS     : the LS matrix we all know so well
 
@@ -43,11 +43,11 @@ function [LS_permodel, LS_mean, LS_stde, LS_pval] = de_models2LS(models, errorTy
 
     mSets = models(1);
     p     = [models.p];
-    rons  = length(models);
+    runs  = length(models);
     tmp   = de_calcPErr( vertcat(p.lastOutput), mSets.data.train.T, errorType );
 
     % Calc ls for each model
-    LS_permodel      = zeros(rons, length(mSets.data.train.TIDX));
+    LS_permodel      = zeros(runs, length(mSets.data.train.TIDX));
     for j = 1:length(mSets.data.train.TIDX)
       if (~isempty(mSets.data.train.TIDX{j}))
         LS_permodel(:,j) = mean(tmp(:,mSets.data.train.TIDX{j}),2); %average over each sub-trial type

@@ -42,7 +42,7 @@ for si=1:n_scripts
     % Plot each figure
     right = stats.rej.cc.perf.(ds){1};
     left = stats.rej.cc.perf.(ds){end};
-    rons = mSets.runs;
+    runs = mSets.runs;
 
     n_trial_types = length(left);
     for fi=1:length(figs)
@@ -75,7 +75,7 @@ for si=1:n_scripts
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 rons, ax);
+                                 runs, ax);
 
         if si ~= round(n_scripts/2)
             xlabel('');  % remove label

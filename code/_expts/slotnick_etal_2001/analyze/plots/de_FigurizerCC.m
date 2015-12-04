@@ -8,7 +8,7 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 
     right = stats.rej.cc.perf.(ds){1};
     left = stats.rej.cc.perf.(ds){end};
-    rons = mSets.runs;
+    runs = mSets.runs;
 
     figs = de_NewFig(mSets.data.taskType);
 
@@ -42,7 +42,7 @@ function figs = de_FigurizerCC(mSets, mss, stats)
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 rons, ax);
+                                 runs, ax);
 
         if pi ~= round(n_plots/2)
             xlabel('');  % remove label

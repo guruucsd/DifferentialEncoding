@@ -20,13 +20,13 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 
   for ss=1:nSigmas
     ms      = mss{ss};
-    rons    = size(ms,1);
+    runs    = size(ms,1);
     nTrials = size(ms(1).data.train.T,2);
 
     avg_eAC(ss,:,:) = zeros(ms(1).ac.MaxIterations,nTrials);
     avg_eP(ss,:,:)  = zeros(ms(1).p.MaxIterations,nTrials);
 
-    for zz=1:rons
+    for zz=1:runs
       m = ms(zz);
 
       % Pad
@@ -58,10 +58,10 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 
       avg_eAC(ss,:,:) = squeeze(avg_eAC(ss,:,:)) + c_eAC;
       avg_eP(ss,:,:)  = squeeze(avg_eP(ss,:,:))  + c_eP;
-    end; %rons
+    end; %runs
 
-    avg_eAC(ss,:,:) = avg_eAC(ss,:,:)/rons;
-    avg_eP(ss,:,:)  = avg_eP(ss,:,:) /rons;
+    avg_eAC(ss,:,:) = avg_eAC(ss,:,:)/runs;
+    avg_eP(ss,:,:)  = avg_eP(ss,:,:) /runs;
 
     if (nSigmas == 1)
       fig.name = 'tcptt';
