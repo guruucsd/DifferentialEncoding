@@ -32,13 +32,23 @@ function model = de_LoadOrTrain(model)
      && exist(de_GetOutFile(model, 'ac.weights'), 'file'))
 
     model.ac.fn     = de_GetOutFile(model, 'ac');
-    model.ac        = guru_loadVars(model.ac.fn, 'ac');
-    model.ac.cached = 1;
+    try
+      model.ac        = guru_loadVars(model.ac.fn, 'ac');
+      model.ac.cached = 1;
+    catch err
+      warning(err.message);
+      model.ac.cached = 0;
+    end;
 
-    if (exist(de_GetOutFile(model,'ac.err'),   'file')), model.ac.err    = guru_loadVars(de_GetOutFile(model,'ac.err'),'err'); end;
-    if (~isfield(model, 'uberpath'))
-        if (exist(de_GetOutFile(model,'ac.output'),'file')), model.ac.output = guru_loadVars(de_GetOutFile(model,'ac.output'),'output'); end;
-        if (exist(de_GetOutFile(model,'ac.hu'),    'file')), model.ac.hu     = guru_loadVars(de_GetOutFile(model,'ac.hu'),'hu'); end;
+    try:
+      if (exist(de_GetOutFile(model,'ac.err'),   'file')), model.ac.err    = guru_loadVars(de_GetOutFile(model,'ac.err'),'err'); end;
+      if (~isfield(model, 'uberpath'))
+          if (exist(de_GetOutFile(model,'ac.output'),'file')), model.ac.output = guru_loadVars(de_GetOutFile(model,'ac.output'),'output'); end;
+          if (exist(de_GetOutFile(model,'ac.hu'),    'file')), model.ac.hu     = guru_loadVars(de_GetOutFile(model,'ac.hu'),'hu'); end;
+      end;
+    catch err
+      % ignore errors.
+      warning(err.message);
     end;
 
     % The "uber" variables don't necessarily correspond to the current variables,
@@ -59,14 +69,19 @@ function model = de_LoadOrTrain(model)
 
   % Load perceptron, if exists
   if (isfield(model, 'p'))
-      if (   ~model.p.continue ...
-          && exist(de_GetOutFile(model, 'p'),          'file') ...
-          && exist(de_GetOutFile(model, 'p.weights'),  'file'))% ...
+      if (model.p.continue ...
+          || ~exist(de_GetOutFile(model, 'p'),          'file') ...
+          || ~exist(de_GetOutFile(model, 'p.weights'),  'file'))% ...
 %          && exist(de_GetOutFile(model, 'p.output'),   'file'))
-        model.p        = guru_loadVars(de_GetOutFile(model, 'p'),  'p');
-        model.p.cached = 1;
-      else
         model.p.cached = 0;
+      else
+        try
+          model.p        = guru_loadVars(de_GetOutFile(model, 'p'),  'p');
+          model.p.cached = 1;
+        catch err
+          warning(err.message);
+          model.p.cached = 0;
+        end;
       end;
   end;
 
