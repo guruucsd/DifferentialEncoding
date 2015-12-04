@@ -11,4 +11,4 @@ plts = {'ls-bars', stats{:}};
 opts = {opts{:},'img2pol','location','LVF'};
 
 % Run sergent task by training on all images
-[trn, tst] = de_SimulatorUber('vanhateren/100', 'sergent_1982/de/sergent', opts, args);
+[trn, tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent', opts, args);

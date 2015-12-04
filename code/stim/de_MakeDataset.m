@@ -71,8 +71,8 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Visualize datasets
         if show_figs
-            tr_figs = de_visualizeData(train);
-            te_figs = de_visualizeData(test);
+            de_visualizeData(train);
+            de_visualizeData(test);
         end;
 
         % Output everything (including images)
@@ -111,10 +111,7 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        %de_visualizeData(dset);
-
         dset.X = guru_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'));
-        %de_visualizeData(dset); % just for now
     end;
 
     if guru_hasopt(opts, 'contrast')
@@ -142,8 +139,6 @@ function dset = de_StimApplyTransform(dset, opts)
           caimg = caimg - mean(caimg(:)) + mean(img(:));
           caimg(caimg>img_range(2)) = img_range(2);
           caimg(caimg<img_range(1)) = img_range(1);
-
-          %subplot(1,2,1); imshow(img, [0 1]); subplot(1,2,2); imshow(caimg, [0 1]);
 
           dset.X(:,ii) = caimg(:);
       end;
@@ -291,7 +286,7 @@ function fig = de_visualizeData(dset)
   im2show     = de_SelectImages(dset, nImages);
 
   for ii=1:nImages
-      subplot(4,4,ii);
+      subplot(4, 4, ii);
       colormap gray;
       imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
       axis image; set(gca, 'xtick',[],'ytick',[]);

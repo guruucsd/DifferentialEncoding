@@ -13,4 +13,4 @@ clear all variables;
                            'p.MaxIterations', 100 ...
                            );
 
-[mSets, models, stats] = de_SimulatorUber('vanhateren/100', 'sergent_1982/de/sergent', {opts{:}}, args);
+[mSets, models, stats] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent', {opts{:}}, args);
