@@ -51,22 +51,24 @@ function train = MakeBlobDot(taskType)
     train.TLAB = {};
     heights = [];
 
-    distances = [0, 4, 10, 12];
+    distances = [0, 4, 8, 12];
+    ref_distance = 6;
     for bi=1:5  % 5 blob images have been coded.
-        for di=1:length(distances)
-            img = blob_stimuli(distances(di), 3, bi);
+        for d=distances
+            img = blob_stimuli(d, 3, bi);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            train.XLAB{end+1} = sprintf('%dpx from %d%c', distances(di), (bi-1)* 72, char(176));
-            heights(end+1) = distances(di);
+            train.XLAB{end+1} = sprintf('%dpx from %d%c', d, (bi-1)* 72, char(176));
+            heights(end+1) = d;
 
-            difficulty = guru_iff(di <= length(distances)/2, 'easy', 'hard');
+            difficulty = guru_iff(abs(d - ref_distance) > 2, 'easy', 'hard');
+
             switch (taskType)
                 case 'categorical',
-                    train.T(end+1) = distances(di) > 0;
+                    train.T(end+1) = d > 0;
                     lbl = guru_iff(train.T(end), 'off', 'on');
                     train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
                 case 'coordinate',
-                    train.T(end+1) = distances(di) / distances(end) < 0.5;
+                    train.T(end+1) = (d / distances(end)) < 0.5;
                     lbl = guru_iff(train.T(end), 'near', 'far');
                     train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
             end
@@ -94,14 +96,14 @@ function train = MakePairedSquares(taskType)
 
     % Create the 16 images
     for d1=distances % left side: distance b/n squares ranges [2, 5]
-        for d2 = 1:distances % right side: distance b/n square ranges [2, 5]
+        for d2=distances % right side: distance b/n square ranges [2, 5]
             img = paired_squares_stimuli(d1, d2, 0);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
             train.XLAB{end+1} = sprintf('(Dist) Left: %dpx ; Right: %dpx', d1, d2);
 
             % Coordinate task
             train.T(end+1) = (d1 == d2); % same distance or no?
-            difficulty = guru_iff(abs(d1 - d2) > 2, 'easy', 'hard');
+            difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
             lbl = guru_iff(train.T(end) == 1, 'same', 'different');
             train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
         end
@@ -123,23 +125,24 @@ function train = MakePlusMinus(taskType)
     train.TLAB = {};
 
     distances = [2 3 4 5 6 7 8 9];
+    ref_distance = 5.5;
     sides = {'left', 'right'};
-    for di=1:length(distances)
+    for d=distances
         for plus_side=sides
             plus_side = plus_side{1};
-            img = plus_minus_stimuli(distances(di), plus_side);
+            img = plus_minus_stimuli(d, plus_side);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            train.XLAB{end+1} = sprintf('Plus on %s, %dpx apart', plus_side, distances(di));
+            train.XLAB{end+1} = sprintf('Plus on %s, %dpx apart', plus_side, d);
 
             % Create the output vectors.
-            difficulty = guru_iff(distances(di) <= 5, 'hard', 'easy');
 
+            difficulty = guru_iff(abs(d - ref_distance) > 2, 'easy', 'hard');
             switch (taskType)
                 case 'categorical'
                     train.T(end+1) = strcmp(plus_side, 'right') == 1;
                     train.TLAB{end+1} = sprintf('%s-%s', plus_side, difficulty);
                 case 'coordinate',
-                    train.T(end+1) = strcmp(difficulty, 'easy');
+                    train.T(end+1) = (d < ref_distance);
                     lbl = guru_iff(train.T(end), 'near', 'far');
                     train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
             end
