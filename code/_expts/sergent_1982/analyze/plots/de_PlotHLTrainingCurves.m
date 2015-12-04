@@ -27,7 +27,7 @@ function [fig] = de_PlotHLTrainingCurves(ms, errorType)
       m.p.err = de_calcPErr(m.p.output.train, m.data.train.T, errorType);
     end;
 
-    guru_assert(isempty(find(m.p.err)<0), 'autoencoder error should never be negative!');
+    guru_assert(~any(m.p.err<0)), 'autoencoder error should never be negative!');
 
     %Plot training curves
     c_eAC = sum(m.ac.err,2);
