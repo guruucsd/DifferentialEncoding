@@ -8,6 +8,7 @@ guru_assert(n_expts == 4, 'Okubo should have four experiments.')
 figs = de_NewFig('okubo-figure2')
 
 for si=1:2
+    % rows are experiments, cols are hemis
     expt_idx = 2 * (si - 1) + [1:2];
     hemi_idx = [1 size(stats.median_error, 2)];
 
