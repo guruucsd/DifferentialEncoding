@@ -11,7 +11,7 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
 % figs       :
 
   % Get the hierarchical letters
-  sergent_dir = fileparts(strrep(which(mfilename), 'lamb_yund_2000', 'sergent_1982'));
+  sergent_dir = fileparts(strrep(which(mfilename), 'han_etal_2003', 'sergent_1982'));
   addpath(genpath(sergent_dir));
   [stats, figs] = de_Analyzer(mSets, mss)
   rmpath(genpath(sergent_dir));
