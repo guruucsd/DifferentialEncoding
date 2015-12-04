@@ -1,4 +1,4 @@
-function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs)
+function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs, force)
 % Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return
 %   the filename and the dataset.
 %
@@ -11,12 +11,13 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
     if ~exist('opt','var'), opt = {}; end;
     if ~exist('show_figs', 'var'), show_figs = true; end;
+    if ~exist('force', 'var'), force = false; end;
 
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
     % If the file doesn't exist, then we have to create it!
-    if (~exist(dataFile,'file'))
+    if (~exist(dataFile,'file') || force)
 
         %% Setup path--each experiment implements a set of generic functions
         % (right, basically like a class, but through file & path manipulation--yuck).
