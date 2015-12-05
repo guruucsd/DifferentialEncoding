@@ -8,14 +8,14 @@ function dset = de_NormalizeDataset(dset, mSets)
 
   if (~isfield(mSets.ac, 'minmax') || isempty(mSets.ac.minmax))
 
-	  switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
-		  case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
-												   % in the [-1 1] range as well
-		  case {2,3}, mSets.ac.minmax    = [0 1];
-		  case {5}, mSets.ac.minmax = 0.5*[-1 1];
-		  case {1}, mSets.ac.minmax = [];
-		  otherwise, error('unknown transfer function');
-	  end;
+      switch (mSets.ac.XferFn(end)) % either a single number, or a vector with output nodes at the end
+          case {4,6}, mSets.ac.minmax    = [-1 1]; %note that 6 goes to 1.71, but the input/output should be
+                                                   % in the [-1 1] range as well
+          case {2,3}, mSets.ac.minmax    = [0 1];
+          case {5}, mSets.ac.minmax = 0.5*[-1 1];
+          case {1}, mSets.ac.minmax = [];
+          otherwise, error('unknown transfer function');
+      end;
   end;
 
   %%%%%%%%%%%%%%%%%%%%%%%
@@ -50,7 +50,6 @@ function dset = de_NormalizeDataset(dset, mSets)
 
     dset.X  = (dset.X - repmat(zs.delta_mean, [size(dset.X,1) 1])) .* repmat(zs.delta_std, [size(dset.X,1) 1]);
     dset.zs = zs;
-
 
   % Prepare to put into minmax range by subtracting out midpoint of original [0 1] range
   elseif (~isempty(mSets.ac.minmax))
@@ -108,11 +107,11 @@ function dset = de_NormalizeDataset(dset, mSets)
           switch (mSets.p.XferFn(end)) % either a single number, or a vector with output nodes at the end
               case {4,6}, mSets.p.minmax    = [-1 1];
               case {1}
-              	mSets.p.minmax = [0 1];
-  		        rand_idx = randi(numel(dset.T), 1000, 1);
-				if length(unique(dset.T(rand_idx))) <= 2
-				  mSets.p.minmax = [-1 1];
-				end;
+                  mSets.p.minmax = [0 1];
+                  rand_idx = randi(numel(dset.T), 1000, 1);
+                if length(unique(dset.T(rand_idx))) <= 2
+                  mSets.p.minmax = [-1 1];
+                end;
               otherwise,  mSets.p.minmax    = [0 1];
           end;
       end;
