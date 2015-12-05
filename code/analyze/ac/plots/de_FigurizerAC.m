@@ -24,6 +24,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
 
   % Plot the original images
   figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, mSets.data.(ds).X(1:end-1,selectedImages),  mSets.data.(ds).XLAB(selectedImages)) ];
+  figs = [ figs de_DoPlot('freqprefs',   'de_PlotFreqPreferences',  mSets, mSets, stats.rej.ac.freqprefs) ];
 
   %----------------
   % Loop over sigmas and trials
