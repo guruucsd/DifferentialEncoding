@@ -37,6 +37,7 @@ function model = de_LoadOrTrain(model)
       model.ac.continue = prev_model.ac.continue;
       if ~strcmp(de_GetOutPath(model, 'ac'), de_GetOutPath(prev_model, 'ac'))
         prev_model.ac, model.ac
+        model = prev_model;
         error('properties somehow differ between model properties and loaded model. Examine the two above to understand deeper.');
       end;
       clear('prev_model');
@@ -87,6 +88,7 @@ function model = de_LoadOrTrain(model)
       model.p = guru_loadVars(de_GetOutFile(model, 'p'),  'p');
       if de_GetOutPath(model, 'p') ~= de_GetOutPath(prev_model, 'p')
         prev_model.p, model.p
+        model = prev_model;
         error('properties somehow differ between model properties and loaded model. Examine the two above to understand deeper.');
       end;
       clear('prev_model');
