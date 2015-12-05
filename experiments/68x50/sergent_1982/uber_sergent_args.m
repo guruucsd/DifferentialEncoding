@@ -3,11 +3,15 @@ function [args,opts] = uber_sergent_args(varargin)
 
   % Get shared args
   script_dir = fileparts(which(mfilename));
-  addpath(fullfile(script_dir, '..'));  
+  addpath(fullfile(script_dir, '..'));
+
+  stats = {};
+  plots = {'ls-bars', stats{:}};
 
   [args,opts] = uber_args( ... %Network structure
-    'errorType', 3,... % cross-entropy
-    'p.errorType', 3,... % cross-entropy
+    'runs', 50, ...
+    'stats', stats, 'plots', plots, ...
+    ...
     'p.XferFn', [6 3], ...  %sigmoid->sigmoid
     'p.zscore', 0.15, ...
     'p.EtaInit', 2E-3, ...
