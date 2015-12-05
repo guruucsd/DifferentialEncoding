@@ -24,12 +24,12 @@ function [figs] = de_PlotSTA(models, sta)
       figure(figs(1).handle);
       subplot(nRows,nCols,hui);
       img = reshape(sta(1, :, hus(hui)), models(1).nInput);
-      imshow(img, max(img(:))*[-1 1]);
+      imagesc(img, max(img(:))*[-1 1], [-1, 1]);
       set(gca, 'xtick',[],'ytick',[]);
 
       figure(figs(2).handle);
       subplot(nRows,nCols,hui);
       img = reshape(mean(sta(:, :, hus(hui))), models(1).nInput);
-      imshow(img, max(img(:))*[-1 1]);
+      imagesc(img, max(img(:))*[-1 1], [-1, 1]);
       set(gca, 'xtick',[],'ytick',[]);
   end;
