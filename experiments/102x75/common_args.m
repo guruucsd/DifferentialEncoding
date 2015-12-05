@@ -2,8 +2,7 @@ function [cargs, opts] = common_args(varargin)
 
   % Add absolute path to the 'code' directory
   script_dir = fileparts(which(mfilename));
-  code_dir = fullfile(script_dir, '..');;
-  addpath(code_dir);
+  addpath(fullfile(script_dir, '..'));
 
   opts = {'standard'};
 
@@ -13,7 +12,6 @@ function [cargs, opts] = common_args(varargin)
     'distn',   {'normem2'},     'mu',        0,  'sigma', [6.0 40.0], ...
     'nHidden', 7650*1,          'hpl',       1,    'nConns',      10, ...
     'deType', 'de', ...
-    'ac.retrain_on_task_images', true, ...
     ...% Input
     'ac.zscore', 0.25, ...
     'ac.tol',    0*34/25, ... %tolerance for disconnected pixels
