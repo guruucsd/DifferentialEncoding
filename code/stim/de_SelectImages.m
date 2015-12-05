@@ -12,7 +12,7 @@ function [selectedImages, nImages] = de_SelectImages(dset, nImages)
       selectedImages_   = randperm(length(un_lbls)); %so that we get to see a variety
       selectedImages_   = selectedImages_( unique(round(linspace(1, length(un_lbls), nImages))) );
       size(dset.X)  % let people know the max # of images.
-      selectedImages_   = sort(imgIdx(selectedImages_))' % so that they're grouped by stimulus type
+      selectedImages_   = sort(imgIdx(selectedImages_))'; % so that they're grouped by stimulus type
       selectedImages_max_ = size(dset.X, 2);
   end;
 

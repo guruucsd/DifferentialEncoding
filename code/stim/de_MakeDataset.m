@@ -72,8 +72,8 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Visualize datasets
         if show_figs
-            de_visualizeData(train);
-            de_visualizeData(test);
+            de_VisualizeDataset(train);
+            de_VisualizeDataset(test);
         end;
 
         % Output everything (including images)
@@ -274,28 +274,3 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
             dset.axes = train.axes;
         end;
     end;
-
-
-
-%%%%%%%%%%%%%%%%%
-function fig = de_visualizeData(dset)
-
-  nImages = min(4*4,size(dset.X,2));
-
-  % View some sample images
-  fig = de_NewFig('dataset-images', '__img', [34 25], nImages);
-  set(fig.handle, 'Position', [0, 0, 1200, 1200]);
-
-  im2show     = de_SelectImages(dset, nImages);
-
-  for ii=1:length(im2show)
-      subplot(4, 4, ii);
-      colormap gray;
-      imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput), [0, 1]);
-      axis image; set(gca, 'xtick',[],'ytick',[]);
-      lbl = dset.XLAB{im2show(ii)};
-      if isfield(dset, 'TLAB')
-          lbl = sprintf('%s\n%s', lbl, dset.TLAB{im2show(ii)});
-      end;
-      xlabel(guru_text2label(lbl));
-  end;
