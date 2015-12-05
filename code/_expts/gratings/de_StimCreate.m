@@ -23,15 +23,19 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
     % Massage/default options
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
-  [train.phases] = guru_getopt(opt, 'phases',  linspace(0,15*pi/16,16));
-  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0,pi/2, 4));
-  [train.cycles] = guru_getopt(opt, 'cycles',  [1 2 4 8 16]);
+  n_phases = guru_getopt(opt, 'nphases', 8);
+  n_thetas = guru_getopt(opt, 'nthetas', 8);
+  n_freqs = guru_getopt(opt, 'nfreqs', 8);
+
   [train.nInput] = guru_getopt(opt, 'nInput',  [135 100]);
-  train.freqs    = train.cycles/train.nInput(1);
+  [train.phases] = guru_getopt(opt, 'phases',  linspace(0, (n_phases-1) * pi / n_phases, n_phases));
+  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0, (n_thetas-1) * pi / n_thetas, n_thetas));
+  [train.cycles] = guru_getopt(opt, 'cycles',  2.^(linspace(0, log2(max(train.nInput))-1, n_freqs)));
+  train.freqs    = train.cycles / max(train.nInput);
+  train.orients = train.thetas;
 
   % With this info, create our X and TT vectors
   [train.X, train.XLAB] = stim2D(stimSet, train.nInput, train.freqs, train.phases, train.thetas);
-
   [train] = applyOptions(opt, train);
 
  % Train & test sets are the same, EXCEPT that the phases change.
@@ -70,8 +74,8 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
 
     ii = 1;
     for fi=1:length(freqs)
-        for phsi=1:length(phases)
-            for ti=1:length(thetas)
+        for ti=1:length(thetas)
+            for phsi=1:length(phases)
                 X(:,ii)  = reshape( mfe_grating2d(freqs(fi), phases(phsi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
                 XLAB{ii} = sprintf('f=%f\np=%f\nt=%f', freqs(fi), phases(phsi), thetas(ti));
                 ii = ii+1;
