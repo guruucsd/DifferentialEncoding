@@ -14,7 +14,7 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     for si=1:n_sigmas
       [~, max_resp_idx] = max(stats.avg_resp{si}, [], 3);
 
-      n_models = size(max_resp_idx, 1);    
+      n_models = size(max_resp_idx, 1);
       imgs = reshape(max_resp_idx, [n_models * mSets.hpl(si), mSets.nInput]);
 
       % Plot 1: distribution of the average max, across the image.
@@ -30,13 +30,13 @@ function figs = de_PlotFreqPreferences(mSets, stats)
 
       for si=1:n_sigmas
         subplot(1, n_sigmas + 1, si);
-        imshow(squeeze(norm_imgs(si, :, :)), [1 n_freqs]);
+        imagesc(squeeze(norm_imgs(si, :, :)), [1 n_freqs]);
         colorbar;
       end;
 
       subplot(1, n_sigmas + 1, n_sigmas + 1);
       distn_diff = diff(norm_imgs([1 end], :, :), 1, 1);
-      imshow(squeeze(distn_diff), (n_freqs - 1) * [-1 1]);
+      imagesc(squeeze(distn_diff), (n_freqs - 1) * [-1 1]);
       colorbar;
       xlabel('RH preference - LH preference');
 
