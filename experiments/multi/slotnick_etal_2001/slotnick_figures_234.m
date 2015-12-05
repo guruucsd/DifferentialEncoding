@@ -4,9 +4,9 @@
 script_dir = fileparts(which(mfilename));
 base_dir = fullfile(script_dir, '..', '..', '..');
 addpath(genpath(fullfile(base_dir, 'code')));
-for d={'34x25', '68x50'}
+for d={'34x25', '68x50'}  % this is the path ordering
     full_path = fullfile(script_dir, '..', '..', d{1}, 'slotnick_etal_2001');
-    addpath(full_path);
+    addpath(full_path, '-end');
 end;
 
 % Scripts ordered by figure 2/3/4 order.
