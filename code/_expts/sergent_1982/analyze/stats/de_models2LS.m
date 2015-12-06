@@ -35,14 +35,14 @@ function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models,
     mSets = models(1);
     runs  = length(models);
     num_trial_types =length(mSets.data.train.TIDX);
-
-    p         = [models.p];
-    o         = [p.output];
-    o_p       = reshape(horzcat(o.test),[numel(o(1).test),length(o)])';  % # models x # trials
-    raw_error = de_calcPErr( o_p, mSets.data.test.T, errorType );        % # models x # trials
+    raw_error = zeros(runs, length(mSets.data.test.T));
+    for mi=1:runs
+      [oact] = guru_nnExec(models(mi), mSets.data.test.X, mSets.data.test.T);
+      raw_error(mi, :) = de_calcPErr( oact, mSets.data.test.T, errorType );        % # models x # trials
+    end;
 
     % Calc ls for each model
-    ndupes           = size(o_p,2)/ length(mSets.data.train.ST);  % sometimes we duplicate outputs for training, for fun.
+    ndupes           = size(oact, 2) / length(mSets.data.test.ST);  % sometimes we duplicate outputs for training, for fun.
     allidx           = cell(num_trial_types, 1);
     LS_permodel      = zeros(runs, num_trial_types);
     LS_raw_permodel  = cell(runs, num_trial_types);
