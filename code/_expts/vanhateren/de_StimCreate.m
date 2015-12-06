@@ -189,8 +189,8 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     end;
     nInput = [nInput_Out(1) nInput_Out(2)];
 
-    guru_assert(~any(X(:)<0), 'no values outside [0 1]');
-    guru_assert(~any(X(:)>1), 'no values outside [0 1]');
+    guru_assert(all(X(:) >= 0), 'no values outside [0 1]');
+    guru_assert(all(X(:) <= 1), 'no values outside [0 1]');
 
     % Divide into training & test datasets
     dataset  = cell(nimgs_out, 1);
@@ -213,7 +213,7 @@ function [normalized_patch, is_good] = validate_and_normalize_patch(img_patch, o
 
     % Normalize to [0 1]
     normalized_patch = (img_patch - min(img_patch(:))) / (max(img_patch(:)) - min(img_patch(:)));
-    is_good = true;
+    is_good = ~any(isnan(normalized_patch(:)));
 
     img_std = std(normalized_patch(:));
     if img_std < min_variance

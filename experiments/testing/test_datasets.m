@@ -25,13 +25,13 @@ addpath(genpath(code_dir));
 % de_MakeDataset('slotnick_etal_2001', 'blob-dot', 'categorical', {'medium'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'blob-dot', 'coordinate', {'medium'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'small'}, true, true);
-de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'medium'}, true, true);
+% de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'medium'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'plus-minus', 'categorical', {'small'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'plus-minus', 'coordinate', {'small'}, true, true);
 
 % de_MakeDataset('text', 'kangaroos', '', {'large', 'skip', 1000}, true, true);
 
-% de_MakeDataset('vanhateren', '100', '', {'small'}, true, true);
+de_NormalizeDataset(de_MakeDataset('vanhateren', '250', '', {'small'}, true, true), struct());
 
 % de_MakeDataset('young_bion_1981', 'orig', 'recog', {'small'}, true, true);
 
