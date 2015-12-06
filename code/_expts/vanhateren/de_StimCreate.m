@@ -32,7 +32,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,7 +138,9 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
     % Hard-coded info about van hateren images.
     nInput_In  = [1024 1536]; %y,x
-    nInput_Out = [135  100]; % y,x
+    if guru_hasopt(opt, 'small'), nInput_Out = [34 25];
+    elseif guru_hasopt(opt, 'medium'), nInput_Out = [68 50];
+    else, nInput_Out = [135  100]; end;
 
     % Set up outputs
     nimgs_out_per_input = (1 + image_reversals);
@@ -152,9 +153,11 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     for ii=1:nimgs_in
         % Read each image
         img_idx = 1 + mod(ii - 1, floor(nimgs_in/4));  % try for 4 patches per
-        img_path = fullfile(indir, files(img_idx).name);
+        img_filename = files(img_idx).name;
+        imgnum = sscanf(img_filename, 'imk%d.iml');
+        img_path = fullfile(indir, img_filename);
+
         img = mfe_readIML(img_path);
-        imgnum = sscanf(files(img_idx).name, 'imk%d.iml');
 
         % Select the middle portion of the image
         for tpi=1:5  % try up to 5 random patches
@@ -164,22 +167,23 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
           [patch, is_good] = validate_and_normalize_patch(patch, opt);
           if is_good, break; end;
         end;
+
         if ~is_good
+          imshow(img, [0 255]); title(img_path);
           warning('likely bad image; please delete %s', img_path);
-          imshow(img); title(img_path);
           % continue  % sadly, can't continue...
         end;
 
         % Add the patch, even if it sucks :(
         X(:, pi)  = patch(:);
-        XLAB{pi} = sprintf('img-%d', imgnum);
+        XLAB{pi} = img_filename;
         pi = pi + 1;
 
         if image_reversals
           patch    = getImagePatch(img(:, end:-1:1), cpt, nInput_Out);
           patch = validate_and_normalize_patch(patch, opt);  % already tested, should pass
           X(:, pi)    = patch(:);
-          XLAB{pi} = sprintf('right-rev-%d', imgnum);
+          XLAB{pi} = [img_filename '-rev'];
           pi = pi + 1;
       end;
     end;
