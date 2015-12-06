@@ -30,7 +30,7 @@ function allstats = de_Loopme(expt, stimSet, taskType, opt, ...
 
   % Figure out the datafile
   dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
-  [TLBL LpSpID LpSpNID LpSm LmSp LmSmID LmSmNID] = guru_loadVars( dataFile, 'TLBL', 'LpSpID', 'LpSpNID', 'LpSm', 'LmSp', 'LmSmID', 'LmSmNID' );
+  [TLAB LpSpID LpSpNID LpSm LmSp LmSmID LmSmNID] = guru_loadVars( dataFile, 'TLAB', 'LpSpID', 'LpSpNID', 'LpSm', 'LmSp', 'LmSmID', 'LmSmNID' );
   conds = [LpSpID LpSpNID LpSm LmSp LmSmID LmSmNID];
 
   % Gather the stats

@@ -43,7 +43,7 @@ function [fig] = de_PloRFDots(mSets, stats)
   mfe_barweb(stats.basics.bars(tidx, :), ...
              stats.basics.bars_stde(tidx, :), ...
              0.8, ...
-             strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')),...
+             strrep(mSets.data.TLAB(tidx),' ',sprintf('\n')),...
              [], [], [], [], [], lentries);
   hold on;
 
@@ -61,7 +61,7 @@ function [fig] = de_PloRFDots(mSets, stats)
 %  else
 %    bar(err(tidx, :));
 %    set(gca,'tickdir','out');
-%    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.TLBL(tidx),' ',sprintf('\n')));
+%    mfe_xticklabels(gca,1:length(tidx),strrep(mSets.data.TLAB(tidx),' ',sprintf('\n')));
 %
 %    if (length(mSets.sigma)==2)
 %      legend(lentries, 'Location','NorthWest');

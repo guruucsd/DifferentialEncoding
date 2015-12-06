@@ -111,7 +111,7 @@ function de_StimCreateAC(stimSet, opt)
                 i = i + 1;
                 patchSize = opt{i};
 
-%                [dataset.X, dataset.XLBL] = createPatches(dataset.X, dataset.XLBL);
+%                [dataset.X, dataset.XLAB] = createPatches(dataset.X, dataset.XLAB);
         end;
         i = i + 1;
     end;

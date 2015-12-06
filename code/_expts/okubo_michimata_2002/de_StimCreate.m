@@ -28,7 +28,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %
 % aux: generic structure for saving off experiment-specific data. Here, contains:
 %    aux.idx : indexing of which trials correspond to local/global targets and distractors.
-%    aux.TLBL : human-readable labels for each of the perceptron outputs.
+%    aux.TLAB : human-readable labels for each of the perceptron outputs.
 
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;

@@ -71,16 +71,6 @@
 
     fprintf(fh, 'Summary:\n');
     fprintf(fh, '\tRejections (ordered by Sigma): %d\n', rcounts(:));
-%    if (isfield(mSets.data, 'TLBL'))
-%        fprintf(fh, '\n');
-%        for i=1:length(mSets.data.TLBL)
-%          fprintf(fh, '\tRAW %s: %s\n', mSets.data.TLBL{i}, sprintf('%5.4e\t', stats.raw.basics.bars(i,:)));
-%        end;
-%        fprintf(fh, '\n');
-%        for i=1:length(mSets.data.TLBL)
-%          fprintf(fh, '\tREJ %s: %s\n', mSets.data.TLBL{i}, sprintf('%5.4e\t', stats.rej.basics.bars(i,:)));
-%        end;
-%    end;
     fprintf(fh, '\n\n');
 
     fclose(fh);

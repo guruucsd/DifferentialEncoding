@@ -28,7 +28,7 @@ function stats = de_StatsBasicsHL(mSets, mss, verbose)
   % Log 'bars'
   fprintf('\t%s\n', sprintf('%3.1f\t', mSets.sigma(:)));
   for i=1:size(BARS,1)
-    fprintf('\t%-10s:', mSets.data.aux.TLBL{i});
+    fprintf('\t%-10s:', mSets.data.aux.TLAB{i});
     for j=1:size(BARS,2)
       LS = stats.ls{j}(:,i);
       fprintf('\t%3.2e +/- %3.2e', mean(LS), std(LS));

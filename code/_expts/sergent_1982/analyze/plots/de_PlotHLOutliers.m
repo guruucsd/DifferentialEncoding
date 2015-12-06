@@ -13,7 +13,7 @@ function [fig] = de_PlotOutliers(mSets, LS, sigma, rin)
 % Output:
 % fig             : array of handles to plots
   tidx = [mSets.data.LpSm mSets.data.LmSp mSets.data.LpSp mSets.data.LmSm];
-  tlbl = mSets.data.aux.TLBL(tidx);
+  tlbl = mSets.data.aux.TLAB(tidx);
 
   fig = de_NewFig('outliers', 'bars', length(tidx), 10);
 

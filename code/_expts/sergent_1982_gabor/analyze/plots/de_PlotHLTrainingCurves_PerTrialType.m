@@ -90,7 +90,7 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
     % autoencoder
     subplot(2,2,1); imagesc(avg_eAC);
     hold on; title( sprintf('Autoencoder training error (%d trial types)', nTrials) );
-    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
     subplot(2,2,3); imagesc(0.25*[sum(avg_eAC(:,m.data.train.TIDX{m.data.LpSm}),2) ...
@@ -98,14 +98,14 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
                                   sum(avg_eAC(:,m.data.train.TIDX{m.data.LpSp}),2) ...
                                   sum(avg_eAC(:,m.data.train.TIDX{m.data.LmSm}),2)]);
     hold on; title('Autoencoder training error (4 trial types)');
-    set(gca,'xtick',[1:4],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[1:4],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
 
     % perceptron
     subplot(2,2,2); imagesc(avg_eP);
     hold on; title( sprintf('Perceptron training error (%d trial types', nTrials) );
-    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
 
@@ -114,6 +114,6 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
                                   sum(avg_eP(:,m.data.train.TIDX{m.data.LpSp}),2) ...
                                   sum(avg_eP(:,m.data.train.TIDX{m.data.LmSm}),2)]);
     hold on; title('Perceptron training error (4 trial types)');
-    set(gca,'xtick',[1:4],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[1:4],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
