@@ -24,7 +24,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
   % Common plotting parts
   lgnd = {sprintf('LVF/RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
           sprintf('RVF/LH (\\sigma=%3.1f)', mSets.sigma(end))};
-  xlbl = 'spatial frequency (cycles)';
+  XLAB = 'spatial frequency (cycles)';
 
   for fi=1:length(ftp)
 
@@ -38,7 +38,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
 
           set(gca,'xlim',[0 max(ffts.freqs_1D)]);
           legend(lgnd{:}, 'Orig');
-          xlabel(guru_text2label(xlbl)); ylabel('power');
+          xlabel(guru_text2label(XLAB)); ylabel('power');
       end;
 
 
@@ -48,7 +48,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
           plot(ffts.freqs_1D, [avgPowerModel1_1D; avgPowerModel2_1D])
 
           set(gca,'xlim',[0 max(ffts.freqs_1D)]);
-          legend(lgnd{:}); xlabel(guru_text2label(xlbl)); ylabel('power');
+          legend(lgnd{:}); xlabel(guru_text2label(XLAB)); ylabel('power');
       end;
 
 
@@ -68,7 +68,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
 
           yl = get(gca,'ylim');
           set(gca,'xlim', [min(ffts.freqs_1D) max(ffts.freqs_1D)], 'ylim',[yl(1) yl(2)]);
-          legend(lgnd{:}, 'Orig'); xlabel(guru_text2label(xlbl)); ylabel('log_{10}(power)');
+          legend(lgnd{:}, 'Orig'); xlabel(guru_text2label(XLAB)); ylabel('log_{10}(power)');
       end;
 
 
@@ -80,7 +80,7 @@ function figures = de_PlotFFTs(mSets, ffts, ftp)
 
           yl = get(gca,'ylim');
           set(gca,'xlim', [0 max(ffts.freqs_1D)], 'ylim',[yl(1) yl(2)]);
-          legend(lgnd{:}); xlabel(guru_text2label(xlbl)); ylabel('log_{10}(power)');
+          legend(lgnd{:}); xlabel(guru_text2label(XLAB)); ylabel('log_{10}(power)');
       end;
 
 
