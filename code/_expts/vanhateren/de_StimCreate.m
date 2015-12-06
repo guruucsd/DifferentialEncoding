@@ -55,7 +55,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
   % Set up test set
   test_idx  = ~strcmp(train_ds, DS);
-  sum(test_idx), length(test_idx)
   test.X    = X(:,test_idx);
   test.XLAB = XLAB(test_idx);
   test.nInput = nInput;

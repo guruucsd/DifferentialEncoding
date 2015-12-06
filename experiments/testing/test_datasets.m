@@ -31,7 +31,7 @@ addpath(genpath(code_dir));
 
 % de_MakeDataset('text', 'kangaroos', '', {'large', 'skip', 1000}, true, true);
 
-de_NormalizeDataset(de_MakeDataset('vanhateren', '250', '', {'small'}, true, true), struct());
+de_MakeDataset('vanhateren', '25', '', {'small'}, true, true);
 
 % de_MakeDataset('young_bion_1981', 'orig', 'recog', {'small'}, true, true);
 
