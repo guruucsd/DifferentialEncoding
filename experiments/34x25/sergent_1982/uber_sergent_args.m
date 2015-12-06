@@ -5,7 +5,7 @@ function [args,opts] = uber_sergent_args(varargin)
   script_dir = fileparts(which(mfilename));
   addpath(fullfile(script_dir, '..'));
 
-  stats = {'freqprefs'};
+  stats = {'freqprefs', 'images', 'ffts'};
   plots = {'ls-bars', stats{:}};
 
   [args,opts] = uber_args( ...
