@@ -111,7 +111,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,XLAB,dataset]= stim2D(stimSet, taskType)
+  function [X,nInput,XLAB,dataset]= stim2D(stimSet, taskType, opt)
   %
   %
   %
