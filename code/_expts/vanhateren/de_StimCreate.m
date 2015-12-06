@@ -31,7 +31,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('taskType','var')), taskType = 'recog'; end;
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
-  if (~exist('force','var'))     force    = 0;      end;
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,7 +38,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % With this info, create our X and TT vectors
-  [X, nInput, XLAB, DS] = stim2D(stimSet, taskType);
+  [X, nInput, XLAB, DS] = stim2D(stimSet, taskType, opt);
 
   % Now index and apply options, including input weightings.
   [X, nInput]          = de_applyOptions(opt, X, nInput);
@@ -47,19 +46,20 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   % Nail down targets for each task
 
   unique_DS = unique(DS);  %datasets #1 and #2
-  ds = unique_DS{1};       % this is train set; the other is test
+  train_ds = unique_DS{1};       % this is train set; the other is test
 
-    % Set up training set
-    train_idx  = find(strcmp(ds, DS));
-    train.X    = X(:,train_idx);
-    train.XLAB = XLAB(train_idx);
-    train.nInput = nInput;
+  % Set up training set
+  train_idx  = strcmp(train_ds, DS);
+  train.X    = X(:,train_idx);
+  train.XLAB = XLAB(train_idx);
+  train.nInput = nInput;
 
-    % Set up test set
-    test_idx  = find(~strcmp(ds, DS));
-    test.X    = X(:,test_idx);
-    test.XLAB = XLAB(test_idx);
-    test.nInput = nInput;
+  % Set up test set
+  test_idx  = ~strcmp(train_ds, DS);
+  sum(test_idx), length(test_idx)
+  test.X    = X(:,test_idx);
+  test.XLAB = XLAB(test_idx);
+  test.nInput = nInput;
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [X_new, nInput_new] = de_applyOptions(opt, X, nInput)
@@ -116,53 +116,114 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   %
   %
   %
+    % Parse some options
+    rseed = guru_getopt(opt, 'rseed', 1);
+    image_reversals = guru_getopt(opt, 'image-reversals', false);
+
+    % Query the images
     nimgs_in   = sscanf(stimSet, '%d');
+    if ischar(nimgs_in), error('stimSet must be an integer'); end;
+    nimgs_in = 2 * nimgs_in;  % train vs. test sets.
 
     indir = fullfile(de_GetOutPath([], 'datasets'), 'vanhateren');
-    if (~exist(indir, 'dir')), error('van Hateren raw images do not exist at expected location: %s', indir); end;
+    if (~exist(indir, 'dir'))
+      error('van Hateren raw images do not exist at expected location: %s',...
+            indir);
+    end;
 
-    fs       = dir(fullfile(indir, '*.iml'));
-    if (length(fs)<nimgs_in), error('Expected %d van Hateren images; only found %d at %s.', nimgs_in, length(fs), indir); end;
+    files = dir(fullfile(indir, '*.iml'));
+    if (length(files) < nimgs_in / 4)
+      error('Expected %d van Hateren images; only found %d at %s.', ...
+            nimgs_in / 4, length(files), indir);
+    end;
 
+    % Hard-coded info about van hateren images.
     nInput_In  = [1024 1536]; %y,x
-    if ischar(nimgs_in), error('stimSet must be an integer'); end;
-
-    % Read each image
     nInput_Out = [135  100]; % y,x
-    nimgs_out  = 2*nimgs_in;
-    X = zeros(prod(nInput_Out), nimgs_out);
 
-    imgnum = zeros(nimgs_in,1);
-    for fi=1:nimgs_in
-        img = mfe_readIML(fullfile(indir, fs(fi).name));
-        imgnum(fi) = sscanf(fs(fi).name, 'imk%d.iml');
+    % Set up outputs
+    nimgs_out_per_input = (1 + image_reversals);
+    nimgs_out  = nimgs_out_per_input * nimgs_in; % train + test sets.
+    X = zeros(prod(nInput_Out), nimgs_out);
+    XLAB = cell(nimgs_out, 1);
+
+    randn('seed',rseed), rand('seed', rseed)
+    pi = 1;
+    for ii=1:nimgs_in
+        % Read each image
+        img_idx = 1 + mod(ii - 1, floor(nimgs_in/4));  % try for 4 patches per
+        img_path = fullfile(indir, files(img_idx).name);
+        img = mfe_readIML(img_path);
+        imgnum = sscanf(files(img_idx).name, 'imk%d.iml');
 
         % Select the middle portion of the image
-        cpt      = round(nInput_In)/2;
-        pixrange = round([(cpt(1)  -nInput_Out(1)/2)   (cpt(2)  -nInput_Out(2)) ; ...
-                          (cpt(1)-1+nInput_Out(1)/2)   (cpt(2)-1+nInput_Out(2)) ]);
+        for tpi=1:5  % try up to 5 random patches
+          rng = [0 0;nInput_In] + round([1 -1]' * nInput_Out/2);
+          cpt = [randi(rng(:, 1)), randi(rng(:, 2))];
+          patch    = getImagePatch(img, cpt, nInput_Out);
+          [patch, is_good] = validate_and_normalize_patch(patch, opt);
+          if is_good, break; end;
+        end;
+        if ~is_good
+          warning('likely bad image; please delete %s', img_path);
+          imshow(img); title(img_path);
+          % continue  % sadly, can't continue...
+        end;
 
-        img_left   = img(pixrange(1,1):pixrange(2,1), pixrange(1,2): 1:cpt(2)-1 );
-        img_rt_rev = img(pixrange(1,1):pixrange(2,1), pixrange(2,2):-1:cpt(2) );
+        % Add the patch, even if it sucks :(
+        X(:, pi)  = patch(:);
+        XLAB{pi} = sprintf('img-%d', imgnum);
+        pi = pi + 1;
 
-        X(:,2*fi-1)  = img_left(:);
-        X(:,2*fi)    = img_rt_rev(:);
-
-        X(:,2*fi-1) = (X(:,2*fi-1) - min(X(:,2*fi-1)))/(max(X(:,2*fi-1))-min(X(:,2*fi-1)));
-        X(:,2*fi)   = (X(:,2*fi  ) - min(X(:,2*fi  )))/(max(X(:,2*fi  ))-min(X(:,2*fi  )));
+        if image_reversals
+          patch    = getImagePatch(img(:, end:-1:1), cpt, nInput_Out);
+          patch = validate_and_normalize_patch(patch, opt);  % already tested, should pass
+          X(:, pi)    = patch(:);
+          XLAB{pi} = sprintf('right-rev-%d', imgnum);
+          pi = pi + 1;
+      end;
     end;
     nInput = [nInput_Out(1) nInput_Out(2)];
 
     guru_assert(~any(X(:)<0), 'no values outside [0 1]');
     guru_assert(~any(X(:)>1), 'no values outside [0 1]');
 
-    % Divide into datasets
-    XLAB = cell(nimgs_out,1);
-    XLAB(1:2:end-1) = guru_csprintf('left-%d',     num2cell(imgnum));
-    XLAB(2:2:end)   = guru_csprintf('right_rev-%d',num2cell(imgnum));
-
-    dataset  = cell(nimgs_out,1);
-    dataset(1:floor(nimgs_out/2))     = {'1'};
-    dataset(floor(nimgs_out/2)+1:end) = {'2'};
+    % Divide into training & test datasets
+    dataset  = cell(nimgs_out, 1);
+    dataset(1:floor(nimgs_out/2))     = {'1'};  % train
+    dataset(floor(nimgs_out/2)+1:end) = {'2'};  % test
 
 
+function patch = getImagePatch(img, cpt, outSz)
+  pixrange = round([(cpt(1)  -outSz(1)/2)   (cpt(2)  -outSz(2)/2) ; ...
+                    (cpt(1)-1+outSz(1)/2)   (cpt(2)-1+outSz(2)/2) ]);
+
+  patch = img(pixrange(1,1):pixrange(2,1), pixrange(1,2):pixrange(2,2));
+  guru_assert(~any(size(patch) - outSz));
+
+
+function [normalized_patch, is_good] = validate_and_normalize_patch(img_patch, opt)
+    % Parse some options
+    min_variance = guru_getopt(opt, 'min-variance', 0.025);
+    max_mean_diff = guru_getopt(opt, 'max-mean-diff', 0.45);  % difference from 0.5
+
+    % Normalize to [0 1]
+    normalized_patch = (img_patch - min(img_patch(:))) / (max(img_patch(:)) - min(img_patch(:)));
+    is_good = true;
+
+    img_std = std(normalized_patch(:));
+    if img_std < min_variance
+      is_good = false;
+      fprintf('\t(skipping vanhateren patch; %.3f < min_variance)\n', img_std);
+    end;
+
+    img_mean_diff = abs(0.5 - mean(normalized_patch(:)));
+    if img_mean_diff > max_mean_diff
+      is_good = false;
+      fprintf('\t(skipping vanhateren patch; %.3f > mean_diff)\n', img_mean_diff);
+    end;
+
+    if img_std < (1.5 * min_variance) && img_mean_diff > (max_mean_diff / 1.25)
+      fprintf('\t(skipping vanhateren patch; bad mean,std combo)\n');
+      is_good = false;
+    end;
