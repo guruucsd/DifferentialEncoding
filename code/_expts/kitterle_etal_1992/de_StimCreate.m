@@ -24,10 +24,15 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   if (~iscell(opt)),             opt      = {opt};  end;
   if (~exist('force','var'))     force    = 0;      end;
 
-  [train.nInput]  = guru_getopt(opt, 'nInput',  [135 100]);
-  [train.nPhases] = guru_getopt(opt, 'nPhases', 20);
-  [train.nThetas] = guru_getopt(opt, 'nThetas', 1);
-  [train.cycles]  = guru_getopt(opt, 'cycles', [3 6]);
+  if guru_hasopt(opt, 'nInput'), train.nInput = guru_getopt(opt, 'nInput');
+  elseif guru_hasopt(opt, 'small'), train.nInput = [34 25];
+  elseif guru_hasopt(opt, 'medium'), train.nInput = [68 50];
+  else train.nInput = [135 100];
+  end;
+
+  [train.nPhases] = guru_getopt(opt, 'nPhases', 16);
+  [train.nThetas] = guru_getopt(opt, 'nThetas', 16);
+  [train.cycles]  = guru_getopt(opt, 'cycles', [3 5]);
   [train.freqs]   = train.cycles/train.nInput(1);
 
   test = train;
@@ -135,10 +140,10 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   function [X,XLAB,phases,thetas]= stim2D(set, tot, freqs, nInput, nPhases, nThetas)
 
     % Determine thetas
-    thetas = linspace(0,pi/2, nThetas); %angle of grating; pi/2=vertical
+    thetas = linspace(0, pi, nThetas); %angle of grating; pi/2=vertical
 
     % Determine phases
-    phases  = linspace(0,2*pi,2*nPhases+1);
+    phases  = linspace(0, 2*pi, 2*nPhases+1);
     phases  = phases(1:end-1); %40 evenly spaced gratings from 0 to 2pi
     switch (tot)
       case 'train', phases = phases(1:2:end);
@@ -173,7 +178,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
           end;
 
           % Make sure dynamic range is between 0 and 1
-          X = (X - min(min(X))) / (max(max(X))-min(min(X)));
+          X = (X - min(X(:))) / (max(X(:)) - min(X(:)));
 
       case 'sf_mixed'
           nImages = length(phases)*length(freqs);
@@ -193,8 +198,8 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
                 % square wave for this frequency
                 imgnum = imgnum + 1;
-                X(:,imgnum) = reshape(mfe_grating2d(freqs(i),phases(j), thetas(k), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
-                X(:,imgnum) = double(X(:,imgnum)>=0.0);
+                X(:,imgnum) = X(:,imgnum-1);  % copy the sin wave.
+                X(:,imgnum) = sign(X(:, imgnum));
                 XLAB{imgnum} = sprintf('square, freq=%3.2f,\nphase=%3.1f, theta=%3.1f', freqs(i), phases(j), thetas(k));
 
               end;
@@ -202,7 +207,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
           end;
 
           % Make sure dynamic range is between 0 and 1
-          X = (X - min(min(X))) / (max(max(X))-min(min(X)));
+          X = (X - min(X(:))) / (max(X(:)) - min(X(:)));
 
     otherwise, error('Stim set %s NYI', set);
   end;
