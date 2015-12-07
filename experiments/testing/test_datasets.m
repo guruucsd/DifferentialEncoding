@@ -4,7 +4,7 @@ script_dir = fileparts(which(mfilename));
 code_dir = fullfile(script_dir, '..', '..', 'code');
 addpath(genpath(code_dir));
 
-% de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'small'}, true, true);
+de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'small'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'high_freq', 'recog', {'small'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'medium'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'high_freq', 'recog', {'medium'}, true, true);
@@ -31,7 +31,7 @@ addpath(genpath(code_dir));
 
 % de_MakeDataset('text', 'kangaroos', '', {'large', 'skip', 1000}, true, true);
 
-de_MakeDataset('vanhateren', '25', '', {'small'}, true, true);
+% de_MakeDataset('vanhateren', '25', '', {'small'}, true, true);
 
 % de_MakeDataset('young_bion_1981', 'orig', 'recog', {'small'}, true, true);
 
