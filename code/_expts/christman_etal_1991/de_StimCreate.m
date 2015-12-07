@@ -32,7 +32,6 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
 
   [train.nphases] = guru_getopt(opt, 'nphases',  8);%[11.25:11.25:180]);
   [train.nthetas] = guru_getopt(opt, 'nthetas',  8);
-  train.cycles    = guru_getopt(opt, 'cycles', [2 4 8 16 32]);
   [train.phases] = guru_getopt(opt, 'phases',  linspace(0, (train.nphases - 1) * 2 * pi / train.nphases, train.nphases));
   [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0, (train.nthetas - 1) * pi / train.nthetas, train.nthetas));
   train.cycles    = guru_getopt(opt, 'cycles', [1 2 4 8 16]);

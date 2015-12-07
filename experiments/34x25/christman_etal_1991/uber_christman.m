@@ -1,11 +1,6 @@
 clear all variables; clear all globals;
 
-stats =  {}; %'ffts','images'};
-plots = stats;
-
-[args,opts] = uber_christman_args( 'plots', plots, 'stats', stats);
-
-[~, tst_low]   = de_SimulatorUber('vanhateren/250', 'christman_etal_1991/low_freq/recog', opts, args);
-[~, tst_high]  = de_SimulatorUber('vanhateren/250', 'christman_etal_1991/high_freq/recog', opts, args);
+uber_christman_low;  % sets tst_low
+uber_christman_high;  % sets tst_high
 
 christman_interaction_analysis(tst_low, tst_high);
