@@ -34,6 +34,4 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
       text(2.125, perf(2,1), hemi_lbls{1}, 'FontSize', 18)
       text(2.125, perf(2,2), hemi_lbls{2}, 'FontSize', 18)
       ylabel('log_{10}(Mean Square Error)');
-
-      print(gcf, '-dpng', ['kitterle-' ds]);
   end;
