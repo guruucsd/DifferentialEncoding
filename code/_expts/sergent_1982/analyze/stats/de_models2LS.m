@@ -35,10 +35,29 @@ function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models,
     mSets = models(1);
     runs  = length(models);
     num_trial_types =length(mSets.data.train.TIDX);
-    raw_error = zeros(runs, length(mSets.data.test.T));
+
+    p         = [models.p];
+    o         = [p.output];
+    o_p       = reshape(horzcat(o.test),[numel(o(1).test),length(o)])';  % # models x # trials
+    raw_error = de_calcPErr( o_p, mSets.data.test.T, errorType );        % # models x # trials
+
+    calc_raw_error = zeros(runs, length(mSets.data.test.T));
     for mi=1:runs
-      [oact] = guru_nnExec(models(mi), mSets.data.test.X, mSets.data.test.T);
-      raw_error(mi, :) = de_calcPErr( oact, mSets.data.test.T, errorType );        % # models x # trials
+      if strcmp(mSets.deType, 'de-stacked')
+          m = de_LoadProps(m, 'p', 'Weights');
+          [oact] = guru_nnExec(m.p, huact, mSets.data.test.T);
+      else
+          m = de_LoadProps(models(mi), 'ac', 'Weights');
+          m = de_LoadProps(m, 'p', 'Weights');
+          [~, ~, huact] = guru_nnExec(m.ac, mSets.data.test.X, mSets.data.test.X(1:end-1,:));
+          [oact] = guru_nnExec(m.p, huact, mSets.data.test.T);
+      end;
+      calc_raw_error(mi, :) = de_calcPErr( oact, mSets.data.test.T, errorType );        % # models x # trials
+    end;
+
+    if any(raw_error(:) - calc_raw_error(:))
+        raw_error - calc_raw_error
+        raw_error = calc_raw_error;
     end;
 
     % Calc ls for each model
