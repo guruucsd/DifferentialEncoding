@@ -30,8 +30,8 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   else train.nInput = [135 100];
   end;
 
-  [train.nPhases] = guru_getopt(opt, 'nPhases', 16);
-  [train.nThetas] = guru_getopt(opt, 'nThetas', 16);
+  [train.nPhases] = guru_getopt(opt, 'nPhases', 8);
+  [train.nThetas] = guru_getopt(opt, 'nThetas', 8);
   [train.cycles]  = guru_getopt(opt, 'cycles', [3 5]);
   [train.freqs]   = train.cycles/train.nInput(1);
 
