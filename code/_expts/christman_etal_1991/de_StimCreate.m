@@ -23,10 +23,19 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-  [train.phases] = guru_getopt(opt, 'phases',  linspace(0,15*16/pi,16));%[11.25:11.25:180]);
-  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0,pi/2, 1));
-  [train.nInput] = guru_getopt(opt, 'nInput',  [135 100]);
+  if guru_hasopt(opt, 'nInput'), train.nInput = guru_getopt(opt, 'nInput');
+  elseif guru_hasopt(opt, 'small'), train.nInput = [34 25];
+  elseif guru_hasopt(opt, 'medium'), train.nInput = [68 50];
+  else train.nInput = [135 100];
+  end;
+
+
+  [train.nphases] = guru_getopt(opt, 'nphases',  16);%[11.25:11.25:180]);
+  [train.nthetas] = guru_getopt(opt, 'nthetas',  16);
   train.cycles    = guru_getopt(opt, 'cycles', [2 4 8 16 32]);
+  [train.phases] = guru_getopt(opt, 'phases',  linspace(0, (train.nphases - 1) * 2 * pi / train.nphases));%[11.25:11.25:180]);
+  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0, (train.nthetas - 1) * pi / train.nthetas));
+  train.cycles    = guru_getopt(opt, 'cycles', [1 2 4 8 16]);
   train.freqs     = train.cycles/train.nInput(1);
   if (length(train.cycles)~=5), error('not enough elements in cycles; expect 5, got %d', length(train.cycles)); end;
 
