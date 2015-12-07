@@ -65,7 +65,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [T, TLAB]         = de_createTargets(taskType, X, XLAB, freqs)
+  function [T, TLAB] = de_createTargets(taskType, X, XLAB, freqs)
   %
   % Take the input vector and taskType, and create a set of labels
   %
@@ -91,37 +91,20 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
       case {'recog_freq'}
         guru_assert(length(freqs)==2);
 
-        T      = zeros(1, length(XLAB));
-        TLAB   = cell (1, length(XLAB));
-
-
-        for i=1:length(XLAB)
-            parts = mfe_split(', ', XLAB{i});
-
-            TLAB{i} = parts{2};
-            if (~exist('f1','var')), f1=TLAB{i}; end;
-
-            T(i) = strcmp(TLAB{i}, f1);
-        end;
+        T = cellfun(@(xl) ~isempty(findstr('f1', xl)), XLAB);
+        TLAB = arrayfun(@(t) guru_iff(t, 'f1', 'f2'), T, ...
+                        'UniformOutput', false);
 
         guru_assert(length(find(T)) == length(T)/2);
-
-
 
       % Kitterle task 2: identify by type [sin vs square] wave
       %   note: sin wave = "1"; square wave = 0 (or -1)
       case {'recog_type'}
         guru_assert(length(freqs)==2);
 
-        T      = zeros(1, length(XLAB));
-        TLAB   = cell (1, length(XLAB));
-
-        for i=1:length(XLAB)
-            parts = mfe_split(', ', XLAB{i});
-
-            TLAB{i} = parts{1};
-            T(i) = strcmp(TLAB{i}, 'sin');
-        end;
+        T = cellfun(@(xl) ~isempty(findstr('square', xl)), XLAB);
+        TLAB = arrayfun(@(t) guru_iff(t, 'square', 'sin'), T, ...
+                        'UniformOutput', false);
 
         guru_assert(length(find(T)) == length(T)/2);
 
@@ -140,7 +123,8 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
   function [X,XLAB,phases,thetas]= stim2D(set, tot, freqs, nInput, nPhases, nThetas)
 
     % Determine thetas
-    thetas = linspace(0, pi, nThetas); %angle of grating; pi/2=vertical
+    thetas = linspace(-pi/4, 3*pi/4, nThetas + 1); %angle of grating; pi/2=vertical
+    thetas = thetas(1:end-1);  % lazy way to eliminate overlap of -pi/2 and pi/2
 
     % Determine phases
     phases  = linspace(0, 2*pi, 2*nPhases+1);
@@ -170,7 +154,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
                   X(:,imgnum) = double(X(:,imgnum) >= 0.0);
                 end;
 
-                XLAB{imgnum} = sprintf('freq=%3.2f,phase=%3.1f, theta=%3.1f', freqs(i), phases(j), thetas(k));
+                XLAB{imgnum} = sprintf('freq=%3.2f (f%d),phase=%3.1f, theta=%3.1f', freqs(i), i, phases(j), thetas(k));
 
 
               end;
@@ -194,13 +178,13 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
                 % sin wave for this frequency
                 imgnum = imgnum + 1;
                 X(:,imgnum) = reshape(mfe_grating2d(freqs(i),phases(j), thetas(k), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
-                XLAB{imgnum} = sprintf('sin, freq=%3.2f,\nphase=%3.1f, theta=%3.1f', freqs(i), phases(j), thetas(k));
+                XLAB{imgnum} = sprintf('sin, freq=%3.2f (f%d),\nphase=%3.1f, theta=%3.1f', freqs(i), i, phases(j), thetas(k));
 
                 % square wave for this frequency
                 imgnum = imgnum + 1;
                 X(:,imgnum) = X(:,imgnum-1);  % copy the sin wave.
                 X(:,imgnum) = sign(X(:, imgnum));
-                XLAB{imgnum} = sprintf('square, freq=%3.2f,\nphase=%3.1f, theta=%3.1f', freqs(i), phases(j), thetas(k));
+                XLAB{imgnum} = sprintf('square, freq=%3.2f (f%d),\nphase=%3.1f, theta=%3.1f', freqs(i), i, phases(j), thetas(k));
 
               end;
             end;

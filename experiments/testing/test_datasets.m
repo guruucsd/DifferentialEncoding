@@ -4,7 +4,7 @@ script_dir = fileparts(which(mfilename));
 code_dir = fullfile(script_dir, '..', '..', 'code');
 addpath(genpath(code_dir));
 
-de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'small'}, true, true);
+% de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'small'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'high_freq', 'recog', {'small'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'medium'}, true, true);
 % de_MakeDataset('christman_etal_1991', 'high_freq', 'recog', {'medium'}, true, true);
@@ -16,7 +16,7 @@ de_MakeDataset('christman_etal_1991', 'low_freq', 'recog', {'small'}, true, true
 
 % de_MakeDataset('jonsson_hellige_1986', 'HMTVWXY', 'samediff', {'small'}, true, true);
 
-% de_MakeDataset('kitterle_etal_1992', 'sf_mixed', 'recog_freq', {'small'}, true, true);
+de_MakeDataset('kitterle_etal_1992', 'sf_mixed', 'recog_freq', {'small', 'nphases', 16, 'nthetas', 1}, true, true);
 % de_MakeDataset('kitterle_etal_1992', 'sf_mixed', 'recog_type', {'small'}, true, true);
 
 % de_MakeDataset('okubo_michimata_2002', 'dots-cb', 'categorical', {'medium'}, true, true);
