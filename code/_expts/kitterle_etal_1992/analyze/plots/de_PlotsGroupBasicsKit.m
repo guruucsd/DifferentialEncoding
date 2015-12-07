@@ -26,7 +26,7 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
       hold on;
 
       task_lbls = {'Wide/Narrow','Sharp/Fuzzy'};
-      if size(means, 1) == 2
+      if size(means, 2) == 2
           hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
                         sprintf('LH (\\sigma=%3.1f)', mSets.sigma(end))};
           plot(1, perf(2,1), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
