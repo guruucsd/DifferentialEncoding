@@ -4,9 +4,6 @@
 % 850x1.mat
 %
 addpath('../sergent_1982');
-clear all variables; clear all globals;
-dbstop if error
-
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
 hu_hpl = [ 850 1; 425 2; 108 8; 108 4; 425 1];
@@ -44,7 +41,7 @@ for hi=1:length(hu_hpl)
         try
           % Try a mini version, so that we don't spend too much time failing
           % to do stuff
-          [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, {args{:}, 'runs', 2, 'plots',{},'stats',{}});
+          [junk.trn, junk.tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent', opts, {args{:}, 'runs', 2, 'plots',{},'stats',{}});
           if any(nnz(sum(junk.trn.stats.raw.r{1},2))==2)
               error('Failed to train autoencoder; all autoencoders were rejected')
           elseif any(nnz(sum(junk.tst.stats.raw.r{1},2))==2)
@@ -52,7 +49,7 @@ for hi=1:length(hu_hpl)
           end;
           
           % Get the result
-          [junk.trn, junk.tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent', opts, args);
+          [junk.trn, junk.tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent', opts, args);
           close all;
           junk.trn.models = []; junk.tst.models = [];
           save(miniFile, 'junk');

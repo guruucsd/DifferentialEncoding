@@ -1,13 +1,14 @@
 function figs = de_PlotsGroupBasicsOkubo( all_mSets, stats )
 
 n_expts = length(all_mSets);
-expt_names = cellfun(@(mSets) sprintf('%%s', mSets.data.taskType), all_mSets, 'UniformOutput', false);
-stim_names = cellfun(@(mSets) sprintf('%%s', mSets.data.stimSet), all_mSets, 'UniformOutput', false);
+expt_names = cellfun(@(mSets) mSets.data.taskType, all_mSets, 'UniformOutput', false);
+stim_names = cellfun(@(mSets) mSets.data.stimSet, all_mSets, 'UniformOutput', false);
 guru_assert(n_expts == 4, 'Okubo should have four experiments.')
 
 figs = de_NewFig('okubo-figure2')
 
 for si=1:2
+    % rows are experiments, cols are hemis
     expt_idx = 2 * (si - 1) + [1:2];
     hemi_idx = [1 size(stats.median_error, 2)];
 

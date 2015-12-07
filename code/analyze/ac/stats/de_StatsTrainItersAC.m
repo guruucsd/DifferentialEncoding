@@ -13,7 +13,7 @@ function [ti, pval] = de_StatsTrainItersAC(models)
   ti = cell(length(models), 1);
 
   for s=1:length(models)
-    ti{s} = cellfun(@(m) m.ac.Iterations, num2cell(models{s}));
+    ti{s} = arrayfun(@(m) m.ac.Iterations, models{s});
   end;
 
 

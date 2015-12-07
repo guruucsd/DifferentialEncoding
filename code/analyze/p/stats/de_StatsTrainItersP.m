@@ -19,5 +19,5 @@ function [ti] = de_StatsTrainItersP(models)
 
   for s=1:length(models)
       if isempty(models{s}), continue; end;
-      ti{s} = cellfun(@(m) m.p.Iterations, num2cell(models{s}));
+      ti{s} = arrayfun(@(m) m.p.Iterations, models{s});
   end;

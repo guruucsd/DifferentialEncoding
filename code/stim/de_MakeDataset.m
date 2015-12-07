@@ -1,4 +1,4 @@
-function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs)
+function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs, force)
 % Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return
 %   the filename and the dataset.
 %
@@ -11,12 +11,13 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
     if ~exist('opt','var'), opt = {}; end;
     if ~exist('show_figs', 'var'), show_figs = true; end;
+    if ~exist('force', 'var'), force = false; end;
 
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
     % If the file doesn't exist, then we have to create it!
-    if (~exist(dataFile,'file'))
+    if (~exist(dataFile,'file') || force)
 
         %% Setup path--each experiment implements a set of generic functions
         % (right, basically like a class, but through file & path manipulation--yuck).
@@ -43,19 +44,19 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Make sure what comes out is the MVP (minimum viable product)
         all_required_props = {'X', 'XLAB', 'nInput'};
-        if ~isempty(taskType), all_required_props{end+1} = 'T'; end;            
+        if ~isempty(taskType), all_required_props{end+1} = 'T'; end;
         for prop_name=all_required_props
             guru_assert(isfield(train, prop_name{1}), ...
                         sprintf('Training set must have "%s" property defined.', prop_name{1}));
         end;
-        
+
 
         path(p); % Restore path
 
         %%
         % Stamp on parameters
-        train.expt = expt; train.stimSet = stimSet; train.TaskType = taskType; train.opt = opt;
-        test.expt  = expt; test.stimSet  = stimSet; test.TaskType  = taskType; test.opt  = opt;
+        train.expt = expt; train.stimSet = stimSet; train.taskType = taskType; train.opt = opt;
+        test.expt  = expt; test.stimSet  = stimSet; test.taskType  = taskType; test.opt  = opt;
 
         % Apply missing (but expected) field
         if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
@@ -71,22 +72,13 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         % Visualize datasets
         if show_figs
-            tr_figs = de_visualizeData(train);
-            te_figs = de_visualizeData(test);
+            de_visualizeData(train);
+            de_visualizeData(test);
         end;
 
         % Output everything (including images)
         if (~exist(guru_fileparts(dataFile,'pathstr'), 'dir'))
           guru_mkdir(guru_fileparts(dataFile,'pathstr'));
-        end;
-
-        if show_figs
-            figpath = guru_fileparts(dataFile,'path');
-            prefix  = guru_fileparts(dataFile, 'name');
-            for fi=1:length(tr_figs)
-                saveas(tr_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-train.png']), 'png');
-                saveas(te_figs(fi).handle, fullfile(figpath, [prefix '.' tr_figs(fi).name '-test.png']), 'png');
-            end;
         end;
 
         save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
@@ -120,10 +112,7 @@ function dset = de_StimApplyTransform(dset, opts)
 
     % Convert all images into polar coordinates, like Plaut & Behrmann 2011
     if guru_hasopt(opts, 'img2pol')
-        %de_visualizeData(dset);
-
         dset.X = guru_img2pol(dset.X, guru_getopt(opts, 'location', 'CVF'));
-        %de_visualizeData(dset); % just for now
     end;
 
     if guru_hasopt(opts, 'contrast')
@@ -151,8 +140,6 @@ function dset = de_StimApplyTransform(dset, opts)
           caimg = caimg - mean(caimg(:)) + mean(img(:));
           caimg(caimg>img_range(2)) = img_range(2);
           caimg(caimg<img_range(1)) = img_range(1);
-
-          %subplot(1,2,1); imshow(img, [0 1]); subplot(1,2,2); imshow(caimg, [0 1]);
 
           dset.X(:,ii) = caimg(:);
       end;
@@ -291,25 +278,24 @@ function dset = de_StimApplyWhitening(dset, opts, dset_to_match)
 
 
 %%%%%%%%%%%%%%%%%
-function figs = de_visualizeData(dset)
-  figs = de_NewFig('dummy');
+function fig = de_visualizeData(dset)
 
   nImages = min(4*4,size(dset.X,2));
 
   % View some sample images
-  figs(end+1) = de_NewFig('data', '__img', [34 25], nImages);
+  fig = de_NewFig('dataset-images', '__img', [34 25], nImages);
+  set(fig.handle, 'Position', [0, 0, 1200, 1200]);
+
   im2show     = de_SelectImages(dset, nImages);
-  %randperm(size(dset.X,2));
-  %im2show     = sort(im2show(1:nImages));
 
-  for ii=1:nImages
-          subplot(4,4,ii);
-          colormap gray;
-          imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput));
-          axis image; set(gca, 'xtick',[],'ytick',[]);
-          xlabel(guru_text2label(dset.XLAB{im2show(ii)}));
+  for ii=1:length(im2show)
+      subplot(4, 4, ii);
+      colormap gray;
+      imagesc( reshape(dset.X(:,im2show(ii)), dset.nInput), [0, 1]);
+      axis image; set(gca, 'xtick',[],'ytick',[]);
+      lbl = dset.XLAB{im2show(ii)};
+      if isfield(dset, 'TLAB')
+          lbl = sprintf('%s\n%s', lbl, dset.TLAB{im2show(ii)});
+      end;
+      xlabel(guru_text2label(lbl));
   end;
-
-  % View frequency info for images
-
-  %

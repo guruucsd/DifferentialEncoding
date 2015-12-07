@@ -37,21 +37,27 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   heights = 6 * guru_getopt(opt, 'heights', [[0.5 1.0 1.5 2.5 3.0 3.5] -1*[0.5 1.0 1.5 2.5 3.0 3.5]]);
   train.nInput = [68 50];
   train.X = zeros(prod(train.nInput), 0);
-  train.XLAB = guru_csprintf('height=%.2f', num2cell(heights));
+  train.XLAB = {};
+  train.T = [];
+  train.TLAB = {};
 
   for h=heights
     img = 1 - create_cat_coord_stimuli(h)';
     if strcmp(stimSet, 'dots-cb')
       img = guru_contrast_balance_image(img, 1, 0.5);
+    else
+      img(img == 0) = 0.5;  % match the grey background.
     end;
     train.X(:, end+1) = img(:);
-  end;
+    train.XLAB{end+1} = sprintf('height=%.2f', h);
 
-  % Create the output vectors.
-  if ~isempty(taskType)
     switch (taskType)
-      case 'categorical', train.T = heights > 0;
-      case 'coordinate', train.T = abs(heights) / max(abs(heights));
+      case 'categorical',
+        train.T(end+1) = h > 0;
+        train.TLAB{end+1} = guru_iff(h > 0, 'above', 'below');
+      case 'coordinate'
+        train.T(end+1) = h <= 2;
+        train.TLAB{end+1} = guru_iff(h <= 2, 'near', 'far');
       otherwise, error('Unknown taskType: %s', taskType);
     end;
   end;
@@ -62,38 +68,38 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
 
 function [ image ] = create_cat_coord_stimuli( height )
-% Takes two parameters:
-%   height (vertical displacement of 2 dots from middle 5),
-%   above (1 for true, 0 for false, i.e. below)
-img_height = 50;
-img_width = 68;
-midline = img_height/2;
-stimuli_mid = img_width/2;
-five_stimuli_width = 44;
-padding = 12;
+    % Takes two parameters:
+    %   height (vertical displacement of 2 dots from middle 5),
+    %   above (1 for true, 0 for false, i.e. below)
+    img_height = 50;
+    img_width = 68;
+    midline = img_height/2;
+    stimuli_mid = img_width/2;
+    five_stimuli_width = 44;
+    padding = 12;
 
-image = ones(img_height, img_width);
+    image = ones(img_height, img_width);
 
-% create the five stimuli, same on all images
-for ii = 1:10:41
-  image(midline, padding+ii) = 0;
-  image(midline+1, padding+ii) = 0;
-  image(midline, padding+ii+1) = 0;
-  image(midline+1, padding+ii+1) = 0;
-end
+    % create the five stimuli, same on all images
+    for ii = 1:10:41
+      image(midline, padding+ii) = 0;
+      image(midline+1, padding+ii) = 0;
+      image(midline, padding+ii+1) = 0;
+      image(midline+1, padding+ii+1) = 0;
+    end
 
-    height = height * -1;
+        height = height * -1;
 
-% create the 2 stimuli based on the height
+    % create the 2 stimuli based on the height
 
-image(midline+height,29) = 0;
-image(midline+height, 28) = 0;
-image(midline+height+1, 29) = 0;
-image(midline+height+1, 28) = 0;
+    image(midline+height,29) = 0;
+    image(midline+height, 28) = 0;
+    image(midline+height+1, 29) = 0;
+    image(midline+height+1, 28) = 0;
 
-image(midline+height, 39) = 0;
-image(midline+height, 38) = 0;
-image(midline+height+1, 39) = 0;
-image(midline+height+1, 38) = 0;
+    image(midline+height, 39) = 0;
+    image(midline+height, 38) = 0;
+    image(midline+height+1, 39) = 0;
+    image(midline+height+1, 38) = 0;
 
 

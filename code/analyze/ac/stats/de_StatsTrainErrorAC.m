@@ -15,5 +15,5 @@ function [te] = de_StatsTrainErrorAC(models)
   te = cell(length(models), 1);
 
   for s=1:length(models)
-    te{s} = cellfun(@(m) m.ac.trainingError, num2cell(models{s}));
+    te{s} = arrayfun(@(m) m.ac.trainingError, models{s});
   end;

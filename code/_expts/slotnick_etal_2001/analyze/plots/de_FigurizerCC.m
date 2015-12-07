@@ -4,30 +4,47 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 % 2) Implement code that generalizes based on the task (blob/dot vs paired
 % squares etc)
 
-ds = 'test';
-taskTitle = guru_capitalizeStr(mSets.data.taskType);
+    ds = 'test';
 
+    right = stats.rej.cc.perf.(ds){1};
+    left = stats.rej.cc.perf.(ds){end};
+    rons = mSets.runs;
 
-left = stats.rej.cc.perf.(ds){1};
-right = stats.rej.cc.perf.(ds){end};
-rons = mSets.runs;
-% these results are for the first trial type, i.e. one of {on, near, same}
-left_results1 = left{1};
-right_results1 = right{1};
+    figs = de_NewFig(mSets.data.taskType);
 
-% these results are for the second trial type, i.e. one of {off, near, different}
-left_results2 = left{2};
-right_results2 = right{2};
+    n_trial_types = length(left);
+    n_plots = n_trial_types + 1;  % plot for each trial type, plus combined
+    for pi=1:n_plots
+        ax = subplot(1, n_plots, pi);
 
-% combine them into a single results matrix
-left_results = [left_results1, left_results2];
-right_results = [right_results1, right_results2];
+        if pi == 1
+            left_mean = mean(cellfun(@(d) mean(d(:)), left));
+            right_mean = mean(cellfun(@(d) mean(d(:)), right));
+            left_stderr = 0 * left_mean;  % feeling lazy; errorbars are clear
+            right_stderr = 0 * right_mean; % on other subplots.
+            taskTitle = guru_capitalizeStr(mSets.data.taskType);
 
-left_average = mean(left_results(:)');
-right_average = mean(right_results(:)');
+        else
+            ti = pi - 1;
+            left_mean = mean(left{ti}(:));
+            right_mean = mean(right{ti}(:));
 
-left_stderr = std(mean(left_results, 2)) / sqrt(size(left_results, 1));
-right_stderr = std(mean(right_results, 2)) / sqrt(size(right_results, 1));
+            % Average over trials to get a single score per network,
+            % then find stderr over all networks.
+            left_stderr = std(mean(left{ti}, 2)) / sqrt(size(left{ti}, 1));
+            right_stderr = std(mean(right{ti}, 2)) / sqrt(size(right{ti}, 1));
 
-fig = de_CreateSlotnickFigure1([left_average right_average], [left_stderr right_stderr], taskTitle, mSets.data.stimSet, rons);
-figs = [fig];
+            taskTitle = sprintf('%s (%s)', ...
+                                guru_capitalizeStr(mSets.data.taskType), ...
+                                guru_capitalizeStr(stats.rej.cc.anova.(ds).trial_types{ti}));
+        end;
+
+        de_CreateSlotnickFigure1([left_mean right_mean], ...
+                                 [left_stderr right_stderr], ...
+                                 taskTitle, mSets.data.stimSet, ...
+                                 rons, ax);
+
+        if pi ~= round(n_plots/2)
+            xlabel('');  % remove label
+        end;
+    end;

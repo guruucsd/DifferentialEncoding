@@ -67,20 +67,6 @@ function [X,XLAB] = stim2D(stimSet, nInput)
             text('units','pixels','position',[midpt(1)   midpt(2)/2],'fontsize',fontsize,'string',lets{ti},'VerticalAlignment', 'middle', 'HorizontalAlignment','center')
             text('units','pixels','position',[midpt(1) 3*midpt(2)/2],'fontsize',fontsize,'string',lets{bi},'VerticalAlignment', 'middle', 'HorizontalAlignment','center')
 
-%            for ri=1:10
-%                % Capture the text image
-%                % Note that the size will have changed by about 1 pixel
-%                figure(hf);
-%                tim = getframe(gca);
-%
-%                % Extract the cdata
-%                tim2 = tim.cdata;
-%
-%                % Make a mask with the negative of the text
-%                tmask = tim2==0;
-%
-%                if any(tmask(:)), break; end;
-%            end;
             tf = [tempname() '.tif'];
             print(hf, tf, '-dtiff');
             close(hf)
@@ -95,10 +81,6 @@ function [X,XLAB] = stim2D(stimSet, nInput)
             im(tmask) = uint8(255);
             im = mean(im,3);
 
-            %figure(f);
-            %subplot(nlets, nlets, ii);
-            %imshow(im);
-            %axis off
             X(:,ii) = im(:);
             XLAB{ii} = sprintf('%s|%s', lets{ti}, lets{bi});
         end;
@@ -124,7 +106,7 @@ function [X,XLAB] = stim2D(stimSet, nInput)
 
           newidx = ii+(bi-1)*nimg;
           X_new(:,newidx) = blur_img(:);
-          XLAB_new{newidx} = sprintf('%s%%%dpx', XLAB{ii}, blurs(bi));
+          XLAB_new{newidx} = sprintf('%s-%%%dpx blur', XLAB{ii}, blurs(bi));
       end;
   end;
 

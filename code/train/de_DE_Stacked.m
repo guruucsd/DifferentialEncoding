@@ -107,7 +107,7 @@ function [model] = de_DE_Stacked(model)
         model.p            = rmfield(model.p, 'err');
 
         % Save off OUTPUT, not error, so that we can show training curves for ANY error measure.
-        model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(good_train) );
+        model.p.output.train = guru_nnExec(model.p, X_train(:,good_train), Y_train(:, good_train) );
 
 
         % TEST

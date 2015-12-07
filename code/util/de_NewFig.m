@@ -16,7 +16,7 @@ function fig = de_NewFig(varargin)
 
   elseif ischar(varargin{1})
       fig.handle = figure;
-%      fig.name   = varargin{1};
+
   else
       fig.handle = varargin{1};
       varargin = varargin(2:end);
@@ -33,8 +33,6 @@ function fig = de_NewFig(varargin)
 
   fig.name   = figName;
   set(gca,'FontSize',18,'FontWeight','bold');
-%  xlabel('', 'FontSize',24);
-%  ylabel('', 'FontSize', 24);
 
   switch (figType)
     case 'default'

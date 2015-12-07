@@ -14,7 +14,7 @@ function [te, pval] = de_StatsTrainErrorP(models)
 
   for s=1:length(models)
       if isempty(models{s}), continue; end;
-      te{s} = cellfun(@(m) m.p.trainingError, num2cell(models{s}));
+      te{s} = arrayfun(@(m) m.p.trainingError, models{s});
   end;
 
 

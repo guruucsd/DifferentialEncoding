@@ -1,9 +1,4 @@
-clear all variables; clear all globals;
-
-stats = {};%'images','ffts', 'distns', 'ipd'};
-plts = {stats{:}};
-
-[args,opts]  = uber_slotnick_args('plots', plts, 'stats', stats);
+[args,opts]  = uber_slotnick_args();
 
 % Run sergent task by training on all images
-[trn, tst] = de_SimulatorUber('vanhateren/250', 'slotnick_etal_2001/plus-minus/categorical', opts, args)
+[trn, tst] = de_SimulatorUber('vanhateren/250', 'slotnick_etal_2001/plus-minus/categorical', opts, args);

@@ -79,12 +79,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
             idx   = range(1)+1:range(2); %X indices of this frequency
 
             T(i, idx) = 1;
-
-%            switch (i)
-%                case 1, TLAB(idx) = deal(repmat({'low'}, size(idx)));
-%                case 2, TLAB(idx) = deal(repmat({'med'}, size(idx)));
-%                case 3, TLAB(idx) = deal(repmat({'high'}, size(idx)));
-%            end;
             TLAB(idx) = deal(repmat({sprintf('freq=%3.2f',freqs(i))}, size(idx)));
         end;
 

@@ -19,7 +19,7 @@ for ei=1:n_expts
         p         = [models.p];
         o         = [p.output];
         o_p       = reshape(horzcat(o.test),[numel(o(1).test),length(o)])';  % # models x # trials
-        
+
         raw_error{ei, hi} = de_calcPErr( o_p, mSets.data.test.T, mSets.errorType );        % # models x # trials
         median_error(ei, hi) = median(raw_error{ei, hi}(:));
         mean_error(ei, hi) = mean(raw_error{ei, hi}(:));

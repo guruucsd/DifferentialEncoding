@@ -19,5 +19,5 @@ function [tt] = de_StatsTrainTime(models)
 
   for s=1:length(models)
     if isempty(models{s}), continue; end;
-    tt{s} = cellfun(@(m) m.p.trainTime, num2cell(models{s}));
+    tt{s} = arrayfun(@(m) m.p.trainTime, models{s});
   end;

@@ -1,8 +1,8 @@
 clear all variables; clear all globals;
 
-stats={};%{'ffts','images'};
+stats={};
 plts = {'ls-bars', stats{:}};
-[args,opts]  = sergent_args('plots',plts,'stats',stats,'runs',10, 'ac.zscore', 0.025, 'ac.EtaInit', 2.1E-2, 'ac.AvgError', 2E-5, 'ac.MaxIterations', 100,  ...
+[args,opts]  = sergent_args('plots', plts,'stats', stats,'runs',10, 'ac.zscore', 0.025, 'ac.EtaInit', 2.1E-2, 'ac.AvgError', 2E-5, 'ac.MaxIterations', 100,  ...
 'ac.lambda', 0.0, 'ac.dropout', 0.0, 'ac.Acc', 1E-5, ...
                            'deType', 'de', 'errorType', 1, 'nHidden', 108*12, 'hpl', 12, ...
                             'p.errorType', 3,... % cross-entropy
@@ -17,4 +17,4 @@ plts = {'ls-bars', stats{:}};
                             'p.AvgError', 7.5E-5, 'p.rej.width', [NaN], 'p.rej.type', {'max'} ...
                             );
 % Run sergent task by training on all images
-[trn, tst] = de_SimulatorUber('uber/natimg', 'sergent_1982/de/sergent',         {opts{:}}, args);
+[trn, tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent',         {opts{:}}, args);

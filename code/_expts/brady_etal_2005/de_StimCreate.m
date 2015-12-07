@@ -152,16 +152,6 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
       case 'recog'
         T = zeros(nSubjects, size(X,2));
 
-        %subjectNum = 1;
-        %for i=1:length(SUBJ)
-          % We assume that
-        %  if (i>1 && ~strcmp(SUBJ{i}, SUBJ{i-1}))
-        %    subjectNum = subjectNum + 1;
-        %  end;
-
-        %  T(subjectNum, i) = 1;
-        %end;
-
         % auto-label each subject with a number
         [s,d,idx] = unique(SUBJ);
 
@@ -258,7 +248,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
         case 'emot'
           error('emotion recognition task NYI');
 
-        otherwise, error('Unknown task: ', taskType);
+        otherwise, error('Unknown task: %s', taskType);
       end;
     end;
 

@@ -5,9 +5,6 @@
 % 850x1.mat
 %
 addpath('../young_bion_1981');
-clear all variables; clear all globals;
-dbstop if error
-
 % I want to test spatial frequency processing with different hu/hpl, sigma, and nconn setups
 
 hu_hpl = [ 850 1; 108 8; 425 2; 108 6];
@@ -36,7 +33,7 @@ for hi=1:length(hu_hpl),
                                      'plots',{},'stats', {'ipd','distns','ffts'});
 
     % Get the result
-    [trn{ci},tst{ci}] = de_SimulatorUber('uber/natimg', 'young_bion_1981/orig/recog', opts, args);
+    [trn{ci},tst{ci}] = de_SimulatorUber('vanhateren/250', 'young_bion_1981/orig/recog', opts, args);
 
     % Clean up
     close all;
