@@ -24,7 +24,7 @@ function [figs] = de_PlotLoopmeHL(allstats)
     imagesc(d, [-0.5 0.5]);
     colorbar;
     axis('xy');
-    %title(TLBL{conds(i)});
+    %title(TLAB{conds(i)});
     set(gca, 'xtick', [1:length(d2args{1})],  'xticklabel', guru_csprintf('%d', num2cell(d2args{1})))
     set(gca, 'ytick', [1:length(d1args{1})],  'yticklabel', guru_csprintf('%d', num2cell(d1args{1})))
     xlabel(d2{1});

@@ -1,13 +1,12 @@
-% Recreate figures 3 and 4.
-matlabpool open 4
+% Recreate figures 2, 3 and 4.
 
 % Add paths
 script_dir = fileparts(which(mfilename));
 base_dir = fullfile(script_dir, '..', '..', '..');
 addpath(genpath(fullfile(base_dir, 'code')));
-for d={'34x25', '68x50'}
+for d={'34x25', '68x50'}  % this is the path ordering
     full_path = fullfile(script_dir, '..', '..', d{1}, 'slotnick_etal_2001');
-    addpath(full_path);
+    addpath(full_path, '-end');
 end;
 
 % Scripts ordered by figure 2/3/4 order.
@@ -24,7 +23,9 @@ figs(end+1) = de_NewFig('slotnick_figure_2');
 figs(end+1) = de_NewFig('slotnick_figure_3');
 figs(end+1) = de_NewFig('slotnick_figure_4');
 fhs = arrayfun(@(f) f.handle, figs);
+n_figs = length(figs);
 
+ymax = zeros(n_figs, 1);
 n_scripts = length(all_scripts);
 for si=1:n_scripts
     script_file = all_scripts{si};
@@ -42,10 +43,10 @@ for si=1:n_scripts
     % Plot each figure
     right = stats.rej.cc.perf.(ds){1};
     left = stats.rej.cc.perf.(ds){end};
-    rons = mSets.runs;
+    runs = mSets.runs;
 
     n_trial_types = length(left);
-    for fi=1:length(figs)
+    for fi=1:n_figs
         figure(figs(fi).handle);
         set(gcf, 'Position', [0, 0, 1200, 600]);
 
@@ -75,15 +76,23 @@ for si=1:n_scripts
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 rons, ax);
+                                 runs, ax);
 
         if si ~= round(n_scripts/2)
             xlabel('');  % remove label
         end;
         if si ~= 1
             ylabel('');
+            set(gca, 'ytick', []);
         end;
-        set(gca, 'xlim', [0.5, 2.5], 'ylim', [0 0.15]);
+
+        % Set the axes equally.
+        yl = get(gca, 'ylim');
+        ymax(fi) = max(yl(2), ymax(fi));
+        for sxi=1:si
+            ax2 = subplot(1, n_scripts, sxi);
+            set(ax2, 'xlim', [0.5, 2.5], 'ylim', [0 ymax(fi)]);
+        end;
     end;
 
     % Save on every loop, for good measure.

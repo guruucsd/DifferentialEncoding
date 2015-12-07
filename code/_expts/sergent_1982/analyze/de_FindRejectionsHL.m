@@ -12,13 +12,13 @@ function [rejMats] = de_FindRejectionsHL(models, rejSets, ...)
 % Output:
 % rejectTypes     : indices of runs that should be rejected
 % models          :
-  % Since each sigma is independent, we may have different #s of 'rons'
+  % Since each sigma is independent, we may have different #s of 'runs'
   %   per sigma.  So, we can't use a matrix of structs, we need to separate
   %   into a cell array.
   nSigmas = size(models,2);
-  rons    = size(models,1);
+  runs    = size(models,1);
   if (~iscell(models))
-    models  = mat2cell(models, rons, ones(1,nSigmas));
+    models  = mat2cell(models, runs, ones(1,nSigmas));
   end;
 
   if (nargin==3)
@@ -96,7 +96,7 @@ function [rejMats] = de_FindRejectionsHL(models, rejSets, ...)
   % rejects       : indices of runs that should be rejected
   % good          : indices of runs that should NOT be rejected
     mSets = models(1);
-    rons = size(LS,1);
+    runs = size(LS,1);
 
     if (~exist('rmodes','var'))
       rmodes = [1 2 3];
@@ -105,7 +105,7 @@ function [rejMats] = de_FindRejectionsHL(models, rejSets, ...)
 
     % The following rejection types are in order of most-to-least-elegant.
     %   So, if you run multiple, one follows another logically.
-    rejectTypes = zeros(rons, length(rmodes));
+    rejectTypes = zeros(runs, length(rmodes));
 
     for r=1:length(rmodes)
 
@@ -243,13 +243,13 @@ function [rejMats] = de_FindRejectionsHL(models, rejSets, ...)
     %
     %
 
-      rons        = length(trials);
-      rejectTypes = zeros(rons, 1);
+      runs        = length(trials);
+      rejectTypes = zeros(runs, 1);
 
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       [a,b] = hist(trials,bins); %bin the output
-      a = a/rons; % normalize to a probability distribution
+      a = a/runs; % normalize to a probability distribution
 
 
       % Fit a gaussian to the binned
@@ -278,9 +278,9 @@ function [rejMats] = de_FindRejectionsHL(models, rejSets, ...)
       end;
 
       % if we rejected too many, then we shouldn't reject any.
-      if (0.2 <= (length(find(rejects))/rons))
+      if (0.2 <= (length(find(rejects))/runs))
 %        if (ismember(1,dbg))
-%          fprintf('%3d/%3d is too many; rejecting NONE.\n', length(find(rejects)), rons);
+%          fprintf('%3d/%3d is too many; rejecting NONE.\n', length(find(rejects)), runs);
 %        end;
         rejects = zeros(size(rejects));
       end;

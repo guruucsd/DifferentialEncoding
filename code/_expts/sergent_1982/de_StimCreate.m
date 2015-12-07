@@ -29,7 +29,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %  LpSm LmSp LpSp LmSm LpSpID LpSpNID LmSmID LmSmNID: indices representing the 8 different trial types
 %
 %  TALL:  index containing above 8 indices
-%  TLBL : labels for all trial types, as indexed above
+%  TLAB : labels for all trial types, as indexed above
 %
 %  STIM : cell array containing each stimulus (usually 4: 2 targets, 2 distracters
 %

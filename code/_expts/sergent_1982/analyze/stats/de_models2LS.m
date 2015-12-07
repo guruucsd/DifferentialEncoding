@@ -1,6 +1,6 @@
 function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models, errorType)
 %
-% models : NxM matrix of models, N=rons, M=nSigmas
+% models : NxM matrix of models, N=runs, M=nSigmas
 %
 % LS     : the LS matrix we all know so well
 
@@ -33,7 +33,7 @@ function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models,
 
 
     mSets = models(1);
-    rons  = length(models);
+    runs  = length(models);
     num_trial_types =length(mSets.data.train.TIDX);
 
     p         = [models.p];
@@ -44,8 +44,8 @@ function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models,
     % Calc ls for each model
     ndupes           = size(o_p,2)/ length(mSets.data.train.ST);  % sometimes we duplicate outputs for training, for fun.
     allidx           = cell(num_trial_types, 1);
-    LS_permodel      = zeros(rons, num_trial_types);
-    LS_raw_permodel  = cell(rons, num_trial_types);
+    LS_permodel      = zeros(runs, num_trial_types);
+    LS_raw_permodel  = cell(runs, num_trial_types);
 
     for j = 1:num_trial_types
       if (~isempty(mSets.data.train.TIDX{j}))
@@ -57,7 +57,7 @@ function [LS_permodel, LS_mean, LS_stde, LS_raw_permodel] = de_models2LS(models,
         LS_raw_permodel(:, j) = num2cell(cur_trials, 2);
         LS_permodel(:, j) = mean(cur_trials, 2); %average over each sub-trial type
       else
-        LS_raw_permodel(:, j) = repmat({[]}, [rons 1]);
+        LS_raw_permodel(:, j) = repmat({[]}, [runs 1]);
         LS_permodel(:, j) = NaN(size(LS_permodel(:,j)));
       end;
     end;

@@ -42,5 +42,5 @@ function [fig] = de_PlotLSDistns(mSets, LS, sigma)
       %set(gca, 'xlim', [0 bins(end)+(bins(end)-bins(end-1))/2]);
     end;
 
-    title(sprintf('%s: Err dist''n, o=%4.1f', mSets.data.TLBL{tidx(j)}, sigma));
+    title(sprintf('%s: Err dist''n, o=%4.1f', mSets.data.TLAB{tidx(j)}, sigma));
   end;

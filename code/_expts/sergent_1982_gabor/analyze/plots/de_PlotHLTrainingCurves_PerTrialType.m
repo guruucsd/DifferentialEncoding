@@ -20,13 +20,13 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 
   for ss=1:nSigmas
     ms      = mss{ss};
-    rons    = size(ms,1);
+    runs    = size(ms,1);
     nTrials = size(ms(1).data.train.T,2);
 
     avg_eAC(ss,:,:) = zeros(ms(1).ac.MaxIterations,nTrials);
     avg_eP(ss,:,:)  = zeros(ms(1).p.MaxIterations,nTrials);
 
-    for zz=1:rons
+    for zz=1:runs
       m = ms(zz);
 
       % Pad
@@ -58,10 +58,10 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
 
       avg_eAC(ss,:,:) = squeeze(avg_eAC(ss,:,:)) + c_eAC;
       avg_eP(ss,:,:)  = squeeze(avg_eP(ss,:,:))  + c_eP;
-    end; %rons
+    end; %runs
 
-    avg_eAC(ss,:,:) = avg_eAC(ss,:,:)/rons;
-    avg_eP(ss,:,:)  = avg_eP(ss,:,:) /rons;
+    avg_eAC(ss,:,:) = avg_eAC(ss,:,:)/runs;
+    avg_eP(ss,:,:)  = avg_eP(ss,:,:) /runs;
 
     if (nSigmas == 1)
       fig.name = 'tcptt';
@@ -90,7 +90,7 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
     % autoencoder
     subplot(2,2,1); imagesc(avg_eAC);
     hold on; title( sprintf('Autoencoder training error (%d trial types)', nTrials) );
-    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
     subplot(2,2,3); imagesc(0.25*[sum(avg_eAC(:,m.data.train.TIDX{m.data.LpSm}),2) ...
@@ -98,14 +98,14 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
                                   sum(avg_eAC(:,m.data.train.TIDX{m.data.LpSp}),2) ...
                                   sum(avg_eAC(:,m.data.train.TIDX{m.data.LmSm}),2)]);
     hold on; title('Autoencoder training error (4 trial types)');
-    set(gca,'xtick',[1:4],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[1:4],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
 
     % perceptron
     subplot(2,2,2); imagesc(avg_eP);
     hold on; title( sprintf('Perceptron training error (%d trial types', nTrials) );
-    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[2:4:14],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;
 
@@ -114,6 +114,6 @@ function [fig] = de_PlotHLTrainingCurves_PerTrialType(mss, errorType)
                                   sum(avg_eP(:,m.data.train.TIDX{m.data.LpSp}),2) ...
                                   sum(avg_eP(:,m.data.train.TIDX{m.data.LmSm}),2)]);
     hold on; title('Perceptron training error (4 trial types)');
-    set(gca,'xtick',[1:4],'xticklabel',m.data.TLBL([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
+    set(gca,'xtick',[1:4],'xticklabel',m.data.TLAB([m.data.LpSm m.data.LmSp m.data.LpSp m.data.LmSm]));
     ylabel('training step #');
     colorbar;

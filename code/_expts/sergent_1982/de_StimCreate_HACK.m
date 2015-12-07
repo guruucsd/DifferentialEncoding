@@ -29,7 +29,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %  LpSm LmSp LpSp LmSm LpSpID LpSpNID LmSmID LmSmNID: indices representing the 8 different trial types
 %
 %  TALL:  index containing above 8 indices
-%  TLBL : labels for all trial types, as indexed above
+%  TLAB : labels for all trial types, as indexed above
 %
 %  STIM : cell array containing each stimulus (usually 4: 2 targets, 2 distracters
 %
@@ -66,15 +66,15 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   TALL = [idx.LpSm idx.LmSp idx.LpSpID idx.LpSpNID idx.LmSmID idx.LmSmNID idx.LpSp idx.LmSm];
 
   % Labels for reporting / plotting
-  TLBL{idx.LpSm}    = 'L+S-';
-  TLBL{idx.LmSp}    = 'L-S+';
-  TLBL{idx.LpSp}    = 'L+S+';
-  TLBL{idx.LmSm}    = 'L-S-';
+  TLAB{idx.LpSm}    = 'L+S-';
+  TLAB{idx.LmSp}    = 'L-S+';
+  TLAB{idx.LpSp}    = 'L+S+';
+  TLAB{idx.LmSm}    = 'L-S-';
 
-  TLBL{idx.LpSpID}  = sprintf('L+S+ ID');
-  TLBL{idx.LpSpNID} = sprintf('L+S+ N.ID');
-  TLBL{idx.LmSmID}  = sprintf('L-S- ID');
-  TLBL{idx.LmSmNID} = sprintf('L-S- N.ID');
+  TLAB{idx.LpSpID}  = sprintf('L+S+ ID');
+  TLAB{idx.LpSpNID} = sprintf('L+S+ N.ID');
+  TLAB{idx.LmSmID}  = sprintf('L-S- ID');
+  TLAB{idx.LmSmNID} = sprintf('L-S- N.ID');
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +97,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 
       train.TLAB = cell(size(train.T,2),1);
       for i=1:length(train.TLAB)
-        train.TLAB{i} = TLBL{train.TT(i)};
+        train.TLAB{i} = TLAB{train.TT(i)};
       end;
   end;
 
@@ -112,7 +112,7 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
   % Now say that test data is the same as training data.
   test     = train;
   aux.idx  = idx;
-  aux.TLBL = TLBL;
+  aux.TLAB = TLAB;
 
 
 

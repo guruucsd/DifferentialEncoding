@@ -111,7 +111,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [X,nInput,XLBL,dataset]= stim2D(stimSet, taskType)
+  function [X,nInput,XLAB,dataset]= stim2D(stimSet, taskType)
   %
   %
   %
@@ -157,9 +157,9 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     guru_assert(~any(X(:)>1), 'no values outside [0 1]');
 
     % Divide into datasets
-    XLBL = cell(nimgs_out,1);
-    XLBL(1:2:end-1) = guru_csprintf('left-%d',     num2cell(imgnum));
-    XLBL(2:2:end)   = guru_csprintf('right_rev-%d',num2cell(imgnum));
+    XLAB = cell(nimgs_out,1);
+    XLAB(1:2:end-1) = guru_csprintf('left-%d',     num2cell(imgnum));
+    XLAB(2:2:end)   = guru_csprintf('right_rev-%d',num2cell(imgnum));
 
     dataset  = cell(nimgs_out,1);
     dataset(1:floor(nimgs_out/2))     = {'1'};

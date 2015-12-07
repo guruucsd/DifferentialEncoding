@@ -18,7 +18,7 @@ function figs = de_PlotGroupBasicsSlot( ms, ss )
 
             right = data{tt}.rej.cc.perf.(ds){1}{tri};
             left = data{tt}.rej.cc.perf.(ds){end}{tri};
-            rons = min(length(models{1}), length(models{end}));
+            runs = min(length(models{1}), length(models{end}));
 
             left_mean = mean(left(:));
             right_mean = mean(right(:));
@@ -28,7 +28,7 @@ function figs = de_PlotGroupBasicsSlot( ms, ss )
             ax(tt) = subplot(1, num_ttypes, tt);
             de_CreateSlotnickFigure1([left_mean right_mean], ...
                                      [left_stderr right_stderr], ...
-                                     taskTitle, stimSet, rons, ax(tt));
+                                     taskTitle, stimSet, runs, ax(tt));
 
             % Store properties to correct axes
             avg(tt) = mean([left_mean, right_mean]);

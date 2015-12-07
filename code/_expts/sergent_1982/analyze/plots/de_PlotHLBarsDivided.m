@@ -47,7 +47,7 @@ function [fig] = de_PlotHLBarsDivided(mSets, stats)
     %d = [d zeros(size(d))]
     %e = [e zeros(size(e))]
 
-    lbls = strrep(mSets.data.aux.TLBL(idx),' ',sprintf('\n'));
+    lbls = strrep(mSets.data.aux.TLAB(idx),' ',sprintf('\n'));
     %if (exist('errbars','var'))
     mfe_barweb(d, e, 0.8, lbls);
     set(gca, 'ylim', yl);

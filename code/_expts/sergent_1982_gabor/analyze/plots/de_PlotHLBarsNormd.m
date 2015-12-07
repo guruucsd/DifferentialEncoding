@@ -22,6 +22,6 @@ tidx = [mSets.data.LpSm mSets.data.LmSp mSets.data.LpSp mSets.data.LmSm];
       %set(gca, 'ylim',[0 0.06]);
       set(gca, 'xlim', [0 bins(end)+(bins(end)-bins(end-1))/2]);
       hold on;
-      title(sprintf('%s: Err dist''n, o=%4.1f', mSets.data.TLBL{tidx(j)}, sigma));
+      title(sprintf('%s: Err dist''n, o=%4.1f', mSets.data.TLAB{tidx(j)}, sigma));
     end;
 end;

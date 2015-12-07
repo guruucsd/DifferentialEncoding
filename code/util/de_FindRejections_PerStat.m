@@ -14,14 +14,14 @@
   % good          : indices of runs that should NOT be rejected
 
     %mSets  = models(1);
-    rons   = length(models);
+    runs   = length(models);
     rmodes = rejSets.type;
     rc     = rejSets.width;
 
 
     % The following rejection types are in order of most-to-least-elegant.
     %   So, if you run multiple, one follows another logically.
-    rejectTypes = zeros(rons, min(1,length(rmodes)));
+    rejectTypes = zeros(runs, min(1,length(rmodes)));
 
     if (numel(models) ~= numel(stats))
         warning('# models(%d) and size of stats(%d) not compatible.', numel(models), numel(stats));
@@ -123,15 +123,15 @@
     %
     %
 
-      rons    = length(trials);
-      rejects = zeros(rons, 1);
+      runs    = length(trials);
+      rejects = zeros(runs, 1);
 
       bins = de_SmartBins(stats);
 
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       [a,b] = hist(stats,bins); %bin the output
-      a = a/rons; % normalize to a probability distribution
+      a = a/runs; % normalize to a probability distribution
 
 
       % Fit a gaussian to the binned
@@ -160,9 +160,9 @@
       end;
 
       % if we rejected too many, then we shouldn't reject any.
-      if (0.2 <= (length(find(rejects))/rons))
+      if (0.2 <= (length(find(rejects))/runs))
 %        if (ismember(1,dbg))
-%          fprintf('%3d/%3d is too many; rejecting NONE.\n', length(find(rejects)), rons);
+%          fprintf('%3d/%3d is too many; rejecting NONE.\n', length(find(rejects)), runs);
 %        end;
         rejects = zeros(size(rejects));
       end;

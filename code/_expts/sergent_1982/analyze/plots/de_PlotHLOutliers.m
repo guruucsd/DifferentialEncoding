@@ -13,7 +13,7 @@ function [fig] = de_PlotOutliers(mSets, LS, sigma, rin)
 % Output:
 % fig             : array of handles to plots
   tidx = [mSets.data.LpSm mSets.data.LmSp mSets.data.LpSp mSets.data.LmSm];
-  tlbl = mSets.data.aux.TLBL(tidx);
+  tlbl = mSets.data.aux.TLAB(tidx);
 
   fig = de_NewFig('outliers', 'bars', length(tidx), 10);
 
@@ -34,7 +34,7 @@ function [fig] = de_PlotOutliers(mSets, LS, sigma, rin)
 
   for j=1:length(tidx)
     data = LS(:,tidx(j));
-    rons = length(data);
+    runs = length(data);
 
     % Sometimes we have conditions without trials
     if (isempty(find(~isnan(data))))
@@ -43,7 +43,7 @@ function [fig] = de_PlotOutliers(mSets, LS, sigma, rin)
 
     % this code won't work if the data are totally homogenous
     if (std(data,1) ~= 0)
-      [bins, binWidth] = de_SmartBins(data); %[0:(1/rons):max(data)];
+      [bins, binWidth] = de_SmartBins(data); %[0:(1/runs):max(data)];
       bins = [bins (bins(end)+binWidth):binWidth:max(data)];
 
       [a,b] = histc(data,bins);

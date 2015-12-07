@@ -1,10 +1,4 @@
-clear all variables; clear all globals;
-
-stats = {'ffts', 'images', 'connectivity'};%'ipd', 'ffts', 'distns', 'pca', 'images'};
-plts = {'ls-bars'};%'ls-bars', stats{:}};
-
 [args,opts]  = uber_sergent_args('deType', 'de-stacked', ...
-                                 'plots', plts, 'stats', stats, 'runs', 50, ...
                                  'p.MaxIterations', 25);
 
 % Run sergent task by training on all images

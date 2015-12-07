@@ -201,10 +201,10 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     % Import each vector, and make sure it's in the range [0 1]
     nInput = size(mfe_getpgmraw(fullfile(indir, fs(1).name)));
     X = zeros(prod(nInput), length(fs));
-    TLBL = cell(size(fs));
+    TLAB = cell(size(fs));
     for fi=1:length(fs)
       f = fs(fi);
-      TLBL{fi} = guru_fileparts(f.name, 'name');
+      TLAB{fi} = guru_fileparts(f.name, 'name');
       x = reshape(mfe_getpgmraw(fullfile(indir, f.name)), [prod(nInput) 1]);
 
       X(:,fi) = (x - min(x))/(max(x)-min(x));
@@ -213,10 +213,10 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     guru_assert(~any(X(:)>1), 'no values outside [0 1]');
 
     % Divide into datasets
-    dataset  = cell(size(TLBL));
+    dataset  = cell(size(TLAB));
 
-    for i=1:length(TLBL)
-      parts   = mfe_split('_', TLBL{i});
+    for i=1:length(TLAB)
+      parts   = mfe_split('_', TLAB{i});
 
       % Divide up into "datasets", which can be used later
       %   to choose between training and test sets.
@@ -253,24 +253,24 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
     end;
 
     % Create labels
-    [SUBJ,EMO] = lbl2SubjDS(TLBL);
+    [SUBJ,EMO] = lbl2SubjDS(TLAB);
     DS = dataset;
 
 
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [subjects,emotions] = lbl2SubjDS(TLBL)
+  function [subjects,emotions] = lbl2SubjDS(TLAB)
   %
   %
   %
 
 
-    subjects = cell(size(TLBL));
-    emotions = cell(size(TLBL));
+    subjects = cell(size(TLAB));
+    emotions = cell(size(TLAB));
 
-    for i=1:length(TLBL)
-      parts   = mfe_split('_', TLBL{i});
+    for i=1:length(TLAB)
+      parts   = mfe_split('_', TLAB{i});
 
       subjects{i} = parts{1};
 
