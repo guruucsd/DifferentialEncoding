@@ -7,11 +7,6 @@ function [pals] = de_StatsFFTs(stats)
     % Now that we've smoothed each model instance's
     %   power spectrum according to the current Gaussian kernel,
     %   we need to do a statistical test at each frequency.
-    %
-    if (length(stats.model.power1D.mean)~=2)
-      pals = [];
-      return;
-    end;
 
     nSig    = size(stats.model.power1D.mean{1},1);
     nModels = min( size(stats.model.power1D.mean{1},2), size(stats.model.power1D.mean{end},2) ); %match sample sizes
