@@ -91,7 +91,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
       case {'recog_freq'}
         guru_assert(length(freqs)==2);
 
-        T = cellfun(@(xl) ~isempty(findstr('f1', xl)), XLAB);
+        T = cellfun(@(xl) ~isempty(findstr('f1', xl)), XLAB(:))';
         TLAB = arrayfun(@(t) guru_iff(t, 'f1', 'f2'), T, ...
                         'UniformOutput', false);
 
@@ -102,7 +102,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
       case {'recog_type'}
         guru_assert(length(freqs)==2);
 
-        T = cellfun(@(xl) ~isempty(findstr('square', xl)), XLAB);
+        T = cellfun(@(xl) ~isempty(findstr('square', xl)), XLAB(:))';
         TLAB = arrayfun(@(t) guru_iff(t, 'square', 'sin'), T, ...
                         'UniformOutput', false);
 

@@ -29,10 +29,10 @@ function figs = de_PlotsGroupBasicsKit( mSets, ms, ss )
       if size(means, 2) == 2
           hemi_lbls = { sprintf('RH (\\sigma=%3.1f)', mSets.sigma(1)), ...
                         sprintf('LH (\\sigma=%3.1f)', mSets.sigma(end))};
-          plot(1, perf(2,1), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
+          plot(1, perf(1,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
           plot(1, perf(1,1), 'ko', 'MarkerSize', 15.0);
           plot(2, perf(2,2), 'ko', 'MarkerSize', 15.0, 'MarkerFaceColor','k');
-          plot(2, perf(1,2), 'ko', 'MarkerSize', 15.0);
+          plot(2, perf(2,1), 'ko', 'MarkerSize', 15.0);
           plot([1 2], perf(1,:), 'k', 'LineWidth', 2.0);
           plot([1 2], perf(2,:), 'k', 'LineWidth', 2.0);
           text(2.125, perf(1,2), hemi_lbls{1}, 'FontSize', 18)
