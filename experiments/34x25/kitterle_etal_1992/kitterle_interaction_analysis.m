@@ -9,4 +9,5 @@ function [ms,ss] = kitterle_interaction_analysis(tst_freq, tst_type)
 
   ss.group = de_StatsGroupBasicsKit( mSets, ms, ss );
 
-  de_PlotsGroupBasicsKit( mSets, ms, ss );
+  figs = de_PlotsGroupBasicsKit( mSets, ms, ss );
+  de_SavePlots(mSets, figs);

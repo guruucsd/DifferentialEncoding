@@ -315,12 +315,12 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
 
           subplot(1,2,1); colormap gray;
           title(sprintf('LH (\\sigma=%3.2f) p<0.05 recon', mSets.sigma(end)));
-          imagesc(imgLH);
+          imagesc(imgLH, [0 1]);
           set(gca, 'xtick',[],'ytick',[]);
 
           subplot(1,2,2); colormap gray;
           title( sprintf('RH (\\sigma=%3.2f) p<0.05 recon', mSets.sigma(1)));
-          imagesc(imgRH);
+          imagesc(imgRH, [0 1]);
           set(gca, 'xtick',[],'ytick',[]);
 
           clear('pd1','pd2');

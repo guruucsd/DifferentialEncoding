@@ -15,7 +15,10 @@ function [oact, err, huact] = guru_nnExec(model,X,Y)
   if (~isfield(model,'Conn')), model.Conn = double(model.Weights~=0); end;
 
   % Calc
-  nUnits = size(model.Weights,1); nIn = size(X,1)-1; nOut = size(Y,1); nHid = nUnits-nIn-nOut-1; % remove input, output, and
+  nUnits = size(model.Weights,1);
+  nIn = size(X,1)-1;
+  nOut = size(Y,1);
+  nHid = nUnits-nIn-nOut-1; % remove input, output, and
 
   % Set up transfer function for each unit
   if (length(model.XferFn)==2)

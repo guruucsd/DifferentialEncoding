@@ -7,6 +7,11 @@ function [model,o_p] = guru_nnTrain_resilient(model,X,Y)
   nOutputs  = size(Y,1);
   nHidden   = nUnits - nInputs - nOutputs - 1;
 
+  if guru_getfield(model, 'Dec', 0) >= 0.1 && guru_getfield(model, 'dropout', 0)
+    warning(['Dropout and resilient backprop with Dec set do NOT play well together.\n' ...
+             'I suggest setting model.Dec = 0.025']);
+  end;
+
   model.err = zeros([model.MaxIterations nDatapts]);
 
   % Only do if necessary, for memory reasons

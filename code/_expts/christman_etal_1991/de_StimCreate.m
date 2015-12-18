@@ -23,10 +23,18 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   if (~exist('opt','var')),      opt      = {};     end;
   if (~iscell(opt)),             opt      = {opt};  end;
 
-  [train.phases] = guru_getopt(opt, 'phases',  linspace(0,15*16/pi,16));%[11.25:11.25:180]);
-  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0,pi/2, 1));
-  [train.nInput] = guru_getopt(opt, 'nInput',  [135 100]);
-  train.cycles    = guru_getopt(opt, 'cycles', [2 4 8 16 32]);
+  if guru_hasopt(opt, 'nInput'), train.nInput = guru_getopt(opt, 'nInput');
+  elseif guru_hasopt(opt, 'small'), train.nInput = [34 25];
+  elseif guru_hasopt(opt, 'medium'), train.nInput = [68 50];
+  else train.nInput = [135 100];
+  end;
+
+
+  [train.nphases] = guru_getopt(opt, 'nphases',  8);%[11.25:11.25:180]);
+  [train.nthetas] = guru_getopt(opt, 'nthetas',  8);
+  [train.phases] = guru_getopt(opt, 'phases',  linspace(0, (train.nphases - 1) * 2 * pi / train.nphases, train.nphases));
+  [train.thetas] = guru_getopt(opt, 'thetas',  linspace(0, (train.nthetas - 1) * pi / train.nthetas, train.nthetas));
+  train.cycles    = guru_getopt(opt, 'cycles', [1 2 4 8 16]);
   train.freqs     = train.cycles/train.nInput(1);
   if (length(train.cycles)~=5), error('not enough elements in cycles; expect 5, got %d', length(train.cycles)); end;
 
@@ -35,48 +43,30 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   % With this info, create our X and TT vectors
   [train.X, train.XLAB] = stim2D(stimSet, train.nInput, train.freqs, train.phases, train.thetas);
   if (~isempty(taskType))
-      %[train.X, train.XLAB] = de_applyOptions(opt, train.X, train.XLAB);
-      [train.T, train.TLAB] = de_createTargets(taskType, train.XLAB, train.phases);
+      [train.T, train.TLAB] = de_createTargets(taskType, train.XLAB);
   end;
 
-  % Train & test sets are the same
+  % Train & test differ by phase only.
   test = train;
   test.phases = train.phases + mean(diff(train.phases))/2;
   [test.X, test.XLAB] = stim2D(stimSet, test.nInput, test.freqs, test.phases, test.thetas);
 
   if (~isempty(taskType))
-      %[test.X, test.XLAB] = de_applyOptions(opt, test.X, test.XLAB);
-      [test.T, test.TLAB] = de_createTargets(taskType, test.XLAB, test.phases);
+      [test.T, test.TLAB] = de_createTargets(taskType, test.XLAB);
   end;
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function [T, TLAB]         = de_createTargets(taskType, XLAB, phases)
+  function [T, TLAB]         = de_createTargets(taskType, XLAB)
   %
   % Take the input vector and taskType, and create a set of labels
   %
 
-    nPhases = length(phases);
     T       = nan(size(XLAB));
     TLAB    = cell(size(T));
 
-    % Identify by frequency
-  switch (taskType)
-
-    case {'low-recog'}
-        T(guru_instr(XLAB,'S1L')) = 0;
-        T(guru_instr(XLAB,'S2L')) = 1;
-
-    case {'high-recog'}
-        T(guru_instr(XLAB,'S1H')) = 0;
-        T(guru_instr(XLAB,'S2H')) = 1;
-
-    case {'recog'}
-        T(guru_instr(XLAB,'S1')) = 0;
-        T(guru_instr(XLAB,'S2')) = 1;
-
-      otherwise, error('Task set %s NYI', taskType);
-  end;
+    T(guru_instr(XLAB,'S1')) = 0;
+    T(guru_instr(XLAB,'S2')) = 1;
 
     TLAB(guru_instr(XLAB,'S1')) = deal(repmat({'S1'}, [1 sum(guru_instr(XLAB,'S1'))])) ;
     TLAB(guru_instr(XLAB,'S2')) = deal(repmat({'S2'}, [1 sum(guru_instr(XLAB,'S2'))])) ;
@@ -87,21 +77,21 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   function [X,XLAB]= stim2D(set, nInput, freqs, phases, thetas)
     if (mod(length(freqs),2)~=1)
       error('Christman stim require an ODD number of frequencies (and preferably exactly 5)');
-    else
-      freqs      = sort(freqs);
-      low_freqs  = freqs(1:(length(freqs)-1)/2);
-      high_freqs = freqs(((length(freqs)+1)/2 + 1):end);
-      mid_freq   = freqs((length(freqs)+1)/2);
     end;
 
+    freqs      = sort(freqs);
+    low_freqs  = freqs(1:(length(freqs)-1)/2);
+    high_freqs = freqs(((length(freqs)+1)/2 + 1):end);
+    mid_freq   = freqs((length(freqs)+1)/2);
+   
     switch (set)
       case {'low_freq'}
           s1_freqs = low_freqs';
-          s2_freqs = [low_freqs mid_freq]';
+          % s2_freqs = [low_freqs mid_freq]';
 
       case {'high_freq'}
           s1_freqs = high_freqs';
-          s2_freqs = [mid_freq high_freqs]';
+          % s2_freqs = [mid_freq high_freqs]';
 
       case {'all_freq'}
           [XL,XLLAB] = stim2D('low_freq',  nInput, freqs, phases, thetas);
@@ -118,52 +108,54 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
     nPhases   = length(phases);
     nThetas   = length(thetas);
     minmax    = [0 1];
-    img_width = min(nInput);
 
     % Calculate stimuli
-    x    = linspace(-pi, pi, max(nInput));
-
     s1     = zeros(prod(nInput), nPhases*nThetas);
-    s1lbl  = cell(nPhases*nThetas,1);
-    curIdx = 1;
+    s1lbl  = cell(nPhases*nThetas, 1);
+    ii = 1;
 
-    for i=1:nPhases
-        for j=1:nThetas
-            s1l   = mfe_grating2d(s1_freqs(1), pi/3,      thetas(j), 0.5, nInput(1), nInput(2));
-            s1h   = mfe_grating2d(s1_freqs(2), phases(i), thetas(j), 0.5, nInput(1), nInput(2));
+    % Create stims
+    for phsi=1:nPhases
+        for ti=1:nThetas
+            % Make the two gratings, then combine them.
+            % One is always at pi/3, the other is at the requested phase.
+            s1l   = mfe_grating2d(s1_freqs(1), pi/3,      thetas(ti), 0.5, nInput(1), nInput(2));
+            s1h   = mfe_grating2d(s1_freqs(2), phases(phsi), thetas(ti), 0.5, nInput(1), nInput(2));
             stmp  = mean(minmax) + (diff(minmax)/2)*(s1l(:)+s1h(:));
-            mn = min(stmp(:));    mx = max(stmp(:));    df = mx-mn;
-            s1(:,curIdx) = minmax(1) + ((stmp(:) - mn)/df)*minmax(2);     % Make sure values range from 0 to 1
-            s1lbl{curIdx} = sprintf('S1,\nphase=%5.2f\ntheta=%5.2f', phases(i), thetas(j));
-            curIdx = curIdx + 1;
+            mn = min(stmp(:));
+            mx = max(stmp(:));
+            df = mx-mn;
+            s1(:, ii) = minmax(1) + ((stmp(:) - mn)/df)*minmax(2);     % Make sure values range from 0 to 1
+            s1lbl{ii} = sprintf('S1,\nphase=%5.2f\ntheta=%5.2f', phases(phsi), thetas(ti));
+            ii = ii + 1;
         end;
     end;
 
     s2     = zeros(size(s1));
     s2lbl  = cell(nPhases*nThetas,1);
-    curIdx = 1;
+    ii = 1;
     s2p = 1:nPhases; %%%randperm(nPhases); %shuffle the phases, as compared to above
-    for i=1:nPhases
-        for j=1:nThetas
-            stmp = mean(minmax)+(diff(minmax)/2)*mfe_grating2d(mid_freq, phases(s2p(i)), thetas(j), 1, nInput(1), nInput(2));
-            stmp = (0.67)*s1(:,j) + (0.33)*stmp(:);
-            mn = min(stmp(:));    mx = max(stmp(:));    df = mx-mn;
-            s2(:,curIdx) = minmax(1) + ((stmp(:) - mn)/df)*minmax(2);
-            s2lbl{curIdx} = sprintf('S2,\nphase=%5.2f\ntheta=%5.2f', phases(s2p(i)), thetas(j));
-            curIdx = curIdx + 1;
+    for phsi=1:nPhases
+        for ti=1:nThetas
+            % Make the middle grating, and mix it (1/3) with the
+            % corresponding stimulus from above (2/3)
+            stmp = mean(minmax)+(diff(minmax)/2)*mfe_grating2d(mid_freq, phases(s2p(phsi)), thetas(ti), 1, nInput(1), nInput(2));
+            stmp = (0.67) * s1(:,ii) + (0.33) * stmp(:);
+            mn = min(stmp(:));
+            mx = max(stmp(:));
+            df = mx-mn;
+            s2(:, ii) = minmax(1) + ((stmp(:) - mn)/df)*minmax(2);
+            s2lbl{ii} = sprintf('S2,\nphase=%5.2f\ntheta=%5.2f', phases(s2p(phsi)), thetas(ti));
+            ii = ii + 1;
         end;
     end;
 
 
     % Make sure values range from 0 to 1
-%    mn = min([s1 s2(:)']);
-%    mx = max([s1 s2(:)']);
-%    df = mx-mn;
-
-%    s1 = minmax(1) + ((s1 - mn)/df)*minmax(2);
-%    s2 = minmax(1) + ((s2 - mn)/df)*minmax(2);
-    if (any(s1(:)<minmax(1)) || any(s2(:)<minmax(1))), error('stim normalization failure'); end;
-    if (any(s1(:)>minmax(2)) || any(s2(:)>minmax(2))), error('stim normalization failure'); end;
+    guru_assert(~any(s1(:)<minmax(1)) && ~any(s2(:)<minmax(1)), ...
+                'stim normalization failure');
+    guru_assert(~any(s1(:)>minmax(2)) && ~any(s2(:)>minmax(2)), ...
+                'stim normalization failure');
 
 
     % Shove into X matrix
@@ -172,16 +164,14 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
 
     X(:, 1:size(s1,2)) = s1;
     XLAB(1:size(s1,2)) = s1lbl;
-
     X(:, size(s1,2)+1:end)  = s2;
     XLAB(size(s1,2)+1:end)  = s2lbl;
 
-  switch (set)
+    switch (set)
       case {'low_freq'},
           XLAB = strrep(XLAB, 'S1','S1L');
           XLAB = strrep(XLAB, 'S2','S2L');
       case {'high_freq'}
           XLAB = strrep(XLAB, 'S1','S1H');
           XLAB = strrep(XLAB, 'S2','S2H');
-  end;
-
+    end;

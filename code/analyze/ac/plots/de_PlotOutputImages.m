@@ -30,14 +30,14 @@ function [fig] = de_PlotOutputImages(models,  imgs, lbls)
 
   fig(end+1) = de_PlotOutputImages_2D( ['images-inst-' sigma], ...
                                        reshape(imgs(1,:,:,:), sz(2:4)), ...
-                                       lbls);
+                                       lbls, [0 1]);
   fig(end+1) = de_PlotOutputImages_2D( ['images-mean-' sigma], ...
                                        reshape(mean(imgs,1),  sz(2:4)), ...
-                                       lbls);
+                                       lbls, [0 1]);
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  function fig = de_PlotOutputImages_2D( fig_lbl, imgs, lbls)
+  function fig = de_PlotOutputImages_2D( fig_lbl, imgs, lbls, cx)
   %2d plot
 
     if (~exist('cx','var'))

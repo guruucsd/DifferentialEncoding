@@ -1,8 +1,8 @@
 function figs = de_FigurizerAC(mSets, mss, stats)
-  global selectedImages_;
 
   if (isfield(mSets.data, 'test')), ds = 'test';
   else,                             ds = 'train'; end;
+  selectedImages = de_SelectImages(mSets.data.(ds), 20);
 
   % Plot default
   if (guru_contains('default', mSets.plots))
@@ -23,7 +23,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   figs = [ figs de_DoPlot('distns',        'de_PlotDistributions',mSets, mSets, stats.rej.ac.distns) ];
 
   % Plot the original images
-  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, mSets.data.(ds).X(1:end-1,selectedImages_),  mSets.data.(ds).XLAB(selectedImages_)) ];
+  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, mSets, mSets.data.(ds).X(1:end-1,selectedImages),  mSets.data.(ds).XLAB(selectedImages)) ];
 
   %----------------
   % Loop over sigmas and trials
@@ -32,7 +32,7 @@ function figs = de_FigurizerAC(mSets, mss, stats)
   for ss=1:length(mSets.sigma)
     ms = mss{ss};
 % Plot the
-    if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages_)) ];
+    if (~isempty(stats.rej.ac.images.(ds))),  figs = [ figs de_DoPlot('images',      'de_PlotOutputImages',     mSets, ms, stats.rej.ac.images.(ds){ss},  mSets.data.(ds).XLAB(selectedImages)) ];
     elseif ismember('images',mSets.plots), warning('Must get images in stats to run plots.'); end;
 
 %    if (isfield(mSets.data, 'test')), figs = [ figs de_DoPlot('image-diffs', 'de_PlotOutputImageDiffs', mSets, ms, mSets.data.test) ];
