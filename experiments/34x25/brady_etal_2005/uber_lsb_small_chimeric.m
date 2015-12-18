@@ -1,4 +1,4 @@
-clear all variables; clear all globals;
+error('Needs to be updated for latest code.');
 [args,opts]  = lsb_args()
 
 % Run sergent task by training on all images
