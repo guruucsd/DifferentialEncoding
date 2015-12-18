@@ -160,7 +160,7 @@ function [train,test] = de_StimCreate(stimSet, taskType, opt)
 
         % Select the middle portion of the image
         for tpi=1:5  % try up to 5 random patches
-          rng = [0 0;nInput_In] + round([1 -1]' * nInput_Out/2);
+          rng = [1 1; nInput_In] + ceil([1 -1]' * nInput_Out/2);
           cpt = [randi(rng(:, 1)), randi(rng(:, 2))];
           patch    = getImagePatch(img, cpt, nInput_Out);
           [patch, is_good] = validate_and_normalize_patch(patch, opt);
