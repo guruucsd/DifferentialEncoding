@@ -1,9 +1,6 @@
 clear all variables; clear all globals;
 
-stats = {};
-plts = {stats{:}};
-
-[args,opts]  = uber_okubo_args('plots', plts, 'stats', stats);
+[args,opts]  = uber_okubo_args();
 
 % Run sergent task by training on all images
 [trn1, tst1] = de_SimulatorUber('vanhateren/250', 'okubo_michimata_2002/dots/categorical', opts, args);
