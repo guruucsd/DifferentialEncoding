@@ -34,7 +34,7 @@ There are two tasks:
 1. Create "datasets" that define the inputs (stimuli) and expected outputs (task) for all 4 experiments.
 2. (optional) Create experiment-specific analysis & plotting code.
 3. Create "experiment" files that train the models, run them through the analyses, and save the results.
-4. Gather data from across all four experiments, and write analyses / scripts to compare/contrast results.
+4. Gather data from across all experiment types, and write analysis scripts to compare/contrast results.
 
 
 #### 1. Create "datasets" that define the stimuli and tasks.
@@ -52,9 +52,9 @@ There are two tasks:
       * `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
      * any other metadata that you'd like to have for your analysis code.
 
-4. Write the function(s) that creates the actual stimuli (i.e. each image in the form of an array) for that experiment, e.g., a create_dots function. The parameters should allow for various types of stimuli to be created, e.g. a "distance" variable for the distance between dots. The function(s) will be called by the main body of the de_StimCreate.m code.
+4. Write the function(s) that creates the actual stimuli (i.e. each image in the form of an array) for that experiment, e.g., a `create_dots` function. The parameters should allow for various types of stimuli to be created, e.g. a "distance" variable for the distance between dots. The function(s) will be called by the main body of the `de_StimCreate.m` code.
 
-5. Write the code that creates the appropriate variables (see the parameters in the header) to be assigned to train and test. This will require calls to the functions that actually create the stimuli images, and creating and setting the appropriate labels.
+5. Write the code that creates the appropriate variables (see the parameters in the header) to be assigned to `train` and `test`. This will require calls to the functions that actually create the stimuli images, and creating and setting the appropriate labels.
 
 
 #### 2. (optional) Add analysis code.
@@ -67,7 +67,7 @@ There are two tasks:
   * `figs` - struct containing figure handles for plots generated (as requested in the experiment file below)
 2. Add any specific code into that file (or call functions from there).
 
-This code likely will include calls to some sort of staticizer (running statistical analyses) and figurizer (making plots) which will handle the desired analysis.
+This code likely will include calls to some sort of `staticizer` (running statistical analyses) and `figurizer` (making plots) which will handle the desired analysis.
 
 #### 3. Create "experiment" files to train models.
 
