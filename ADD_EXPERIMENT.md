@@ -52,9 +52,12 @@ There are two tasks:
       * `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
      * any other metadata that you'd like to have for your analysis code.
 
-4. Write the function(s) that creates the actual stimuli (i.e. each image in the form of an array) for that experiment, e.g., a `create_dots` function. The parameters should allow for various types of stimuli to be created, e.g. a "distance" variable for the distance between dots. The function(s) will be called by the main body of the `de_StimCreate.m` code.
+4. Write the function(s) that creates the actual stimuli (i.e. each image in the form of an array) for that experiment, e.g., a `create_dots` function. The parameters should allow for various types of stimuli to be created, e.g. a `distance` parameter for the distance between dots. The function(s) will be called by the main body of the `de_StimCreate.m` code.
 
-5. Write the code that creates the appropriate variables (see the parameters in the header) to be assigned to `train` and `test`. This will require calls to the functions that actually create the stimuli images, and creating and setting the appropriate labels.
+5. Write the code that assigns the `train` and `test` set stimuli
+   * Set the `train/test.X` variables by calling the stimulus creation files (e.g. `create_dots`)
+   * Give the corresponding labels (`train/test.XLAB`) for that stimulus type (e.g. `height=5px`)
+   * Based on the task type (e.g. `categorical`), set the appropriate value for `train/test.T` (e.g. `1`) and  `train/test.TLAB` (e.g. `above`).
 
 
 #### 2. (optional) Add analysis code.
