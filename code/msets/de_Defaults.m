@@ -109,4 +109,4 @@ function [args] = de_Defaults(expt, stimSet, taskType, opt, varargin)
                                                                                                               any(strcmp(args(ischar(args)), 'uberpath')), ...
                                                                                                               any(strcmp(args(ischar(args)), 'uberpath')))}; end;
   if (~ismember('out.pub',          aKeys)), args(end+1:end+2) = {'out.pub',   0}; end;
-  if (~ismember('out.titles',       aKeys)), args(end+1:end+2) = {'out.titles',   {'1', '2'}}; end;
+  if (~ismember('out.titles',       aKeys)), args(end+1:end+2) = {'out.titles',   guru_csprintf('%.4f', guru_getopt(args, 'sigma'))}; end;

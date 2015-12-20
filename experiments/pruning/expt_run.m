@@ -48,7 +48,7 @@ end;
 
 mSets.debug          = 1:11;
 mSets.lrrev          = false;
-mSets.out.titles     = {'RH ()', 'LH ()'};
+mSets.out.titles     = {'RH (early)', 'LH (late)'};
 % Allow multiple loops, for simplicity's sake (hi, nohup! :D)
 
 for si=1:length(lambdas)

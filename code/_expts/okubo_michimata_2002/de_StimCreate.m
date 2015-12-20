@@ -1,4 +1,5 @@
 function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
+%function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
 %
 %Input:
 %  stimSet  : a string specifying the (INPUT) image dataset.
