@@ -21,18 +21,17 @@ function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet,
 
     % Get the file time of de_StimCreate
     fil = dir(which('de_StimCreate'));
-    timestamp = fil.datenum;
-    
+    file_timestamp = fil.datenum;
+
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
     % Invalidate cached data based on the timestamp.
     if exist(dataFile,'file') && ~force
-        tmp = load(dataFile);
-        if guru_getfield(tmp, 'timestamp', 0) ~= timestamp
+        load(dataFile);
+        if ~exist('timestamp', 'var') || timestamp ~= file_timestamp
             force = true;
         end;
-        clear('tmp');
     end;
 
     % If the file doesn't exist, then we have to create it!
@@ -65,9 +64,9 @@ function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet,
 
         % Stamp on parameters
         train.expt = expt; train.stimSet = stimSet;
-        train.taskType = taskType;  train.opt = opt; train.timestamp = timestamp;
+        train.taskType = taskType;  train.opt = opt;
         test.expt  = expt; test.stimSet  = stimSet;
-        test.taskType  = taskType; test.opt  = opt; test.timestamp = timestamp;
+        test.taskType  = taskType; test.opt  = opt;
 
         % Apply missing (but expected) field
         if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
@@ -91,12 +90,13 @@ function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet,
           guru_mkdir(guru_fileparts(dataFile,'pathstr'));
         end;
 
+        timestamp = file_timestamp;  % alias it over to expected property name.
         save(dataFile, 'stimSet', 'taskType', 'opt', 'train', 'test', 'aux', 'timestamp');
     end;
 
     path(p); % Restore path
 
-    load(dataFile);
+    % Variables should have been loaded or created; nothing left to do!
     guru_assert(exist('train', 'var'));
     guru_assert(exist('test', 'var'));
 
