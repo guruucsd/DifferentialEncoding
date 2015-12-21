@@ -34,7 +34,7 @@ There are two tasks:
 1. Create "datasets" that define the inputs (stimuli) and expected outputs (task) for all 4 experiments.
 2. (optional) Create experiment-specific analysis & plotting code.
 3. Create "experiment" files that train the models, run them through the analyses, and save the results.
-4. Gather data from across all four experiments, and write analyses / scripts to compare/contrast results.
+4. Gather data from across all experiment types, and write analysis scripts to compare/contrast results.
 
 
 #### 1. Create "datasets" that define the stimuli and tasks.
@@ -51,9 +51,11 @@ There are two tasks:
       * `train.T` - [n_outputs x examples] expected outputs based on the task
       * `train.TLAB` - [1 x examples] a text label for each expected output (used for display or filtering purposes)
      * any other metadata that you'd like to have for your analysis code.
-
-4. In the code, write functions to create the stimuli of each type, the expected outputs for each stimulus (based on the task), and assign to the objects as above.
-
+4. Write the function(s) that creates the actual stimuli (i.e. each image in the form of an array) for that experiment, e.g., a `create_dots` function. The parameters should allow for various types of stimuli to be created, e.g. a `distance` parameter for the distance between dots. The function(s) will be called by the main body of the `de_StimCreate.m` code.
+5. Write the code that assigns the `train` and `test` set stimuli.
+   * Set the `train/test.X` variables by calling the stimulus creation files (e.g. `create_dots`)
+   * Give the corresponding labels (`train/test.XLAB`) for that stimulus type (e.g. `height=5px`)
+   * Based on the task type (e.g. `categorical`), set the appropriate value for `train/test.T` (e.g. `1`) and  `train/test.TLAB` (e.g. `above`).
 
 #### 2. (optional) Add analysis code.
 
@@ -65,6 +67,7 @@ There are two tasks:
   * `figs` - struct containing figure handles for plots generated (as requested in the experiment file below)
 2. Add any specific code into that file (or call functions from there).
 
+This code likely will include calls to some sort of `staticizer` (running statistical analyses) and `figurizer` (making plots) which will handle the desired analysis.
 
 #### 3. Create "experiment" files to train models.
 
