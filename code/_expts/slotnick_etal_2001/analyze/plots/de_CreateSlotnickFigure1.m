@@ -1,8 +1,11 @@
-function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, runs, ax)
+function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, lruns, rruns, ax)
 % de_CreateSlotnickFigure1(Y1, E1)
 %  Y1:  errorbar y
 %  E1:  errorbar e
 %  taskTitle: slotnick task (captialized first letter)
+%  stimSet: e.g. categorical, coordinate
+%  lruns: valid trials in LH; rruns = valid trials in RH
+%  ax: the axis to plot to.
 
     if ~exist('ax', 'var')
         % Create figure
@@ -22,7 +25,7 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, runs, ax
 
     % Set the remaining axes properties
     set(ax, 'XTick', [1 2], ...
-            'XTickLabel', {sprintf('LH'), sprintf('RH')});
+            'XTickLabel', {sprintf('LH runs: %d', lruns), sprintf('RH runs: %d', rruns)});
     xlabel('Hemisphere Injected');  % weird, right??
     ylabel(ax, 'Sum squared error');
     title(ax, sprintf('%s\n%s\n ', taskTitle, stimSet));
