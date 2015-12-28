@@ -15,3 +15,8 @@ ss.group = de_StatsGroupBasicsOkubo(all_models, all_mSets);
 figs = de_PlotsGroupBasicsOkubo(all_mSets, ss.group);
 
 de_SavePlots(all_mSets{1}, figs);
+
+% interaction analysis
+all_stats = {tst1.stats tst2.stats tst3.stats tst4.stats};
+okubo_interaction_analysis(all_stats);
+
