@@ -8,10 +8,10 @@ for dsi=1:length(dss)
     %%%%%%%%
     % Must match # of instances across both experiments
     %%%%%%%%
-    cate = ss{1}.rej.ok;
-    coor = ss{2}.rej.ok;
-    cb_cate = ss{3}.rej.ok;
-    cb_coor = ss{4}.rej.ok;
+    cate = ss.cate.rej.ok;
+    coor = ss.coor.rej.ok;
+    cb_cate = ss.cb_cate.rej.ok;
+    cb_coor = ss.cb_coor.rej.ok;
 
     % Find # instances to use
     nInstCate = [ size(cate.perf.(ds){1}{1},1), ...

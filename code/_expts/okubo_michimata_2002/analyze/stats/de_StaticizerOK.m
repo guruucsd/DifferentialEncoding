@@ -1,10 +1,10 @@
 function stats = de_StaticizerOK(mSets, mss, dump)
 if (~exist('dump','var')), dump = 0; end;
 
-mss = {mss(1), mss(2)}; %hack to convert from struct array to cell array of structs
+mss = {mss(:,1), mss(:,2)}; %hack to convert from struct array to cell array of structs
 
 for ti=1:2
-    if (ti==1), ds='train', else ds='test'; end;
+    if (ti==1), ds='train'; else ds='test'; end;
 
     stats.perf.(ds) = cell(size(mss));
 
@@ -13,9 +13,11 @@ for ti=1:2
 
         p     = [ms.p];
         o    = [p.output];
-
+        taskType = ms(1).data.taskType; % all of structs have same taskType
+        % arbitrarily pick index 1
+        
         tmp   = de_calcPErr( vertcat(o.(ds)), mSets.data.test.T, 2);
-        if strcmp(ms.data.taskType, 'coordinate')
+        if strcmp(taskType, 'coordinate')
             trial_types = {'near', 'far'};
         else 
             trial_types = {'above', 'below'};
