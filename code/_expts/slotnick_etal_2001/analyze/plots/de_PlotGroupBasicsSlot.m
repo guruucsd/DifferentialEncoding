@@ -37,9 +37,9 @@ function figs = de_PlotGroupBasicsSlot( ms, ss )
 
         for tai = 1:num_ttypes
             % Only need yrng/2 for full range, but 2* yrng for room for error bar
-            set(ax(tai), 'ylim', avg(tai) + 2*[-1, 1])
+            set(ax(tai), 'ylim', avg(tai) + 2*[-yrng, yrng])
         end
-    end;
+    end
     
     figs = [fig];
 
