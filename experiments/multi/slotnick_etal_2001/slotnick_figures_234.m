@@ -22,7 +22,7 @@ figs = de_NewFig('dummy');
 figs(end+1) = de_NewFig('slotnick_figure_2');
 figs(end+1) = de_NewFig('slotnick_figure_3');
 figs(end+1) = de_NewFig('slotnick_figure_4');
-fhs = arrayfun(@(f) f.handle, figs);
+fhs = arrayfun(@(f) f.handle, figs, 'UniformOutput', false); %compatible in 2015
 n_figs = length(figs);
 
 ymax = zeros(n_figs, 1);
@@ -36,7 +36,7 @@ for si=1:n_scripts
     stats = tst.stats;
     mSets = tst.mSets;
     for ii=1:100  % close all unrecognized figures.
-        if ~ismember(gcf, fhs), close(gcf);
+        if ~(any(cellfun(@(x) isequal(x, gcf), fhs))), close(gcf); %2015
         else, break; end;
     end;
 
