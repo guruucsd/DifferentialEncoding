@@ -24,7 +24,7 @@ de_MakeDataset('kitterle_etal_1992', 'sf_mixed', 'recog_freq', {'small', 'nphase
 
 % de_MakeDataset('slotnick_etal_2001', 'blob-dot', 'categorical', {'medium'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'blob-dot', 'coordinate', {'medium'}, true, true);
-% de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'small'}, true, true);
+  de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'small'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'paired-squares', 'coordinate', {'medium'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'plus-minus', 'categorical', {'small'}, true, true);
 % de_MakeDataset('slotnick_etal_2001', 'plus-minus', 'coordinate', {'small'}, true, true);
