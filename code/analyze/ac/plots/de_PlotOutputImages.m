@@ -49,7 +49,7 @@ function [fig] = de_PlotOutputImages(models,  imgs, lbls)
 
     for ii=1:size(imgs,3)
       img = squeeze(imgs(:,:,ii));
-
+      img = img - min(img(:));
       % Plot the connectivity pattern
       subplot(nRows, nCols, ii);
       colormap(gray);
