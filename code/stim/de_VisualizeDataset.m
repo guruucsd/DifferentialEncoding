@@ -7,12 +7,12 @@ function fig = de_visualizeData(dset, nImages)
 
   n_pix = prod(dset.nInput);
   img_shape = dset.nInput;
-  im2show     = de_SelectImages(dset, nImages);
+  im2show     = de_SelectImages(dset, nImages); %for vanhateren nImage = 16, but size(im2show) = 20?
 
   fig = de_NewFig('dataset-images', '__img', img_shape, nImages);
   set(fig.handle, 'Position', [0, 0, 1200, 1200]);
 
-  for ii=1:length(im2show)
+  for ii=1:min(4*4, length(im2show)) %make sure only 14 are shown
       subplot(4, 4, ii);
       colormap gray;
       imagesc( reshape(dset.X(1:n_pix, im2show(ii)), img_shape), [0, 1]);
