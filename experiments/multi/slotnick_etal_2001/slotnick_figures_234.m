@@ -89,10 +89,10 @@ for si=1:n_scripts
         % Set the axes equally.
         yl = get(gca, 'ylim');
         ymax(fi) = max(yl(2), ymax(fi));
-        for sxi=1:si
-            ax2 = subplot(1, n_scripts, sxi);
-            set(ax2, 'xlim', [0.5, 2.5], 'ylim', [0 ymax(fi)]);
-        end;
+       for sxi=1:si
+           ax2 = subplot(1, n_scripts, sxi);
+           set(ax2, 'xlim', [0.5, 2.5], 'ylim', [0 ymax(fi)]);
+       end;
     end;
 
     % Save on every loop, for good measure.
