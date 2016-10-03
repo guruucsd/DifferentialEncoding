@@ -91,21 +91,47 @@ function train = MakePairedSquares(taskType)
     train.T = [];
     train.TLAB = {};
 
-    left_distances = []; % to be used when assigning labels
-    right_distances = [];
+    top_distances = []; % to be used when assigning labels
+    bottom_distances = [];
 
     % Create the 16 images
     for d1=distances % left side: distance b/n squares ranges [2, 5]
         for d2=distances % right side: distance b/n square ranges [2, 5]
-            img = paired_squares_stimuli(d1, d2, 0);
+            img = paired_squares_stimuli(d1, d2, 1);
             train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-            train.XLAB{end+1} = sprintf('(Dist) Left: %dpx ; Right: %dpx', d1, d2);
+            train.XLAB{end+1} = sprintf('(Dist) Top: %dpx ; Bottom: %dpx', d1, d2);
 
             % Coordinate task
             train.T(end+1) = (d1 == d2); % same distance or no?
             difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
             lbl = guru_iff(train.T(end) == 1, 'same', 'different');
             train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
+            
+            if d1 == d2
+                
+                img = paired_squares_stimuli(d1, d2, 1);
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
+                train.XLAB{end+1} = sprintf('(Dist) Top: %dpx ; Bottom: %dpx', d1, d2);
+
+                % Coordinate task
+                train.T(end+1) = (d1 == d2); % same distance or no?
+                difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
+                lbl = guru_iff(train.T(end) == 1, 'same', 'different');
+                train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
+
+                img = paired_squares_stimuli(d1, d2, 1);
+                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
+                train.XLAB{end+1} = sprintf('(Dist) Top: %dpx ; Bottom: %dpx', d1, d2);
+
+                % Coordinate task
+                train.T(end+1) = (d1 == d2); % same distance or no?
+                difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
+                lbl = guru_iff(train.T(end) == 1, 'same', 'different');
+                train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
+
+
+                
+            end
         end
     end
 
@@ -150,7 +176,7 @@ function train = MakePlusMinus(taskType)
     end;
 
 
-function image = paired_squares_stimuli(left_distance, right_distance, four_pixel)
+function image = paired_squares_stimuli(top_distance, bottom_distance, four_pixel)
 % Takes three parameters: 2 are distances from quartile lines
 % Last parameter: if four_pixel = 1, then the square will be 4 pixels. For all other values it will be 1 pixel
 
@@ -160,20 +186,37 @@ function image = paired_squares_stimuli(left_distance, right_distance, four_pixe
     horizontal_midline = image_height/2;
     vertical_midline = ceil(image_width/2);
 
-    left_quarterline = floor(image_width/4);
-    right_quarterline = image_width - left_quarterline;
+    top_quarterline = floor(image_height/4);
+    bottom_quarterline = image_height - top_quarterline;
 
     image = ones(image_height, image_width);
 
-    for ii = 2:image_height-1
-        image(ii, vertical_midline) = 0;
+    for ii = 2:image_width-1
+        image(horizontal_midline, ii) = 0;
     end
 
+    image(top_quarterline-top_distance+1, vertical_midline) = 0;
+    image(top_quarterline+top_distance, vertical_midline) = 0;
+    image(bottom_quarterline+bottom_distance, vertical_midline) = 0;
+    image(bottom_quarterline-bottom_distance+1, vertical_midline) = 0;
 
-    image(horizontal_midline, left_quarterline-left_distance+1) = 0;
-    image(horizontal_midline, left_quarterline+left_distance) = 0;
-    image(horizontal_midline, right_quarterline+right_distance) = 0;
-    image(horizontal_midline, right_quarterline-right_distance+1) = 0;
+    
+    if four_pixel
+        image(top_quarterline-top_distance, vertical_midline) = 0;
+        image(top_quarterline+top_distance+1, vertical_midline) = 0;
+        image(bottom_quarterline+bottom_distance+1, vertical_midline) = 0;
+        image(bottom_quarterline-bottom_distance, vertical_midline) = 0;
+        
+        image(top_quarterline-top_distance, vertical_midline+1) = 0;
+        image(top_quarterline+top_distance+1, vertical_midline+1) = 0;
+        image(bottom_quarterline+bottom_distance+1, vertical_midline+1) = 0;
+        image(bottom_quarterline-bottom_distance, vertical_midline+1) = 0;
+        
+      	image(top_quarterline-top_distance+1, vertical_midline+1) = 0;
+        image(top_quarterline+top_distance, vertical_midline+1) = 0;
+        image(bottom_quarterline+bottom_distance, vertical_midline+1) = 0;
+        image(bottom_quarterline-bottom_distance+1, vertical_midline+1) = 0;
+    end
 
 
 function rot_image = blob_stimuli(distance, dot_size, orientation)
