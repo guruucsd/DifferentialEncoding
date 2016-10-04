@@ -264,7 +264,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
     end % per hpl
 
     Con(inPix+1:inPix+sH,1:inPix) = halfCon; %input -> hidden connections
-        keyboard
+
     if inPix == sH/hpl && strcmp(distn_name, 'normem3')
         input_pos = ones(inPix);
         Con(inPix+sH+1:end,inPix+1:inPix+sH) = repmat(input_pos, [1 hpl]); %hidden->output connections

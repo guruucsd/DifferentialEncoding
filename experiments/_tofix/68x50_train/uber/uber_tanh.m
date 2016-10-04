@@ -24,7 +24,6 @@ for i=1:length(ac)
 end;
 clear('ac');
 
-%keyboard
 
 %%%%%%%%%%%%%%%%
 % Run each task
@@ -40,11 +39,11 @@ p_args = { args{:}, ...
          };
 
 for ti=1:length(tasks)
-    
-    
+
+
     if (strcmp('sergent',tasks{ti}))
-    
-        
+
+
         % Sergent
         s_args = { p_args{:}, 'runs', min(n_ac, 68), ...
                   'plots', {'ls_bars'},  ...
@@ -60,8 +59,8 @@ for ti=1:length(tasks)
         de_Simulator('sergent_1982', 'de', 'sergent', {sz,'D2#T2'}, s_args{:});
         de_Simulator('sergent_1982', 'de', 'sergent', {sz,'swapped'}, s_args{:});
     end;
-    
-    
+
+
     % Kitterle
     if (strcmp('kitterle', tasks{ti}))
         k_args  = { p_args{:}, 'runs', min(n_ac, 40), ...
@@ -72,8 +71,8 @@ for ti=1:length(tasks)
         de_Simulator('kitterle_etal_1992', 'sf_mixed', 'recog_freq', {sz,'freqs', k_freqs}, k_args{:}, 'plots', {'ffts', 'images'}, 'stats', {'ffts', 'images'});
         de_Simulator('kitterle_etal_1992', 'sf_mixed', 'recog_type', {sz,'freqs', k_freqs}, k_args{:});
     end;
-    
-    
+
+
     % Christman
     if (strcmp('christman', tasks{ti}))
         c_args  = { p_args{:}, 'runs', min(n_ac, 64), ...
@@ -85,8 +84,8 @@ for ti=1:length(tasks)
         de_Simulator('christman_etal_1991', 'low_freq',  'recog', {sz,'freqs', c_freqs, 'thetas', c_thetas}, c_args{:});
         de_Simulator('christman_etal_1991', 'high_freq', 'recog', {sz,'freqs', c_freqs, 'thetas', c_thetas}, c_args{:});
     end;
-    
-    
+
+
     % Young
     if (strcmp('young', tasks{ti}))
         y_args  = { p_args{:}, 'runs', min(n_ac, 50), ...

@@ -34,7 +34,7 @@ for hi=1:length(hu_hpl)
 
     if exist(miniFile,'file')
         load(miniFile, 'junk');
-        if ~isfield(junk,'trn'), fprintf('lasterr: %s\n', junk); keyboard;
+        if ~isfield(junk,'trn'), fprintf('lasterr: %s\n', junk);
         else, fprintf('Loaded cached file %s\n', miniFile); end;
 
     else
@@ -47,7 +47,7 @@ for hi=1:length(hu_hpl)
           elseif any(nnz(sum(junk.tst.stats.raw.r{1},2))==2)
               error('Failed to train classifiers; all classifiers were rejected')
           end;
-          
+
           % Get the result
           [junk.trn, junk.tst] = de_SimulatorUber('vanhateren/250', 'sergent_1982/de/sergent', opts, args);
           close all;
@@ -61,7 +61,7 @@ for hi=1:length(hu_hpl)
         end;
     end;
 
-    trn{si,ci,fi} = junk.trn; 
+    trn{si,ci,fi} = junk.trn;
     tst{si,ci,fi} = junk.tst;
     clear('junk');
   end; end; end;

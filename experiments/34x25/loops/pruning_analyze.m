@@ -21,8 +21,6 @@ hf.bars_diff = diff(hf.bars,[],3);
 
 asymm_fact = (lf.bars_diff - hf.bars_diff)./(lf.bars_diff+hf.bars_diff)/2
 
-keyboard
-
 
 % low freq
 loop_plot_data(fns{1}, plt, dbg);
