@@ -309,8 +309,8 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
           pwrLH = squeeze(ffts.orig2D(1,1,:,:)).*(pd<0).*(ffts.pals.an2D<=0.05);
 
           imgRH = ifft2(pwrRH); imgRH=imgRH(1:mSets.nInput(1), 1:mSets.nInput(2));
-          rMin = min(min(imgRH));
-          rMax = max(max(imgRH));
+          rMin = min(imgRH(:));
+          rMax = max(imgRH(:));
           imgRH = (imgRH - rMin) / (rMax-rMin);
           
           imgLH = ifft2(pwrLH); imgLH=imgLH(1:mSets.nInput(1), 1:mSets.nInput(2));
@@ -326,7 +326,7 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
           subplot(1,2,1); colormap gray;
           title(sprintf('LH (\\sigma=%3.2f) p<0.05 recon', mSets.sigma(end)));
           imagesc(imgLH, [0 1]);
-          ylabel('Normalized')
+          ylabel('Normalized power')
           set(gca, 'xtick',[],'ytick',[]);
 
           subplot(1,2,2); colormap gray;

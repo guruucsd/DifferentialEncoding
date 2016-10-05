@@ -15,5 +15,5 @@ function [selectedImages, nImages] = de_SelectImages(dset, nImages)
       selectedImages_max_ = size(dset.X, 2);
   end;
 
-  selectedImages = selectedImages_;
+  selectedImages = selectedImages_(1:min(nImages, length(selectedImages_))); %Actually use the nImages param...
   nImages = length(selectedImages);
