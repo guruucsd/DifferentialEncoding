@@ -107,30 +107,20 @@ function train = MakePairedSquares(taskType)
             lbl = guru_iff(train.T(end) == 1, 'same', 'different');
             train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
             
+            %There are 12 "different" stimuli and 4 "same" stimuli. To make
+            %class sizes the same, each "same" stimuli will be duplicated
+            %twice (for a total of three copies).
+            
             if d1 == d2
-                
-                img = paired_squares_stimuli(d1, d2, 1);
-                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-                train.XLAB{end+1} = sprintf('(Dist) Top: %dpx ; Bottom: %dpx', d1, d2);
+                nRepeat = 2; %how many times should this be repeated?
+                for i=1:nRepeat
+                    %Just copy over the information from before.
+                    train.X(:, end+1) = train.X(:, end);
+                    train.XLAB{end+1} = train.XLAB{end};
 
-                % Coordinate task
-                train.T(end+1) = (d1 == d2); % same distance or no?
-                difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
-                lbl = guru_iff(train.T(end) == 1, 'same', 'different');
-                train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
-
-                img = paired_squares_stimuli(d1, d2, 1);
-                train.X(:, end+1) = reshape(img, prod(train.nInput), 1);
-                train.XLAB{end+1} = sprintf('(Dist) Top: %dpx ; Bottom: %dpx', d1, d2);
-
-                % Coordinate task
-                train.T(end+1) = (d1 == d2); % same distance or no?
-                difficulty = guru_iff(d1 == d2, 'easy', 'hard');  % according to the paper...
-                lbl = guru_iff(train.T(end) == 1, 'same', 'different');
-                train.TLAB{end+1} = sprintf('%s-%s', lbl, difficulty);
-
-
-                
+                    train.T(end+1) = train.T(end); % same distance or no?
+                    train.TLAB{end+1} = train.TLAB{end};
+                end
             end
         end
     end
