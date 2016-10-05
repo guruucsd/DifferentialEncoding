@@ -1,0 +1,3 @@
+uber_slotnick_plusminus_all;
+uber_slotnick_blobdot_all;
+uber_slotnick_pairedsquares_coordinate;
