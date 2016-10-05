@@ -7,7 +7,7 @@ function spatialcorr( img, sig, pt )
   else
       imgsize = size(img);
   end;
-  
+
   if (~exist('pt','var'))
       pt = round(imgsize/2);
   end;
@@ -23,23 +23,23 @@ function spatialcorr( img, sig, pt )
   if (~exist('sig','var'))
       sig = min(size(img))*[1 1];
   end;
-  
+
   d = zeros(size(img));
   for ii=1:numel(img)
       [x1,x2] = ind2sub(size(img), ii);
       d(ii) = img(pt(1),pt(2)) * img(ii) * mvnpdf([x1 x2], pt, sig);
   end;
-  
+
   figure;
   set(gcf,'position',[45           8        1125         676]);
-  
+
   subplot(1,3,1);
   colormap('gray');
   imagesc(img); hold on;
   plot(pt(1),pt(2),'*g');
   axis image; axis equal; axis tight; set(gca, 'xtick',[],'ytick',[]);
   mfe_freezeColors;
-  
+
   subplot(1,3,2);
   colormap('gray');
   imagesc(d); hold on;
@@ -55,6 +55,4 @@ function spatialcorr( img, sig, pt )
   axis tight; set(gca, 'xtick',[],'ytick',[],'ztick',[]);
   mfe_freezeColors;
 
-      
-%  keyboard
-mfe_unfreezeColors;
+  mfe_unfreezeColors;

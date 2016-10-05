@@ -8,7 +8,6 @@ function figs = de_FigurizerCC(mSets, mss, stats)
 
     right = stats.rej.cc.perf.(ds){1};
     left = stats.rej.cc.perf.(ds){end};
-    runs = mSets.runs;
 
     figs = de_NewFig(mSets.data.taskType);
 
@@ -23,16 +22,25 @@ function figs = de_FigurizerCC(mSets, mss, stats)
             left_stderr = 0 * left_mean;  % feeling lazy; errorbars are clear
             right_stderr = 0 * right_mean; % on other subplots.
             taskTitle = guru_capitalizeStr(mSets.data.taskType);
+            
+            %get the amount of non-rejected runs for each hemisphere
+            left_runs = size(left{1}, 1);
+            right_runs = size(right{1}, 1);
+
 
         else
             ti = pi - 1;
             left_mean = mean(left{ti}(:));
             right_mean = mean(right{ti}(:));
+            
+            % Find number of valid trials for each hemisphere
+            left_runs = size(left{ti}, 1);
+            right_runs = size(right{ti}, 1);
 
             % Average over trials to get a single score per network,
             % then find stderr over all networks.
-            left_stderr = std(mean(left{ti}, 2)) / sqrt(size(left{ti}, 1));
-            right_stderr = std(mean(right{ti}, 2)) / sqrt(size(right{ti}, 1));
+            left_stderr = std(mean(left{ti}, 2)) / sqrt(left_runs);
+            right_stderr = std(mean(right{ti}, 2)) / sqrt(right_runs);
 
             taskTitle = sprintf('%s (%s)', ...
                                 guru_capitalizeStr(mSets.data.taskType), ...
@@ -42,7 +50,7 @@ function figs = de_FigurizerCC(mSets, mss, stats)
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 runs, ax);
+                                 left_runs, right_runs, ax);
 
         if pi ~= round(n_plots/2)
             xlabel('');  % remove label

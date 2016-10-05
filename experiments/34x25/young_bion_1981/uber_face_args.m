@@ -6,7 +6,7 @@ function [args,opts] = face_args(varargin)
   addpath(fullfile(script_dir, '..'));
 
   stats = {'default', 'ffts'};
-  plts = {'train-error', stats{:}};
+  plots = {'train-error', stats{:}};
 
   [args,opts] = uber_args( ...
     'runs', 25, ...

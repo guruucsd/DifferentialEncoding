@@ -28,8 +28,6 @@ function centersurround()
   plot(freqs, std_mean(1:ncirc,:)');
   legend(guru_csprintf('c%d', num2cell(1:ncirc)));
 
-  keyboard
-
 
 function [avg_mean, std_mean, wts_mean, f] = nn_2layer_processor(varargin)
 
@@ -39,4 +37,4 @@ function [avg_mean, std_mean, wts_mean, f] = nn_2layer_processor(varargin)
   std_mean = mean(std_std,1);
   wts_mean = squeeze(mean(wts,1));
   f = figure; imagesc(wts_mean); colorbar;
-  
+

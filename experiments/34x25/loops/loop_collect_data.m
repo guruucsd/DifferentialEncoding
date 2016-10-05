@@ -45,10 +45,10 @@ for ci=1:nc
 
         pow1D_trn(ci,si,:) = mean(trn(ci).stats.rej.ac.ffts.model.power1D{si}(smidx,:,:),2);
         pow1D_tst(ci,si,:) = mean(tst(ci).stats.rej.ac.ffts.model.power1D{si}(smidx,:,:),2);
-         
+
         ipd_spread(ci,si) = tst(ci).stats.rej.ac.ipd.from_center_mean(si);
         ipd_nearest(ci,si) = tst(ci).stats.rej.ac.ipd.nearest_neighbor_mean(si);
-        
+
         if isfield(tst(ci).stats.rej.basics, 'bars')
             perf{ci,si} = tst(ci).stats.rej.basics.bars(3:4,sum(rejs(ci,:)<mSets(1).runs))';
             perf{ci,si} = perf{ci,si}./sum(perf{ci,si}); % normalize bars
@@ -68,10 +68,10 @@ ipdd_nearest = nan(nc,ns,nc,ns);
 
 for ci=1:nc
     for si=1:ns
-        
+
         for ci2=1:nc
             for si2=1:ns
-                
+
 
                  % ipd
                 ipdd_spread(ci,si,ci2,si2)  = ipd_spread(ci,si)- ipd_spread(ci2,si2);
@@ -85,7 +85,6 @@ end;
 % Clean up workspace
 clear('mSets','trn','tst');
 clear('ci','ci2','si','si2');
-keyboard
 
 % Now save off the workspace
 filout = [tempname() '.mat'];

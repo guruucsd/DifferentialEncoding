@@ -33,8 +33,6 @@ type = 'loglog';
         if length(fns) == length(x) % per-class limit
             % Scatter points
 
-
-           % keyboard
             if strcmp(type, 'loglog'), h(ci) = scatter(x{ci}, y{ci}, 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
             else,                      h(ci) = scatter(fns{ci}.xxform(x{ci}), fns{ci}.yxform(y{ci}), 50, [mark(ci) col(ci)], 'LineWidth', 1.5);
             end;

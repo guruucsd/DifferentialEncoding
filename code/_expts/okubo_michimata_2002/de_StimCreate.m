@@ -55,10 +55,12 @@ function [train,test,aux] = de_StimCreate(stimSet, taskType, opt)
     switch (taskType)
       case 'categorical',
         train.T(end+1) = h > 0;
-        train.TLAB{end+1} = guru_iff(h > 0, 'above', 'below');
+        train.TLAB{end+1} = guru_iff(train.T(end), 'above', 'below');
+
       case 'coordinate'
-        train.T(end+1) = h <= 2;
-        train.TLAB{end+1} = guru_iff(h <= 2, 'near', 'far');
+        midpt = mean(abs(heights));
+        train.T(end+1) = h <= midpt;
+        train.TLAB{end+1} = guru_iff(train.T(end), 'near', 'far');
       otherwise, error('Unknown taskType: %s', taskType);
     end;
   end;

@@ -123,10 +123,8 @@ function outdir = de_GetOutPath(model, dirType)
     %
     % The shared part of ac and p paths
     case {'ac_p_base'}
-          %origString = guru_fileparts(model.dataFile, 'filename'); %
-
-          origString = [ 'opt=' guru_cell2str(model.data.opt, '.')];
-          %origString = ''; % options should be pasted on
+          origString = [ sprintf('opt=%s', guru_cell2str(model.data.opt, '.')), ...
+                         sprintf('ts=%f', model.data.timestamp)];
 
           origString = [ origString ... % add on base model settings
                          sprintf('UBER=%d', isfield(model, 'uberpath')), ...

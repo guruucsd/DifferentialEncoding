@@ -2,11 +2,11 @@ function stats = de_StatsGroupBasicsOkubo( all_models, all_mSets )
 
 % 4 tasks, 2 hemis
 
-n_expts = length(all_models);
-n_hemis = size(all_models{1}, 2);
+n_expts = length(all_models);     %Should be 4
+n_hemis = size(all_models{1}, 2); %Should be 2
 
-raw_sse = cell(n_expts, n_hemis);
-n_models = zeros(n_expts, n_hemis);
+raw_sse = cell(n_expts, n_hemis);  % 4x2 cell array of SSE vals 
+n_models = zeros(n_expts, n_hemis);%
 median_sse = zeros(n_expts, n_hemis);
 mean_sse = zeros(n_expts, n_hemis);
 std_sse = zeros(n_expts, n_hemis);

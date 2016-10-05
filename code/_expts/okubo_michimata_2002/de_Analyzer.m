@@ -11,3 +11,8 @@ function [stats, figs]  = de_Analyzer(mSets, mss)
 % figs       :
 
   [stats,figs] = de_AnalyzerDE(mSets, mss);
+  
+  % Do OK-specific stats & figs
+  [stats.rej.ok] = de_StaticizerOK(mSets, mss, stats);
+  %[figs]         = [figs de_FigurizerCC(mSets, mss, stats) ];
+

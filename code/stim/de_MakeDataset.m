@@ -1,4 +1,4 @@
-function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs, force)
+function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet, taskType, opt, show_figs, force)
 % Given some selective parameters and a set of generic options, create a dataset, write it to disk, and return
 %   the filename and the dataset.
 %
@@ -13,18 +13,30 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
     if ~exist('show_figs', 'var'), show_figs = true; end;
     if ~exist('force', 'var'), force = false; end;
 
+    % Setup path--each experiment implements a set of generic functions
+    % (right, basically like a class, but through file & path manipulation--yuck).
+    % So, set up the path to access this experiment's functions.
+    p = path();
+    de_SetupExptPaths(expt);
+
+    % Get the file time of de_StimCreate
+    fil = dir(which('de_StimCreate'));
+    file_timestamp = fil.datenum;
+
     % Calc the "expected" datafile
     dataFile = de_GetDataFile(expt, stimSet, taskType, opt);
 
+    % Invalidate cached data based on the timestamp.
+    if exist(dataFile,'file') && ~force
+        load(dataFile);
+        if ~exist('timestamp', 'var') || timestamp ~= file_timestamp
+            force = true;
+        end;
+    end;
+
     % If the file doesn't exist, then we have to create it!
-    if (~exist(dataFile,'file') || force)
-
-        %% Setup path--each experiment implements a set of generic functions
-        % (right, basically like a class, but through file & path manipulation--yuck).
-        % So, set up the path to access this experiment's functions.
-        p = path();
-        de_SetupExptPaths(expt);
-
+    if ~exist(dataFile, 'file') || force
+        fprintf('Recreating dataset (force=%d).\n', force);
         % Get the base stimuli; not every function emits an aux, and some are
         %   forceful about what dataFile they use (probably legacy code)
         switch nargout('de_StimCreate')
@@ -50,13 +62,11 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
                         sprintf('Training set must have "%s" property defined.', prop_name{1}));
         end;
 
-
-        path(p); % Restore path
-
-        %%
         % Stamp on parameters
-        train.expt = expt; train.stimSet = stimSet; train.taskType = taskType; train.opt = opt;
-        test.expt  = expt; test.stimSet  = stimSet; test.taskType  = taskType; test.opt  = opt;
+        train.expt = expt; train.stimSet = stimSet;
+        train.taskType = taskType;  train.opt = opt;
+        test.expt  = expt; test.stimSet  = stimSet;
+        test.taskType  = taskType; test.opt  = opt;
 
         % Apply missing (but expected) field
         if (~isfield(train, 'minmax')), train.minmax = guru_minmax(train.X(:)); end;
@@ -64,7 +74,6 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
 
         if (~isfield(train, 'name')),   train.name   = 'train';  end;
         if (~isfield(test,  'name')),   test.name    = 'test';   end;
-
 
         % Apply any extra common options
         [train] = de_StimApplyOptions(train, opt);
@@ -81,10 +90,15 @@ function [dataFile, train, test, aux] = de_MakeDataset(expt, stimSet, taskType, 
           guru_mkdir(guru_fileparts(dataFile,'pathstr'));
         end;
 
-        save(dataFile, 'stimSet', 'taskType', 'opt', 'train','test','aux');
+        timestamp = file_timestamp;  % alias it over to expected property name.
+        save(dataFile, 'stimSet', 'taskType', 'opt', 'train', 'test', 'aux', 'timestamp');
     end;
 
-    load(dataFile);
+    path(p); % Restore path
+
+    % Variables should have been loaded or created; nothing left to do!
+    guru_assert(exist('train', 'var'));
+    guru_assert(exist('test', 'var'));
 
 
 %%%%%%%%%%%%%%%%%

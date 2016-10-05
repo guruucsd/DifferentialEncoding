@@ -14,12 +14,12 @@ nphases = 8;
 norients=8;
 freqs = 0.01 * [ 6 8 10 12];
 
-mu = 10+ [0 0]; 
+mu = 10+ [0 0];
 Sigma = 50*eye(2);
 [X1,X2] = meshgrid([1:sz(1)]', [1:sz(2)]');
 X = [X1(:) X2(:)];
 
-figure; 
+figure;
 set(gcf,'Position',[ 84         -21        1014         705]);
 bestofall=[];
 
@@ -45,7 +45,7 @@ for jj = 1:nbatches
 
         for fi=1:length(freqs)
             ci = 1;
-            
+
             % Find the best fit orientation and phase
             for oi = 1:norients
                 orient = 2*pi*oi/8;
@@ -54,7 +54,7 @@ for jj = 1:nbatches
 
                     x = 0.5+mfe_grating2d( freqs(fi), phase, orient, 0.5, sz(1), sz(2));
                     resps(fi,oi,phsi) = sum(x(:).*w(:));
-                    
+
                     if (best_vals(fi)<resps(fi,oi,phsi))
                         best_vals(fi)     = sum(x(:).*w(:));
                         best_params(fi,:) = [freqs(fi) orient phase];
@@ -68,7 +68,7 @@ for jj = 1:nbatches
         switch mode
             case 'max',   [~,bestofall(end+1)] = max(best_vals);
             case {'mean','total'}                                                                                                        , [~,bestofall(end+1)] = max(mean(mean(resps,3),2));
-            case 'range', 
+            case 'range',
                 alld = reshape(resps, [length(freqs), norients*nphases]);
                 rng  = max(alld') - min(alld');
                 [~,bestofall(end+1)] = max(rng);
@@ -126,7 +126,6 @@ for jj = 1:nbatches
         ylabel(sprintf('Weighted\nresponse'), 'FontSize',16);
         if (bestofall(end)~=1)
             drawnow;
-            %keyboard
         end;
     end;
     drawnow;
