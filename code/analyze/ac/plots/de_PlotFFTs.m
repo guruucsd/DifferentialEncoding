@@ -309,18 +309,30 @@ error('NYI; ratio doesn''t make sense unless anything < 1 becomes flipped and ne
           pwrLH = squeeze(ffts.orig2D(1,1,:,:)).*(pd<0).*(ffts.pals.an2D<=0.05);
 
           imgRH = ifft2(pwrRH); imgRH=imgRH(1:mSets.nInput(1), 1:mSets.nInput(2));
+          rMin = min(imgRH(:));
+          rMax = max(imgRH(:));
+          imgRH = (imgRH - rMin) / (rMax-rMin);
+          
           imgLH = ifft2(pwrLH); imgLH=imgLH(1:mSets.nInput(1), 1:mSets.nInput(2));
+          lMin = min(min(imgLH));
+          lMax = max(max(imgLH));
+          imgLH = (imgLH - lMin) / (lMax-lMin);
 
+
+          % Now normalize the images so they are properly visible
           % Now take an image, and show.
+         
 
           subplot(1,2,1); colormap gray;
           title(sprintf('LH (\\sigma=%3.2f) p<0.05 recon', mSets.sigma(end)));
           imagesc(imgLH, [0 1]);
+          ylabel('Normalized power')
           set(gca, 'xtick',[],'ytick',[]);
 
           subplot(1,2,2); colormap gray;
           title( sprintf('RH (\\sigma=%3.2f) p<0.05 recon', mSets.sigma(1)));
           imagesc(imgRH, [0 1]);
+          ylabel('Normalized')
           set(gca, 'xtick',[],'ytick',[]);
 
           clear('pd1','pd2');
