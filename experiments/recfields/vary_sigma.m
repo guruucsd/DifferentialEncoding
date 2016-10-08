@@ -1,7 +1,8 @@
 function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
 %
 %
-%
+% Notes:
+%  a_mode
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
 %  freqs = [ 0.0001 0.01 * [ 1.5 3 6 12 18 24 30 36] 0.5]; % using only harmonics
@@ -11,15 +12,15 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
   [cpi,    varargin] = guru_popopt(varargin, 'cpi',    3*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
   args  = { 'seed', 1, ...
-            'w_mode', 'posmean', ...
-            'a_mode', 'mean', ...
+            'w_mode', 'posmean', ...  % how to sample weights
+            'a_mode', 'mean', ...  % how to compute output stats.
             'cpi',  cpi, ...
-            'nin', 20, ...
+            'nin', 20, ...  % size of image (square)
             'distn', 'norme2', ...
-            'nsamps', 5, ...
-            'nbatches', 5 ...
-            'img2pol', false, ...
-            'disp', [10 11 12 13], ...
+            'nsamps', 5, ...  % 
+            'nbatches', 5 ...  % 
+            'img2pol', false, ...  % whether to stretch cartesian image via retinotopy
+            'disp', [10 11 12 13], ...  % plots to show
             varargin{:} ...
          };
 
@@ -97,6 +98,10 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
   end;
 
   if ismember(11, pt.disp)
+      % Plots the mean (across all units) of the standard deviation of each
+      % units' response to different frequency gratings (frequency, phase,
+      % orientation)
+      
       colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
 
       figure;
@@ -140,12 +145,12 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
 
 
 function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
+  
+  [raw_avg, raw_std, ~, raw_wts, p] = nn_2layer(varargin{:});
 
-  [raw_std_avg, raw_std_std, ~, raw_wts, p] = nn_2layer(varargin{:});
-
-  avg_mean = mean(raw_std_avg,1);
-  std_mean = mean(raw_std_std,1);
-  std_std  = std(raw_std_std,[],1)/sqrt(size(raw_std_std,1));
+  avg_mean = mean(raw_avg,1);  % mean of means
+  std_mean = mean(raw_std,1);  % mean of standard deviations
+  std_std  = std(raw_std,[],1)/sqrt(size(raw_std,1));
   wts_mean = squeeze(mean(raw_wts,1));
 
   % Calculate average distance

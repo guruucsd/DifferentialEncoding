@@ -26,7 +26,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 
     if isfield(p, 'freqs'), error('freqs should not be set. please set cpi!'); end;
     p.freqs = p.cpi./max(p.sz); %cycles
-        
+
     % Set param values that are dependent on other param values
     if (~isfield(p, 'mu')),     p.mu     = p.sz/2; end;
     if (~isfield(p, 'Sigma')),  p.Sigma  = [2*p.sz(1) 0; 0 0.5*p.sz(2)]; end;
@@ -34,7 +34,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
 
     rand('seed', p.seed);
     randn('seed', p.seed);
-    
+
     % Create grid of points for calculating images
     [X1,X2] = meshgrid([1:p.sz(1)]', [1:p.sz(2)]');
     X = [X1(:) X2(:)];
@@ -101,7 +101,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                             subplot(nrows,ncols,fi);
                             imshow(x); xlabel(sprintf('frq=%.4f',p.freqs(fi)));
                         end;
-                        
+
                         % Calculate output node response
                         resp = x(:)/sum(x(:));
                         for ixi=1:p.niters
@@ -135,7 +135,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                     best_vals = avg_resp(sampnum,:);
                     [~,bestofall(sampnum)] = max(avg_resp(sampnum,:));%max(mean(mean(resps,3),2));
 
-                case {'std'}
+                case {'std'}  % ewwww... this is the same as 'mean' :-/
                     avg_resp(sampnum,:) = mean(resps_by_freq_norm,2);
                     std_resp(sampnum,:) = std(resps_by_freq_norm,[],2)';%./avg_resp(sampnum,:)';
                     best_vals = std_resp(sampnum,:);
@@ -177,7 +177,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                     best_vals = std_resp(sampnum,:);
                     [~,bestofall(sampnum)] = max(std_resp(sampnum,:));%max(mean(mean(resps,3),2));
 
-                case 'range', 
+                case 'range',
                     rng  = max(alld') - min(alld');
                     [~,bestofall(sampnum)] = max(rng);
 
