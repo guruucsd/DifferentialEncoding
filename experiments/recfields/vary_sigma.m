@@ -24,14 +24,6 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = vary_sigma(varargin)
          };
 
 
-  %% Reload file
-  outfile = sprintf('%s.mat', mfilename());
-  if (false && exist(outfile,'file'))
-      load(outfile);
-      return;
-  end;
-
-
   %% Run from scratch
   for ni=1:length(sigmas)
 
