@@ -4,13 +4,14 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 %  freqs = [ 0.0001 0.01 * [ 1.5 3 6 12 18 24 30 36] 0.5]; % using only harmonics
   %freqs = [ 0.0001 0.01 * [ 2 4 6 8 10 12 14 16 18 20 25 30 35 50]]; %using non-harmonics
   [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1, 2, 4, 6, 8, 10]);%8 2 1/2 1/8 1/16 1/32];
-  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    3*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
+  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    6*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
   args  = { 'seed', 1, ...
             'w_mode', 'posmean', ...  % how to sample weights
             'a_mode', 'mean', ...  % how to compute output stats.
             'cpi',  cpi, ...
-            'nin', [34, 25], ...  % size of image (square)
+            'sz', [34, 25], ...  % size of image (square)
+            'nConns', 25, ... % number of connections
             'distn', 'norme2', ...
             'nsamps', 5, ...  % 
             'nbatches', 5 ...  % 
@@ -69,42 +70,68 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
             i = 2;
             while ratios(i) >= 1
                 i = i+1;
+                if i > length(ratios)
+                    i = 1;
+                    break;
+                end
+                
             end
         else
             i = 2;
             while ratios(i) <= 1
                 i = i+1;
+                if i > length(ratios)
+                    i = 1;
+                    break;
+                end
             end
         end
-        crossover_cpi(counter) = cpi(i);
+        if i ~= 1 %this means there was a crossover 
+            crossover_cpi(counter) = cpi(i);
+        end
         sigma_pairs(counter, :) = [sigmas(ii), sigmas(ij)];
         counter = counter + 1;
+
     end
-  end
+  end 
   
-  
-  figure; 
+  figure; hold on;
   start = 1;
+  
   for ii=1:numSigmas
-      subplot(1, numSigmas, ceil(start/(numSigmas-1)))
-      plot(sigma_pairs(start:start+numSigmas-2, 2), ...
-      crossover_cpi(start:start+numSigmas-2))
+      sp = sigma_pairs(start:start+numSigmas-2, 2);
+      cc = crossover_cpi(start:start+numSigmas-2);
+      
+      sp( all(~cc,2), : ) = []; %get rid of the entries that didn't have crossover
+      cc( all(~cc,2), : ) = [];
+
+      plot(sp, cc) %change to scatter if desired
   
-      start = start + numSigmas -1;
-      title(sprintf('Sigma 1 = %d', sigmas(ii)))
-      xlabel('Sigma 2')
-      ylabel('Crossover frequency (CPI)')
-            
+      start = start + numSigmas -1;       
   end
- % C{numSigmas, 1} = {};
- % for ii=1:numSigmas
- %    C{ii} = sprintf('Sigma 1 = %d', sigmas(ii)); 
- % end
+            
+  C{numSigmas, 1} = {};
+  for ii=1:numSigmas
+     C{ii} = sprintf('Sigma 1 = %d', sigmas(ii)); 
+  end
   
-%  [hleg1, hobj1] = legend(C)
-%  set(hleg1, 'fontsize', 15);
-%  xlabel('Sigma 2')
-%  ylabel('Crossover frequency (CPI)')
+  [hleg1, hobj1] = legend(C)
+  set(hleg1, 'fontsize', 15);
+  xlabel('Sigma 2')
+  ylabel('Crossover frequency (CPI)')
+
+%   for si=1:length(sigmas)
+%     plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
+%   end;
+%   for si=1:length(sigmas)
+%     errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+%   end;
+%   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
+%   set(gca, 'FontSize', 16);
+%   xlabel('frequency (cycles per image)');
+%   ylabel('output activity (linear xfer fn)');
+%   legend(lbls, 'Location', 'best', 'FontSize',16);
+%   title('Non-normalized std (divided by global mean)');
 
   
   function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
