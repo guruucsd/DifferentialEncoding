@@ -1,7 +1,7 @@
 function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargin)
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
-  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1 2:2:10]);%8 2 1/2 1/8 1/16 1/32];
+  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1:10]);%8 2 1/2 1/8 1/16 1/32];
   [cpi,    varargin] = guru_popopt(varargin, 'cpi',    6*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
   args  = { 
@@ -22,7 +22,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 
   %% Collect raw data
   for si=1:length(sigmas)
-    fprintf('Processing sigma=%.2f...\n', sigmas(si));
+    fprintf('Processing sigma = %.2f...\n', sigmas(si));
 
     [am,sm,ss,wm,pt,ft] = nn_2layer_processor( ...
         args{:}, ...
@@ -50,16 +50,14 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
     p(end+1)=pt;
   end;
   
+  
   %% Analyze raw data for crossover
-  scaling = max(std_mean(:)); % Rescale over all sigmas, such that the scale of response isn't a factor
   numSigmas = size(std_mean, 1);
-  crossover_cpi = zeros(numSigmas * (numSigmas-1), 1);
-  sigma_pairs = zeros(numSigmas * (numSigmas-1), 2);
+  crossover_cpi = nan(numSigmas * (numSigmas-1), 1);
+  sigma_pairs = nan(numSigmas * (numSigmas-1), 2);
   counter = 1;
   for ii=1:numSigmas
-  	for ij=1:numSigmas
-      if ij == ii, continue; end
-
+  	for ij=(ii + 1):numSigmas
       ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
       if (ratios(1) > 1)  % detect from high to low crossing
         compareFn = @(idx) ratios(idx) >= 1;
@@ -79,8 +77,6 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
       
       if si ~= 1 %this means there was a crossover
         crossover_cpi(counter) = cpi(si);
-      %else
-      %  crossover_cpi(counter) = nan;
       end
       sigma_pairs(counter, :) = [sigmas(ii), sigmas(ij)];
       counter = counter + 1;
@@ -105,7 +101,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   % Generate legend labels
   C{numSigmas, 1} = {};
   for si=1:numSigmas
-     C{si} = sprintf('Sigma 1 = %d', sigmas(si)); 
+     C{si} = sprintf('\\sigma = %d', sigmas(si)); 
   end
   
   % Massage data for plotting
@@ -116,18 +112,17 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
     sp(si, :) = sigma_pairs(start:start+numSigmas-2, 2);
     cc(si, :) = crossover_cpi(start:start+numSigmas-2);
 
-    start = start + numSigmas -1;   
-    fprintf('start = %d', start);
+    start = start + numSigmas - 1;   
   end
 
   % Do the actual plotting
-  figure;
+  figure('Position', [ 116          -5        1079         688]);
   plot(sp', cc') %change to scatter if desired
-  
-  [hleg1, ~] = legend(C);
-  set(hleg1, 'fontsize', 15);
-  xlabel('Sigma 2');
-  ylabel('Crossover frequency (CPI)');
+  title(sprintf('Crossover for %d x %d image, %d connections.', p(1).sz, p(1).nConns), ...
+        'FontSize', 20); 
+  legend(C, 'Location', 'SouthWest', 'FontSize', 14);
+  xlabel('Sigma 2', 'FontSize', 16);
+  ylabel('Crossover frequency (CPI)', 'FontSize', 16);
 
 
 function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
