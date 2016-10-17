@@ -1,60 +1,56 @@
 function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargin)
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
-%  freqs = [ 0.0001 0.01 * [ 1.5 3 6 12 18 24 30 36] 0.5]; % using only harmonics
-  %freqs = [ 0.0001 0.01 * [ 2 4 6 8 10 12 14 16 18 20 25 30 35 50]]; %using non-harmonics
-  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1, 2, 4, 6, 8, 10]);%8 2 1/2 1/8 1/16 1/32];
+  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1 2:2:10]);%8 2 1/2 1/8 1/16 1/32];
   [cpi,    varargin] = guru_popopt(varargin, 'cpi',    6*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
-  args  = { 'seed', 1, ...
-            'w_mode', 'posmean', ...  % how to sample weights
-            'a_mode', 'mean', ...  % how to compute output stats.
-            'cpi',  cpi, ...
-            'sz', [34, 25], ...  % size of image (square)
-            'nConns', 25, ... % number of connections
-            'distn', 'norme2', ...
-            'nsamps', 5, ...  % 
-            'nbatches', 5 ...  % 
-            'img2pol', false, ...  % whether to stretch cartesian image via retinotopy
-            'disp', [11], ...  % plots to show
-            varargin{:} ...
-         };
+  args  = { 
+    'seed', 1, ...
+    'w_mode', 'posmean', ...  % how to sample weights
+    'a_mode', 'mean', ...  % how to compute output stats.
+    'cpi',  cpi, ...
+    'sz', [34, 25], ...  % size of image (square)
+    'nConns', 25, ... % number of connections
+    'distn', 'norme2', ...
+    'nsamps', 5, ...  % 
+    'nbatches', 5 ...  % 
+    'img2pol', false, ...  % whether to stretch cartesian image via retinotopy
+    'disp', [11], ...  % plots to show
+    varargin{:} ...
+  };
 
 
-  %% Run from scratch
-  for ni=1:length(sigmas)
+  %% Collect raw data
+  for si=1:length(sigmas)
+    fprintf('Processing sigma=%.2f...\n', sigmas(si));
 
-      [am,sm,ss,wm,pt,ft]=nn_2layer_processor(args{:}, 'Sigma', sigmas(ni)*[1 0;0 1]); % circular gaussian
+    [am,sm,ss,wm,pt,ft] = nn_2layer_processor( ...
+        args{:}, ...
+       'Sigma', sigmas(si)*[1 0;0 1] ... % circular gaussian
+    ); 
 
-      if (ni==1)
-          freqs = pt.freqs;
+    if (si==1)
+      % Initialize outputs
+      freqs = pt.freqs;
 
-          % run the thing and collect stats!
-          avg_mean = zeros(length(sigmas), length(freqs));
-          std_mean = zeros(length(sigmas), length(freqs));
-          std_std  = zeros(length(sigmas), length(freqs));
-          f        = zeros(length(sigmas),1);
-          wts_mean = zeros(length(sigmas), size(wm,1), size(wm,2));
+      avg_mean = zeros(length(sigmas), length(freqs));
+      std_mean = zeros(length(sigmas), length(freqs));
+      std_std  = zeros(length(sigmas), length(freqs));
+      f        = zeros(length(sigmas),1);
+      wts_mean = zeros(length(sigmas), size(wm,1), size(wm,2));
 
-          p=pt(1:0);
-      end;
+      p=pt(1:0);
+    end;
 
-      avg_mean(ni, :) = am;
-      std_mean(ni,:) = sm;
-      std_std(ni, :) = ss;
-      f(ni) = ft;
-      wts_mean(ni,:,:) = wm;
-      p(end+1)=pt;
+    avg_mean(si, :) = am;
+    std_mean(si,:) = sm;
+    std_std(si, :) = ss;
+    f(si) = ft;
+    wts_mean(si,:,:) = wm;
+    p(end+1)=pt;
   end;
   
-    lbls = cell(size(p));
-  for pi=1:length(p)
-      lbls{pi} = sprintf('d_{center}=%.1f%% (%.1fpx); d_{nn} = %.1f%% (%.1fpx)', ...
-                         100*p(pi).avg_dist/p(1).sz(1),      p(pi).avg_dist, ...
-                         100*mean(p(pi).neighbor_dist/p(1).sz(1)), mean(p(pi).neighbor_dist));
-  end;
-
-  %
+  %% Analyze raw data for crossover
   scaling = max(std_mean(:)); % Rescale over all sigmas, such that the scale of response isn't a factor
   numSigmas = size(std_mean, 1);
   crossover_cpi = zeros(numSigmas * (numSigmas-1), 1);
@@ -62,36 +58,32 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   counter = 1;
   for ii=1:numSigmas
   	for ij=1:numSigmas
-    if ij == ii
-        continue;
-    end
-  	ratios = std_mean(ii,:)./ std_mean(ij,:); % Check when ratio goes over 1
-        if (ratios(1) > 1)
-            i = 2;
-            while ratios(i) >= 1
-                i = i+1;
-                if i > length(ratios)
-                    i = 1;
-                    break;
-                end
-                
-            end
-        else
-            i = 2;
-            while ratios(i) <= 1
-                i = i+1;
-                if i > length(ratios)
-                    i = 1;
-                    break;
-                end
-            end
-        end
-        if i ~= 1 %this means there was a crossover 
-            crossover_cpi(counter) = cpi(i);
-        end
-        sigma_pairs(counter, :) = [sigmas(ii), sigmas(ij)];
-        counter = counter + 1;
+      if ij == ii, continue; end
 
+      ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
+      if (ratios(1) > 1)  % detect from high to low crossing
+        compareFn = @(idx) ratios(idx) >= 1;
+      else  % detect low to high crossing
+        compareFn = @(idx) ratios(idx) <= 1;
+      end;
+      
+      % Search for crossover point
+      si = 2;
+      while compareFn(si)
+        si = si+1;
+        if si > length(ratios)  % failure
+          si = 1;
+          break;
+        end                
+      end
+      
+      if si ~= 1 %this means there was a crossover
+        crossover_cpi(counter) = cpi(si);
+      %else
+      %  crossover_cpi(counter) = nan;
+      end
+      sigma_pairs(counter, :) = [sigmas(ii), sigmas(ij)];
+      counter = counter + 1;
     end
   end 
   
@@ -109,7 +101,18 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   
       start = start + numSigmas -1;       
   end
-            
+  % Generate plot labels
+  lbls = cell(size(p));
+  for pi=1:length(p)
+      lbls{pi} = sprintf( ...
+        'd_{center}=%.1f%% (%.1fpx); d_{nn} = %.1f%% (%.1fpx)', ...
+        100 * p(pi).avg_dist / p(1).sz(1), ...
+        p(pi).avg_dist, ...
+        100 * mean(p(pi).neighbor_dist / p(1).sz(1)), ...
+        mean(p(pi).neighbor_dist) ...
+      );
+  end;
+  
   C{numSigmas, 1} = {};
   for ii=1:numSigmas
      C{ii} = sprintf('Sigma 1 = %d', sigmas(ii)); 
@@ -134,7 +137,8 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 %   title('Non-normalized std (divided by global mean)');
 
   
-  function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
+  [hleg1, ~] = legend(C);
+function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
   
   [raw_avg, raw_std, ~, raw_wts, p] = nn_2layer(varargin{:});
 
