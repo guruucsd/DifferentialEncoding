@@ -87,20 +87,9 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
     end
   end 
   
-  figure; hold on;
-  start = 1;
   
-  for ii=1:numSigmas
-      sp = sigma_pairs(start:start+numSigmas-2, 2);
-      cc = crossover_cpi(start:start+numSigmas-2);
-      
-      sp( all(~cc,2), : ) = []; %get rid of the entries that didn't have crossover
-      cc( all(~cc,2), : ) = [];
-
-      plot(sp, cc) %change to scatter if desired
+  %% Plot data
   
-      start = start + numSigmas -1;       
-  end
   % Generate plot labels
   lbls = cell(size(p));
   for pi=1:length(p)
@@ -113,31 +102,34 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
       );
   end;
   
+  % Generate legend labels
   C{numSigmas, 1} = {};
-  for ii=1:numSigmas
-     C{ii} = sprintf('Sigma 1 = %d', sigmas(ii)); 
+  for si=1:numSigmas
+     C{si} = sprintf('Sigma 1 = %d', sigmas(si)); 
   end
   
-  [hleg1, hobj1] = legend(C)
-  set(hleg1, 'fontsize', 15);
-  xlabel('Sigma 2')
-  ylabel('Crossover frequency (CPI)')
+  % Massage data for plotting
+  start = 1;
+  sp = zeros(numSigmas, numSigmas-1);
+  cc = zeros(numSigmas, numSigmas-1);
+  for si=1:numSigmas
+    sp(si, :) = sigma_pairs(start:start+numSigmas-2, 2);
+    cc(si, :) = crossover_cpi(start:start+numSigmas-2);
 
-%   for si=1:length(sigmas)
-%     plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
-%   end;
-%   for si=1:length(sigmas)
-%     errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
-%   end;
-%   set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
-%   set(gca, 'FontSize', 16);
-%   xlabel('frequency (cycles per image)');
-%   ylabel('output activity (linear xfer fn)');
-%   legend(lbls, 'Location', 'best', 'FontSize',16);
-%   title('Non-normalized std (divided by global mean)');
+    start = start + numSigmas -1;   
+    fprintf('start = %d', start);
+  end
 
+  % Do the actual plotting
+  figure;
+  plot(sp', cc') %change to scatter if desired
   
   [hleg1, ~] = legend(C);
+  set(hleg1, 'fontsize', 15);
+  xlabel('Sigma 2');
+  ylabel('Crossover frequency (CPI)');
+
+
 function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
   
   [raw_avg, raw_std, ~, raw_wts, p] = nn_2layer(varargin{:});
