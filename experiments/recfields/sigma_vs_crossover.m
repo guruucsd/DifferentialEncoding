@@ -1,16 +1,19 @@
 function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargin)
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
-  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1:10]);%8 2 1/2 1/8 1/16 1/32];
-  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    6*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
+  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [2:2:10]);%8 2 1/2 1/8 1/16 1/32];
+  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    4*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
+  rand('seed', 1);
+  randn('seed', 1);
+   
   args  = { 
     'seed', 1, ...
     'w_mode', 'posmean', ...  % how to sample weights
     'a_mode', 'mean', ...  % how to compute output stats.
     'cpi',  cpi, ...
-    'sz', [34, 25], ...  % size of image (square)
-    'nConns', 25, ... % number of connections
+    'sz', [20, 20], ...  % size of image (square)
+    'nConns', 34, ... % number of connections
     'distn', 'norme2', ...
     'nsamps', 5, ...  % 
     'nbatches', 5 ...  % 
@@ -24,12 +27,14 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   for si=1:length(sigmas)
     fprintf('Processing sigma = %.2f...\n', sigmas(si));
 
-    [am,sm,ss,wm,pt,ft] = nn_2layer_processor( ...
+    [am,sm,ss,wm,pt] = nn_2layer_processor( ...
         args{:}, ...
        'Sigma', sigmas(si)*[1 0;0 1] ... % circular gaussian
     ); 
 
     if (si==1)
+      density = pt.nConns / prod(pt.sz)
+      
       % Initialize outputs
       freqs = pt.freqs;
 
@@ -45,7 +50,6 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
     avg_mean(si, :) = am;
     std_mean(si,:) = sm;
     std_std(si, :) = ss;
-    f(si) = ft;
     wts_mean(si,:,:) = wm;
     p(end+1)=pt;
   end;
@@ -53,11 +57,13 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   
   %% Analyze raw data for crossover
   numSigmas = size(std_mean, 1);
-  crossover_cpi = nan(numSigmas * (numSigmas-1), 1);
-  sigma_pairs = nan(numSigmas * (numSigmas-1), 2);
+  crossover_cpi = nan(numSigmas * numSigmas, 1);
+  sigma_pairs = nan(numSigmas * numSigmas, 2);
   counter = 1;
   for ii=1:numSigmas
-  	for ij=(ii + 1):numSigmas
+  	for ij=1:numSigmas
+      %if ij >= ii, continue; end
+
       ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
       if (ratios(1) > 1)  % detect from high to low crossing
         compareFn = @(idx) ratios(idx) >= 1;
@@ -85,19 +91,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   
   
   %% Plot data
-  
-  % Generate plot labels
-  lbls = cell(size(p));
-  for pi=1:length(p)
-      lbls{pi} = sprintf( ...
-        'd_{center}=%.1f%% (%.1fpx); d_{nn} = %.1f%% (%.1fpx)', ...
-        100 * p(pi).avg_dist / p(1).sz(1), ...
-        p(pi).avg_dist, ...
-        100 * mean(p(pi).neighbor_dist / p(1).sz(1)), ...
-        mean(p(pi).neighbor_dist) ...
-      );
-  end;
-  
+    
   % Generate legend labels
   C{numSigmas, 1} = {};
   for si=1:numSigmas
@@ -105,27 +99,21 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   end
   
   % Massage data for plotting
-  start = 1;
-  sp = zeros(numSigmas, numSigmas-1);
-  cc = zeros(numSigmas, numSigmas-1);
-  for si=1:numSigmas
-    sp(si, :) = sigma_pairs(start:start+numSigmas-2, 2);
-    cc(si, :) = crossover_cpi(start:start+numSigmas-2);
-
-    start = start + numSigmas - 1;   
-  end
-
+  cc = reshape(crossover_cpi, [numSigmas numSigmas]);
+  sp = repmat(sigmas, [numSigmas 1]);
+  cc(tril(ones(size(cc))) ~= 0) = nan;  % blank out starting lines
+  
   % Do the actual plotting
   figure('Position', [ 116          -5        1079         688]);
-  plot(sp', cc') %change to scatter if desired
-  title(sprintf('Crossover for %d x %d image, %d connections.', p(1).sz, p(1).nConns), ...
+  plot(sp', cc', 'o-', 'MarkerSize', 5, 'LineWidth', 5) %change to scatter if desired
+  title(sprintf('Crossover for %d x %d image, %d connections, cpi(0)=%.2f.', ...
+                p(1).sz, p(1).nConns, p(1).cpi(1)), ...
         'FontSize', 20); 
   legend(C, 'Location', 'SouthWest', 'FontSize', 14);
   xlabel('Sigma 2', 'FontSize', 16);
   ylabel('Crossover frequency (CPI)', 'FontSize', 16);
 
-
-function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(varargin)
+function [avg_mean, std_mean, std_std, wts_mean, p] = nn_2layer_processor(varargin)
   
   [raw_avg, raw_std, ~, raw_wts, p] = nn_2layer(varargin{:});
 
@@ -133,26 +121,3 @@ function [avg_mean, std_mean, std_std, wts_mean, p, f] = nn_2layer_processor(var
   std_mean = mean(raw_std,1);  % mean of standard deviations
   std_std  = std(raw_std,[],1)/sqrt(size(raw_std,1));
   wts_mean = squeeze(mean(raw_wts,1));
-
-  % Calculate average distance
-  dist_fn = zeros(size(wts_mean));
-  for x=1:size(dist_fn,2), for y=1:size(dist_fn,1), dist_fn(y,x) = sqrt((x-(size(dist_fn,2)+1)/2).^2 + (y-(size(dist_fn,1)+1)/2).^2); end; end;
-  p.avg_dist = dist_fn(:)' * (wts_mean(:)/sum(wts_mean(:)));
-
-  % Calculate nearest-neighbor distance
-  p.neighbor_dist = zeros(size(raw_wts,1), 1);
-  for mi=1:size(raw_wts,1)
-    p.neighbor_dist(mi) = calc_neighbor_dist(squeeze(raw_wts(mi,:,:))~=0);
-  end;
-
-
-  if ismember(13, p.disp)
-      f = figure; imagesc(wts_mean); colorbar;
-      title(sprintf('\\sigma=%.2fpx; d_{cent}=%.2fpx; d_{nn}=%.2f', p.Sigma(1), p.avg_dist, mean(p.neighbor_dist)), 'FontSize', 16);
-  else
-      f = NaN;
-  end;
-
-
-
-
