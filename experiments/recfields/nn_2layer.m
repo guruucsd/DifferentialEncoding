@@ -7,11 +7,11 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
     p = struct( 'seed', rand(1), ...
                 'sz', [20 20], ... %image size
                 'img2pol', false, ...
-                'nbatches', 20, ... %
-                'nsamps', 5, ...
-                'a_mode', 'mean', ... % activation mode
+                'nBatches', 20, ... %
+                'nSamps', 5, ...
+                'aMode', 'mean', ... % activation mode
                 'c_mode', 'pdf',     ... % connectivity mode
-                'w_mode', 'posmean', ... % weight mode
+                'wMode', 'posmean', ... % weight mode
                 'distn', 'norme2', ...
                 'thresh', 0.001, ...
                 'dfromcent', 3, ...
@@ -40,14 +40,14 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
     X = [X1(:) X2(:)];
 
     % Initialize variables
-    bestofall= zeros(p.nbatches*p.nsamps,1);
-    avg_resp = zeros(p.nbatches*p.nsamps, length(p.freqs));
-    std_resp = zeros(p.nbatches*p.nsamps, length(p.freqs));
+    bestofall= zeros(p.nBatches*p.nSamps,1);
+    avg_resp = zeros(p.nBatches*p.nSamps, length(p.freqs));
+    std_resp = zeros(p.nBatches*p.nSamps, length(p.freqs));
     resps = zeros(length(p.freqs),p.norients,p.nphases);
-    wts   = zeros([p.nbatches*p.nsamps, p.sz]);
-    for jj = 1:p.nbatches
-        for ii=1:p.nsamps
-            sampnum = (jj-1)*p.nsamps+ii;
+    wts   = zeros([p.nBatches*p.nSamps, p.sz]);
+    for jj = 1:p.nBatches
+        for ii=1:p.nSamps
+            sampnum = (jj-1)*p.nSamps+ii;
 
             % Determine weights
             [~, Wts] = de_connector(struct( 'nInput',  p.sz, ...
@@ -60,7 +60,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                                           'ac', struct('debug', 0, 'tol', 1-p.nConns/prod(p.sz), 'useBias', 0, 'WeightInitScale', 0.01, 'WeightInitType', 'randn') ...
                                          ));
             w = reshape(Wts(2+prod(p.sz),1:prod(p.sz)), p.sz);
-            switch (p.w_mode)
+            switch (p.wMode)
                 case {'fixed'},    w = double(w ~= 0); %set to 1
                 case {'posmean'},  w = abs(w);
                 case {'negmean'},  w = -abs(w);
@@ -74,7 +74,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                   w_pdf2 = reshape( mvnpdf(X, p.mu, 1.25*p.Sigma), p.sz);
                   w = (w ~= 0) .* (w_pdf1-1.05*w_pdf2);
                   %imagesc(w_pdf1-0.5*w_pdf2); colorbar;
-                otherwise, error('unknown weight mode: %s', p.w_mode);
+                otherwise, error('unknown weight mode: %s', p.wMode);
             end;
             %w = w / max(abs(sum(w(:))), 1); %p.nConns; %sum(abs(w(:))); %implicitly dividing by p_in
             wts(sampnum, :,:) = w;
@@ -124,7 +124,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
             resps_by_freq = reshape(resps, [length(p.freqs) p.norients*p.nphases]);
             resps_by_freq_norm = resps_by_freq;%/mean(resps_by_freq(:));
 
-            switch p.a_mode
+            switch p.aMode
                 case 'max'
                     [~,bestofall(sampnum)] = max(best_vals);
 
@@ -181,7 +181,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                     rng  = max(alld') - min(alld');
                     [~,bestofall(sampnum)] = max(rng);
 
-                otherwise, error('%s nyi', p.a_mode);
+                otherwise, error('%s nyi', p.aMode);
             end;
         end;
     end;

@@ -2,14 +2,14 @@ function sigma = de_GetSigmasFromSpacing(spacing)
 %
 %
 %
-    nsigmas = 2;
+    nSigmas = 2;
     mean_spacing = spacing.mean;
     maxdiffpct = spacing.maxdiffpct;
 
     % Compute the spacings desired
     min_spacing = mean_spacing*(1-maxdiffpct/2);
     max_spacing = mean_spacing*(1+maxdiffpct/2);
-    spacings = linspace(min_spacing, max_spacing, nsigmas);
+    spacings = linspace(min_spacing, max_spacing, nSigmas);
 
     % Empirically, average spacing comparison of sigma(2) vs. sigma(1) is sqrt(sigma(2)/sigma(1))
     % for 2D sigma
