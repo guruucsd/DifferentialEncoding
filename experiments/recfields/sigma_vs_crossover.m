@@ -1,20 +1,28 @@
 function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargin)
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
-  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [2:2:10]);%8 2 1/2 1/8 1/16 1/32];
-  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    4*[0.5:0.1:2]);%8 2 1/2 1/8 1/16 1/32];
 
-  rand('seed', 1);
-  randn('seed', 1);
-   
-  args  = { 
-    'seed', 1, ...
+  old_sz = [20 20];
+  [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1 2:2:12]);%8 2 1/2 1/8 1/16 1/32];
+  [new_sz, varargin] = guru_popopt(varargin, 'sz',    [20, 20]);
+
+  cpi_coeff = 3 * sqrt(prod(new_sz) / prod(old_sz));
+  [nConns, varargin] = guru_popopt(varargin, 'nConns', round(34 * prod(new_sz) / prod(old_sz)));
+  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    cpi_coeff*[0.5:0.1:2]);
+  [seed,   varargin] = guru_popopt(varargin, 'seed',   1);
+
+  % Reproducible science :)
+  rand('seed', seed);
+  randn('seed', seed);
+
+  args  = {
+    'seed', seed, ...
     'wMode', 'posmean', ...  % how to sample weights
     'aMode', 'mean', ...  % how to compute output stats.
     'cpi',  cpi, ...
-    'sz', [20, 20], ...  % size of image (square)
-    'nConns', 34, ... % number of connections
-    'distn', 'norme2', ...
+    'sz', new_sz, ...  % size of image (square)
+    'nConns', nConns, ... % number of connections
+    'distn', 'normem2', ...
     'nSamps', 5, ...  %
     'nBatches', 5 ...  %
     'img2pol', false, ...  % whether to stretch cartesian image via retinotopy
@@ -59,7 +67,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   sigma_pairs = nan(numSigmas * numSigmas, 2);
   counter = 1;
   for ii=1:numSigmas
-  	for ij=1:numSigmas
+    for ij=1:numSigmas
       %if ij >= ii, continue; end
 
       ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
@@ -102,7 +110,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   cc(tril(ones(size(cc))) ~= 0) = nan;  % blank out starting lines
 
   % Do the actual plotting
-  figure('Position', [ 116          -5        1079         688]);
+  figure('Position', [ 0 0 1024 768]);
   plot(sp', cc', 'o-', 'MarkerSize', 5, 'LineWidth', 5) %change to scatter if desired
   title(sprintf('Crossover for %d x %d image, %d connections, cpi(0)=%.2f.', ...
                 p(1).sz, p(1).nConns, p(1).cpi(1)), ...
@@ -110,6 +118,43 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   legend(C, 'Location', 'SouthWest', 'FontSize', 14);
   xlabel('Sigma 2', 'FontSize', 16);
   ylabel('Crossover frequency (CPI)', 'FontSize', 16);
+
+  if ismember(11, pt.disp)
+      scaling = max(std_mean(:)); % Rescale over all sigmas, such that the scale of response isn't a factor
+      max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
+      %max_std = avg_mean;
+      ns_mean = std_mean./max_std;
+      ns_std  = std_std./sqrt(max_std);
+
+      lbls = cell(size(p));
+      for pi=1:length(p)
+          lbls{pi} = sprintf('sigma = %.2f', p(pi).Sigma(1));
+      end;
+
+      % Plots the mean (across all units) of the standard deviation of each
+      % units' response to different frequency gratings (frequency, phase,
+      % orientation)
+
+      colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
+
+      figure('position', [0, 0, 768, 768]);
+      hold on;
+      %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
+      %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+      for si=1:length(sigmas)
+        plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
+      end;
+      for si=1:length(sigmas)
+        errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+      end;
+      set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
+      set(gca, 'FontSize', 16);
+      xlabel('frequency (cycles per image)');
+      ylabel('output activity (linear xfer fn)');
+      legend(lbls, 'Location', 'best', 'FontSize',16);
+      title('Non-normalized std (divided by global mean)');
+
+  end;
 
 function [avg_mean, std_mean, std_std, wts_mean, p] = nn_2layer_processor(varargin)
 
