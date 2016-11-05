@@ -14,6 +14,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'wMode', 'posmean', ... % weight mode
                 'distn', 'norme2', ...
                 'thresh', 0.001, ...
+                'normInput', true, ...  % whether to normalize inputs
                 'dfromcent', 3, ...
                 'disp',false,...
                 'nConns', 177, .... %round(177*.0);%round( prod(sz) * (0/100) ); %177 max
@@ -23,14 +24,25 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'cpi', [0.5 1 2 4 8 16 32] ...% freqs', 0.01 * [ 1.5 3 6 12 18 24 30 36 42 48 54] ...    %freqs = 0.015 * [ 6 9 12 15];
               );
     p = guru_stampProps(p, varargin{:});
-
-    if isfield(p, 'freqs'), error('freqs should not be set. please set cpi!'); end;
-    p.freqs = p.cpi./max(p.sz); %cycles
+    guru_assert( ...
+        ~isfield(p, 'freqs'), ...
+        'freqs should not be set. please set cpi!' ...
+    );
 
     % Set param values that are dependent on other param values
     if (~isfield(p, 'mu')),     p.mu     = p.sz/2; end;
     if (~isfield(p, 'Sigma')),  p.Sigma  = [2*p.sz(1) 0; 0 0.5*p.sz(2)]; end;
     if (~isfield(p, 'lambda')), p.lambda = prod(p.sz)/p.nConns; end;
+
+    % Create dataset from parameters
+    % Force re-creation, plot results
+    args = { ...
+        'nInput', p.sz, 'cycles', p.cpi, ...
+        'nthetas', p.norients, 'nphases', p.nphases ...
+    };
+    if p.img2pol, args{end+1} = 'img2pol'; end;
+    [~, dset] = de_MakeDataset('gratings', 'all', '', args, false, false);
+    p.freqs = dset.freqs;
 
     rand('seed', p.seed);
     randn('seed', p.seed);
@@ -46,10 +58,11 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
     resps = zeros(length(p.freqs),p.norients,p.nphases);
     wts   = zeros([p.nBatches*p.nSamps, p.sz]);
     for jj = 1:p.nBatches
+        fprintf('\tBatch %d of %d\n', jj, p.nBatches);
         for ii=1:p.nSamps
             sampnum = (jj-1)*p.nSamps+ii;
 
-            % Determine weights
+            %% Determine weights
             [~, Wts] = de_connector(struct( 'nInput',  p.sz, ...
                                           'nHidden', 1, ...
                                           'hpl',     1,...
@@ -84,32 +97,40 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
             best_params = zeros(length(p.freqs), 3);
             best_x = zeros(length(p.freqs), prod(p.sz));
 
+            % Dataset created looping freq/orient/phs,
+            % so we need to match.
+            ci = 1;
             for fi=1:length(p.freqs)
-                ci = 1;
-
                 % Find the best fit orientation and phase
                 for oi = 1:p.norients
-                    orient = 2*pi*oi/p.norients; % oi starts at 1, so essentially [0 to pi)
+                    orient = pi*(oi-1) / p.norients; % oi starts at 1, so essentially [pi/norients to pi)
                     for phsi=1:p.nphases
-                        phase = 2*pi*phsi/p.nphases; %pi starts at 1, so essentially [0 to 2pi)
+                        phase = 2*pi*(phsi-1)/p.nphases; %pi starts at 1, so essentially [2pi/norients to 2pi)
 
-                        x = 0.5+mfe_grating2d( p.freqs(fi), phase, orient, 0.5, p.sz(1), p.sz(2));
-                        if p.img2pol, x = mfe_img2pol(x); end;
-                        if ismember(1, p.disp) && oi==1 && phsi==1 && jj==1 && ii==1
-                            if fi==1, f=figure; [nrows,ncols] = guru_optSubplots(length(p.freqs));
-                            else, figure(f); end;
-                            subplot(nrows,ncols,fi);
-                            imshow(x); xlabel(sprintf('frq=%.4f',p.freqs(fi)));
+                        lbl = sprintf( ...
+                            'f=%f\nt=%f\np=%f', ...
+                             p.freqs(fi), orient, phase ...
+                        );
+                        if ~strcmp(lbl, dset.XLAB{ci})
+                            fprintf('%s\nvs\n%s\n', lbl, dset.XLAB{ci});
+                            keyboard;
                         end;
 
+                        x = reshape(dset.X(:, ci), p.sz);
+
                         % Calculate output node response
-                        resp = x(:)/sum(x(:));
+                        if p.normInput
+                            resp = x(:)/max(1.0, sum(x(:)));
+                        else
+                            resp = x(:);
+                        end;
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));
                         end;
                         resps(fi,oi,phsi) = sum(resp);
 
-                        if (best_vals(fi)<resps(fi,oi,phsi))
+                        % Strongest response (+ or -)
+                        if (abs(best_vals(fi))<abs(resps(fi,oi,phsi)))
                             best_vals(fi)     = resps(fi,oi,phsi);
                             best_params(fi,:) = [p.freqs(fi) orient phase];
                             best_x(fi,:)      = x(:);
