@@ -4,8 +4,8 @@ clear all; %close all;
 addpath(genpath('../../code'))
 
 sz = [20 20];
-nbatches = 10;
-nsamps = 5;
+nBatches = 10;
+nSamps = 5;
 mode = 'max';
 %thresh
 nout = round( prod(sz) * (0/100) );
@@ -26,8 +26,8 @@ bestofall=[];
 resps = zeros(length(freqs),norients,nphases);
 
 
-for jj = 1:nbatches
-    for ii=1:nsamps
+for jj = 1:nBatches
+    for ii=1:nSamps
         w = reshape( mvnpdf(X, mu, Sigma), sz);
         %w = (w>0.002);
 

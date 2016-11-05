@@ -1,18 +1,18 @@
-function new_models = de_ContinueModels(models, expt, stimSet, taskType, opt)
+function newModels = de_ContinueModels(models, expt, stimSet, taskType, opt)
 % Preliminary code for training models that were created via developmental pruning.
 
     mSets = models(1);
 
     % Do what's necessary to make the models re-trainable.
     for ii=1:numel(models)
-        new_models(ii) = de_LoadProps(models(ii), 'ac', 'Weights');
-        new_models(ii).ac.Conn = sparse(new_models(ii).ac.Weights ~= 0);
+        newModels(ii) = de_LoadProps(models(ii), 'ac', 'Weights');
+        newModels(ii).ac.Conn = sparse(newModels(ii).ac.Weights ~= 0);
 
-        new_models(ii).ac.continue = true;
-        new_models(ii).p.continue  = false;
+        newModels(ii).ac.continue = true;
+        newModels(ii).p.continue  = false;
 
-        new_models(ii).ac.cached = false;
-        new_models(ii).p.cached  = false;
+        newModels(ii).ac.cached = false;
+        newModels(ii).p.cached  = false;
     end;
 
     % Now, run!
@@ -33,23 +33,23 @@ function new_models = de_ContinueModels(models, expt, stimSet, taskType, opt)
     dataFile = de_MakeDataset(expt, stimSet, taskType, opt);
 
     % Initialize model settings.
-    [new_models.expt] = deal(repmat(expt, [numel(new_models) 1]));
+    [newModels.expt] = deal(repmat(expt, [numel(newModels) 1]));
 
     %%%%%%%%%%%%%%%%%
     % Training
     %%%%%%%%%%%%%%%%%
 
     % Train autoencoders
-    parfor zz=1:numel(new_models)
+    parfor zz=1:numel(newModels)
         % Generate randState for ac
-        rand ('state',new_models(zz).ac.randState);
+        rand ('state',newModels(zz).ac.randState);
 
         fprintf('[%3d]',zz);
-        new_models(zz) = de_Trainer(new_models(zz));
+        newModels(zz) = de_Trainer(newModels(zz));
     end;
 
     % Train classifiers
-    [new_models]      = de_TrainAllP          (new_models);
+    [newModels]      = de_TrainAllP          (newModels);
 
     %%%%%%%%%%%%%%%%%
     % Analysis
@@ -61,9 +61,9 @@ function new_models = de_ContinueModels(models, expt, stimSet, taskType, opt)
     end;
 
     % Analyze the results
-    [stats, figs] = de_Analyzer(mSets, new_models);
+    [stats, figs] = de_Analyzer(mSets, newModels);
 
     % Save these off
-    [s,mSets]     = de_SaveAll(mSets, new_models, stats, figs);
+    [s,mSets]     = de_SaveAll(mSets, newModels, stats, figs);
 
     toc

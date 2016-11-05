@@ -5,24 +5,24 @@ nn_map = [];
 
 sigmas = [1:20];
 nconns = [5:5:50];
-nsamps = 10000;
+nSamps = 10000;
 
 for si=1:length(sigmas)
     sigma = sigmas(si);
-    
+
     for ni=1:length(nconns)
         nconn = nconns(ni);
         fprintf('Computing average distances for sigma=%.2f, nconns=%d\n', sigma, nconn);
 
         fc_avg = [];
         nn_avg = [];
-        for ii=1:round(nsamps/nconn)
+        for ii=1:round(nSamps/nconn)
             pts = mvnrnd([0 0], sigma*[1.5 0; 0 1/1.5], nconn);
             [fc, nn] = de_stats_ipd([], pts);
             fc_avg(ii) = mean(fc);
             nn_avg(ii) = mean(min(nn));
         end;
-        
+
         fc_map(si, ni) = mean(fc_avg);
         nn_map(si, ni) = mean(nn_avg);
     end;

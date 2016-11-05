@@ -51,20 +51,20 @@ function [models] = de_TrainAllAC(mSets)
 
             for ii=1:nhemis
 
-                new_model           = de_CopyModelSettings(model, ii);
-                new_model.hemi      = ii;
+                newModel           = de_CopyModelSettings(model, ii);
+                newModel.hemi      = ii;
 
                 % Generate randState for ac
-                new_model.ac.randState = randState;
-                if isfield(model.ac, 'ct'), new_model.ac.ct.ac.randState = randState; end;
-                rand ('state',new_model.ac.randState);
+                newModel.ac.randState = randState;
+                if isfield(model.ac, 'ct'), newModel.ac.ct.ac.randState = randState; end;
+                rand ('state',newModel.ac.randState);
 
                 fprintf('[%3d]',zz);
-                new_model = de_Trainer(new_model);
-                if (~new_model.ac.cached), fprintf('\n'); end;
+                newModel = de_Trainer(newModel);
+                if (~newModel.ac.cached), fprintf('\n'); end;
 
                 % Save
-                models{zz,ii} = new_model;
+                models{zz,ii} = newModel;
             end;  %zz
         end;
     catch
