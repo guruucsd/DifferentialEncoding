@@ -21,7 +21,7 @@ for ai = 1:length(argsBySize)
         'nSamps', 10, ...
         'nBatches', 5, ...
         'seed', ai ...  % different seed per size
-        'normInput', true ...  % doesn't much matter, esp. at larger image sizes
+        'normInput', false ...  % doesn't much matter, esp. at larger image sizes
     };
 
     fprintf('Processing spatial frequency preferences for sz = [%d, %d]\n', sz);

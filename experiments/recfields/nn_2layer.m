@@ -116,11 +116,11 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                             keyboard;
                         end;
 
-                        x = 0.5 + 0.5 * reshape(dset.X(:, ci), p.sz);
+                        x = reshape(dset.X(:, ci), p.sz);
 
                         % Calculate output node response
                         if p.normInput
-                            resp = x(:)/sum(x(:));
+                            resp = x(:)/max(1.0, sum(x(:)));
                         else
                             resp = x(:);
                         end;
