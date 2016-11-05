@@ -6,9 +6,8 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   [sigmas, varargin] = guru_popopt(varargin, 'Sigmas', [1 2:2:12]);%8 2 1/2 1/8 1/16 1/32];
   [new_sz, varargin] = guru_popopt(varargin, 'sz',    [20, 20]);
 
-  cpi_coeff = 3 * sqrt(prod(new_sz) / prod(old_sz));
-  [nConns, varargin] = guru_popopt(varargin, 'nConns', round(34 * prod(new_sz) / prod(old_sz)));
-  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    cpi_coeff*[0.5:0.1:2]);
+  [nConns, varargin] = guru_popopt(varargin, 'nConns', round(36 * prod(new_sz) / prod(old_sz)));
+  [cpi,    varargin] = guru_popopt(varargin, 'cpi',    [0:0.25:6]);
   [seed,   varargin] = guru_popopt(varargin, 'seed',   1);
 
   % Reproducible science :)
