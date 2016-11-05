@@ -34,6 +34,16 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
     if (~isfield(p, 'Sigma')),  p.Sigma  = [2*p.sz(1) 0; 0 0.5*p.sz(2)]; end;
     if (~isfield(p, 'lambda')), p.lambda = prod(p.sz)/p.nConns; end;
 
+    % Create dataset from parameters
+    % Force re-creation, plot results
+    args = { ...
+        'nInput', p.sz, 'cycles', p.cpi, ...
+        'nthetas', p.norients, 'nphases', p.nphases ...
+    };
+    if p.img2pol, args{end+1} = 'img2pol'; end;
+    [~, dset] = de_MakeDataset('gratings', 'all', '', args, false, false);
+    p.freqs = dset.freqs;
+
     rand('seed', p.seed);
     randn('seed', p.seed);
 
@@ -86,23 +96,26 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
             best_params = zeros(length(p.freqs), 3);
             best_x = zeros(length(p.freqs), prod(p.sz));
 
+            % Dataset created looping freq/orient/phs,
+            % so we need to match.
+            ci = 1;
             for fi=1:length(p.freqs)
-                ci = 1;
-
                 % Find the best fit orientation and phase
                 for oi = 1:p.norients
-                    orient = 2*pi*oi/p.norients; % oi starts at 1, so essentially [0 to pi)
+                    orient = pi*(oi-1) / p.norients; % oi starts at 1, so essentially [pi/norients to pi)
                     for phsi=1:p.nphases
-                        phase = 2*pi*phsi/p.nphases; %pi starts at 1, so essentially [0 to 2pi)
+                        phase = 2*pi*(phsi-1)/p.nphases; %pi starts at 1, so essentially [2pi/norients to 2pi)
 
-                        x = 0.5+mfe_grating2d( p.freqs(fi), phase, orient, 0.5, p.sz(1), p.sz(2));
-                        if p.img2pol, x = mfe_img2pol(x); end;
-                        if ismember(1, p.disp) && oi==1 && phsi==1 && jj==1 && ii==1
-                            if fi==1, f=figure; [nrows,ncols] = guru_optSubplots(length(p.freqs));
-                            else, figure(f); end;
-                            subplot(nrows,ncols,fi);
-                            imshow(x); xlabel(sprintf('frq=%.4f',p.freqs(fi)));
+                        lbl = sprintf( ...
+                            'f=%f\nt=%f\np=%f', ...
+                             p.freqs(fi), orient, phase ...
+                        );
+                        if ~strcmp(lbl, dset.XLAB{ci})
+                            fprintf('%s\nvs\n%s\n', lbl, dset.XLAB{ci});
+                            keyboard;
                         end;
+
+                        x = 0.5 + 0.5 * reshape(dset.X(:, ci), p.sz);
 
                         % Calculate output node response
                         if p.normInput
