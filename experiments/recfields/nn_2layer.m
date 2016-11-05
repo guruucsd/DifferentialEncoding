@@ -129,7 +129,8 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                         end;
                         resps(fi,oi,phsi) = sum(resp);
 
-                        if (best_vals(fi)<resps(fi,oi,phsi))
+                        % Strongest response (+ or -)
+                        if (abs(best_vals(fi))<abs(resps(fi,oi,phsi)))
                             best_vals(fi)     = resps(fi,oi,phsi);
                             best_params(fi,:) = [p.freqs(fi) orient phase];
                             best_x(fi,:)      = x(:);

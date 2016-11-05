@@ -119,7 +119,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   ylabel('Crossover frequency (CPI)', 'FontSize', 16);
 
   if ismember(11, pt.disp)
-      scaling = max(std_mean(:)); % Rescale over all sigmas, such that the scale of response isn't a factor
+      scaling = max(abs(std_mean(:))); % Rescale over all sigmas, such that the scale of response isn't a factor
       max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
       %max_std = avg_mean;
       ns_mean = std_mean./max_std;
@@ -141,10 +141,10 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
       %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
       %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
       for si=1:length(sigmas)
-        plot(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
+        plot(cpi, std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
       end;
       for si=1:length(sigmas)
-        errorbar(cpi, sign(avg_mean(si,:)).*std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+        errorbar(cpi, std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
       end;
       set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
       set(gca, 'FontSize', 16);
