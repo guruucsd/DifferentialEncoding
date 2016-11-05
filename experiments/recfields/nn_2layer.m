@@ -24,9 +24,10 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'cpi', [0.5 1 2 4 8 16 32] ...% freqs', 0.01 * [ 1.5 3 6 12 18 24 30 36 42 48 54] ...    %freqs = 0.015 * [ 6 9 12 15];
               );
     p = guru_stampProps(p, varargin{:});
-
-    if isfield(p, 'freqs'), error('freqs should not be set. please set cpi!'); end;
-    p.freqs = p.cpi./max(p.sz); %cycles
+    guru_assert( ...
+        ~isfield(p, 'freqs'), ...
+        'freqs should not be set. please set cpi!' ...
+    );
 
     % Set param values that are dependent on other param values
     if (~isfield(p, 'mu')),     p.mu     = p.sz/2; end;
