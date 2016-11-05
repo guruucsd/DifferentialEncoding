@@ -77,7 +77,7 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
         for ti=1:length(thetas)
             for phsi=1:length(phases)
                 X(:,ii)  = reshape( mfe_grating2d(freqs(fi), phases(phsi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
-                XLAB{ii} = sprintf('f=%f\np=%f\nt=%f', freqs(fi), phases(phsi), thetas(ti));
+                XLAB{ii} = sprintf('f=%f\nt=%f\np=%f', freqs(fi), thetas(ti), phases(phsi));
                 ii = ii+1;
             end;
         end;
