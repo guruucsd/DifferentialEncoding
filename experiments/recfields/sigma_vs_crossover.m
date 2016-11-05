@@ -62,35 +62,39 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 
   %% Analyze raw data for crossover
   numSigmas = size(std_mean, 1);
-  crossover_cpi = nan(numSigmas * numSigmas, 1);
-  sigma_pairs = nan(numSigmas * numSigmas, 2);
-  counter = 1;
+  crossover_cpi = nan(numSigmas, numSigmas);
+  sigma_pairs = nan(numSigmas, numSigmas, 2);
   for ii=1:numSigmas
-    for ij=1:numSigmas
-      %if ij >= ii, continue; end
-
+    for ij=(ii+1):numSigmas
+      % which direction should we be searching for cross-overs?
       ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
-      if (ratios(1) > 1)  % detect from high to low crossing
-        compareFn = @(idx) ratios(idx) >= 1;
-      else  % detect low to high crossing
-        compareFn = @(idx) ratios(idx) <= 1;
+
+      % -1 means 1.0+ => 0.9-
+      % add 1, as diff has n-1 elements
+      xoverPts = 1 + find(diff(ratios > 1) == -1);
+
+      % Do nothing for zero.
+      if length(xoverPts) == 1
+        si = xoverPts;
+      elseif length(xoverPts) > 1
+        % multiple points, keep the one closest to the middle
+        % of the range of frequencies. TOTALLY AD-HOC
+        xoverPts
+        [~, minIdx] = min(abs(xoverPts - length(ratios) / 2));
+        si = xoverPts(minIdx);
+      else
+        continue;
+        % No points. Look for a trend.
+        % [~, si] = min(ratios(2:end));  % si represents AFTER the crossing.
       end;
 
-      % Search for crossover point
-      si = 2;
-      while compareFn(si)
-        si = si+1;
-        if si > length(ratios)  % failure
-          si = 1;
-          break;
-        end
-      end
+      % Now we have the crossover point (between si-1 and si);
+      % do linear interpolation to estimate the crossover.
+      pctOfUnitMoved = (ratios(si-1) - 1) / -diff(ratios(si-1:si));
+      cpiMoved = diff(cpi(si-1:si)) * pctOfUnitMoved;
+      crossover_cpi(ii, ij) = cpi(si-1) + cpiMoved;
 
-      if si ~= 1 %this means there was a crossover
-        crossover_cpi(counter) = cpi(si);
-      end
-      sigma_pairs(counter, :) = [sigmas(ii), sigmas(ij)];
-      counter = counter + 1;
+      sigma_pairs(ii, ij, :) = [sigmas(ii), sigmas(ij)];
     end
   end
 
@@ -104,9 +108,8 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
   end
 
   % Massage data for plotting
-  cc = reshape(crossover_cpi, [numSigmas numSigmas]);
+  cc = crossover_cpi'
   sp = repmat(sigmas, [numSigmas 1]);
-  cc(tril(ones(size(cc))) ~= 0) = nan;  % blank out starting lines
 
   % Do the actual plotting
   figure('Position', [ 0 0 1024 768]);
