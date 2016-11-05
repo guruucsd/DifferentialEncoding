@@ -58,10 +58,11 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
     resps = zeros(length(p.freqs),p.norients,p.nphases);
     wts   = zeros([p.nBatches*p.nSamps, p.sz]);
     for jj = 1:p.nBatches
+        fprintf('\tBatch %d of %d\n', jj, p.nBatches);
         for ii=1:p.nSamps
             sampnum = (jj-1)*p.nSamps+ii;
 
-            % Determine weights
+            %% Determine weights
             [~, Wts] = de_connector(struct( 'nInput',  p.sz, ...
                                           'nHidden', 1, ...
                                           'hpl',     1,...

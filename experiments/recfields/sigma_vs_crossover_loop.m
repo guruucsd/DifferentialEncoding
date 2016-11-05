@@ -25,9 +25,6 @@ for sz=sizes
         'normInput', true ...  % doesn't much matter, esp. at larger image sizes
     };
 
-    rawFile = sprintf('data-%dx%d.mat', sz);
-    if exist(rawFile, 'file'), continue; end;
-
     fprintf('Processing spatial frequency preferences for sz = [%d, %d]\n', sz);
     [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover( ...
         'disp', [11], ...

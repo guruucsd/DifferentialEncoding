@@ -36,7 +36,7 @@ function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet,
 
     % If the file doesn't exist, then we have to create it!
     if ~exist(dataFile, 'file') || force
-        fprintf('Recreating dataset (force=%d).\n', force);
+        fprintf('Creating dataset (force=%d).\n', force);
         % Get the base stimuli; not every function emits an aux, and some are
         %   forceful about what dataFile they use (probably legacy code)
         switch nargout('de_StimCreate')
