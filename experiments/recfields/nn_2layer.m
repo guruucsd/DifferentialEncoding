@@ -14,6 +14,7 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                 'wMode', 'posmean', ... % weight mode
                 'distn', 'norme2', ...
                 'thresh', 0.001, ...
+                'normInput', true, ...  % whether to normalize inputs
                 'dfromcent', 3, ...
                 'disp',false,...
                 'nConns', 177, .... %round(177*.0);%round( prod(sz) * (0/100) ); %177 max
@@ -103,7 +104,11 @@ function [avg_resp, std_resp, bestofall, wts, p] = nn_2layer(varargin)
                         end;
 
                         % Calculate output node response
-                        resp = x(:)/sum(x(:));
+                        if p.normInput
+                            resp = x(:)/sum(x(:));
+                        else
+                            resp = x(:);
+                        end;
                         for ixi=1:p.niters
                             resp = sum(resp.*w(:));
                         end;
