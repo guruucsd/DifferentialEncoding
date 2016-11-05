@@ -46,13 +46,9 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
           if si == 1
             stats.(prop).mean = cell(n_sigmas, 1);
             stats.(prop).std = cell(n_sigmas, 1);
-            stats.(prop).mean_best = cell(n_sigmas, 1);
-            stats.(prop).std_best = cell(n_sigmas, 1);
           end;
           stats.(prop).mean{si}  = zeros(n_models, mSets.nHidden, n_prop_vals);
           stats.(prop).std{si}  = zeros(n_models, mSets.nHidden, n_prop_vals);
-          stats.(prop).mean_best{si} = zeros(n_models, n_prop_vals);
-          stats.(prop).std_best{si} = zeros(n_models, n_prop_vals);
         end;
 
         % average over the other two properties.
@@ -63,8 +59,6 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
 
         stats.(prop).mean{si}(mi,:,:) = mean(resps_by_prop, 3);
         stats.(prop).std{si}(mi,:,:) = std(resps_by_prop, [], 3);
-        [~, stats.(prop).mean_best{si}(mi)] = max(stats.(prop).mean{si}(mi,:));
-        [~, stats.(prop).std_best{si}(mi)] = max(stats.(prop).std{si}(mi,:));
       end;
     end;
   end;
