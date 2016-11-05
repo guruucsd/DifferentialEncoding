@@ -5,29 +5,29 @@ function simulate_amir(expt, disp)
 %   2: vary only sigmas.
 % disp:
 %   array of plot numbers to display
-%   1: 
-%   2: 
-%   11: 
-%   12: 
+%   1:
+%   2:
+%   11:
+%   12:
 
 % Set variables
 if ~exist('expt', 'var'), expt=1; end;
 if ~exist('disp','var'), disp=[1 2 11 12]; end;
-    
+
 %% Choose the experimental parmaeters
 switch expt
-    case {1, '1'}, 
+    case {1, '1'},
         sz = [35 35];
         sigmas = [1 2 4 8 16 32 64 128];%
-        cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
+        cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image
         nconns = ceil(2*linspace(5,25, length(sigmas))); %[1 1 1 1 1  1  1  1]*10;
-        nsamps = 1;
-    case {2, '2'}, 
+        nSamps = 1;
+    case {2, '2'},
         sz = [35 35];
         sigmas = [1 2 4 8 16 32 64 128];%
-        cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image 
+        cpi    = [.025 0.25 0.5 1 1.5 2 2.5 3 3.5 4 5 6 7 8 9 10 11 12 13 14 15]; % keep the same number of cycles per image
         nconns = ceil(2*linspace(5,5, length(sigmas))); %[1 1 1 1 1  1  1  1]*10;
-        nsamps = 2;
+        nSamps = 2;
     otherwise, error('Unknown expt: %d', expt)
 end;
 
@@ -61,7 +61,7 @@ amir.calc.patch_nn_pct = amir.patch_nn./amir.calc.area_diameter*100;  %estimate 
 fact = 3; % how to convert from sigma to nearest_neighbor difference
 amir.diff1 = [1.75 2.05];
 amir.pct_diff = fact*(2*diff(amir.diff1)/mean(amir.diff1));
-fprintf('Simulating %d with %5.2f%% difference.\n', nsamps, 100*amir.pct_diff)
+fprintf('Simulating %d with %5.2f%% difference.\n', nSamps, 100*amir.pct_diff)
 
 
 % Only initialize if they haven't been computed previously.
@@ -83,7 +83,7 @@ if ismember(1, disp)
     set(gca, 'FontSize', 16);
     xlabel('spatial frequency (cycles per image)');
     ylabel('output activity (linear xfer fn)');
-    title('differences (all)'); 
+    title('differences (all)');
 end;
 
 if ismember(11, disp)
@@ -95,7 +95,7 @@ if ismember(11, disp)
     set(gca, 'FontSize', 16);
     xlabel('spatial frequency (cycles per image)');
     ylabel('output activity (linear xfer fn)');
-    title('differences (all)'); 
+    title('differences (all)');
 end;
 
 %% Run the experiment
@@ -105,12 +105,12 @@ lbls=cell(length(sigmas),3);
 for szi=1:length(sigmas)
     sigma_variations = sigmas(szi)*[1-amir.pct_diff/2 1 1+amir.pct_diff/2]; %
     fprintf('Simulating on sigmas=[%s ]\n', sprintf(' %.2f', sigma_variations));
-    
+
     % Avoid re-running if this was loaded from local cache
     if isempty(am{szi})
         % average_mean, std_mean, std_std, weights_mean, settings_object
         [am{szi},sm{szi},ss{szi},wm{szi},p{szi}] = vary_sigma('sz', sz,        'Sigmas', sigma_variations, 'distn', 'norme', ...
-                                                              'nin', nconns(szi), 'nsamps', nsamps, ...
+                                                              'nin', nconns(szi), 'nSamps', nSamps, ...
                                                               'cpi', cpi,      'disp', []);%11 12]);
     end;
     midpt = (length(sigma_variations)+1)/2;
@@ -125,14 +125,14 @@ for szi=1:length(sigmas)
                              100*mean(p{szi}(si).neighbor_dist/p{szi}(1).sz(1)), mean(p{szi}(si).neighbor_dist));
     end;
     dff = (mean(p{szi}(1).neighbor_dist)-mean(p{szi}(end).neighbor_dist))/((mean(p{szi}(1).neighbor_dist)+mean(p{szi}(end).neighbor_dist))/2);
-    
+
     fprintf('\tActual difference: %5.2f%% difference.\n', 100*abs(dff));
 
 
     % non-normalized: scale to peak frequency (irrespective)
     if ismember(11, disp)
         sc = max(sm{szi}(:)); % overall scaling constant
-        
+
         figure('Position', [360     6   768   672])
         hold on;
         h = [];
@@ -154,7 +154,7 @@ for szi=1:length(sigmas)
         legend(h, lbls(szi,:), 'Location', 'NorthEast', 'FontSize',16);
         title('Semi-normalized std (divided by global max)');
     end;
-    
+
 
     % Normalized
     if ismember(12, disp)
@@ -175,9 +175,9 @@ for szi=1:length(sigmas)
         xlabel('frequency (cycles per image)');
         ylabel('output activity (normalized)');
         legend(h, lbls(szi,:), 'Location', 'NorthEast', 'FontSize',14);
-        title('Normalized std (each sigma''s response divided by its max)');    
+        title('Normalized std (each sigma''s response divided by its max)');
     end;
-    
+
 
     % differences
     if ismember(1, disp)
@@ -187,7 +187,7 @@ for szi=1:length(sigmas)
         legend(lbls(1:szi,midpt), 'Location', 'NorthEast', 'FontSize',16);
         title('semi-normalized (global max)')
     end;
-    
+
     % differences
     if ismember(2, disp)
         mx = max(sm{szi}(sdi,:),[],2); % max for THIS sigma

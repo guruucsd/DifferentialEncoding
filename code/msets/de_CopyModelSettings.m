@@ -1,6 +1,6 @@
-function new_model = de_CopyModelSettings(model, mi)
+function newModel = de_CopyModelSettings(model, mi)
 
-    new_model = guru_rmfield(model, 'p');  % creates a copy, due to MATLAB's lazy-pass-by-value procedure
+    newModel = guru_rmfield(model, 'p');  % creates a copy, due to MATLAB's lazy-pass-by-value procedure
 
     flds = { 'mu', 'sigma', 'nHidden', 'hpl', 'nConns', 'distn', ...
                'ac.EtaInit', 'ac.Acc', 'ac.Dec', 'ac.lambda', ...
@@ -23,6 +23,6 @@ function new_model = de_CopyModelSettings(model, mi)
             cur_val = field_vals(mi);
         end;
 
-        new_model = guru_setfield(new_model, flds{fi}, cur_val);
+        newModel = guru_setfield(newModel, flds{fi}, cur_val);
     end;
 
