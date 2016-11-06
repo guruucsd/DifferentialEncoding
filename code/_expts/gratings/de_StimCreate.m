@@ -46,19 +46,20 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
   [test.X, test.XLAB] = stim2D(stimSet, test.nInput, test.freqs, test.phases, test.thetas);
   [test] = applyOptions(opt, test);
 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
   function [dset] = applyOptions(opts, dset)
     if guru_hasopt(opts,'square')
-      dset.X(dset.X<=0) = -1;
-      dset.X(dset.X>0)  = 1;
-      guru_assert(dset.X==-1 | dset.X==1, 'make sure all values are -1 or 1');
+      % Square waves
+      dset.X(dset.X <= 0) = -1;
+      dset.X(dset.X > 0)  = 1;
+      guru_assert(dset.X == -1 | dset.X == 1, 'make sure all values are -1 or 1');
       dset.type='square';
     else
       dset.type='sin';
     end;
 
 
-
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   function [X,XLAB]= stim2D(stimSet, nInput, freqs, phases, thetas)
 
     % Filter the gratings based on teh stimulus set
@@ -69,18 +70,17 @@ function [train, test] = de_StimCreate(stimSet, taskType, opt)
         otherwise, error('unknown stimSet');
     end;
 
-    X    = zeros(prod(nInput), length(freqs)*length(phases)*length(thetas));
-    XLAB = cell(size(X,2),1);
+    X    = zeros(prod(nInput), length(freqs), length(phases), length(thetas));
+    XLAB = cell(length(freqs), length(phases), length(thetas));
 
-    ii = 1;
     for fi=1:length(freqs)
         for ti=1:length(thetas)
             for phsi=1:length(phases)
-                X(:,ii)  = reshape( mfe_grating2d(freqs(fi), phases(phsi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
-                XLAB{ii} = sprintf('f=%f\nt=%f\np=%f', freqs(fi), thetas(ti), phases(phsi));
-                ii = ii+1;
+                X(:, fi, ti, phsi) = reshape( mfe_grating2d(freqs(fi), phases(phsi), thetas(ti), 1, nInput(1), nInput(2)), [prod(nInput) 1]);
+                XLAB{fi, ti, phsi} = sprintf('f=%f\nt=%f\np=%f', freqs(fi), thetas(ti), phases(phsi));
             end;
         end;
     end;
 
-
+    XLAB = XLAB(:);
+    X = reshape(X, [prod(nInput), length(XLAB)]);
