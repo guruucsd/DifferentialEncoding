@@ -90,7 +90,9 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     sp = repmat(sigmas, [numSigmas 1]);
 
     % Do the actual plotting
-    figure('Position', [ 0 0 1024 768]);
+    figs(end+1) = de_NewFig('sigma vs. crossover');
+
+    set(figs(end).handle,'Position', [ 0 0 1024 768]);
     plot(sp', cc', 'o-', 'MarkerSize', 5, 'LineWidth', 5) %change to scatter if desired
     title(sprintf('Crossover for %d x %d image, %d connections, cpi(0)=%.2f.', ...
                 mSets.nInput, mSets.nConns(1), stats.freq.cpi(1)), ...
@@ -116,7 +118,8 @@ function figs = de_PlotFreqPreferences(mSets, stats)
 
     colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
 
-    figure('position', [0, 0, 768, 768]);
+    figs(end+1) = de_NewFig('output std vs. frequency per sigma');
+	set(figs(end).handle,'position', [0, 0, 768, 768]);
     hold on;
     %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
     %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_ste'/scaling);
