@@ -64,3 +64,75 @@ function figs = de_PlotFreqPreferences(mSets, stats)
         set(figs(end).handle, 'Position', [0, 0, 1200, 800]);
       end;  % val
     end;  % prop
+    
+    % Now for the Recfields code. Stick to naming convention in recfields,
+    % which requires taking information from structs.
+    
+    crossover_cpi = stats.freq.xover;
+    sigma_pairs = stats.freq.spairs;
+    sigmas = mSets.sigma;
+    numSigmas = length(sigmas);
+    std_mean = stats.freq.std_mean;
+    std_std = stats.freq.std_std;
+    freqs = stats.freq.cpi;
+    cpi = freqs;
+    
+    %% Plot data
+
+    % Generate legend labels
+    C{numSigmas, 1} = {};
+    for si=1:numSigmas
+      C{si} = sprintf('\\sigma = %d', sigmas(si));
+    end
+
+    % Massage data for plotting
+    cc = crossover_cpi';
+    sp = repmat(sigmas, [numSigmas 1]);
+
+    % Do the actual plotting
+    figure('Position', [ 0 0 1024 768]);
+    plot(sp', cc', 'o-', 'MarkerSize', 5, 'LineWidth', 5) %change to scatter if desired
+    title(sprintf('Crossover for %d x %d image, %d connections, cpi(0)=%.2f.', ...
+                mSets.nInput, mSets.nConns(1), stats.freq.cpi(1)), ...
+          'FontSize', 20);
+    legend(C, 'Location', 'SouthWest', 'FontSize', 14);
+    xlabel('Sigma 2', 'FontSize', 16);
+    ylabel('Crossover frequency (CPI)', 'FontSize', 16);
+
+    scaling = max(abs(std_mean(:))); % Rescale over all sigmas, such that the scale of response isn't a factor
+    max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
+    %max_std = avg_mean;
+    ns_mean = std_mean./max_std;
+    ns_std  = std_std./sqrt(max_std);
+
+    lbls = cell(size(sigmas));
+    for si=1:length(sigmas)
+        lbls{si} = sprintf('sigma = %.2f', sigmas(si));
+    end;
+
+    % Plots the mean (across all units) of the standard deviation of each
+    % units' response to different frequency gratings (frequency, phase,
+    % orientation)
+
+    colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
+
+    figure('position', [0, 0, 768, 768]);
+    hold on;
+    %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
+    %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+    for si=1:length(sigmas)
+      plot(cpi, std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
+    end;
+    for si=1:length(sigmas)
+      errorbar(cpi, std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+    end;
+    set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
+    set(gca, 'FontSize', 16);
+    xlabel('frequency (cycles per image)');
+    ylabel('output activity (linear xfer fn)');
+    legend(lbls, 'Location', 'best', 'FontSize',16);
+    title('Non-normalized std (divided by global mean)');
+
+end
+
+    
