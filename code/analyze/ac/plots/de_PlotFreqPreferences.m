@@ -73,7 +73,7 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     sigmas = mSets.sigma;
     numSigmas = length(sigmas);
     std_mean = stats.freq.std_mean;
-    std_std = stats.freq.std_std;
+    std_ste = stats.freq.std_ste;
     freqs = stats.freq.cpi;
     cpi = freqs;
     
@@ -103,7 +103,7 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
     %max_std = avg_mean;
     ns_mean = std_mean./max_std;
-    ns_std  = std_std./sqrt(max_std);
+    ns_std  = std_ste./sqrt(max_std);
 
     lbls = cell(size(sigmas));
     for si=1:length(sigmas)
@@ -119,12 +119,12 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     figure('position', [0, 0, 768, 768]);
     hold on;
     %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
-    %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+    %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_ste'/scaling);
     for si=1:length(sigmas)
       plot(cpi, std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
     end;
     for si=1:length(sigmas)
-      errorbar(cpi, std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+      errorbar(cpi, std_mean(si,:)/scaling, std_ste(si,:)/scaling, 'Color', colors(si));
     end;
     set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
     set(gca, 'FontSize', 16);

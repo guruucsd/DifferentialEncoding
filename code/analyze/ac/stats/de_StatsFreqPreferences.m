@@ -52,7 +52,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
             stats.(prop).std = cell(n_sigmas, 1);
             if strcmp(prop, 'freq') % This code is used for sigma vs xover computations
                 stats.(prop).std_mean = zeros(n_sigmas, n_freqs);
-                stats.(prop).std_std = zeros(n_sigmas, n_freqs);
+                stats.(prop).std_ste = zeros(n_sigmas, n_freqs);
                 stats.(prop).xover = nan(n_sigmas, n_sigmas); %crossover freqs
                 stats.(prop).spairs = nan(n_sigmas, n_sigmas, 2); %sigma pairs
             end
@@ -95,7 +95,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
     ss  = std(raw_std,[],1)/sqrt(size(raw_std,1)); %stick to naming convention
 
     stats.('freq').std_mean(si, :) = sm;
-    stats.('freq').std_std(si, :) = ss;
+    stats.('freq').std_ste(si, :) = ss; %std_err of std_dev
     
   end
     
