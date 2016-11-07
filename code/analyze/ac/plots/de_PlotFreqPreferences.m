@@ -119,7 +119,7 @@ function figs = de_PlotFreqPreferences(mSets, stats)
     colors = @(si) (reshape(repmat(numel(sigmas)-si(:), [1 3])/numel(sigmas) * 1 .* repmat([1 0 0],[numel(si) 1]),[numel(si) 3]));
 
     figs(end+1) = de_NewFig('output std vs. frequency per sigma');
-	set(figs(end).handle,'position', [0, 0, 768, 768]);
+    set(figs(end).handle,'position', [0, 0, 768, 768]);
     hold on;
     %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
     %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_ste'/scaling);
