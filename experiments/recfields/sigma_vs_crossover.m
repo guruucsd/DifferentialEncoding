@@ -1,4 +1,4 @@
-function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargin)
+function [avg_mean, std_mean, std_ste, wts_mean, p] = sigma_vs_crossover(varargin)
 
   if ~exist('guru_popopt','file'), addpath(genpath('../../code')); end;
 
@@ -22,7 +22,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
     'sz', new_sz, ...  % size of image (square)
     'nConns', nConns, ... % number of connections
     'distn', 'normem2', ...
-    'nSamps', 5, ...  %
+    'nSamps', 6, ...  %
     'nBatches', 5 ...  %
     'img2pol', false, ...  % whether to stretch cartesian image via retinotopy
     'disp', [11], ...  % plots to show
@@ -45,7 +45,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 
       avg_mean = zeros(length(sigmas), length(freqs));
       std_mean = zeros(length(sigmas), length(freqs));
-      std_std  = zeros(length(sigmas), length(freqs));
+      std_ste  = zeros(length(sigmas), length(freqs));
       f        = zeros(length(sigmas),1);
       wts_mean = zeros(length(sigmas), size(wm,1), size(wm,2));
 
@@ -54,7 +54,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 
     avg_mean(si, :) = am;
     std_mean(si,:) = sm;
-    std_std(si, :) = ss;
+    std_ste(si, :) = ss;
     wts_mean(si,:,:) = wm;
     p(end+1)=pt;
   end;
@@ -126,7 +126,7 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
       max_std = repmat(max(abs(std_mean),[],2), [1 length(freqs)]); % can normalize each sigma's response so that it's peak is 1
       %max_std = avg_mean;
       ns_mean = std_mean./max_std;
-      ns_std  = std_std./sqrt(max_std);
+      ns_std  = std_ste./sqrt(max_std);
 
       lbls = cell(size(p));
       for pi=1:length(p)
@@ -142,12 +142,12 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
       figure('position', [0, 0, 768, 768]);
       hold on;
       %plot(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean/scaling)', 'LineWidth', 2);
-      %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_std'/scaling);
+      %errorbar(repmat(cpi,[size(avg_mean,1) 1])', (sign(avg_mean).*std_mean)'/scaling, std_ste'/scaling);
       for si=1:length(sigmas)
         plot(cpi, std_mean(si,:)/scaling, '*-', 'Color', colors(si), 'LineWidth', 3, 'MarkerSize', 5);
       end;
       for si=1:length(sigmas)
-        errorbar(cpi, std_mean(si,:)/scaling, std_std(si,:)/scaling, 'Color', colors(si));
+        errorbar(cpi, std_mean(si,:)/scaling, std_ste(si,:)/scaling, 'Color', colors(si));
       end;
       set(gca,'xlim', [min(cpi)-0.01 max(cpi)+0.01], 'ylim', [0 1.05]);
       set(gca, 'FontSize', 16);
@@ -158,13 +158,13 @@ function [avg_mean, std_mean, std_std, wts_mean, p] = sigma_vs_crossover(varargi
 
   end;
 
-function [avg_mean, std_mean, std_std, wts_mean, p] = nn_2layer_processor(varargin)
+function [avg_mean, std_mean, std_ste, wts_mean, p] = nn_2layer_processor(varargin)
 
   [raw_avg, raw_std, ~, raw_wts, p] = nn_2layer(varargin{:});
 
   avg_mean = mean(raw_avg,1);  % mean of means
   std_mean = mean(raw_std,1);  % mean of standard deviations
-  std_std  = std(raw_std,[],1)/sqrt(size(raw_std,1));
+  std_ste  = std(raw_std,[],1)/sqrt(size(raw_std,1));
   wts_mean = squeeze(mean(raw_wts,1));
 
 
