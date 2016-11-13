@@ -7,7 +7,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
   opt = {mSets.data.train.opt, varargin{:}};
   n_phases = guru_getopt(opt, 'nphases', 8);
   n_orients = guru_getopt(opt, 'nthetas', 8);
-  n_freqs = guru_getopt(opt, 'nfreqs', 8);
+  n_freqs = guru_getopt(opt, 'nfreqs', 24);
 
   % Create a dataset to test network on.
   [~, dset] = de_MakeDataset('gratings', 'all', '', {mSets.data.train.opt{:}, ...
@@ -103,7 +103,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
   % sigma_vs_crossover, define a few variables.
   std_mean = stats.('freq').std_mean; % aids in readability, stay consistent w/ sigma_vs_crossover
   numSigmas = n_sigmas;
-  cpi = dset.freqs;
+  cpi = dset.freqs * max(dset.nInput);
   stats.freq.cpi = cpi; %will need this later
   
   for ii=1:numSigmas
