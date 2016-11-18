@@ -60,7 +60,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         case {'gam','gamma','game','gammae'}
           k = rds^2/sig;
           theta = sig/rds;
-        case {'norm','norme','norme2','normem2','normn', 'normeh', 'normepK', 'normemK'}
+        case {'norm','norme','norme2','normem2','normem3', 'normn', 'normeh', 'normepK', 'normemK'}
           if (rds ~= 0.0) && ~isnan(rds), warning('Ignoring non-zero rds=%4.1f', rds); end;
         case {'normr', 'normre'}
         case {'full','fulle'}, opts={'nofill'};
