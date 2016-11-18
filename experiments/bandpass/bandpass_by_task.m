@@ -31,13 +31,12 @@ while high <= max(imgsiz)/2
     low = low + bandpass_step;
     high = high + bandpass_step;
     close all;
-        
+
 end
 
 figure;
 errorbar(center_freq, results, errors);
 xlabel('Center Frequency (cycles/ img)');
 ylabel('Sum Squared Error');
-title(sprintf('SSE vs Frequency: Bandpass Step %d, Bandpass Width %d', ... 
+title(sprintf('SSE vs Frequency: Bandpass Step %d, Bandpass Width %d', ...
     bandpass_step, bandpass_width));
-        
