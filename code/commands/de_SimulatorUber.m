@@ -2,6 +2,15 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
 %
 % Run sergent task by training on all images
 
+  % parse opts
+  if isstruct(opts)
+    uber_opts = opts.uber;
+    task_opts = opts.task;
+  else
+    uber_opts = opts;
+    task_opts = opts;
+  end;
+
   %%%%%%%%%%%%%%%%
   % Train autoencoders on some set of images
   %%%%%%%%%%%%%%%%%
@@ -22,7 +31,7 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
   tough_ac_arg_idx = sort([ 2 * tough_ac_argname_idx - 1, 2 * tough_ac_argname_idx]);
   uber_args = uber_args(tough_ac_arg_idx);
 
-  [trn.mSets, trn.models, trn.stats] = de_Simulator(training_expt, training_imageset, '', opts, uber_args{:});
+  [trn.mSets, trn.models, trn.stats] = de_Simulator(training_expt, training_imageset, '', uber_opts, uber_args{:});
 
   % Get the autoencoder directories
   ac = [trn.models(1,:).ac];
@@ -43,8 +52,8 @@ function [trn, tst, dirs] = de_SimulatorUber(training_info, testing_info, opts, 
       testing_task = '';
   else
       testing_task      = testing_info_split{3};
+
+    p_args = { args{:}, 'uberpath', dirs };
+
+    [tst.mSets, tst.models, tst.stats] = de_Simulator(testing_expt, testing_imageset, testing_task, task_opts, p_args{:});
   end;
-
-  p_args = { args{:}, 'uberpath', dirs };
-
-  [tst.mSets, tst.models, tst.stats] = de_Simulator(testing_expt, testing_imageset, testing_task, opts, p_args{:});
