@@ -1,14 +1,30 @@
-function bandpass_by_task(n_steps, window_steps, args_path, task_info, extra_opts, extra_args)
-  if ~exist('extra_opts', 'var'), extra_opts = {}; end;
-  if ~exist('extra_args', 'var'), extra_args = {}; end;
+function bandpass_by_task(args_path, task_info, varargin)
+%
+%
+%    if (strcmp(tst.mSets.expt, 'slotnick_etal_2001'))
+%      trial_types = {'easy', 'hard'};
+%    elseif (strcmp(tst.mSets.expt, 'sergent_1982'))
+%        trial_types = {'L-S+', 'L+S-'};
+%    end
+%
+
+  fn_args = guru_stampProps([{ ...
+    'n_steps', 10, 'window_steps', 2, ...
+    'trial_types', {}, ...
+    'opts', {}, 'args', {}, ...
+    }, varargin ...
+  ]);
+  n_steps = fn_args.n_steps;
+  window_steps = fn_args.window_steps;
+  trial_types = fn_args.trial_types;
 
   % Get args & opts from function
   [dir_name, file_name] = fileparts(args_path);
   addpath(dir_name);
   args_fn = str2func(file_name);
   [args, opts] = args_fn();
-  args = [args, extra_args];
-  opts = [opts, extra_opts];
+  args = [args, fn_args.args];
+  opts = [opts, fn_args.opts];
 
   % Pre-train the autoencoder on full-fidelity. This will get us the image size.
   [trn] = de_SimulatorUber('vanhateren/250', '', opts, args);
