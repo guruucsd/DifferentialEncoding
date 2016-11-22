@@ -6,6 +6,12 @@ function mSets = guru_stampProps(varargin)
     mSets = struct();
     error('No input arguments')
 
+  % Passed in a cell array
+  elseif length(varargin) == 1 && iscell(varargin)
+      varargin = varargin{1};
+      mSets = guru_stampProps(varargin{:});
+      return;
+      
   % Odd # of inputs; grab original object, and expect strings at every second input
   elseif isstruct(varargin{1})
     if 0==mod(length(varargin),2), error('You have an odd number of args [first arg is the object]'); end;
