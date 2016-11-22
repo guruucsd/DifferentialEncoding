@@ -6,6 +6,7 @@ function [args,opts] = uber_sergent_args(varargin)
   addpath(fullfile(script_dir, '..'));
 
   [args,opts] = uber_args( ...% 'out.pub', true, ... %Network structure
+    'p.errorType', 2, ...  % SSE for sigmoid
     'p.zscore', 0.0250, ...
     'p.XferFn', [6 3], ...  %sigmoid->sigmoid
     'p.TrainMode', 'resilient', 'p.Pow', 1, ...
