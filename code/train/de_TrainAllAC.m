@@ -35,8 +35,11 @@ function [models] = de_TrainAllAC(mSets)
     models = cell(mSets.runs, nhemis);
 
     try
-        parfor zz=1:mSets.runs
-            randState = mSets.ac.randState + (zz-1);
+        parfor zi=1:(mSets.runs * nhemis)
+            ri = 1 + mod(zi - 1, mSets.runs);
+            hi = 1 + mod(zi - 1, nhemis);
+
+            randState = mSets.ac.randState + (ri-1);
 
 
             % Can specify multiple mu & sigma,
@@ -48,27 +51,23 @@ function [models] = de_TrainAllAC(mSets)
             end;
 
 
+            newModel           = de_CopyModelSettings(model, hi);
+            newModel.hemi      = hi;
 
-            for ii=1:nhemis
+            % Generate randState for ac
+            newModel.ac.randState = randState;
+            if isfield(model.ac, 'ct'), newModel.ac.ct.ac.randState = randState; end;
+            rand ('state',newModel.ac.randState);
 
-                newModel           = de_CopyModelSettings(model, ii);
-                newModel.hemi      = ii;
+            fprintf('[%3d]',ri);
+            newModel = de_Trainer(newModel);
+            if (~newModel.ac.cached), fprintf('\n'); end;
 
-                % Generate randState for ac
-                newModel.ac.randState = randState;
-                if isfield(model.ac, 'ct'), newModel.ac.ct.ac.randState = randState; end;
-                rand ('state',newModel.ac.randState);
-
-                fprintf('[%3d]',zz);
-                newModel = de_Trainer(newModel);
-                if (~newModel.ac.cached), fprintf('\n'); end;
-
-                % Save
-                models{zz,ii} = newModel;
-            end;  %zz
+            % Save
+            models{zi} = newModel;
         end;
-    catch
-        rethrow(lasterror())
+    catch err
+        rethrow(err)
     end;
 
     fprintf('\n');
