@@ -52,23 +52,21 @@ function [model] = de_DE(model)
     fprintf('\nwts {in=>hid: [%5.2f %5.2f]}; {hid=>out: [%5.2f %5.2f]}', ih_mn,ih_mx,ho_mn,ho_mx);
   end;
 
-  % Even if it's cached, we need the output characteristics
-  %   of the model.
-  if (~isfield(model.ac,'hu'))
-      % Make sure the autoencoder's connectivity is set.
-      model = de_LoadProps(model, 'ac', 'Weights');
-      model.ac.Conn = (model.ac.Weights~=0);
-
-      [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
-      [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
-  end;
-
-
   %--------------------------------%
   % Create and train the perceptron
   %--------------------------------%
   if (isfield(model, 'p'))
       if (~model.p.cached)
+
+      % We need the output characteristics of the model.
+      if (~isfield(model.ac,'hu'))
+          % Make sure the autoencoder's connectivity is set.
+          model = de_LoadProps(model, 'ac', 'Weights');
+          model.ac.Conn = (model.ac.Weights~=0);
+          [model.ac.output.train,~,model.ac.hu.train] = guru_nnExec(model.ac, model.data.train.X, model.data.train.X(1:end-1,:));
+          [model.ac.output.test, ~,model.ac.hu.test]  = guru_nnExec(model.ac, model.data.test.X,  model.data.test.X(1:end-1,:));
+      end;
+
         good_train = ~isnan(sum(model.data.train.T,1));
         nTrials    = sum(good_train); % count the # of trials with no NaN anywhere in them
 
