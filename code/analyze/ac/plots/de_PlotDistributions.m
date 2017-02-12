@@ -110,7 +110,7 @@ function fig = de_PlotMeanDistributions2D(mSets, data, figname)
   max2 = max(data2(:));
 
   % Defaults
-  clim = max(max1,max2)*[-1 1];
+  clim = max(1E-5, max(max1,max2)) * [-1 1];
 
   % When the distribution is norme2,
   %   there is a single location with an extreme value;
@@ -127,7 +127,7 @@ function fig = de_PlotMeanDistributions2D(mSets, data, figname)
 
     max1 = max(data1(:));
     max2 = max(data2(:));
-    clim = max(max1, max2) * [-1 1];
+    clim = max(1E-5, max(max1, max2)) * [-1 1];
 
     data1(maxidx1) = max1;
     data2(maxidx2) = max2;
@@ -135,7 +135,7 @@ function fig = de_PlotMeanDistributions2D(mSets, data, figname)
 
   % compute difference
   dff = data1 - data2;
-  clim_dff = max(abs(dff(:))) * [-1 1];
+  clim_dff = max(1E-5, max(abs(dff(:)))) * [-1 1];
 
   % zoom in on center of image
   xidx = round(size(data1,1)/4 + [1:mSets.nInput(1)]);
