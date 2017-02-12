@@ -8,6 +8,7 @@ function [stats] = de_StatsDistributions(mss)
   stats.cxns_out    = cell(length(mss),1);
 
   for si=1:length(mss)
+    fprintf('\t%d: ', si);
     if isempty(mss{si}),
       continue;
     end;
@@ -28,6 +29,8 @@ function [stats] = de_StatsDistributions(mss)
     stats.cxns_out{si}    = zeros(mSets.nInput*2);
 
     for mi=1:length(mss{si})
+      fprintf('%d ', mi);
+
       m = de_LoadProps(mss{si}(mi), 'ac', 'Weights');
       w_in2hid  = m.ac.Weights( (nPix+2):(nPix+1+m.nHidden), 1:nPix);
       w_hid2out = m.ac.Weights( (end-nPix+1):end, (nPix+2):(nPix+1+m.nHidden))';
@@ -43,5 +46,6 @@ function [stats] = de_StatsDistributions(mss)
           end;
       end;
     end;
+    fprintf('done.\n');
     %fprintf('Total connection weight (%d %d %d): %f\n', mSets.nHidden, mSets.hpl, mSets.nConns, sum(abs(stats.cxns_out{si}(:))));
   end;
