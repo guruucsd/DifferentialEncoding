@@ -41,9 +41,8 @@ function [models] = de_TrainAllP(mSets, modelsAC)
 
   try
       parfor mi=1:(n_runs * n_args)
-        ri = 1 + mod(mi - 1, n_runs);
         ai = 1 + mod(mi - 1, n_args);
-        
+        ri = 1 + ceil(zi / n_args);
         randState = mSets.p.randState;
 
         model = modelsAC(mi);
@@ -53,7 +52,7 @@ function [models] = de_TrainAllP(mSets, modelsAC)
         model.p.Acc = mSets.p.Acc(min(numel(mSets.p.Acc), ai));
         model.p.EtaInit = mSets.p.EtaInit(min(numel(mSets.p.EtaInit), ai));
         model.p.Dec = mSets.p.Dec(min(numel(mSets.p.Dec), ai));
-        
+
         % Generate randState for ac
         model.p.randState = randState;
         rand ('state', model.p.randState);

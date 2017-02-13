@@ -35,10 +35,9 @@ function [models] = de_TrainAllAC(mSets)
     models = cell(mSets.runs, nhemis);
 
     try
-        parfor zi=1:(mSets.runs * nhemis)
-            ri = 1 + mod(zi - 1, mSets.runs);
+        for zi=1:(mSets.runs * nhemis)
             hi = 1 + mod(zi - 1, nhemis);
-
+            ri = 1 + ceil(zi / nhemis);
             randState = mSets.ac.randState + (ri-1);
 
 
@@ -59,10 +58,10 @@ function [models] = de_TrainAllAC(mSets)
             if isfield(model.ac, 'ct'), newModel.ac.ct.ac.randState = randState; end;
             rand ('state',newModel.ac.randState);
 
-            fprintf('[%3d]',ri);
+            fprintf('[%3d]', ri);
             newModel = de_Trainer(newModel);
             if (~newModel.ac.cached), fprintf('\n'); end;
-
+            
             % Save
             models{zi} = newModel;
         end;
