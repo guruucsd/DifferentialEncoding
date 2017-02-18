@@ -60,7 +60,7 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
         case {'gam','gamma','game','gammae'}
           k = rds^2/sig;
           theta = sig/rds;
-        case {'norm','norme','norme2','normem2','normn', 'normeh', 'normepK', 'normemK'}
+        case {'norm','norme','norme2','normem2','normem3', 'normn', 'normeh', 'normepK', 'normemK'}
           if (rds ~= 0.0) && ~isnan(rds), warning('Ignoring non-zero rds=%4.1f', rds); end;
         case {'normr', 'normre'}
         case {'full','fulle'}, opts={'nofill'};
@@ -129,12 +129,17 @@ function [Con,mu] = de_connector2D(sI,sH,hpl,numCon,distn,rds,sig,dbg,tol,weight
                         cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
                         pdn   = mvnpdf(X, mn, cv);
 
-                    case {'norme', 'norme2', 'normem2'}
+                    case {'norme', 'norme2', 'normem2', 'normem3'}
                         theta = 2*pi*rand; %really just need pi (half circle is enough; distn's are symmetric), but ...
                         rm    = [cos(theta) -sin(theta); sin(theta) cos(theta)];
 
                         mn    = mupos(mi,:);
-                        cv    = rm*[1.5*sig 0;0 sig/1.5]*rm';
+                        if strcmp(distn_name, 'normem3')
+                          elong = min(2, max(0.5, 1.5 + 0.25*randn()));
+                        else
+                          elong = 1.5;
+                        end;
+                        cv    = rm*[elong*sig 0;0 sig/elong]*rm';
                         pdn   = mvnpdf(X, mn, cv);
                         if strcmp(distn_name, 'norme2')
                           [~,mp] = max(pdn);

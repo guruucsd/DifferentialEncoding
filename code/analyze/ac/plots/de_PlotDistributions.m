@@ -14,10 +14,10 @@ function figs = de_PlotDistributions(mSets, stats)
   connection_bins = linspace(0,0.10,25);
 
   % Plot radial distribution of weights/connections (as a surface; x-axis=distance, y-axis=weight value bins, z-axis=p(x&y))
-  %figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
-  %figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_out, connection_bins, 'cxns_out_distn', 'cxn');
-  %figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_in, weight_bins, 'weights_in_distn', 'weight');
-  %figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_in, connection_bins, 'cxns_in_distn', 'cxn');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.cxns_out, connection_bins, 'cxns_out_distn', 'cxn');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_in, weight_bins, 'weights_in_distn', 'weight');
+  figs(end+1) = de_PlotDistributions1D(mSets, stats.weights_out, weight_bins, 'weights_out_distn', 'weight');
 
   % Plot distribution of weights
   n_dist_bins = 25;
@@ -117,7 +117,7 @@ function fig = de_PlotMeanDistributions2D(mSets, data, figname)
   %   make sure when we get the clim, we take care
   %   to exclude those extreme values
   if nnz(data{1}>=max1/2)==1 ...
-    && nnz(data{2}>=max2/2)==1
+    && nnz(data{end}>=max2/2)==1
 
     maxidx1 = find(data1>=max1);
     maxidx2 = find(data2>=max2);
