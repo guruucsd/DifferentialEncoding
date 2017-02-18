@@ -32,13 +32,12 @@ function [models] = de_TrainAllAC(mSets)
     %   (to collect enough samples)
     %----------------
     nhemis = max( length(mSets.mu), length(mSets.sigma) );
-    models = cell(mSets.runs, nhemis);
+    models = cell(nhemis, mSets.runs);
 
     try
         parfor zi=1:(mSets.runs * nhemis)
-            ri = 1 + mod(zi - 1, mSets.runs);
             hi = 1 + mod(zi - 1, nhemis);
-
+            ri = 1 + ceil(zi / nhemis);
             randState = mSets.ac.randState + (ri-1);
 
 
@@ -50,7 +49,6 @@ function [models] = de_TrainAllAC(mSets)
               error('mu & sigma must match!');
             end;
 
-
             newModel           = de_CopyModelSettings(model, hi);
             newModel.hemi      = hi;
 
@@ -59,10 +57,10 @@ function [models] = de_TrainAllAC(mSets)
             if isfield(model.ac, 'ct'), newModel.ac.ct.ac.randState = randState; end;
             rand ('state',newModel.ac.randState);
 
-            fprintf('[%3d]',ri);
+            fprintf('[%3d]', ri);
             newModel = de_Trainer(newModel);
             if (~newModel.ac.cached), fprintf('\n'); end;
-
+            
             % Save
             models{zi} = newModel;
         end;
@@ -72,4 +70,4 @@ function [models] = de_TrainAllAC(mSets)
 
     fprintf('\n');
 
-    models = cell2mat(models);
+    models = cell2mat(models');

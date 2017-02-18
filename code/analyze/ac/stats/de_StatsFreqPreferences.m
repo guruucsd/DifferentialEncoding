@@ -86,7 +86,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
 
     end;
     % Now, do the analysis as done in the `recfields` scripts.
-    
+
     %Take raw stds and average over all units (see nn_2layer_processor)
     raw_std = stats.freq.std{si};
     %First, combine first 2 dimensions (models x hidden units)
@@ -96,21 +96,22 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
 
     stats.('freq').std_mean(si, :) = sm;
     stats.('freq').std_ste(si, :) = ss; %std_err of std_dev
-    
+
   end
-    
+
   % To aid in readability and stay consistent w/ conventions in
   % sigma_vs_crossover, define a few variables.
   std_mean = stats.('freq').std_mean; % aids in readability, stay consistent w/ sigma_vs_crossover
   numSigmas = n_sigmas;
   cpi = dset.freqs * max(dset.nInput);
   stats.freq.cpi = cpi; %will need this later
-  
+  sigmas = cellfun(@(arr) arr(1).sigma, mss);
+
   for ii=1:numSigmas
     for ij=(ii+1):numSigmas
       % which direction should we be searching for cross-overs?
       ratios = std_mean(ii,:) ./ std_mean(ij,:); % Check when ratio goes over 1
-  
+
       % -1 means 1.0+ => 0.9-
       % add 1, as diff has n-1 elements
       xoverPts = 1 + find(diff(ratios > 1) == -1);
@@ -125,7 +126,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
         [~, minIdx] = min(abs(xoverPts - length(ratios) / 2));
         si = xoverPts(minIdx);
       else
-        continue; 
+        continue;
         % No points. Look for a trend.
         % [~, si] = min(ratios(2:end));  % si represents AFTER the crossing.
       end;
@@ -134,11 +135,10 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
       % do linear interpolation to estimate the crossover.
       pctOfUnitMoved = (ratios(si-1) - 1) / -diff(ratios(si-1:si));
       cpiMoved = diff(cpi(si-1:si)) * pctOfUnitMoved;
-      
+
       % save results
       stats.('freq').xover(ii, ij) = cpi(si-1) + cpiMoved;
-      stats.('freq').spairs(ii, ij, :) = ...
-          [unique([mss{ii}.sigma]), unique([mss{ij}.sigma])];
+      stats.('freq').spairs(ii, ij, :) = sigmas([ii, ij]);
     end
   end
 
