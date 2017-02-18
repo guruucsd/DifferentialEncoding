@@ -29,3 +29,7 @@ function figure1 = de_CreateSlotnickFigure1(Y1, E1, taskTitle, stimSet, lruns, r
     xlabel('Hemisphere Injected');  % weird, right??
     ylabel(ax, 'Sum squared error');
     title(ax, sprintf('%s\n%s\n ', taskTitle, stimSet));
+    
+    yrule = ax.YAxis;
+    yrule.FontSize=15
+
