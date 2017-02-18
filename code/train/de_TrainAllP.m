@@ -37,15 +37,16 @@ function [models] = de_TrainAllP(mSets, modelsAC)
   );
   n_args = max(arglens);
 
-  models = cell([n_runs, arglens]);
-
+  models = cell(size(modelsAC))';
+  
+  modelsAC = modelsAC';
   try
-      parfor mi=1:(n_runs * n_args)
-        ai = 1 + mod(mi - 1, n_args);
+      parfor zi=1:(n_runs * n_args)
+        ai = 1 + mod(zi - 1, n_args);
         ri = 1 + ceil(zi / n_args);
         randState = mSets.p.randState;
 
-        model = modelsAC(mi);
+        model = modelsAC(zi);
         model.p = mSets.p; % re-stamp the p settings!
 
         model.p.AvgError = mSets.p.AvgError(min(numel(mSets.p.AvgError), ai));
@@ -57,12 +58,14 @@ function [models] = de_TrainAllP(mSets, modelsAC)
         model.p.randState = randState;
         rand ('state', model.p.randState);
 
-        fprintf('[%3d]',mi);
-        models{mi} = de_Trainer(model);
-        if (~models{mi}.p.cached), fprintf('\n'); end;
+        fprintf('[%3d]', zi);
+        models{zi} = de_Trainer(model);
+        if (~models{zi}.p.cached), fprintf('\n'); end;
       end;
   catch err
     rethrow(err);
   end;
 
-  models = reshape(cell2mat(models), [size(modelsAC) squeeze(size(models(1,:,:,:,:)))]);
+  models = cell2mat(models');  % , [size(modelsAC) squeeze(size(models(1,:,:,:,:)))]);
+  modelsAC = modelsAC';
+  

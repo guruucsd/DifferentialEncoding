@@ -32,10 +32,10 @@ function [models] = de_TrainAllAC(mSets)
     %   (to collect enough samples)
     %----------------
     nhemis = max( length(mSets.mu), length(mSets.sigma) );
-    models = cell(mSets.runs, nhemis);
+    models = cell(nhemis, mSets.runs);
 
     try
-        for zi=1:(mSets.runs * nhemis)
+        parfor zi=1:(mSets.runs * nhemis)
             hi = 1 + mod(zi - 1, nhemis);
             ri = 1 + ceil(zi / nhemis);
             randState = mSets.ac.randState + (ri-1);
@@ -48,7 +48,6 @@ function [models] = de_TrainAllAC(mSets)
                 && length(mSets.mu) ~= length(mSets.sigma))
               error('mu & sigma must match!');
             end;
-
 
             newModel           = de_CopyModelSettings(model, hi);
             newModel.hemi      = hi;
@@ -71,4 +70,4 @@ function [models] = de_TrainAllAC(mSets)
 
     fprintf('\n');
 
-    models = cell2mat(models);
+    models = cell2mat(models');
