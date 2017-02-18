@@ -13,6 +13,9 @@ function [dataFile, train, test, aux, timestamp] = de_MakeDataset(expt, stimSet,
     if ~exist('show_figs', 'var'), show_figs = true; end;
     if ~exist('force', 'var'), force = false; end;
 
+    if strcmp(expt, 'vanhateren')
+        opt = {opt{1}};
+    end
     % Setup path--each experiment implements a set of generic functions
     % (right, basically like a class, but through file & path manipulation--yuck).
     % So, set up the path to access this experiment's functions.
