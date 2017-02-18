@@ -105,7 +105,7 @@ function [stats] = de_StatsFreqPreferences(mss, varargin)
   numSigmas = n_sigmas;
   cpi = dset.freqs * max(dset.nInput);
   stats.freq.cpi = cpi; %will need this later
-  sigmas = unique([mss{1}.sigma]);
+  sigmas = cellfun(@(arr) arr(1).sigma, mss);
 
   for ii=1:numSigmas
     for ij=(ii+1):numSigmas
