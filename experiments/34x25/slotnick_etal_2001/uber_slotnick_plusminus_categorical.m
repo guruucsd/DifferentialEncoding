@@ -15,4 +15,3 @@ addpath(dir);
 %opts = [opts, 'force', true, 'bandpass', bandpass];
 % Run sergent task by training on all images
 [trn, tst] = de_SimulatorUber('vanhateren/250', 'slotnick_etal_2001/plus-minus/categorical', opts, args);
-tst.stats.rej.cc.anova.test.stats

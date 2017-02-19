@@ -11,7 +11,8 @@ end;
 
 % Scripts ordered by figure 2/3/4 order.
 ds = 'test';
-all_scripts = {'uber_slotnick_blobdot_categorical', ...
+all_scripts = {'uber_slotnick_pairedsquares_coordinate', ...
+              'uber_slotnick_blobdot_categorical', ...
               'uber_slotnick_plusminus_categorical', ...
               'uber_slotnick_blobdot_coordinate', ...
               'uber_slotnick_plusminus_coordinate', ...
@@ -54,7 +55,9 @@ for si=1:n_scripts
         if fi == 1
             left_mean = mean(cellfun(@(d) mean(d(:)), left));
             right_mean = mean(cellfun(@(d) mean(d(:)), right));
-            left_temp = [left{1}, left{2}];
+            
+            %left{1} and left{2} correspond to easy and hard            
+            left_temp = [left{1}, left{2}]; 
             right_temp = [right{1}, right{2}];
             
             left_stderr = mean(std(left_temp)) / sqrt(size(left{fi}, 1));
@@ -80,14 +83,13 @@ for si=1:n_scripts
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 runs, runs, ax);
+                                 size(left{1}, 1), size(right{1}, 1), ax);
 
         if si ~= round(n_scripts/2)
             xlabel('');  % remove label
         end;
         if si ~= 1
             ylabel('');
-            %set(gca, 'ytick', []);
         end;
 
         % Set the axes equally.
