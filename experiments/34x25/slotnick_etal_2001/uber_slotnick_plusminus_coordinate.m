@@ -11,8 +11,7 @@ fname = mfilename('fullpath');
 [dir, ~, ~] = fileparts(fname); %find parent directory: should be 68x50 or 34x25
 addpath(dir);
 
-[args, opts]  = uber_slotnick_args('p.dropout', 0.85);
+[args, opts]  = uber_slotnick_args('p.dropout', 0.70);
 %opts = [opts, 'force', true, 'bandpass', [10.5, 12]]
 % Run sergent task by training on all images
 [trn, tst] = de_SimulatorUber('vanhateren/250', 'slotnick_etal_2001/plus-minus/coordinate', opts, args);
-

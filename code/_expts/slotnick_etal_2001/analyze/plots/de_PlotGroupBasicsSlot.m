@@ -28,7 +28,7 @@ function figs = de_PlotGroupBasicsSlot( ms, ss )
             ax(tai) = subplot(1, num_ttypes, tai);
             de_CreateSlotnickFigure1([left_mean right_mean], ...
                                      [left_stderr right_stderr], ...
-                                     taskTitle, stimSet, runs, ax(tai));
+                                     taskTitle, stimSet, runs,runs, ax(tai));
 
             % Store properties to correct axes
             avg(tai) = mean([left_mean, right_mean]);

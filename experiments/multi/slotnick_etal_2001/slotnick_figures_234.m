@@ -11,11 +11,13 @@ end;
 
 % Scripts ordered by figure 2/3/4 order.
 ds = 'test';
-all_scripts = {'uber_slotnick_blobdot_categorical', ...
+all_scripts = {
+              'uber_slotnick_blobdot_categorical', ...
               'uber_slotnick_plusminus_categorical', ...
               'uber_slotnick_blobdot_coordinate', ...
               'uber_slotnick_plusminus_coordinate', ...
-              'uber_slotnick_pairedsquares_coordinate'};
+              'uber_slotnick_pairedsquares_coordinate', ...
+              };
 
 % We will incrementally build each figure.
 figs = de_NewFig('dummy');
@@ -53,8 +55,13 @@ for si=1:n_scripts
         if fi == 1
             left_mean = mean(cellfun(@(d) mean(d(:)), left));
             right_mean = mean(cellfun(@(d) mean(d(:)), right));
-            left_stderr = 0 * left_mean;  % feeling lazy; errorbars are clear
-            right_stderr = 0 * right_mean; % on other subplots.
+            
+            %left{1} and left{2} correspond to easy and hard            
+            left_temp = [left{1}, left{2}]; 
+            right_temp = [right{1}, right{2}];
+            
+            left_stderr = mean(std(left_temp)) / sqrt(size(left{fi}, 1));
+            right_stderr = mean(std(right_temp)) / sqrt(size(right{fi}, 1));
             taskTitle = guru_capitalizeStr(mSets.data.taskType);
 
         else
@@ -64,8 +71,8 @@ for si=1:n_scripts
 
             % Average over trials to get a single score per network,
             % then find stderr over all networks.
-            left_stderr = std(mean(left{ti}, 2)) / sqrt(size(left{ti}, 1));
-            right_stderr = std(mean(right{ti}, 2)) / sqrt(size(right{ti}, 1));
+            left_stderr = mean(std(left{ti})) / sqrt(size(left{ti}, 1));
+            right_stderr = mean(std(right{ti})) / sqrt(size(right{ti}, 1));
 
             taskTitle = sprintf('%s (%s)', ...
                                 guru_capitalizeStr(mSets.data.taskType), ...
@@ -76,22 +83,23 @@ for si=1:n_scripts
         de_CreateSlotnickFigure1([left_mean right_mean], ...
                                  [left_stderr right_stderr], ...
                                  taskTitle, mSets.data.stimSet, ...
-                                 runs, ax);
+                                 size(left{1}, 1), size(right{1}, 1), ax);
 
         if si ~= round(n_scripts/2)
             xlabel('');  % remove label
         end;
         if si ~= 1
             ylabel('');
-            set(gca, 'ytick', []);
         end;
 
         % Set the axes equally.
         yl = get(gca, 'ylim');
         ymax(fi) = max(yl(2), ymax(fi));
-       for sxi=1:si
+        
+       for sxi=si
            ax2 = subplot(1, n_scripts, sxi);
-           set(ax2, 'xlim', [0.5, 2.5], 'ylim', [0 ymax(fi)]);
+           avg = (yl(1) + yl(2))/2;
+           set(ax2, 'xlim', [0.5, 2.5], 'ylim', [avg-.01, avg + .01]);
        end;
     end;
 
